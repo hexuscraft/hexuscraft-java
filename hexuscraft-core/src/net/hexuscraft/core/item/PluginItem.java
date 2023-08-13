@@ -4,6 +4,7 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.item.command.CommandGive;
 import net.hexuscraft.core.permission.IPermission;
+import net.hexuscraft.core.permission.PermissionGroup;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
@@ -18,6 +19,8 @@ public class PluginItem extends MiniPlugin {
 
     public PluginItem(JavaPlugin javaPlugin) {
         super(javaPlugin, "Item");
+
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GIVE);
     }
 
     @Override
