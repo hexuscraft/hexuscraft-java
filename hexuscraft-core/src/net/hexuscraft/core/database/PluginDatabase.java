@@ -32,7 +32,9 @@ public class PluginDatabase extends MiniPlugin {
 
         callbacks = new HashMap<>();
 
+        //noinspection ReassignedVariable
         String host = "127.0.0.1";
+        //noinspection ReassignedVariable
         int port = 6379;
 
         File redisFile = new File("_redis.dat");
@@ -41,7 +43,9 @@ public class PluginDatabase extends MiniPlugin {
             host = redisScanner.nextLine();
             port = redisScanner.nextInt();
         } catch (FileNotFoundException ex) {
-            throw new RuntimeException(ex);
+            // Just realised the host and port fallback to defaults specified above. Stack trace here is A-OK!
+            //noinspection CallToPrintStackTrace
+            ex.printStackTrace();
         }
 
         try {
