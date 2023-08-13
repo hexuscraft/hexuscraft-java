@@ -158,7 +158,7 @@ public class F {
     }
 
     public static String fCurrency(String color, String nameSingular, String namePlural, int amount) {
-        return C.fReset + color + Integer.toString(amount) + " " + (amount == 1 ? nameSingular : namePlural) + RESET_GRAY;
+        return C.fReset + color + amount + " " + (amount == 1 ? nameSingular : namePlural) + RESET_GRAY;
     }
 
     public static String fCurrency(CurrencyType currencyType, int amount) {
