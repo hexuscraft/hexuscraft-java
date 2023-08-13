@@ -41,7 +41,7 @@ public class PluginDatabase extends MiniPlugin {
             host = redisScanner.nextLine();
             port = redisScanner.nextInt();
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
+            throw new RuntimeException(ex);
         }
 
         try {
