@@ -12,6 +12,7 @@
         <relativePath>plugin.xml</relativePath>
     </parent>
 
+    <name>ProxyPlugin</name>
     <artifactId>hexuscraft-plugin-proxy</artifactId>
     <packaging>pom</packaging>
 
