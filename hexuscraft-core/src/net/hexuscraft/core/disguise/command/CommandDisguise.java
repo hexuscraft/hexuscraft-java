@@ -34,8 +34,10 @@ public class CommandDisguise extends BaseCommand {
             }
             player.sendMessage(F.fMain(this) + "You are now disguised as " + F.fEntity(player.getName()) + ".");
         } catch (Exception ex) {
+            // Not very important if disguises fail, just print the error to console and let the player know
+            //noinspection CallToPrintStackTrace
             ex.printStackTrace();
-            player.sendMessage(F.fMain(this) + "There was an error while applying your disguise: " + ex.getMessage());
+            player.sendMessage(F.fMain(this) + F.fError("There was an error while applying your disguise:\n") + F.fMain() + ex.getMessage());
         }
     }
 
