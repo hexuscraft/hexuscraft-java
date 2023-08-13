@@ -4,6 +4,7 @@ import net.hexuscraft.core.chat.C;
 
 public enum CurrencyType {
 
+    @SuppressWarnings("unused")
     COIN("Coin", "Coins", C.cGold);
 
     private final String _nameSingular;
