@@ -6,6 +6,4 @@ public enum PunishType {
     MUTE,
     WARNING
 
-    ;
-
 }

@@ -20,8 +20,8 @@ import java.util.Set;
 
 public class CommandRankRemove extends BaseCommand {
 
-    PluginDatabase pluginDatabase;
-    PluginScoreboard pluginScoreboard;
+    final PluginDatabase pluginDatabase;
+    final PluginScoreboard pluginScoreboard;
 
     CommandRankRemove(PluginPermission pluginPermission, PluginDatabase pluginDatabase, PluginScoreboard pluginScoreboard) {
         super(pluginPermission, "remove", "<Player> <Permission Group>", "Take a group from a player.", Set.of("r"), PluginPermission.PERM.COMMAND_RANK_REMOVE);

@@ -35,9 +35,8 @@ public class CommandGive extends BaseCommand {
     public List<String> tab(CommandSender sender, String alias, String[] args) {
         List<String> names = new ArrayList<>();
         switch (args.length) {
-            case 1 -> _miniPlugin._javaPlugin.getServer().getOnlinePlayers().forEach(player -> {
-                names.add(player.getName());
-            });
+            case 1 ->
+                    _miniPlugin._javaPlugin.getServer().getOnlinePlayers().forEach(player -> names.add(player.getName()));
             case 2 -> {
                 for (Material material : Material.values()) {
                     names.add(material.name());

@@ -5,7 +5,6 @@ import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.libs.jline.console.history.PersistentHistory;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.JSONArray;
@@ -63,7 +62,7 @@ public class PlayerSearch extends MiniPlugin {
         MojangProfile mojangProfile;
         try {
             mojangProfile = fetchMojangProfile(searchName);
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             return null;
         }
 
@@ -83,7 +82,7 @@ public class PlayerSearch extends MiniPlugin {
         URL url;
         try {
             url = new URI("https://api.mojang.com/users/profiles/minecraft/" + name).toURL();
-        } catch(URISyntaxException ex) {
+        } catch (URISyntaxException ex) {
             throw new RuntimeException(ex.getMessage());
         }
 
@@ -116,7 +115,7 @@ public class PlayerSearch extends MiniPlugin {
     public static MojangProfile fetchMojangProfile(String name, Player sender) {
         try {
             return fetchMojangProfile(name);
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             sender.sendMessage(F.fMain("Profile Search") + F.fBoolean("Error while fetching profile of ", false) + F.fEntity(name) + "\n" + F.fMain() + ex.getMessage());
             return null;
         }
@@ -126,8 +125,8 @@ public class PlayerSearch extends MiniPlugin {
     public static MojangSession fetchMojangSession(UUID uuid) throws IOException {
         URL url;
         try {
-            url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replaceAll("-","")).toURL();
-        } catch(URISyntaxException ex) {
+            url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replaceAll("-", "")).toURL();
+        } catch (URISyntaxException ex) {
             throw new RuntimeException(ex.getMessage());
         }
 
@@ -153,7 +152,7 @@ public class PlayerSearch extends MiniPlugin {
         String mojangName = jsonObject.getString("name");
 
         HashMap<String, String> properties = new HashMap<>();
-        
+
         JSONArray propertiesArray = jsonObject.getJSONArray("properties");
         for (Object propertyObject : propertiesArray) {
             JSONObject propertyJSONObject = (JSONObject) propertyObject;

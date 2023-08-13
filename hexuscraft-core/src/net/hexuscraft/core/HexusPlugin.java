@@ -65,6 +65,7 @@ public class HexusPlugin extends JavaPlugin {
         log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
+    @SuppressWarnings("EmptyMethod")
     public void enable() {
     }
 
@@ -80,6 +81,7 @@ public class HexusPlugin extends JavaPlugin {
         log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
+    @SuppressWarnings("EmptyMethod")
     public void disable() {
     }
 

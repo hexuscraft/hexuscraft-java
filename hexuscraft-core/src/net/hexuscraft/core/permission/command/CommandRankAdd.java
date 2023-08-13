@@ -20,9 +20,9 @@ import java.util.Set;
 
 public class CommandRankAdd extends BaseCommand {
 
-    PluginPermission _pluginPermission;
-    PluginDatabase _pluginDatabase;
-    PluginScoreboard _pluginScoreboard;
+    final PluginPermission _pluginPermission;
+    final PluginDatabase _pluginDatabase;
+    final PluginScoreboard _pluginScoreboard;
 
     CommandRankAdd(PluginPermission pluginPermission, PluginDatabase pluginDatabase, PluginScoreboard pluginScoreboard) {
         super(pluginPermission, "add", "<Player> <Permission Group>", "Add a group to a player.", Set.of("a"), PluginPermission.PERM.COMMAND_RANK_ADD);

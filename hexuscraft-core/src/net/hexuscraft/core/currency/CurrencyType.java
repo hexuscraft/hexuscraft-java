@@ -9,7 +9,8 @@ public enum CurrencyType {
     private final String _nameSingular;
     private final String _namePlural;
     private final String _color;
-    
+
+    @SuppressWarnings("SameParameterValue")
     CurrencyType(String nameSingular, String namePlural, String color) {
         _nameSingular = nameSingular;
         _namePlural = namePlural;

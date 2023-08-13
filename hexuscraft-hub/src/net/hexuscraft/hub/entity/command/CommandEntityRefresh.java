@@ -3,15 +3,13 @@ package net.hexuscraft.hub.entity.command;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.hub.entity.PluginEntity;
-import net.hexuscraft.core.permission.PermissionGroup;
 import org.bukkit.command.CommandSender;
 
-import java.util.List;
 import java.util.Set;
 
 public class CommandEntityRefresh extends BaseCommand {
 
-    PluginEntity pluginEntity;
+    final PluginEntity pluginEntity;
 
     CommandEntityRefresh(PluginEntity pluginEntity) {
         super(pluginEntity, "refresh", "", "Refresh all NPCs.", Set.of("ref", "r"), PluginEntity.PERM.COMMAND_ENTITY_REFRESH);

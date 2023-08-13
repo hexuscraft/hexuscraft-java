@@ -179,6 +179,7 @@ public class PluginEntity extends MiniPlugin {
         return new Entity[0];
     }
 
+    @SuppressWarnings("SameReturnValue")
     public int purge() {
         // TODO
         return 0;

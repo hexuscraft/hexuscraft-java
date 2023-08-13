@@ -1,3 +1,4 @@
+#file: noinspection YAMLSchemaValidation
 name: ${project.name}
 main: ${project.groupId}.hub.Hub
 version: 1.0.0

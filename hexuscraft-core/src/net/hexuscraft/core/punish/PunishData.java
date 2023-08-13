@@ -1,8 +1,5 @@
 package net.hexuscraft.core.punish;
 
-import org.bukkit.Bukkit;
-
-import javax.sound.midi.SysexMessage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -19,7 +16,7 @@ public class PunishData {
     public final UUID staffId;
     public final UUID staffServerId;
 
-    // these cannot be guarenteed to exist unless 'active' is false. ye be warned!
+    // these cannot be guaranteed to exist unless 'active' is false. ye be warned!
     public final Long removeOrigin;
     public final String removeReason;
     public final UUID removeServerId;

@@ -26,7 +26,7 @@ public class Proxy {
     final Logger logger;
     final Path dataDirectory;
 
-    String pingDescription = "§5§m--------§r§8§m]§r§d§m--§r  §6§lHexuscraft§r §e§lNetwork§r  §d§m--§r§8§m[§r§5§m--------§r"
+    final String pingDescription = "§5§m--------§r§8§m]§r§d§m--§r  §6§lHexuscraft§r §e§lNetwork§r  §d§m--§r§8§m[§r§5§m--------§r"
             + "\n§8§l>§r §aTower Battles§r  §8§l§mo§r  §cSurvival Games§r  §8§l§mo§r  §bSkywars§r";
 
     @Inject

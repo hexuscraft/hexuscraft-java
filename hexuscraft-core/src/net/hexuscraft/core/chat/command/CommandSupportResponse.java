@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class CommandSupportResponse extends BaseCommand {
 
-    PluginPermission pluginPermission;
+    final PluginPermission pluginPermission;
 
     public CommandSupportResponse(PluginChat pluginChat, PluginPermission pluginPermission) {
         super(pluginChat, "supportresponse", "<Player> <Message>", "Respond to a help request.", Set.of("ma", "sr"), PluginChat.PERM.COMMAND_SUPPORT_RESPONSE);
@@ -46,7 +46,7 @@ public class CommandSupportResponse extends BaseCommand {
                     String sourceStr = F.fPermissionGroup(permissionGroup) + " " + permissionGroup._color + sender.getName();
                     String targetStr = F.fPermissionGroup(targetGroup) + " " + targetGroup._color + player.getName();
 
-                    player.sendMessage( sourceStr + C.fReset + C.cPurple + " -> " + C.fReset + targetStr + C.fReset + " " + C.cPurple + String.join(" ", Arrays.stream(args).toList().subList(1, args.length)));
+                    player.sendMessage(sourceStr + C.fReset + C.cPurple + " -> " + C.fReset + targetStr + C.fReset + " " + C.cPurple + String.join(" ", Arrays.stream(args).toList().subList(1, args.length)));
                     if (player.equals(target)) {
                         player.playSound(player.getLocation(), Sound.NOTE_PLING, Integer.MAX_VALUE, 2);
                     }

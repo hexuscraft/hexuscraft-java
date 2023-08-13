@@ -2,7 +2,6 @@ package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.PluginPortal;
 import org.bukkit.command.CommandSender;
 

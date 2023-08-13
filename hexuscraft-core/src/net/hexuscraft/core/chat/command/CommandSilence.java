@@ -23,14 +23,18 @@ public class CommandSilence extends BaseCommand {
             if (_pluginChat.getMuted()) {
                 _pluginChat.setMuted(false, true);
                 _pluginChat._javaPlugin.getServer().getOnlinePlayers().forEach(player -> {
-                    if (!player.hasPermission(PluginChat.PERM.COMMAND_SILENCE_SEE.name())) { return; }
-                    _pluginChat._javaPlugin.getServer().broadcastMessage(F.fMain(this) + F.fEntity(sender) + " " + F.fBoolean("unmuted the global chat", true) + ".");
+                    if (!player.hasPermission(PluginChat.PERM.COMMAND_SILENCE_SEE.name())) {
+                        return;
+                    }
+                    _pluginChat._javaPlugin.getServer().broadcastMessage(F.fMain(this) + F.fEntity(sender) + " " + F.fBoolean("un-muted the global chat", true) + ".");
                 });
                 return;
             }
             _pluginChat.setMuted(true, true);
             _pluginChat._javaPlugin.getServer().getOnlinePlayers().forEach(player -> {
-                if (!player.hasPermission(PluginChat.PERM.COMMAND_SILENCE_SEE.name())) { return; }
+                if (!player.hasPermission(PluginChat.PERM.COMMAND_SILENCE_SEE.name())) {
+                    return;
+                }
                 player.sendMessage(F.fStaff() + F.fMain(this) + F.fEntity(sender) + " " + F.fBoolean("muted the global chat", false) + ".");
             });
 

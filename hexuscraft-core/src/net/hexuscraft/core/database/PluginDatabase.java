@@ -1,7 +1,6 @@
 package net.hexuscraft.core.database;
 
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.database.Database;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -54,20 +53,20 @@ public class PluginDatabase extends MiniPlugin {
 
     @Override
     public void onEnable() {
-        _javaPlugin.getServer().getScheduler().runTaskAsynchronously(_javaPlugin, () -> {
-            getJedisPooled().psubscribe(new JedisPubSub() {
+        _javaPlugin.getServer().getScheduler().runTaskAsynchronously(_javaPlugin, () -> getJedisPooled().psubscribe(new JedisPubSub() {
 
-                @Override
-                public void onPMessage(String pattern, String channel, String message) {
-                    if (!callbacks.containsKey(channel)) { return; }
-                    callbacks.get(channel).forEach((uuid, callback) -> {
-                        callback.setMessage(message);
-                        callback.run();
-                    });
+            @Override
+            public void onPMessage(String pattern, String channel, String message) {
+                if (!callbacks.containsKey(channel)) {
+                    return;
                 }
+                callbacks.get(channel).forEach((uuid, callback) -> {
+                    callback.setMessage(message);
+                    callback.run();
+                });
+            }
 
-            }, "*");
-        });
+        }, "*"));
     }
 
     @Override
@@ -79,6 +78,7 @@ public class PluginDatabase extends MiniPlugin {
         return database.getJedisPooled();
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public UUID registerCallback(String channelName, MessagedRunnable callback) {
         UUID id = UUID.randomUUID();
         if (!callbacks.containsKey(channelName)) {
@@ -90,11 +90,15 @@ public class PluginDatabase extends MiniPlugin {
 
     public void unregisterCallback(UUID id) {
         callbacks.forEach((s, uuidRunnableMap) -> {
-            if (!uuidRunnableMap.containsKey(id)) { return; }
+            if (!uuidRunnableMap.containsKey(id)) {
+                return;
+            }
             uuidRunnableMap.remove(id);
 
             // remove the map if there are no more callbacks
-            if (uuidRunnableMap.values().size() > 0) { return; }
+            if (!uuidRunnableMap.values().isEmpty()) {
+                return;
+            }
             callbacks.remove(s);
         });
     }

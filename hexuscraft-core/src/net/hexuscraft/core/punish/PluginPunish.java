@@ -121,9 +121,7 @@ public class PluginPunish extends MiniPlugin {
                 }
                 if (punishData.type.equals(PunishType.BAN)) {
                     if (target != null) {
-                        _javaPlugin.getServer().getScheduler().runTask(_javaPlugin, () -> {
-                            target.kickPlayer(F.fPunishBan(UUID.fromString(punishmentId), punishData.reason, punishData.length));
-                        });
+                        _javaPlugin.getServer().getScheduler().runTask(_javaPlugin, () -> target.kickPlayer(F.fPunishBan(UUID.fromString(punishmentId), punishData.reason, punishData.length)));
                     }
                     _javaPlugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {

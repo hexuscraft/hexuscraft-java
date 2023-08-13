@@ -3,13 +3,10 @@ package net.hexuscraft.core.disguise.command;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.disguise.PluginDisguise;
-import net.hexuscraft.core.permission.PermissionGroup;
-import net.minecraft.server.v1_8_R3.BlockActionData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Set;
 
 public class CommandDisguise extends BaseCommand {
@@ -32,7 +29,9 @@ public class CommandDisguise extends BaseCommand {
 
         try {
             boolean disguised = ((PluginDisguise) _miniPlugin).disguise(player, EntityType.PLAYER, args[0]);
-            if (!disguised) { return; }
+            if (!disguised) {
+                return;
+            }
             player.sendMessage(F.fMain(this) + "You are now disguised as " + F.fEntity(player.getName()) + ".");
         } catch (Exception ex) {
             ex.printStackTrace();

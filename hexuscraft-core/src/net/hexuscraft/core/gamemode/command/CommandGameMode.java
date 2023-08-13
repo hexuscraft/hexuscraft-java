@@ -56,9 +56,7 @@ public class CommandGameMode extends BaseCommand {
     public List<String> tab(CommandSender sender, String alias, String[] args) {
         List<String> names = new ArrayList<>();
         if (args.length == 1) {
-            _miniPlugin._javaPlugin.getServer().getOnlinePlayers().forEach(player -> {
-                names.add(player.getName());
-            });
+            _miniPlugin._javaPlugin.getServer().getOnlinePlayers().forEach(player -> names.add(player.getName()));
         }
         return names;
     }

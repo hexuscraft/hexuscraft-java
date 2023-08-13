@@ -38,7 +38,7 @@ public abstract class MiniPlugin implements Listener {
         _javaPlugin.getServer().getPluginManager().registerEvents(this, _javaPlugin);
         onEnable();
 
-        log("Enabled in " + Long.toString(System.currentTimeMillis() - start) + "ms.");
+        log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public final void disable() {

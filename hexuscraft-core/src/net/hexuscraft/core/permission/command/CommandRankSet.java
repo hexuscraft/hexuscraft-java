@@ -20,8 +20,8 @@ import java.util.Set;
 
 public class CommandRankSet extends BaseCommand {
 
-    PluginDatabase pluginDatabase;
-    PluginScoreboard pluginScoreboard;
+    final PluginDatabase pluginDatabase;
+    final PluginScoreboard pluginScoreboard;
 
     CommandRankSet(PluginPermission pluginPermission, PluginDatabase pluginDatabase, PluginScoreboard pluginScoreboard) {
         super(pluginPermission, "set", "<Player> <Permission Group>", "Set the primary group of a player.", Set.of("s"), PluginPermission.PERM.COMMAND_RANK_SET);

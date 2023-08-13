@@ -1,3 +1,4 @@
+#file: noinspection YAMLSchemaValidation,YAMLSchemaValidation
 name: ${project.name}
 main: ${project.groupId}.arcade.Arcade
 version: 1.0.0

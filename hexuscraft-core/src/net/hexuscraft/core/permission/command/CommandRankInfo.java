@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class CommandRankInfo extends BaseCommand {
 
-    PluginDatabase _pluginDatabase;
+    final PluginDatabase _pluginDatabase;
 
     CommandRankInfo(PluginPermission pluginPermission, PluginDatabase pluginDatabase) {
         super(pluginPermission, "info", "<Player>", "List the groups of a player.", Set.of("i"), PluginPermission.PERM.COMMAND_RANK_INFO);

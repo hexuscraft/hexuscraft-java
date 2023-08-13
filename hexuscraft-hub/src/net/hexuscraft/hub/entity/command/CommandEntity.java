@@ -2,9 +2,7 @@ package net.hexuscraft.hub.entity.command;
 
 import net.hexuscraft.core.command.BaseMultiCommand;
 import net.hexuscraft.hub.entity.PluginEntity;
-import net.hexuscraft.core.permission.PermissionGroup;
 
-import java.util.List;
 import java.util.Set;
 
 public class CommandEntity extends BaseMultiCommand {

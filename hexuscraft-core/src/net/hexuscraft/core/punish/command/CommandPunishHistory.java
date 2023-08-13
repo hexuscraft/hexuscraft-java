@@ -1,5 +1,6 @@
 package net.hexuscraft.core.punish.command;
 
+import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.punish.PluginPunish;
 import org.bukkit.command.CommandSender;
@@ -14,6 +15,6 @@ public class CommandPunishHistory extends BaseCommand {
 
     @Override
     public final void run(CommandSender sender, String alias, String[] args) {
-
+        sender.sendMessage(F.fMain(this) + "Not implemented.");
     }
 }

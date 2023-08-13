@@ -15,8 +15,8 @@ import java.util.Set;
 
 public class CommandSupport extends BaseCommand {
 
-    Set<CommandSender> receivedTipSet;
-    PluginPermission pluginPermission;
+    final Set<CommandSender> receivedTipSet;
+    final PluginPermission pluginPermission;
 
     public CommandSupport(PluginChat pluginChat, PluginPermission pluginPermission) {
         super(pluginChat, "support", "<Message>", "Request help from a staff member.", Set.of("a", "helpop"), PluginChat.PERM.COMMAND_SUPPORT);

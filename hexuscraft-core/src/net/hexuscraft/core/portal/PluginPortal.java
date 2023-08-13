@@ -6,12 +6,11 @@ import com.google.common.io.ByteStreams;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.PluginCommand;
-import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.database.MessagedRunnable;
+import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.command.CommandRestart;
-import net.hexuscraft.core.portal.command.CommandRestartServer;
 import net.hexuscraft.core.portal.command.CommandSend;
 import net.hexuscraft.core.portal.command.CommandServer;
 import org.bukkit.Server;
@@ -77,7 +76,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
             _serverPort = read(new File("_port.dat"));
             _serverJar = read(new File("_jar.dat"));
             _serverWebsite = read(new File("_website.dat"));
-        } catch(FileNotFoundException ex) {
+        } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
 
@@ -103,13 +102,17 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
                 if (senderName != null) {
                     _javaPlugin.getServer().getOnlinePlayers().forEach(player1 -> {
-                        if (!player1.hasPermission(PermissionGroup.ADMINISTRATOR.name())) { return; }
+                        if (!player1.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
+                            return;
+                        }
                         player1.sendMessage(F.fStaff() + F.fMain(this) + F.fEntity(senderName) + " sent " + F.fEntity(playerName) + " to " + F.fItem(serverName));
                     });
                 }
 
                 Player player = _javaPlugin.getServer().getPlayer(playerName);
-                if (player == null) { return; }
+                if (player == null) {
+                    return;
+                }
 
                 if (args.length > 2) {
                     player.sendMessage(F.fMain(this) + F.fEntity(senderName) + " sent you from " + F.fItem(_serverName) + " to " + F.fItem(serverName) + ".");
@@ -135,10 +138,14 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
                 if (restartType.equals("server")) {
                     String serverName = args[1];
-                    if (!_serverName.equals(serverName)) { return; }
+                    if (!_serverName.equals(serverName)) {
+                        return;
+                    }
                 } else if (restartType.equals("group")) {
                     String groupName = args[1];
-                    if (!_serverName.split("-")[0].equals(groupName)) { return; }
+                    if (!_serverName.split("-")[0].equals(groupName)) {
+                        return;
+                    }
                 }
 
                 Server server = _javaPlugin.getServer();
@@ -165,7 +172,9 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
         if (channel.equals(PROXY_CHANNEL)) {
             String subChannel = in.readUTF();
-            if (!_callbacks.containsKey(subChannel)) { return; }
+            if (!_callbacks.containsKey(subChannel)) {
+                return;
+            }
             _callbacks.get(subChannel).forEach((uuid, callback) -> {
                 callback.setIn(in);
                 callback.run();
@@ -189,13 +198,11 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         _pluginDatabase.getJedisPooled().publish(RESTART_CHANNEL, "group," + group);
     }
 
-    public void locate(String player) {
-    }
-
     public String read(File file) throws FileNotFoundException {
         return new Scanner(file).nextLine();
     }
 
+    @SuppressWarnings("SameReturnValue")
     public int getPlayerCount(String name) {
         //noinspection UnstableApiUsage
         ByteArrayDataOutput outServer = ByteStreams.newDataOutput();
@@ -217,7 +224,9 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
     public void unregisterCallback(UUID id) {
         _callbacks.forEach((s, uuidRunnableMap) -> {
-            if (!uuidRunnableMap.containsKey(id)) { return; }
+            if (!uuidRunnableMap.containsKey(id)) {
+                return;
+            }
             uuidRunnableMap.remove(id);
         });
     }

@@ -7,6 +7,8 @@ public class ServerMonitor implements Runnable {
 
     static Console _console;
 
+    static boolean Running = true;
+
     public static void main(String[] args) {
         _console = System.console();
         _console.printf("sup" + "\n");
@@ -26,9 +28,10 @@ public class ServerMonitor implements Runnable {
     @Override
     public void run() {
 //        Console console = System.console();
-        while (true) {
+        while (Running) {
             _console.printf("TEST\n");
             try {
+                //noinspection BusyWait
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

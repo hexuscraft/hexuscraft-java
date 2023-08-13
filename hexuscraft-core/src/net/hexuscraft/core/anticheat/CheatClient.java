@@ -59,8 +59,6 @@ public class CheatClient extends MiniPluginClient {
         return guardian;
     }
 
-    ;
-
     private void ban(Player player, String reason, CheatSeverity severity, int count) {
         Guardian guardian0 = spawnGuardian(player.getLocation().add(new Vector(3, 3, 0)));
         Guardian guardian1 = spawnGuardian(player.getLocation().add(new Vector(-3, 3, 0)));
