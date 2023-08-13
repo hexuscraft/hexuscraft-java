@@ -50,7 +50,7 @@ public class PluginCommand extends MiniPlugin {
 
         String[] messageArray = event.getMessage().split(" ");
 
-        String alias = messageArray[0].split("/", 1)[1];
+        String alias = messageArray[0].split("/", 2)[1];
         //noinspection unused
         String[] args = messageArray.length > 1 ? Arrays.copyOfRange(messageArray, 1, messageArray.length) : new String[0];
 
