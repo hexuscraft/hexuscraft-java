@@ -1,7 +1,7 @@
 /*/target/
 /out/
 /.idea/
-/lib/
+# /lib/
 
 ### Maven ###
 !.mvn/wrapper/maven-wrapper.jar
