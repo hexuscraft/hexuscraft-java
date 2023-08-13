@@ -37,12 +37,11 @@ public class CommandGive extends BaseCommand {
             }
             case "*" -> targets = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().toArray(new Player[0]);
 
-            case "**" -> {
-                targets = (Player[]) _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream().filter(player -> !player.getName().equals(sender.getName())).toArray();
-            }
-            default -> {
-                targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0]);
-            }
+            case "**" ->
+                    targets = (Player[]) _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream().filter(player -> !player.getName().equals(sender.getName())).toArray();
+
+            default ->
+                    targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0]);
         }
 
         if (targets.length == 0) {

@@ -202,7 +202,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         return new Scanner(file).nextLine();
     }
 
-    @SuppressWarnings("SameReturnValue")
+    @SuppressWarnings({"SameReturnValue", "unused"})
     public int getPlayerCount(String name) {
         //noinspection UnstableApiUsage
         ByteArrayDataOutput outServer = ByteStreams.newDataOutput();
@@ -213,6 +213,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         return 0;
     }
 
+    @SuppressWarnings("unused")
     public UUID registerCallback(String channelName, ByteArrayDataInputRunnable callback) {
         UUID id = UUID.randomUUID();
         if (!_callbacks.containsKey(channelName)) {
@@ -222,6 +223,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         return id;
     }
 
+    @SuppressWarnings("unused")
     public void unregisterCallback(UUID id) {
         _callbacks.forEach((s, uuidRunnableMap) -> {
             if (!uuidRunnableMap.containsKey(id)) {
@@ -231,6 +233,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         });
     }
 
+    @SuppressWarnings("unused")
     public void sendProxyMessage(String... data) {
         //noinspection UnstableApiUsage
         ByteArrayDataOutput outServer = ByteStreams.newDataOutput();

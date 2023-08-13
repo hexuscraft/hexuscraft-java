@@ -88,6 +88,7 @@ public class PluginDatabase extends MiniPlugin {
         return id;
     }
 
+    @SuppressWarnings("unused")
     public void unregisterCallback(UUID id) {
         callbacks.forEach((s, uuidRunnableMap) -> {
             if (!uuidRunnableMap.containsKey(id)) {

@@ -4,7 +4,6 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.MiniPluginClient;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Guardian;
@@ -59,6 +58,7 @@ public class CheatClient extends MiniPluginClient {
         return guardian;
     }
 
+    @SuppressWarnings("unused")
     private void ban(Player player, String reason, CheatSeverity severity, int count) {
         Guardian guardian0 = spawnGuardian(player.getLocation().add(new Vector(3, 3, 0)));
         Guardian guardian1 = spawnGuardian(player.getLocation().add(new Vector(-3, 3, 0)));
@@ -70,6 +70,7 @@ public class CheatClient extends MiniPluginClient {
         guardians.add(guardian3);
     }
 
+    @SuppressWarnings("unused")
     private void kick(Player player, String reason, CheatSeverity severity, int count) {
         _javaPlugin.getServer().broadcastMessage(F.fMain(this) + F.fEntity(player) + " kicked for " + severity.getColor() + reason);
         player.kickPlayer(C.cRed + C.fBold + "You were kicked by Hexuscraft Anti-Cheat" + C.fReset + C.cWhite + "\n" + reason);
@@ -77,7 +78,7 @@ public class CheatClient extends MiniPluginClient {
 
     private void alert(Player player, String reason, CheatSeverity severity, int count) {
 //        _javaPlugin.getServer().broadcastMessage(F.fMain(this, F.fPlayer(player) + " suspected of " + severity.getColor() + reason));
-        ComponentBuilder builder = new ComponentBuilder("abc");
+//        ComponentBuilder builder = new ComponentBuilder("abc");
         _javaPlugin.getServer().broadcastMessage(F.fCheat("HAC", player, severity, reason, count, "Lobby-1"));
     }
 
