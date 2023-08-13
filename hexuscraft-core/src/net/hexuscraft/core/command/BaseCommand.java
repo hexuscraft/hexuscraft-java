@@ -24,7 +24,7 @@ public abstract class BaseCommand extends Command {
         _permission = permission;
     }
 
-    public final String help(String alias) {
+    public String help(String alias) {
         return F.fMain(_miniPlugin._name) + "Command Usage:\n" + F.fCommand(this, alias);
     }
 
