@@ -1,8 +1,8 @@
-package net.hexuscraft.servermanager;
+package net.hexuscraft.servermonitor;
 
 import java.io.Console;
 
-public class ServerManager implements Runnable {
+public class ServerMonitor implements Runnable {
     static String LOGGER_FILE_NAME = "manager.log";
 
     static Console _console;
@@ -11,8 +11,8 @@ public class ServerManager implements Runnable {
         _console = System.console();
         _console.printf("sup" + "\n");
 
-        ServerManager threaddedServerManager = new ServerManager();
-        Thread thread = new Thread(threaddedServerManager);
+        ServerMonitor threaddedServerMonitor = new ServerMonitor();
+        Thread thread = new Thread(threaddedServerMonitor);
         thread.start();
 
         String input = _console.readLine("> ");
