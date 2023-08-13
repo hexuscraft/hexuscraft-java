@@ -2,6 +2,7 @@ package net.hexuscraft.core.chat;
 
 import org.bukkit.ChatColor;
 
+@SuppressWarnings("unused")
 public class C {
 
     public static final String fBold = ChatColor.BOLD.toString();
