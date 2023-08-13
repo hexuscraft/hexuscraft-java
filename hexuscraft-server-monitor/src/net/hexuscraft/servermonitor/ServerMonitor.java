@@ -3,6 +3,8 @@ package net.hexuscraft.servermonitor;
 import java.io.Console;
 
 public class ServerMonitor implements Runnable {
+
+    @SuppressWarnings("unused")
     static String LOGGER_FILE_NAME = "manager.log";
 
     static Console _console;
