@@ -4,6 +4,7 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.permission.IPermission;
+import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.hub.entity.command.CommandEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,6 +38,13 @@ public class PluginEntity extends MiniPlugin {
 
     public PluginEntity(JavaPlugin javaPlugin) {
         super(javaPlugin, "Entity");
+
+        PermissionGroup.BUILDER._permissions.add(PERM.COMMAND_ENTITY);
+        PermissionGroup.BUILDER._permissions.add(PERM.COMMAND_ENTITY_LIST);
+
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_ENTITY_REFRESH);
+
+        PermissionGroup.DEVELOPER._permissions.add(PERM.COMMAND_ENTITY_PURGE);
     }
 
     @Override
