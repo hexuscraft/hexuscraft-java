@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
@@ -146,6 +147,10 @@ public class F {
 
     public static String fItem(Material material, int... count) {
         return fItem(material.getData().getName(), count);
+    }
+
+    public static String fItem(ItemStack stack) {
+        return fItem(stack.getType().getData().getName(), stack.getAmount());
     }
 
     public static String fElem(String name, int... count) {
