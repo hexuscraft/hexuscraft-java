@@ -6,7 +6,7 @@ import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.permission.PluginPermission;
 import org.bukkit.command.CommandSender;
 
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Set;
 
 public class CommandRankList extends BaseCommand {
@@ -22,21 +22,8 @@ public class CommandRankList extends BaseCommand {
             return;
         }
 
-        Set<String> metaGroups = new HashSet<>();
-        Set<String> playerGroups = new HashSet<>();
-
-        for (PermissionGroup group : PermissionGroup.values()) {
-            if (group.name().startsWith("_")) {
-                metaGroups.add(group._color + group.name());
-                continue;
-            }
-            playerGroups.add(group._color + group.name());
-        }
-
-        sender.sendMessage(F.fMain(this) + "Listing Meta Groups:");
-        sender.sendMessage(F.fMain() + F.fList(metaGroups.toArray(new String[0])));
-        sender.sendMessage(F.fMain(this) + "Listing Player Groups:");
-        sender.sendMessage(F.fMain() + F.fList(playerGroups.toArray(new String[0])));
+        sender.sendMessage(F.fMain(this) + "Listing Groups:\n"
+                + F.fMain() + F.fList(Arrays.stream(PermissionGroup.values()).map(group -> group._color + group.name()).toArray(String[]::new)));
     }
 
 
