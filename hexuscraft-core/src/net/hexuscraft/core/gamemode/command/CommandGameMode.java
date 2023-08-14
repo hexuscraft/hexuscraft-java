@@ -40,6 +40,11 @@ public class CommandGameMode extends BaseCommand {
             return;
         }
 
+        if (target != sender && !sender.hasPermission(PluginGameMode.PERM.COMMAND_GAMEMODE_OTHERS.name())) {
+            sender.sendMessage(F.fInsufficientPermissions());
+            return;
+        }
+
         boolean toggleCreativeMode = target.getGameMode() != GameMode.CREATIVE;
         target.setGameMode(toggleCreativeMode ? GameMode.CREATIVE : _miniPlugin._javaPlugin.getServer().getDefaultGameMode());
 
