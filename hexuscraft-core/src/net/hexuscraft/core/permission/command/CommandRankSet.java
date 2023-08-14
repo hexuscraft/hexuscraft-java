@@ -54,12 +54,8 @@ public class CommandRankSet extends BaseCommand {
             return;
         }
 
-        final MojangProfile profile;
-        try {
-            profile = PlayerSearch.fetchMojangProfile(args[0], sender);
-        } catch (IOException ex) {
-            return;
-        }
+        final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
+        if (profile == null) { return; }
 
         pluginDatabase.getJedisPooled().set(PermissionQueries.PRIMARY(profile.uuid.toString()), targetGroup.toString());
         sender.sendMessage(F.fMain(this) + "Assigned primary group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
