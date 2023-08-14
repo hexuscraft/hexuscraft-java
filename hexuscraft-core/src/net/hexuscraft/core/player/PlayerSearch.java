@@ -83,6 +83,7 @@ public class PlayerSearch {
     }
 
     public static MojangProfile fetchMojangProfile(String name, CommandSender sender) {
+        sender.sendMessage(F.fMain("Profile Fetcher") + "Fetching profile of " + F.fItem(name) + "...");
         try {
             return fetchMojangProfile(name);
         } catch (IOException ex) {
@@ -126,6 +127,7 @@ public class PlayerSearch {
 
     @SuppressWarnings("unused")
     public static MojangSession fetchMojangSession(UUID uuid, CommandSender sender) {
+        sender.sendMessage(F.fMain("Session Fetcher") + "Fetching session of " + F.fItem(uuid.toString()) + "...");
         try {
             return fetchMojangSession(uuid);
         } catch (IOException ex) {
