@@ -18,7 +18,7 @@ public class CommandBuildVersion extends BaseCommand {
         PluginBuildVersion plugin = (PluginBuildVersion) _miniPlugin;
         long lastModified = plugin.getLastModifiedMillis();
         long fileSize = plugin.getSizeBytes();
-        sender.sendMessage(F.fMain(this) + "Build Version:\n"
+        sender.sendMessage(F.fMain(this) + "Plugin Information:\n"
                 + F.fMain() + "Name: " + F.fItem(plugin._javaPlugin.getDescription().getName() + "\n")
                 + F.fMain() + "Main: " + F.fItem(plugin._javaPlugin.getDescription().getMain() + "\n")
                 + F.fMain() + "Version: " + F.fItem(plugin._javaPlugin.getDescription().getVersion() + "\n")
