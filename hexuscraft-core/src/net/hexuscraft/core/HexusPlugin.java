@@ -16,6 +16,7 @@ import net.hexuscraft.core.report.PluginReport;
 import net.hexuscraft.core.scoreboard.PluginScoreboard;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,6 +92,10 @@ public class HexusPlugin extends JavaPlugin {
 
     public final void log(String message) {
         getLogger().info(message);
+    }
+
+    public final File getFile() {
+        return super.getFile();
     }
 
 }
