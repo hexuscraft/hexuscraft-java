@@ -203,7 +203,7 @@ public class F {
     }
 
     public static String fList(int index, String message) {
-        return index + SPACER + message;
+        return index + "." + SPACER + message;
     }
 
     public static String fChat(int level, PermissionGroup permissionGroup) {
