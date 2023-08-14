@@ -2,7 +2,6 @@ package net.hexuscraft.core.player;
 
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
