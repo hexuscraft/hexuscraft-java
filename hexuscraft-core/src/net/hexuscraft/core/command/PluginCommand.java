@@ -1,8 +1,10 @@
 package net.hexuscraft.core.command;
 
 import net.hexuscraft.core.MiniPlugin;
+import net.hexuscraft.core.chat.F;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -23,6 +25,11 @@ public class PluginCommand extends MiniPlugin {
     public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
         _commandMap = ((CraftServer) _javaPlugin.getServer()).getCommandMap();
         _commands = new HashSet<>();
+    }
+
+    @Override
+    public void onEnable() {
+        ((SimpleCommandMap) _commandMap).getCommands().forEach(command -> command.setPermissionMessage(F.fInsufficientPermissions()));
     }
 
     @Override
