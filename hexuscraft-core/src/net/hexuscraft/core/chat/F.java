@@ -179,7 +179,13 @@ public class F {
     }
 
     public static String fCommand(String alias, String usage, String description, ChatColor color) {
-        return color + "/" + alias + " " + usage + SPACER_GRAY + description;
+        StringBuilder builder = new StringBuilder();
+        builder.append(color).append("/").append(alias);
+        if (!usage.isEmpty()) {
+            builder.append(" ").append(usage);
+        }
+        builder.append(SPACER_GRAY).append(description);
+        return builder.toString();
     }
 
     public static String fCommand(String alias, String usage, String description) {
