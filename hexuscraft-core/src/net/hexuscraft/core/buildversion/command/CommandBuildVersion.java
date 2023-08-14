@@ -24,7 +24,7 @@ public class CommandBuildVersion extends BaseCommand {
                 + F.fMain() + "Version: " + F.fItem(plugin._javaPlugin.getDescription().getVersion())
                 + F.fMain() + "Load: " + F.fItem(plugin._javaPlugin.getDescription().getLoad().name())
                 + F.fMain() + "Last Modified: " + F.fTime(System.currentTimeMillis() - lastModified) + " (" + lastModified + ")"
-                + F.fMain() + "File Size: " + F.fItem(Long.toString(fileSize) + "B")
+                + F.fMain() + "File Size: " + F.fItem(fileSize + "B")
         );
     }
 
