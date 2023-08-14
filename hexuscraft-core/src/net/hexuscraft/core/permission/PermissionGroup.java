@@ -20,10 +20,10 @@ public enum PermissionGroup {
 
 //    Teams
 
-    QUALITY_ASSURANCE("", C.cWhite),
+    QUALITY_ASSURANCE("QA", C.cWhite),
 
-    EVENT_MOD("", C.cDGreen),
-    EVENT_LEAD("", C.cDGreen, EVENT_MOD),
+    EVENT_MOD("E.Mod", C.cDGreen),
+    EVENT_LEAD("E.Lead", C.cDGreen, EVENT_MOD),
 
 //    Ranks
 
