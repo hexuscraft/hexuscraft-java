@@ -19,14 +19,16 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unused")
 public class F {
 
-    static String SPACER = C.fReset + " ";
-    static String SPACER_GRAY = C.fReset + " " + C.cGray;
-    static String RESET_GRAY = C.fReset + C.cGray;
+    private static final String SPACER = C.fReset + " ";
+    private static final String SPACER_GRAY = C.fReset + " " + C.cGray;
+    private static final String RESET_GRAY = C.fReset + C.cGray;
 
-    static String PREFIX_MAIN = C.cGold + C.fBold;
-//    static String PREFIX_SUB = C.cDGray + C.fBold;
-    static String PREFIX_SUB = C.cDAqua + C.fBold;
-    static String ITEM_COLOR = C.cYellow;
+    private static final String PREFIX_MAIN = C.cGold + C.fBold;
+    //    static String PREFIX_SUB = C.cDGray + C.fBold;
+    private static final String PREFIX_SUB = C.cDAqua + C.fBold;
+    private static final String PREFIX_ANNOUNCE = C.cYellow + C.fBold;
+
+    private static final String ITEM_COLOR = C.cYellow;
 
     public static String fMain(String prefix) {
 //        return C.cBlue + C.fBold + prefix + SPACER_GRAY;
@@ -88,37 +90,11 @@ public class F {
     }
 
     public static String fStaff() {
-//        return C.cBlue + "[S]" + SPACER_GRAY;
         return fSub("[S]");
     }
 
-    public static String fCheat(String prefix, String name, String color, String reason, int count, String... server) {
-        StringBuilder builder = new StringBuilder(C.cAqua).append(C.fMagic).append("H")
-                .append(SPACER)
-                .append(C.cRed).append(C.fBold).append(prefix.toUpperCase()).append(" >")
-                .append(SPACER)
-                .append(C.cGold).append(name)
-                .append(SPACER)
-                .append(C.cYellow).append("failed")
-                .append(SPACER)
-                .append(color).append(reason)
-                .append(SPACER)
-                .append("(").append(count).append(")");
-        if (server.length > 0) {
-            builder.append(SPACER)
-                    .append(C.cYellow).append("in")
-                    .append(SPACER)
-                    .append(C.cAqua).append(server[0]);
-        }
-        return builder.toString();
-    }
-
-    public static String fCheat(String prefix, Player player, CheatSeverity severity, String reason, int count, String... server) {
-        return fCheat(prefix, player.getName(), severity.getColor(), reason, count, server);
-    }
-
-    public static String fCheat(MiniPlugin miniPlugin, Player player, CheatSeverity severity, String reason, int count, String... server) {
-        return fCheat(miniPlugin._name, player, severity, reason, count, server);
+    public static String fAnnounce(String text) {
+        return PREFIX_ANNOUNCE + text + SPACER;
     }
 
     public static String fItem(String name) {
@@ -247,6 +223,35 @@ public class F {
                 + "\n" + C.cDGreen + "Unfairly banned? Appeal at " + C.cGreen + "www.hexuscraft.net" + C.fReset
                 + "\n"
                 + "\n" + C.cDGray + id.toString();
+    }
+
+    public static String fCheat(String prefix, String name, String color, String reason, int count, String... server) {
+        StringBuilder builder = new StringBuilder(C.cAqua).append(C.fMagic).append("H")
+                .append(SPACER)
+                .append(C.cRed).append(C.fBold).append(prefix.toUpperCase()).append(" >")
+                .append(SPACER)
+                .append(C.cGold).append(name)
+                .append(SPACER)
+                .append(C.cYellow).append("failed")
+                .append(SPACER)
+                .append(color).append(reason)
+                .append(SPACER)
+                .append("(").append(count).append(")");
+        if (server.length > 0) {
+            builder.append(SPACER)
+                    .append(C.cYellow).append("in")
+                    .append(SPACER)
+                    .append(C.cAqua).append(server[0]);
+        }
+        return builder.toString();
+    }
+
+    public static String fCheat(String prefix, Player player, CheatSeverity severity, String reason, int count, String... server) {
+        return fCheat(prefix, player.getName(), severity.getColor(), reason, count, server);
+    }
+
+    public static String fCheat(MiniPlugin miniPlugin, Player player, CheatSeverity severity, String reason, int count, String... server) {
+        return fCheat(miniPlugin._name, player, severity, reason, count, server);
     }
 
     static final double MILLIS_PER_SECOND = 1000;
