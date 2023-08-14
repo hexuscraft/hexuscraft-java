@@ -59,13 +59,13 @@ public class CommandRankSet extends BaseCommand {
             sender.sendMessage(F.fMain(this) + "Fetching profile...");
             profile = PlayerSearch.fetchMojangProfile(args[0]);
         } catch (IOException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Error fetching profile of ") + F.fEntity(args[0]) + " (Did you type their name correctly?)");
+            sender.sendMessage(F.fMain(this) + F.fError("Error fetching profile of ") + F.fItem(args[0]) + " (Did you type their name correctly?)");
             sender.sendMessage(F.fMain() + ex.getMessage());
             return;
         }
 
         pluginDatabase.getJedisPooled().set(PermissionQueries.PRIMARY(profile.uuid.toString()), targetGroup.toString());
-        sender.sendMessage(F.fMain(this) + "Assigned primary group " + F.fPermissionGroup(targetGroup) + " to " + F.fEntity(profile.name) + ".");
+        sender.sendMessage(F.fMain(this) + "Assigned primary group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
 
         Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
         if (player == null) {

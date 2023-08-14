@@ -32,7 +32,7 @@ public class CommandDisguise extends BaseCommand {
             if (!disguised) {
                 return;
             }
-            player.sendMessage(F.fMain(this) + "You are now disguised as " + F.fEntity(player.getName()) + ".");
+            player.sendMessage(F.fMain(this) + "You are now disguised as " + F.fItem(player.getName()) + ".");
         } catch (Exception ex) {
             // Not very important if disguises fail, just print the error to console and let the player know
             //noinspection CallToPrintStackTrace

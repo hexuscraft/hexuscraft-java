@@ -31,7 +31,7 @@ public class CommandEntityRefresh extends BaseCommand {
             pluginEntity.refreshNPCs(world);
         });
 
-        sender.sendMessage(F.fMain(this) + "Completed NPC refresh in " + F.fElem(F.fTime(System.currentTimeMillis() - start)) + ".");
+        sender.sendMessage(F.fMain(this) + "Completed NPC refresh in " + F.fItem(F.fTime(System.currentTimeMillis() - start)) + ".");
     }
 
 }

@@ -43,13 +43,13 @@ public class CommandGameMode extends BaseCommand {
         boolean toggleCreativeMode = target.getGameMode() != GameMode.CREATIVE;
         target.setGameMode(toggleCreativeMode ? GameMode.CREATIVE : _miniPlugin._javaPlugin.getServer().getDefaultGameMode());
 
-        sender.sendMessage(F.fMain(this) + F.fEntity(target) + " Creative Mode: " + F.fBoolean(toggleCreativeMode));
+        sender.sendMessage(F.fMain(this) + F.fItem(target) + " Creative Mode: " + F.fBoolean(toggleCreativeMode));
 
         if (target == sender) {
             return;
         }
 
-        target.sendMessage(F.fMain(this) + F.fEntity(sender) + " set your Creative Mode: " + F.fBoolean(toggleCreativeMode));
+        target.sendMessage(F.fMain(this) + F.fItem(sender) + " set your Creative Mode: " + F.fBoolean(toggleCreativeMode));
     }
 
     @Override

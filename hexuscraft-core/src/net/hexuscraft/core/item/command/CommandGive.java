@@ -25,7 +25,7 @@ public class CommandGive extends BaseCommand {
             return;
         }
 
-        Player[] targets;
+        final Player[] targets;
 
         switch (args[0]) {
             case "." -> {
@@ -45,20 +45,35 @@ public class CommandGive extends BaseCommand {
         }
 
         if (targets.length == 0) {
-            sender.sendMessage(F.fMain(this) + "Found no players with name " + F.fEntity(args[0]) + ".");
+            sender.sendMessage(F.fMain(this) + "Found no players with name " + F.fItem(args[0]) + ".");
             return;
         }
 
-        int amount = args.length > 2 ? Integer.parseInt(args[2]) : 1;
+        final int amount = args.length > 2 ? Integer.parseInt(args[2]) % 64 : 1;
 
-        HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
+        final HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
         if (args.length > 3) {
-            for (String enchantmentTableRaw : args[3].split(",")) {
-                String[] enchantmentTable = enchantmentTableRaw.split(":", 2);
-                Enchantment enchantment = Enchantment.getByName(enchantmentTable[0]);
-                int enchantmentLevel = enchantmentTable.length > 1 ? Integer.parseInt(enchantmentTable[2]) : 1;
+            Arrays.stream(args[3].split(",")).map(s -> s.split(":")).forEach(strings -> {
+                Enchantment enchantment = Enchantment.getByName(strings[0]);
+                if (enchantment == null) {
+                    sender.sendMessage(F.fMain(this) + "Unknown enchantment named " + F.fItem(strings[0]) + ". Listing Enchantments:\n"
+                            + F.fMain() + F.fList(Arrays.stream(Enchantment.values()).map(Enchantment::getName).toArray(String[]::new)));
+                    return;
+                }
+
+                //noinspection ReassignedVariable
+                int enchantmentLevel = 1;
+                if (strings.length > 1) {
+                    try {
+                        enchantmentLevel = Integer.parseInt(strings[1]);
+                    } catch(NumberFormatException ex) {
+                        sender.sendMessage(F.fMain(this) + "Unknown enchantment level " + F.fItem(strings[1]));
+                        return;
+                    }
+                }
+
                 enchantmentMap.put(enchantment, enchantmentLevel);
-            }
+            });
         }
 
         for (String materialSearchName : args[1].split(",")) {
@@ -67,7 +82,7 @@ public class CommandGive extends BaseCommand {
                 StringBuilder builder = new StringBuilder();
                 builder.append(F.fMain("Material Search")).append(F.fItem(targetMaterials.length + " Matches")).append(" for ").append(F.fItem(materialSearchName)).append(".");
                 if (targetMaterials.length > 1) {
-                    builder.append(F.fMain()).append(F.fList((String[]) Arrays.stream(targetMaterials).map(Material::name).toArray()));
+                    builder.append(F.fMain()).append(F.fList(Arrays.stream(targetMaterials).map(Material::name).toArray(String[]::new)));
                 }
                 sender.sendMessage(builder.toString());
                 continue;
@@ -76,13 +91,13 @@ public class CommandGive extends BaseCommand {
             ItemStack stack = new ItemStack(targetMaterials[0]);
             stack.setAmount(amount);
 
-            enchantmentMap.forEach(stack::addUnsafeEnchantment);
+            stack.addUnsafeEnchantments(enchantmentMap);
 
             for (Player target : targets) {
                 target.getInventory().addItem(stack);
             }
 
-            sender.sendMessage(F.fMain(this) + "Gave " + F.fItem(stack) + " to " + F.fList((String[]) Arrays.stream(targets).map(Player::getName).toArray()) + ".");
+            sender.sendMessage(F.fMain(this) + "Gave " + F.fItem(stack) + " to " + F.fList(Arrays.stream(targets).map(Player::getName).toArray(String[]::new)));
         }
     }
 
@@ -121,8 +136,7 @@ public class CommandGive extends BaseCommand {
                     return true;
                 }).map(Player::getName).toList());
             }
-            case 2 ->
-                    names.addAll(Arrays.stream(Material.values()).map(material -> material.getData().getName()).toList());
+            case 2 -> names.addAll(Arrays.stream(Material.values()).map(Material::name).toList());
             case 3 -> {
                 for (int i = 1; i <= 64; i++) {
                     names.add(Integer.toString(i));
@@ -137,8 +151,8 @@ public class CommandGive extends BaseCommand {
     public String help(String alias) {
         return super.help(alias) + "\n" +
                 F.fMain() + "Player selectors:\n" +
-                F.fList(1, F.fElem(".") + " - Yourself\n") +
-                F.fList(1, F.fElem("*") + " - Everyone\n") +
-                F.fList(1, F.fElem("**") + " - Others");
+                F.fList(1, F.fItem(".") + " - Yourself\n") +
+                F.fList(1, F.fItem("*") + " - Everyone\n") +
+                F.fList(1, F.fItem("**") + " - Others");
     }
 }

@@ -25,7 +25,7 @@ public class CommandEntityPurge extends BaseCommand {
 
         int amount = pluginEntity.purge();
 
-        sender.sendMessage(F.fMain(this) + "Temporarily purged " + F.fElem(amount + " NPCs") + ".");
+        sender.sendMessage(F.fMain(this) + "Temporarily purged " + F.fItem(amount + " NPCs") + ".");
     }
 
 }

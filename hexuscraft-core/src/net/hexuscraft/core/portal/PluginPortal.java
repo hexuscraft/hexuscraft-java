@@ -105,7 +105,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
                         if (!player1.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
                             return;
                         }
-                        player1.sendMessage(F.fStaff() + F.fMain(this) + F.fEntity(senderName) + " sent " + F.fEntity(playerName) + " to " + F.fItem(serverName));
+                        player1.sendMessage(F.fStaff() + F.fMain(this) + F.fItem(senderName) + " sent " + F.fItem(playerName) + " to " + F.fItem(serverName));
                     });
                 }
 
@@ -115,7 +115,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
                 }
 
                 if (args.length > 2) {
-                    player.sendMessage(F.fMain(this) + F.fEntity(senderName) + " sent you from " + F.fItem(_serverName) + " to " + F.fItem(serverName) + ".");
+                    player.sendMessage(F.fMain(this) + F.fItem(senderName) + " sent you from " + F.fItem(_serverName) + " to " + F.fItem(serverName) + ".");
                 } else {
                     player.sendMessage(F.fMain(this) + "You were sent from " + F.fItem(_serverName) + " to " + F.fItem(serverName) + ".");
                 }

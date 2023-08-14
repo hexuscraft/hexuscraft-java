@@ -72,7 +72,7 @@ public class CheatClient extends MiniPluginClient {
 
     @SuppressWarnings("unused")
     private void kick(Player player, String reason, CheatSeverity severity, int count) {
-        _javaPlugin.getServer().broadcastMessage(F.fMain(this) + F.fEntity(player) + " kicked for " + severity.getColor() + reason);
+        _javaPlugin.getServer().broadcastMessage(F.fMain(this) + F.fItem(player) + " kicked for " + severity.getColor() + reason);
         player.kickPlayer(C.cRed + C.fBold + "You were kicked by Hexuscraft Anti-Cheat" + C.fReset + C.cWhite + "\n" + reason);
     }
 

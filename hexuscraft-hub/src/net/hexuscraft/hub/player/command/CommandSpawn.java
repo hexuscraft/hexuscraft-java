@@ -50,13 +50,13 @@ public class CommandSpawn extends BaseCommand {
             return;
         }
 
-        target.sendMessage(F.fMain(this) + "You were teleported to spawn by " + F.fEntity(sender) + ".");
-        sender.sendMessage(F.fMain(this) + "Teleported " + F.fEntity(target) + " to spawn.");
+        target.sendMessage(F.fMain(this) + "You were teleported to spawn by " + F.fItem(sender) + ".");
+        sender.sendMessage(F.fMain(this) + "Teleported " + F.fItem(target) + " to spawn.");
         _miniPlugin._javaPlugin.getServer().getOnlinePlayers().forEach(staff -> {
             if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {
                 return;
             }
-            staff.sendMessage(F.fStaff() + F.fMain(this) + F.fEntity(sender) + " teleported " + F.fEntity(target) + " to spawn.");
+            staff.sendMessage(F.fStaff() + F.fMain(this) + F.fItem(sender) + " teleported " + F.fItem(target) + " to spawn.");
         });
     }
 }

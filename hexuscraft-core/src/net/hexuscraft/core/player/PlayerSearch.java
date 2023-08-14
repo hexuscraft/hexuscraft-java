@@ -45,10 +45,10 @@ public class PlayerSearch extends MiniPlugin {
         Arrays.stream(matches).toList().forEach(match -> names.add(match.getName()));
         if (matches.length != 1) {
             if (matches.length == 0) {
-                executor.sendMessage(F.fMain("Online Player Search") + F.fItem(matches.length + " Matches") + " for " + F.fEntity(searchName) + ".");
+                executor.sendMessage(F.fMain("Online Player Search") + F.fItem(matches.length + " Matches") + " for " + F.fItem(searchName) + ".");
             } else {
-                executor.sendMessage(F.fMain("Online Player Search") + F.fItem(matches.length + " Matches") + " for " + F.fEntity(searchName) + ".");
-                executor.sendMessage(F.fMain("") + "Matches: " + F.fListSep(C.cYellow, names.toArray(new String[0])));
+                executor.sendMessage(F.fMain("Online Player Search") + F.fItem(matches.length + " Matches") + " for " + F.fItem(searchName) + ".");
+                executor.sendMessage(F.fMain("") + "Matches: " + F.fList(names.toArray(String[]::new)));
             }
         }
         return matches;
@@ -72,7 +72,7 @@ public class PlayerSearch extends MiniPlugin {
     public static OfflinePlayer offlinePlayerSearch(MiniPlugin miniPlugin, String searchName, CommandSender executor) {
         OfflinePlayer match = offlinePlayerSearch(miniPlugin, searchName);
         if (match == null) {
-            executor.sendMessage(F.fMain("Offline Player Search") + F.fItem("0 Matches") + " for " + F.fEntity(searchName) + ".");
+            executor.sendMessage(F.fMain("Offline Player Search") + F.fItem("0 Matches") + " for " + F.fItem(searchName) + ".");
         }
         return match;
     }
@@ -116,7 +116,7 @@ public class PlayerSearch extends MiniPlugin {
         try {
             return fetchMojangProfile(name);
         } catch (IOException ex) {
-            sender.sendMessage(F.fMain("Profile Search") + F.fBoolean("Error while fetching profile of ", false) + F.fEntity(name) + "\n" + F.fMain() + ex.getMessage());
+            sender.sendMessage(F.fMain("Profile Search") + F.fBoolean("Error while fetching profile of ", false) + F.fItem(name) + "\n" + F.fMain() + ex.getMessage());
             return null;
         }
     }

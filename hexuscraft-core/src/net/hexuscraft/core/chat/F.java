@@ -18,7 +18,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings("unused")
 public class F {
 
     static String SPACER = C.fReset + " ";
@@ -27,7 +26,10 @@ public class F {
 
     public static String fMain(String prefix) {
         return C.cBlue + prefix + ">" + SPACER_GRAY;
-//        return C.cGold + C.fBold + prefix + C.fReset + C.cDGray + ">" + SPACER_GRAY;
+    }
+
+    public static String fMain() {
+        return fMain("");
     }
 
     public static String fMain(MiniPlugin miniPlugin) {
@@ -44,10 +46,6 @@ public class F {
 
     public static String fMain(Object object) {
         return fMain(object.toString());
-    }
-
-    public static String fMain() {
-        return fMain("");
     }
 
     public static String fMain(JavaPlugin plugin) {
@@ -76,6 +74,10 @@ public class F {
 
     public static String fSub(JavaPlugin plugin) {
         return fSub(plugin.getName());
+    }
+
+    public static String fStaff() {
+        return C.cBlue + "[S]" + SPACER_GRAY;
     }
 
     public static String fCheat(String prefix, String name, String color, String reason, int count, String... server) {
@@ -107,63 +109,40 @@ public class F {
         return fCheat(miniPlugin._name, player, severity, reason, count, server);
     }
 
-    public static String fEntity(String name, int... count) {
-        StringBuilder builder = new StringBuilder(C.fReset).append(C.cYellow);
-        if (count.length > 0) {
-            builder.append(count[0]).append(" ");
-        }
-        builder.append(name).append(RESET_GRAY);
-        return builder.toString();
+    public static String fItem(String name) {
+        return C.cYellow + name + RESET_GRAY;
     }
 
-    public static String fEntity(CommandSender commandSender) {
-        return fEntity(commandSender.getName());
+    public static String fItem(String name, int count) {
+        return C.cYellow + count + " " + name + RESET_GRAY;
     }
 
-    public static String fEntity(Entity entity) {
-        return fEntity(entity.getName());
+    public static String fItem(CommandSender commandSender) {
+        return fItem(commandSender.getName());
     }
 
-    public static String fEntity(OfflinePlayer offlinePlayer) {
-        return fEntity(offlinePlayer.getName());
+    public static String fItem(Entity entity) {
+        return fItem(entity.getName());
     }
 
-    public static String fEntity(Player player) {
-        return fEntity(player.getName());
+//    public static String fItem(OfflinePlayer offlinePlayer) {
+//        return fItem(offlinePlayer.getName());
+//    }
+
+    public static String fItem(Material material) {
+        return fItem(material.getData().getName());
     }
 
-    public static String fItem(String name, int... count) {
-        StringBuilder builder = new StringBuilder(C.fReset).append(C.cGold);
-        if (count.length > 0) {
-            builder.append(count[0]).append(" ");
-        }
-        builder.append(name).append(RESET_GRAY);
-        return builder.toString();
-    }
-
-    public static String fItem(Item item, int... count) {
-        return fItem(item.getName(), count);
-    }
-
-    public static String fItem(Material material, int... count) {
+    public static String fItem(Material material, int count) {
         return fItem(material.getData().getName(), count);
     }
 
     public static String fItem(ItemStack stack) {
-        return fItem(stack.getType().getData().getName(), stack.getAmount());
-    }
-
-    public static String fElem(String name, int... count) {
-        StringBuilder builder = new StringBuilder(C.fReset).append(C.cGreen);
-        if (count.length > 0) {
-            builder.append(count[0]).append(" ");
-        }
-        builder.append(name).append(RESET_GRAY);
-        return builder.toString();
+        return fItem(stack.getType().getData().getCanonicalName(), stack.getAmount());
     }
 
     public static String fCurrency(String color, String nameSingular, String namePlural, int amount) {
-        return C.fReset + color + amount + " " + (amount == 1 ? nameSingular : namePlural) + RESET_GRAY;
+        return color + amount + " " + (amount == 1 ? nameSingular : namePlural) + RESET_GRAY;
     }
 
     public static String fCurrency(CurrencyType currencyType, int amount) {
@@ -200,12 +179,8 @@ public class F {
         return fCommand(alias, command.getUsage(), command.getDescription());
     }
 
-    public static String fListSep(String separator, String... args) {
-        return RESET_GRAY + "[" + separator + String.join(RESET_GRAY + ", " + separator, args) + RESET_GRAY + "]";
-    }
-
     public static String fList(String... args) {
-        return fListSep(C.cBlue, args);
+        return RESET_GRAY + "[" + C.cYellow + String.join(RESET_GRAY + ", " + C.cYellow, args) + RESET_GRAY + "]";
     }
 
     public static String fList(int index, String message) {
@@ -220,9 +195,13 @@ public class F {
         return C.fReset + color + prefix + RESET_GRAY;
     }
 
-    public static String fPermissionGroup(PermissionGroup permissionGroup, boolean... bold) {
+    public static String fPermissionGroup(PermissionGroup permissionGroup) {
+        return fPermissionGroup(permissionGroup._prefix, permissionGroup._color);
+    }
+
+    public static String fPermissionGroup(PermissionGroup permissionGroup, boolean bold) {
         StringBuilder builder = new StringBuilder(permissionGroup._color);
-        if (bold.length > 0 && bold[0]) {
+        if (bold) {
             builder.append(C.fBold);
         }
         return fPermissionGroup(permissionGroup._prefix, builder.toString());
@@ -246,14 +225,6 @@ public class F {
 
     public static String fError(String action) {
         return fBoolean(action, false);
-    }
-
-    public static String fAnnouncement(String message) {
-        return fMain("Announcement") + C.cAqua + message;
-    }
-
-    public static String fStaff() {
-        return C.cBlue + "[S]" + SPACER_GRAY;
     }
 
     public static String fPunishBan(UUID id, String reason, long length) {

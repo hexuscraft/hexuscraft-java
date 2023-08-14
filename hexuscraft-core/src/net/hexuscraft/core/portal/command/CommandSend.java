@@ -22,7 +22,7 @@ public class CommandSend extends BaseCommand {
 
         PluginPortal pluginPortal = (PluginPortal) _miniPlugin;
 
-        sender.sendMessage(F.fMain(this) + "Sending " + F.fEntity(args[0]) + " to server " + F.fItem(args[1]) + ".");
+        sender.sendMessage(F.fMain(this) + "Sending " + F.fItem(args[0]) + " to server " + F.fItem(args[1]) + ".");
         pluginPortal.teleport(args[0], args[1], sender.getName());
     }
 

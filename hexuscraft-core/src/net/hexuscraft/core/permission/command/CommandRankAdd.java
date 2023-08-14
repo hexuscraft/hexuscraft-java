@@ -62,13 +62,13 @@ public class CommandRankAdd extends BaseCommand {
             sender.sendMessage(F.fMain(this) + "Fetching profile...");
             profile = PlayerSearch.fetchMojangProfile(args[0]);
         } catch (IOException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Error fetching profile of ") + F.fEntity(args[0]));
+            sender.sendMessage(F.fMain(this) + F.fError("Error fetching profile of ") + F.fItem(args[0]));
             sender.sendMessage(F.fMain() + ex.getMessage());
             return;
         }
 
         _pluginDatabase.getJedisPooled().sadd(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.toString());
-        sender.sendMessage(F.fMain(this) + "Added sub-group " + F.fPermissionGroup(targetGroup) + " to " + F.fEntity(profile.name) + ".");
+        sender.sendMessage(F.fMain(this) + "Added sub-group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
 
         Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
         if (player == null) {

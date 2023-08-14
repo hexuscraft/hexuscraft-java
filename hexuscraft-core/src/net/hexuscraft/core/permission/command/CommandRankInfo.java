@@ -36,7 +36,7 @@ public class CommandRankInfo extends BaseCommand {
             sender.sendMessage(F.fMain(this) + "Fetching profile...");
             profile = PlayerSearch.fetchMojangProfile(args[0]);
         } catch (IOException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Error fetching profile of ") + F.fEntity(args[0]) + " (Did you type their name correctly?)");
+            sender.sendMessage(F.fMain(this) + F.fError("Error fetching profile of ") + F.fItem(args[0]) + " (Did you type their name correctly?)");
             sender.sendMessage(F.fMain() + ex.getMessage());
             return;
         }
@@ -49,7 +49,7 @@ public class CommandRankInfo extends BaseCommand {
             primaryName = PermissionGroup.MEMBER.toString();
         }
 
-        sender.sendMessage(F.fMain(this) + "Displaying group info for " + F.fEntity(profile.name) + ":\n"
+        sender.sendMessage(F.fMain(this) + "Displaying group info for " + F.fItem(profile.name) + ":\n"
                 + F.fMain("") + "Primary Group: " + F.fPermissionGroup(PermissionGroup.valueOf(primaryName)) + "\n"
                 + F.fMain("") + "Sub Groups: " + F.fList(groupNames.stream().map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s))).distinct().toArray(String[]::new)));
     }

@@ -44,7 +44,7 @@ public class CommandPunish extends BaseCommand {
         try {
             profile = PlayerSearch.fetchMojangProfile(args[0]);
         } catch(IOException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Error while fetching profile of ") + F.fEntity(args[0]) + " (Did you type their name correctly?)");
+            sender.sendMessage(F.fMain(this) + F.fError("Error while fetching profile of ") + F.fItem(args[0]) + " (Did you type their name correctly?)");
             sender.sendMessage(F.fMain() + ex.getMessage());
             return;
         }

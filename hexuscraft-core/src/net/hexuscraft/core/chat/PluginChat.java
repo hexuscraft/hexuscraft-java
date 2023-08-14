@@ -88,14 +88,14 @@ public class PluginChat extends MiniPlugin {
 
                 _plugin._javaPlugin.getServer().getOnlinePlayers().forEach(player -> {
                     if (player.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
-                        player.sendMessage(F.fStaff() + F.fMain(this) + F.fEntity(senderName) + " broadcast to " + F.fPermissionGroup(permissionGroup) + ".");
+                        player.sendMessage(F.fStaff() + F.fMain(this) + F.fItem(senderName) + " broadcast to " + F.fPermissionGroup(permissionGroup) + ".");
                     }
 
                     if (!player.hasPermission(permissionGroup.name())) {
                         return;
                     }
 
-                    player.sendMessage(F.fAnnouncement(announcementMessage));
+                    player.sendMessage(F.fMain("Announcement") + C.cAqua + announcementMessage);
 
                     PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
                     playerConnection.sendPacket(new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, IChatBaseComponent.ChatSerializer.a(announcementMessage)));
