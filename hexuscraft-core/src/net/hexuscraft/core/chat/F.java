@@ -24,7 +24,8 @@ public class F {
     static String RESET_GRAY = C.fReset + C.cGray;
 
     static String PREFIX_MAIN = C.cGold + C.fBold;
-    static String PREFIX_SUB = C.cDGray + C.fBold;
+//    static String PREFIX_SUB = C.cDGray + C.fBold;
+    static String PREFIX_SUB = C.cDAqua + C.fBold;
     static String ITEM_COLOR = C.cYellow;
 
     public static String fMain(String prefix) {
@@ -162,7 +163,7 @@ public class F {
 
     public static String fBroadcast(String name, String msg) {
 //        return C.cGold + C.fBold + name + SPACER + C.cYellow + msg;
-        return fSub("[!]") + fMain(name) + C.cYellow + msg;
+        return fSub(name) + C.cAqua + msg;
     }
 
     public static String fBroadcast(CommandSender sender, String msg) {
