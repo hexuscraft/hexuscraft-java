@@ -32,7 +32,8 @@ public class F {
 
     public static String fMain(String prefix) {
 //        return C.cBlue + C.fBold + prefix + SPACER_GRAY;
-        return PREFIX_MAIN + prefix + SPACER_GRAY;
+//        return PREFIX_MAIN + prefix + SPACER_GRAY;
+        return C.cGray;
     }
 
     public static String fMain() {
@@ -62,7 +63,8 @@ public class F {
 
     public static String fSub(String prefix) {
 //        return C.cDGray + C.fBold + prefix + SPACER_GRAY;
-        return PREFIX_SUB + prefix + SPACER_GRAY;
+//        return PREFIX_SUB + prefix + SPACER_GRAY;
+        return C.cGray;
     }
 
     public static String fSub() {
@@ -94,7 +96,8 @@ public class F {
     }
 
     public static String fAnnounce(String text) {
-        return PREFIX_ANNOUNCE + text + SPACER;
+//        return PREFIX_ANNOUNCE + text + SPACER;
+        return text;
     }
 
     public static String fItem(String name) {
