@@ -121,21 +121,14 @@ public class CommandGive extends BaseCommand {
                     return true;
                 }).map(Player::getName).toList());
             }
-            case 2 -> {
-                for (Material material : Material.values()) {
-                    names.add(material.name());
-                }
-            }
+            case 2 ->
+                    names.addAll(Arrays.stream(Material.values()).map(material -> material.getData().getName()).toList());
             case 3 -> {
                 for (int i = 1; i <= 64; i++) {
                     names.add(Integer.toString(i));
                 }
             }
-            default -> {
-                for (Enchantment enchantment : Enchantment.values()) {
-                    names.add(enchantment.getName());
-                }
-            }
+            default -> names.addAll(Arrays.stream(Enchantment.values()).map(Enchantment::getName).toList());
         }
         return names;
     }
