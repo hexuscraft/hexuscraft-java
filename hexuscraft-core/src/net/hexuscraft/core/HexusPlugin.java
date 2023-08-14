@@ -2,6 +2,7 @@ package net.hexuscraft.core;
 
 import net.hexuscraft.core.anticheat.PluginCheat;
 import net.hexuscraft.core.authentication.PluginAuth;
+import net.hexuscraft.core.buildversion.PluginBuildVersion;
 import net.hexuscraft.core.chat.PluginChat;
 import net.hexuscraft.core.combat.PluginCombat;
 import net.hexuscraft.core.command.PluginCommand;
@@ -32,6 +33,7 @@ public class HexusPlugin extends JavaPlugin {
         _miniPluginClassMap = new HashMap<>();
 
         register(new PluginAuth(this));
+        register(new PluginBuildVersion(this));
         register(new PluginCheat(this));
         register(new PluginChat(this));
         register(new PluginCombat(this));
