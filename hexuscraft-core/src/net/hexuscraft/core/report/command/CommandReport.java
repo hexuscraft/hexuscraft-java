@@ -4,10 +4,8 @@ import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.player.MojangProfile;
-import net.hexuscraft.core.player.MojangSession;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.report.PluginReport;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
