@@ -124,6 +124,7 @@ public class PlayerSearch {
         return new MojangSession(mojangId, mojangName, properties);
     }
 
+    @SuppressWarnings("unused")
     public static MojangSession fetchMojangSession(UUID uuid, CommandSender sender) {
         try {
             return fetchMojangSession(uuid);
