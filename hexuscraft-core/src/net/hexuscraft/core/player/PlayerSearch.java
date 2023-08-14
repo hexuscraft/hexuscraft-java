@@ -1,7 +1,6 @@
 package net.hexuscraft.core.player;
 
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -52,29 +51,6 @@ public class PlayerSearch extends MiniPlugin {
             }
         }
         return matches;
-    }
-
-    public static OfflinePlayer offlinePlayerSearch(MiniPlugin miniPlugin, String searchName) {
-        if (searchName.length() > 16) {
-            return null;
-        }
-
-        MojangProfile mojangProfile;
-        try {
-            mojangProfile = fetchMojangProfile(searchName);
-        } catch (IOException ex) {
-            return null;
-        }
-
-        return miniPlugin._javaPlugin.getServer().getOfflinePlayer(mojangProfile.uuid);
-    }
-
-    public static OfflinePlayer offlinePlayerSearch(MiniPlugin miniPlugin, String searchName, CommandSender executor) {
-        OfflinePlayer match = offlinePlayerSearch(miniPlugin, searchName);
-        if (match == null) {
-            executor.sendMessage(F.fMain("Offline Player Search") + F.fItem("0 Matches") + " for " + F.fItem(searchName) + ".");
-        }
-        return match;
     }
 
     // TODO: Profile caching
