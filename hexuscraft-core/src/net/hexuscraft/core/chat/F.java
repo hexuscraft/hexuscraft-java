@@ -7,10 +7,8 @@ import net.hexuscraft.core.currency.CurrencyType;
 import net.hexuscraft.core.permission.PermissionGroup;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,12 +22,18 @@ public class F {
     static String SPACER_GRAY = C.fReset + " " + C.cGray;
     static String RESET_GRAY = C.fReset + C.cGray;
 
+    static String PREFIX_MAIN = C.cGold + C.fBold;
+    static String PREFIX_SUB = C.cDGray + C.fBold;
+    static String ITEM_COLOR = C.cYellow;
+
     public static String fMain(String prefix) {
-        return C.cBlue + prefix + ">" + SPACER_GRAY;
+//        return C.cBlue + C.fBold + prefix + SPACER_GRAY;
+        return PREFIX_MAIN + prefix + SPACER_GRAY;
     }
 
     public static String fMain() {
-        return fMain("");
+//        return fMain("");
+        return fMain(">");
     }
 
     public static String fMain(MiniPlugin miniPlugin) {
@@ -53,7 +57,12 @@ public class F {
     }
 
     public static String fSub(String prefix) {
-        return C.cDGray + prefix + ">" + SPACER_GRAY;
+//        return C.cDGray + C.fBold + prefix + SPACER_GRAY;
+        return PREFIX_SUB + prefix + SPACER_GRAY;
+    }
+
+    public static String fSub() {
+        return fSub(">");
     }
 
     public static String fSub(MiniPlugin miniPlugin) {
@@ -77,7 +86,8 @@ public class F {
     }
 
     public static String fStaff() {
-        return C.cBlue + "[S]" + SPACER_GRAY;
+//        return C.cBlue + "[S]" + SPACER_GRAY;
+        return fSub("[S]");
     }
 
     public static String fCheat(String prefix, String name, String color, String reason, int count, String... server) {
@@ -110,11 +120,11 @@ public class F {
     }
 
     public static String fItem(String name) {
-        return C.cYellow + name + RESET_GRAY;
+        return ITEM_COLOR + name + RESET_GRAY;
     }
 
     public static String fItem(String name, int count) {
-        return C.cYellow + count + " " + name + RESET_GRAY;
+        return ITEM_COLOR + count + " " + name + RESET_GRAY;
     }
 
     public static String fItem(CommandSender commandSender) {
@@ -130,15 +140,15 @@ public class F {
 //    }
 
     public static String fItem(Material material) {
-        return fItem(material.getData().getName());
+        return fItem(material.name());
     }
 
     public static String fItem(Material material, int count) {
-        return fItem(material.getData().getName(), count);
+        return fItem(material.name(), count);
     }
 
     public static String fItem(ItemStack stack) {
-        return fItem(stack.getType().getData().getCanonicalName(), stack.getAmount());
+        return fItem(stack.getType().name(), stack.getAmount());
     }
 
     public static String fCurrency(String color, String nameSingular, String namePlural, int amount) {
@@ -150,7 +160,8 @@ public class F {
     }
 
     public static String fBroadcast(String name, String msg) {
-        return C.cGold + C.fBold + name + SPACER + C.cYellow + msg;
+//        return C.cGold + C.fBold + name + SPACER + C.cYellow + msg;
+        return fSub("[!]") + fMain(name) + C.cYellow + msg;
     }
 
     public static String fBroadcast(CommandSender sender, String msg) {
@@ -180,7 +191,7 @@ public class F {
     }
 
     public static String fList(String... args) {
-        return RESET_GRAY + "[" + C.cYellow + String.join(RESET_GRAY + ", " + C.cYellow, args) + RESET_GRAY + "]";
+        return RESET_GRAY + "[" + ITEM_COLOR + String.join(RESET_GRAY + ", " + ITEM_COLOR, args) + RESET_GRAY + "]";
     }
 
     public static String fList(int index, String message) {

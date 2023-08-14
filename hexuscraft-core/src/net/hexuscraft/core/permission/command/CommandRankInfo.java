@@ -50,8 +50,8 @@ public class CommandRankInfo extends BaseCommand {
         }
 
         sender.sendMessage(F.fMain(this) + "Displaying group info for " + F.fItem(profile.name) + ":\n"
-                + F.fMain("") + "Primary Group: " + F.fPermissionGroup(PermissionGroup.valueOf(primaryName)) + "\n"
-                + F.fMain("") + "Sub Groups: " + F.fList(groupNames.stream().map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s))).distinct().toArray(String[]::new)));
+                + F.fMain() + "Primary Group: " + F.fPermissionGroup(PermissionGroup.valueOf(primaryName)) + "\n"
+                + F.fMain() + "Sub Groups: " + F.fList(groupNames.stream().map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s))).distinct().toArray(String[]::new)));
     }
 
     @Override

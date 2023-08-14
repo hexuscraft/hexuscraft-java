@@ -48,7 +48,7 @@ public class PlayerSearch extends MiniPlugin {
                 executor.sendMessage(F.fMain("Online Player Search") + F.fItem(matches.length + " Matches") + " for " + F.fItem(searchName) + ".");
             } else {
                 executor.sendMessage(F.fMain("Online Player Search") + F.fItem(matches.length + " Matches") + " for " + F.fItem(searchName) + ".");
-                executor.sendMessage(F.fMain("") + "Matches: " + F.fList(names.toArray(String[]::new)));
+                executor.sendMessage(F.fMain() + "Matches: " + F.fList(names.toArray(String[]::new)));
             }
         }
         return matches;
