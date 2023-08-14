@@ -11,7 +11,6 @@ import net.hexuscraft.database.queries.PermissionQueries;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
