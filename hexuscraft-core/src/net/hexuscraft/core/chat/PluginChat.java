@@ -95,16 +95,9 @@ public class PluginChat extends MiniPlugin {
                         return;
                     }
 
-                    player.sendMessage(F.fAnnounce("Announcement") + announcementMessage);
-
-                    PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-                    playerConnection.sendPacket(new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, IChatBaseComponent.ChatSerializer.a(announcementMessage)));
-                    playerConnection.sendPacket(new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, IChatBaseComponent.ChatSerializer.a(C.cYellow + "Announcement")));
-
-                    /*
                     //noinspection deprecation
                     player.sendTitle(C.cYellow + "Announcement", announcementMessage);
-                     */
+                    player.sendMessage(F.fAnnounce("Announcement") + announcementMessage);
                 });
             }
 
