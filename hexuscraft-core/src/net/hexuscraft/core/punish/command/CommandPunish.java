@@ -38,16 +38,8 @@ public class CommandPunish extends BaseCommand {
             return;
         }
 
-        sender.sendMessage(F.fMain(this) + "Fetching profile...");
-
-        MojangProfile profile;
-        try {
-            profile = PlayerSearch.fetchMojangProfile(args[0]);
-        } catch(IOException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Error while fetching profile of ") + F.fItem(args[0]) + " (Did you type their name correctly?)");
-            sender.sendMessage(F.fMain() + ex.getMessage());
-            return;
-        }
+        final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
+        if (profile == null) { return; }
 
         String reasonMessage = String.join(" ", Arrays.stream(args).toList().subList(1, args.length));
 

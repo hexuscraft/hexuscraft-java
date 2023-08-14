@@ -2,7 +2,6 @@ package net.hexuscraft.core.disguise;
 
 import com.mojang.authlib.GameProfile;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.disguise.command.CommandDisguise;
 import net.hexuscraft.core.permission.IPermission;
@@ -48,14 +47,13 @@ public class PluginDisguise extends MiniPlugin {
         if (entityType == EntityType.PLAYER) {
             CraftPlayer craftPlayer = (CraftPlayer) player;
 
-            player.sendMessage(F.fMain(this) + "Fetching profile...");
-            MojangProfile mojangProfile = PlayerSearch.fetchMojangProfile(disguiseName, player);
-            if (mojangProfile == null) {
+            final MojangProfile profile = PlayerSearch.fetchMojangProfile(disguiseName, player);
+            if (profile == null) {
                 return false;
             }
 
             GameProfile playerProfile = craftPlayer.getProfile();
-            GameProfile targetProfile = new GameProfile(mojangProfile.uuid, mojangProfile.name);
+            GameProfile targetProfile = new GameProfile(profile.uuid, profile.name);
 
             String newName = targetProfile.getName();
 

@@ -54,13 +54,10 @@ public class CommandRankSet extends BaseCommand {
             return;
         }
 
-        MojangProfile profile;
+        final MojangProfile profile;
         try {
-            sender.sendMessage(F.fMain(this) + "Fetching profile...");
-            profile = PlayerSearch.fetchMojangProfile(args[0]);
+            profile = PlayerSearch.fetchMojangProfile(args[0], sender);
         } catch (IOException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Error fetching profile of ") + F.fItem(args[0]) + " (Did you type their name correctly?)");
-            sender.sendMessage(F.fMain() + ex.getMessage());
             return;
         }
 

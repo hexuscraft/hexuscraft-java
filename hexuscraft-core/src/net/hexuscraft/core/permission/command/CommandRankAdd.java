@@ -57,15 +57,8 @@ public class CommandRankAdd extends BaseCommand {
             return;
         }
 
-        MojangProfile profile;
-        try {
-            sender.sendMessage(F.fMain(this) + "Fetching profile...");
-            profile = PlayerSearch.fetchMojangProfile(args[0]);
-        } catch (IOException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Error fetching profile of ") + F.fItem(args[0]));
-            sender.sendMessage(F.fMain() + ex.getMessage());
-            return;
-        }
+        final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
+        if (profile == null) { return; }
 
         _pluginDatabase.getJedisPooled().sadd(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.toString());
         sender.sendMessage(F.fMain(this) + "Added sub-group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
