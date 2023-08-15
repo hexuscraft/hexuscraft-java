@@ -66,7 +66,7 @@ public class CommandGive extends BaseCommand {
                 if (strings.length > 1) {
                     try {
                         enchantmentLevel = Integer.parseInt(strings[1]);
-                    } catch(NumberFormatException ex) {
+                    } catch (NumberFormatException ex) {
                         sender.sendMessage(F.fMain(this) + "Unknown enchantment level " + F.fItem(strings[1]));
                         return;
                     }
@@ -149,10 +149,11 @@ public class CommandGive extends BaseCommand {
 
     @Override
     public String help(String alias) {
-        return super.help(alias) + "\n" +
-                F.fMain() + "Player selectors:\n" +
-                F.fList(1, F.fItem(".") + " - Yourself\n") +
-                F.fList(1, F.fItem("*") + " - Everyone\n") +
-                F.fList(1, F.fItem("**") + " - Others");
+        return super.help(alias) + "\n"
+                + F.fMain() + "Player selectors:\n"
+                + F.fList(1, "Yourself - " + F.fItem(".")) + "\n"
+                + F.fList(2, "Everyone - " + F.fItem("*")) + "\n"
+                + F.fList(3, "Others - " + F.fItem("**"));
     }
+
 }
