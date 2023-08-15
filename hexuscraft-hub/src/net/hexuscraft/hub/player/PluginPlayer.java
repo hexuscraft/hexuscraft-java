@@ -84,7 +84,7 @@ public class PluginPlayer extends MiniPlugin {
         PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), F.fTabFooter(_pluginPortal._serverWebsite));
 
         PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
-        event.setJoinMessage(F.fSuccess("[+]") + " " + F.fPermissionGroup(primaryGroup, true).toUpperCase() + " " + F.fItem(player.getName()));
+        event.setJoinMessage(F.fSub("Join") + F.fPermissionGroup(primaryGroup, true).toUpperCase() + " " + F.fItem(player.getName()));
     }
 
     void refreshInventory(Player player) {
@@ -183,7 +183,7 @@ public class PluginPlayer extends MiniPlugin {
     void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
-        event.setQuitMessage(F.fError("[-]") + " " + F.fPermissionGroup(primaryGroup, true).toUpperCase() + " " + F.fItem(player.getName()));
+        event.setQuitMessage(F.fSub("Quit") + F.fPermissionGroup(primaryGroup, true).toUpperCase() + " " + F.fItem(player.getName()));
     }
 
     @EventHandler

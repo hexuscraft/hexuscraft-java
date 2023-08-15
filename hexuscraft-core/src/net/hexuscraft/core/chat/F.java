@@ -19,26 +19,25 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unused")
 public class F {
 
-    private static final String SPACER = C.fReset + " ";
-    private static final String SPACER_GRAY = C.fReset + " " + C.cGray;
+    private static final String RESET = C.fReset;
     private static final String RESET_GRAY = C.fReset + C.cGray;
 
-    private static final String PREFIX_MAIN = C.cGold + C.fBold;
-    //    static String PREFIX_SUB = C.cDGray + C.fBold;
-    private static final String PREFIX_SUB = C.cDAqua + C.fBold;
-    private static final String PREFIX_ANNOUNCE = C.cYellow + C.fBold;
+    private static final String SPACER = RESET + " ";
+    private static final String SPACER_GRAY = RESET_GRAY + " ";
+
+    private static final String PREFIX_MAIN = C.cBlue;
+    private static final String PREFIX_SUB = C.cDGray;
+
+    private static final String PREFIX_ANNOUNCE = C.cYellow;
 
     private static final String ITEM_COLOR = C.cYellow;
 
     public static String fMain(String prefix) {
-//        return C.cBlue + C.fBold + prefix + SPACER_GRAY;
-//        return PREFIX_MAIN + prefix + SPACER_GRAY;
-        return C.cGray;
+        return PREFIX_MAIN + prefix + ">" + SPACER_GRAY;
     }
 
     public static String fMain() {
-//        return fMain("");
-        return fMain(">");
+        return fMain("");
     }
 
     public static String fMain(MiniPlugin miniPlugin) {
@@ -62,13 +61,11 @@ public class F {
     }
 
     public static String fSub(String prefix) {
-//        return C.cDGray + C.fBold + prefix + SPACER_GRAY;
-//        return PREFIX_SUB + prefix + SPACER_GRAY;
-        return C.cGray;
+        return PREFIX_SUB + prefix + ">" + SPACER_GRAY;
     }
 
     public static String fSub() {
-        return fSub(">");
+        return fSub("");
     }
 
     public static String fSub(MiniPlugin miniPlugin) {
@@ -96,8 +93,7 @@ public class F {
     }
 
     public static String fAnnounce(String text) {
-//        return PREFIX_ANNOUNCE + text + SPACER;
-        return text;
+        return PREFIX_ANNOUNCE + "Announcement>" + SPACER + text;
     }
 
     public static String fItem(String name) {
