@@ -32,26 +32,22 @@ public class PluginDatabase extends MiniPlugin {
 
         callbacks = new HashMap<>();
 
-        //noinspection ReassignedVariable
-        String host = "127.0.0.1";
-        //noinspection ReassignedVariable
-        int port = 6379;
+        final String host;
+        final int port;
 
-        File redisFile = new File("_redis.dat");
         try {
+            File redisFile = new File("_redis.dat");
             Scanner redisScanner = new Scanner(redisFile);
             host = redisScanner.nextLine();
             port = redisScanner.nextInt();
         } catch (FileNotFoundException ex) {
-            // Just realised the host and port fallback to defaults specified above. Stack trace here is A-OK!
-            //noinspection CallToPrintStackTrace
-            ex.printStackTrace();
+            throw new RuntimeException(ex);
         }
 
         try {
             database = new Database(host, port);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 
@@ -79,7 +75,7 @@ public class PluginDatabase extends MiniPlugin {
     }
 
     public JedisPooled getJedisPooled() {
-        return database.getJedisPooled();
+        return database._jedisPooled;
     }
 
     @SuppressWarnings("UnusedReturnValue")

@@ -151,9 +151,9 @@ public class CommandGive extends BaseCommand {
     public String help(String alias) {
         return super.help(alias) + "\n"
                 + F.fMain() + "Player selectors:\n"
-                + F.fList(1, "Yourself - " + F.fItem(".")) + "\n"
-                + F.fList(2, "Everyone - " + F.fItem("*")) + "\n"
-                + F.fList(3, "Others - " + F.fItem("**"));
+                + F.fList(1) + "Yourself - " + F.fItem(".") + "\n"
+                + F.fList(2) + "Everyone - " + F.fItem("*") + "\n"
+                + F.fList(3) + "Others - " + F.fItem("**");
     }
 
 }

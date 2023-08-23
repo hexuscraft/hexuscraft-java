@@ -8,7 +8,9 @@ import redis.clients.jedis.util.SafeEncoder;
 
 public class Database {
 
-    final JedisPooled _jedisPooled;
+    public static final String KEY_DELIMITER = ".";
+
+    public final JedisPooled _jedisPooled;
 
     public Database(String host, int port) throws Exception {
         _jedisPooled = new JedisPooled(host, port);
@@ -17,12 +19,6 @@ public class Database {
         byte[] result = (byte[]) _jedisPooled.sendCommand(Protocol.Command.PING);
         assert (SafeEncoder.encode(result).equals("PONG"));
     }
-
-    public JedisPooled getJedisPooled() {
-        return _jedisPooled;
-    }
-
-    public static final String KEY_DELIMITER = ".";
 
     public static String buildQuery(String... args) {
         return String.join(KEY_DELIMITER, args);

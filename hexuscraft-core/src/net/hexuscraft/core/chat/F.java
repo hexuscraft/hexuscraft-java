@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -128,21 +129,28 @@ public class F {
         return fItem(stack.getType().name(), stack.getAmount());
     }
 
+    public static String fList(String[] args) {
+        return RESET_GRAY + "[" + ITEM_COLOR + String.join(RESET_GRAY + ", " + ITEM_COLOR, args) + RESET_GRAY + "]";
+    }
+
+    public static String fList(List<String> args) {
+        return fList(args.toArray(String[]::new));
+    }
+
+    public static String fList(String text) {
+        return text + "." + SPACER;
+    }
+
+    public static String fList(int index) {
+        return fList(Integer.toString(index));
+    }
+
     public static String fCurrency(String color, String nameSingular, String namePlural, int amount) {
         return color + amount + " " + (amount == 1 ? nameSingular : namePlural) + RESET_GRAY;
     }
 
     public static String fCurrency(CurrencyType currencyType, int amount) {
         return fCurrency(currencyType.getColor(), currencyType.getNameSingular(), currencyType.getNamePlural(), amount);
-    }
-
-    public static String fBroadcast(String name, String msg) {
-//        return C.cGold + C.fBold + name + SPACER + C.cYellow + msg;
-        return fSub(name) + C.cAqua + msg;
-    }
-
-    public static String fBroadcast(CommandSender sender, String msg) {
-        return fBroadcast(sender.getName(), msg);
     }
 
     public static String fCommand(String alias, String usage, String description, ChatColor color) {
@@ -167,20 +175,12 @@ public class F {
         return fCommand(alias, command.getUsage(), command.getDescription());
     }
 
-    public static String fList(String... args) {
-        return RESET_GRAY + "[" + ITEM_COLOR + String.join(RESET_GRAY + ", " + ITEM_COLOR, args) + RESET_GRAY + "]";
-    }
-
-    public static String fList(int index, String message) {
-        return index + "." + SPACER + message;
-    }
-
     public static String fChat(int level, PermissionGroup permissionGroup) {
         return C.cGray + level + SPACER + fPermissionGroup(permissionGroup, true).toUpperCase() + SPACER + C.cYellow + "%s" + SPACER + "%s";
     }
 
     public static String fPermissionGroup(String prefix, String color) {
-        return C.fReset + color + prefix + RESET_GRAY;
+        return RESET + color + prefix + RESET_GRAY;
     }
 
     public static String fPermissionGroup(PermissionGroup permissionGroup) {
@@ -200,11 +200,11 @@ public class F {
     }
 
     public static String fBoolean(boolean toggle) {
-        return C.fReset + (toggle ? (C.cGreen + "True") : (C.cRed + "False")) + RESET_GRAY;
+        return RESET + (toggle ? (C.cGreen + "True") : (C.cRed + "False")) + RESET_GRAY;
     }
 
     public static String fBoolean(String action, boolean toggle) {
-        return C.fReset + (toggle ? C.cGreen : C.cRed) + action + RESET_GRAY;
+        return RESET + (toggle ? C.cGreen : C.cRed) + action + RESET_GRAY;
     }
 
     public static String fSuccess(String action) {
@@ -217,11 +217,10 @@ public class F {
 
     public static String fPunishBan(UUID id, String reason, long length) {
         String formattedLength = length == 0 ? "Permanent" : fTime(length);
-        return C.cRed + C.fBold + "You are banned for " + formattedLength + C.fReset
-                + "\n" + reason + C.fReset
-                + "\n" + C.cDGreen + "Unfairly banned? Appeal at " + C.cGreen + "www.hexuscraft.net" + C.fReset
-                + "\n"
-                + "\n" + C.cDGray + id.toString();
+        return C.cRed + C.fBold + "You are banned for " + formattedLength + RESET + "\n"
+                + reason + RESET + "\n"
+                + C.cDGreen + "Unfairly banned? Appeal at " + C.cGreen + "www.hexuscraft.net" + RESET + "\n\n"
+                + C.cDGray + id.toString();
     }
 
     public static String fCheat(String prefix, String name, String color, String reason, int count, String... server) {
@@ -253,10 +252,10 @@ public class F {
         return fCheat(miniPlugin._name, player, severity, reason, count, server);
     }
 
-    static final double MILLIS_PER_SECOND = 1000;
-    static final double MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60;
-    static final double MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
-    static final double MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
+    private static final double MILLIS_PER_SECOND = 1000;
+    private static final double MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60;
+    private static final double MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
+    private static final double MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
 
     public static String fTime(long millis, int trim, TimeUnit unit) {
         if (millis == -1) {
@@ -303,11 +302,11 @@ public class F {
     }
 
     public static String fTabHeader(String server) {
-        return C.cWhite + C.fBold + "Hexuscraft Network" + SPACER + " " + C.cGreen + server;
+        return "\n     " + C.fBold + "Hexuscraft Network" + RESET + "     \n     " + C.cGreen + server + RESET + "     \n";
     }
 
     public static String fTabFooter(String website) {
-        return C.cWhite + "Visit" + SPACER + C.cGreen + website + SPACER + "for News, Forums and Shop";
+        return RESET;
     }
 
 }

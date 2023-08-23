@@ -138,11 +138,11 @@ public class PluginPermission extends MiniPlugin {
     }
 
     private void setBukkitPermissions(PermissionAttachment attachment, boolean toggle) {
-        attachment.setPermission(_pluginCommand._commandMap.getCommand("minecraft:me").getPermission(), toggle);
-        attachment.setPermission(_pluginCommand._commandMap.getCommand("minecraft:tell").getPermission(), toggle);
-        attachment.setPermission(_pluginCommand._commandMap.getCommand("bukkit:help").getPermission(), toggle);
-        attachment.setPermission(_pluginCommand._commandMap.getCommand("bukkit:plugins").getPermission(), toggle);
-        attachment.setPermission(_pluginCommand._commandMap.getCommand("bukkit:version").getPermission(), toggle);
+        attachment.setPermission("minecraft.command.me", toggle);
+        attachment.setPermission("minecraft.command.tell", toggle);
+        attachment.setPermission("bukkit.command.help", toggle);
+        attachment.setPermission("bukkit.command.plugins", toggle);
+        attachment.setPermission("bukkit.command.version", toggle);
     }
 
     private void grantPermissions(PermissionAttachment attachment, PermissionGroup group) {

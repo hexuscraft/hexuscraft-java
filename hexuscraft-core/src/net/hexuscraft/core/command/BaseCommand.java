@@ -16,7 +16,7 @@ public abstract class BaseCommand extends Command {
     public final IPermission _permission;
 
     protected BaseCommand(MiniPlugin miniPlugin, String name, String usage, String description, Set<String> aliases, IPermission permission) {
-        super(name, description, usage, aliases.stream().toList());
+        super(name.toLowerCase(), description, usage, aliases.stream().map(String::toLowerCase).toList());
         setPermission(permission.toString());
         setPermissionMessage(F.fInsufficientPermissions());
 
@@ -29,7 +29,7 @@ public abstract class BaseCommand extends Command {
     }
 
     public final boolean isAlias(String alias) {
-        return getName().equals(alias) || getAliases().contains(alias);
+        return getName().equalsIgnoreCase(alias) || getAliases().contains(alias.toLowerCase());
     }
 
     public void run(CommandSender sender, String alias, String[] args) {

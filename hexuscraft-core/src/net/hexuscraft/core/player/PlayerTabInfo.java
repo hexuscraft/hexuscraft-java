@@ -20,9 +20,9 @@ public class PlayerTabInfo {
             field.set(packet, footerComponent);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
-        } finally {
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
         }
+
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
     }
 
 }

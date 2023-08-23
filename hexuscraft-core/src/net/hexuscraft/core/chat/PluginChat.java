@@ -93,7 +93,7 @@ public class PluginChat extends MiniPlugin {
 
                     //noinspection deprecation
                     player.sendTitle(C.cYellow + "Announcement", announcementMessage);
-                    player.sendMessage(F.fAnnounce("Announcement") + announcementMessage);
+                    player.sendMessage(F.fAnnounce(announcementMessage));
                 });
             }
 

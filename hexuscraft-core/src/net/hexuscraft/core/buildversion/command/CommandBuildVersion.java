@@ -15,6 +15,11 @@ public class CommandBuildVersion extends BaseCommand {
 
     @Override
     public final void run(CommandSender sender, String alias, String[] args) {
+        if (args.length > 0) {
+            sender.sendMessage(help(alias));
+            return;
+        }
+
         PluginBuildVersion plugin = (PluginBuildVersion) _miniPlugin;
         long lastModified = plugin.getLastModifiedMillis();
         long fileSize = plugin.getSizeBytes();

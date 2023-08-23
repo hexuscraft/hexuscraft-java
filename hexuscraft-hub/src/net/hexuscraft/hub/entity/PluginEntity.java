@@ -65,7 +65,7 @@ public class PluginEntity extends MiniPlugin {
     }
 
     void createEntity(World world, double x, double y, double z, float yaw, float pitch, String[] data) {
-        log(String.join(", ", new String[]{world.toString(), Double.toString(x), Double.toString(y), Double.toString(z), Float.toString(yaw), Float.toString(pitch), String.join(",", data)}));
+        log(String.join(", ", new String[]{world.toString(), Double.toString(x), Double.toString(y), Double.toString(z), Float.toString(yaw), Float.toString(pitch), String.join(":", data)}));
         Location location = new Location(world, x, y, z, yaw, pitch);
         //noinspection ReassignedVariable
         Entity entity = null;

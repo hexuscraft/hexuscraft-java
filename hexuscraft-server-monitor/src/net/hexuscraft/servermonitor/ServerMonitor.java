@@ -1,43 +1,43 @@
 package net.hexuscraft.servermonitor;
 
+import net.hexuscraft.servermonitor.database.PluginDatabase;
+
 import java.io.Console;
 
 public class ServerMonitor implements Runnable {
 
-    @SuppressWarnings("unused")
-    static String LOGGER_FILE_NAME = "manager.log";
-
-    static Console _console;
-
-    static boolean Running = true;
-
     public static void main(String[] args) {
+        new ServerMonitor();
+    }
+
+    private final Console _console;
+    private final PluginDatabase _database;
+
+    private ServerMonitor() {
         _console = System.console();
-        _console.printf("sup" + "\n");
+        _database = new PluginDatabase();
+        new Thread(this).start();
+    }
 
-        ServerMonitor threaddedServerMonitor = new ServerMonitor();
-        Thread thread = new Thread(threaddedServerMonitor);
-        thread.start();
+    private void log(String message, Object... args) {
+        _console.printf(message + "\n", args);
+    }
 
-        String input = _console.readLine("> ");
-
-        _console.printf("INPUT: " + input + "\n");
-        char[] pass = _console.readPassword("> ");
-        _console.printf("PASS: " + String.valueOf(pass) + "\n");
-        _console.readLine();
+    private void tick() {
     }
 
     @Override
-    public void run() {
-//        Console console = System.console();
-        while (Running) {
-            _console.printf("TEST\n");
+    public final void run() {
+        while (true) {
             try {
+                tick();
                 //noinspection BusyWait
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                Thread.sleep(1);
+            } catch (Exception ex) {
+                log(ex.getMessage(), ex);
+                break;
             }
         }
     }
+
 }
