@@ -5,7 +5,6 @@ import net.hexuscraft.core.anticheat.CheatSeverity;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.currency.CurrencyType;
 import net.hexuscraft.core.permission.PermissionGroup;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;

@@ -13,7 +13,6 @@ import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.command.*;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
-import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,7 +23,6 @@ import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -200,6 +198,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         _messenger.unregisterIncomingPluginChannel(_javaPlugin, PROXY_CHANNEL);
 
         _callbacks.clear();
+        _lastUpdateTask.cancel();
     }
 
     @Override

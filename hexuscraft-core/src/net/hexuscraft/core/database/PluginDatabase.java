@@ -1,7 +1,6 @@
 package net.hexuscraft.core.database;
 
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.database.Database;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,7 +16,7 @@ import java.util.UUID;
 
 public class PluginDatabase extends MiniPlugin {
 
-    private Database _database;
+    private final Database _database;
 
     private final Map<String, Map<UUID, MessagedRunnable>> _callbacks;
 

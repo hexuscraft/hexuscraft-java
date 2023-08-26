@@ -2,9 +2,9 @@ package net.hexuscraft.database.queries;
 
 import net.hexuscraft.database.Database;
 
-import javax.xml.crypto.Data;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class ServerQueries {
 
     public static String SERVER(UUID uuid) {

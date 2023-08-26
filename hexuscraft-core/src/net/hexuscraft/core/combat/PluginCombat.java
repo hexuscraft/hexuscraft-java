@@ -1,7 +1,6 @@
 package net.hexuscraft.core.combat;
 
 import net.hexuscraft.core.MiniPlugin;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;

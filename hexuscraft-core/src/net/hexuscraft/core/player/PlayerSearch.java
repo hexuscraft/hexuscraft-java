@@ -1,12 +1,9 @@
 package net.hexuscraft.core.player;
 
-import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

@@ -2,7 +2,8 @@ package net.hexuscraft.proxy;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.player.*;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
+import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.event.query.ProxyQueryEvent;
@@ -20,16 +21,13 @@ import net.hexuscraft.database.serverdata.ServerGroupData;
 import net.hexuscraft.database.serverdata.ServerGroupType;
 import net.hexuscraft.proxy.database.PluginDatabase;
 import net.kyori.adventure.text.Component;
-import redis.clients.jedis.params.XReadGroupParams;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @Plugin(id = "hexuscraft-proxy", name = "Proxy", version = "1.0.0")
 public class Proxy {
@@ -73,12 +71,8 @@ public class Proxy {
                 serverInfoMap.put(serverData._name, new InetSocketAddress(serverData._serverIp, serverData._serverPort));
             });
 
-            _server.getAllServers().forEach(registeredServer -> {
-                _server.unregisterServer(registeredServer.getServerInfo());
-            });
-            serverInfoMap.forEach((name, address) -> {
-                _server.registerServer(new ServerInfo(name, address));
-            });
+            _server.getAllServers().forEach(registeredServer -> _server.unregisterServer(registeredServer.getServerInfo()));
+            serverInfoMap.forEach((name, address) -> _server.registerServer(new ServerInfo(name, address)));
         }).repeat(Duration.ofSeconds(1)).delay(Duration.ofSeconds(0)).schedule();
     }
 

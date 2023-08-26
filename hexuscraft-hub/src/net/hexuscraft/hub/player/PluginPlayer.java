@@ -64,9 +64,7 @@ public class PluginPlayer extends MiniPlugin {
 
             @Override
             public void run() {
-                _javaPlugin.getServer().getOnlinePlayers().forEach(player -> {
-                    PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + _pluginPortal._serverWebsite.toUpperCase());
-                });
+                _javaPlugin.getServer().getOnlinePlayers().forEach(player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + _pluginPortal._serverWebsite.toUpperCase()));
             }
 
         };

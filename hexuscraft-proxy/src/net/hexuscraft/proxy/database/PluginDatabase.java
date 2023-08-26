@@ -38,29 +38,27 @@ public class PluginDatabase {
             throw new RuntimeException(e);
         }
 
-        new Thread(() -> {
-            getJedisPooled().psubscribe(new JedisPubSub() {
+        new Thread(() -> getJedisPooled().psubscribe(new JedisPubSub() {
 
-                @Override
-                public void onPMessage(String pattern, String channel, String message) {
-                    if (!_callbacks.containsKey(channel)) {
-                        return;
-                    }
-                    _callbacks.get(channel).forEach((uuid, callback) -> {
-                        callback.setMessage(message);
-                        callback.run();
-                    });
+            @Override
+            public void onPMessage(String pattern, String channel, String message) {
+                if (!_callbacks.containsKey(channel)) {
+                    return;
                 }
+                _callbacks.get(channel).forEach((uuid, callback) -> {
+                    callback.setMessage(message);
+                    callback.run();
+                });
+            }
 
-            }, "*");
-        });
+        }, "*"));
     }
 
     public JedisPooled getJedisPooled() {
         return _database._jedisPooled;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
+    @SuppressWarnings({"UnusedReturnValue", "unused"})
     public UUID registerCallback(String channelName, MessagedRunnable callback) {
         UUID id = UUID.randomUUID();
         if (!_callbacks.containsKey(channelName)) {

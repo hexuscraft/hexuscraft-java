@@ -6,7 +6,6 @@ import net.hexuscraft.servermonitor.database.PluginDatabase;
 import redis.clients.jedis.JedisPubSub;
 
 import java.io.Console;
-import java.util.Map;
 import java.util.UUID;
 
 public class ServerMonitor implements Runnable {

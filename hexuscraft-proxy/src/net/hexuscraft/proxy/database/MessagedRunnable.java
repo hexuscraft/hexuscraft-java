@@ -12,6 +12,7 @@ public class MessagedRunnable implements Runnable {
         _message = message;
     }
 
+    @SuppressWarnings("unused")
     public final String getMessage() {
         return _message;
     }
