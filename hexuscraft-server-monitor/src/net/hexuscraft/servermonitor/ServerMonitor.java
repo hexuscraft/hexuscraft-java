@@ -3,7 +3,6 @@ package net.hexuscraft.servermonitor;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import net.hexuscraft.servermonitor.database.PluginDatabase;
-import redis.clients.jedis.JedisPubSub;
 
 import java.io.Console;
 import java.util.UUID;
@@ -44,33 +43,20 @@ public class ServerMonitor implements Runnable {
 
     @Override
     public final void run() {
-        new Thread(() -> {
-            while (true) {
-                try {
-                    _database.getJedisPooled().psubscribe(new JedisPubSub() {
-                        @Override
-                        public void onPMessage(final String pattern, final String channel, final String message) {
-                            // TODO: Messaging logic
-                        }
-                    }, "*");
-                } catch(final Exception ex) {
-                    log("Disconnected from redis subscription: " + ex.getMessage());
-                    break;
-                }
-            }
-        }).start();
-
+        //noinspection InfiniteLoopStatement
         while (true) {
             try {
                 tick();
-                //noinspection BusyWait
-                Thread.sleep(100);
-            } catch(final InterruptedException ex) {
-                log("Interrupted, stopping monitor loop.");
-                break;
-            } catch (final Exception ex) {
+            } catch(Exception ex) {
                 //noinspection CallToPrintStackTrace
                 ex.printStackTrace();
+            }
+
+            try {
+                //noinspection BusyWait
+                Thread.sleep(1000);
+            } catch(InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
