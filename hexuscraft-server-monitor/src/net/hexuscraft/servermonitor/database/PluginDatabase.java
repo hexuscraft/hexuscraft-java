@@ -3,6 +3,7 @@ package net.hexuscraft.servermonitor.database;
 import net.hexuscraft.database.Database;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,20 +40,28 @@ public class PluginDatabase {
         }
 
         new Thread(() -> {
-            getJedisPooled().psubscribe(new JedisPubSub() {
+            while (true) {
+                try {
+                    getJedisPooled().psubscribe(new JedisPubSub() {
 
-                @Override
-                public void onPMessage(String pattern, String channel, String message) {
-                    if (!_callbacks.containsKey(channel)) {
-                        return;
-                    }
-                    _callbacks.get(channel).forEach((uuid, callback) -> {
-                        callback.setMessage(message);
-                        callback.run();
-                    });
+                        @Override
+                        public void onPMessage(String pattern, String channel, String message) {
+                            if (!_callbacks.containsKey(channel)) {
+                                return;
+                            }
+                            _callbacks.get(channel).forEach((uuid, callback) -> {
+                                callback.setMessage(message);
+                                callback.run();
+                            });
+                        }
+
+                    }, "*");
+                } catch (JedisConnectionException ex) {
+                    System.out.println("[JEDIS] Exception while connecting to database: " + ex.getMessage());
+                } catch (Exception ex) {
+                    break;
                 }
-
-            }, "*");
+            }
         });
     }
 

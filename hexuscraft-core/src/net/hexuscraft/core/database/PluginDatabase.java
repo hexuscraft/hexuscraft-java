@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -51,20 +52,28 @@ public class PluginDatabase extends MiniPlugin {
         _asyncMessageRunnable = new BukkitRunnable() {
             @Override
             public void run() {
-                getJedisPooled().psubscribe(new JedisPubSub() {
+                while (true) {
+                    try {
+                        getJedisPooled().psubscribe(new JedisPubSub() {
 
-                    @Override
-                    public void onPMessage(String pattern, String channel, String message) {
-                        if (!_callbacks.containsKey(channel)) {
-                            return;
-                        }
-                        _callbacks.get(channel).forEach((uuid, callback) -> {
-                            callback.setMessage(message);
-                            callback.run();
-                        });
+                            @Override
+                            public void onPMessage(String pattern, String channel, String message) {
+                                if (!_callbacks.containsKey(channel)) {
+                                    return;
+                                }
+                                _callbacks.get(channel).forEach((uuid, callback) -> {
+                                    callback.setMessage(message);
+                                    callback.run();
+                                });
+                            }
+
+                        }, "*");
+                    } catch(JedisConnectionException ex) {
+                        log("[JEDIS] Exception while connecting to database: " + ex.getMessage());
+                    } catch(Exception ex) {
+                        break;
                     }
-
-                }, "*");
+                }
             }
         };
         _asyncMessageRunnable.runTaskAsynchronously(_javaPlugin);
