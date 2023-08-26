@@ -14,10 +14,11 @@ import net.hexuscraft.core.player.PlayerTabInfo;
 import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
-import net.hexuscraft.database.serverdata.ServerGroupData;
 import net.hexuscraft.hub.Hub;
 import net.hexuscraft.hub.player.command.CommandSpawn;
-import org.bukkit.*;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -35,7 +36,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import redis.clients.jedis.JedisPooled;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -150,36 +150,15 @@ public class PluginPlayer extends MiniPlugin {
         String displayName = currentItemMeta.getDisplayName();
 
         if (itemType.equals(Material.COMPASS) && displayName.contains("Game Menu")) {
-            openGameMenu(player);
+            openGameMenu(player).run();
         } else if (itemType.equals(Material.SKULL_ITEM) && displayName.contains(player.getName())) {
-            openProfileMenu(player);
+            openProfileMenu(player).run();
         } else if (itemType.equals(Material.CHEST) && displayName.contains("Cosmetics Menu")) {
-            openCosmeticsMenu(player);
+            openCosmeticsMenu(player).run();
         } else if (itemType.equals(Material.EMERALD) && displayName.contains("Shop Menu")) {
-            openShopMenu(player);
+            openShopMenu(player).run();
         } else if (itemType.equals(Material.WATCH) && displayName.contains("Lobby Menu")) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    Inventory lobbyMenu = _javaPlugin.getServer().createInventory(player, 54, "Lobby Menu");
-
-                    JedisPooled jedis = _pluginDatabase.getJedisPooled();
-                    jedis.smembers(ServerQueries.SERVERS_ACTIVE())
-                            .stream()
-                            .map(UUID::fromString)
-                            .map(uuid -> new ServerData(jedis.hgetAll(ServerQueries.SERVER(uuid))))
-                            .filter(serverData -> serverData._name.split("-")[0].equals("Lobby"))
-                            .forEach(serverData -> {
-                                ItemStack serverItem = new ItemStack(Material.EMERALD_BLOCK);
-                                ItemMeta serverItemMeta = serverItem.getItemMeta();
-                                serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby " + serverData._name.split("-")[1]);
-                                serverItemMeta.setLore(List.of(C.cGray + "Click to join"));
-                                serverItem.setItemMeta(serverItemMeta);
-                                lobbyMenu.addItem(serverItem);
-                            });
-                    player.openInventory(lobbyMenu);
-                }
-            }.runTaskAsynchronously(_javaPlugin);
+            openLobbyMenu(player).run();
         }
     }
 
@@ -224,24 +203,65 @@ public class PluginPlayer extends MiniPlugin {
 
     }
 
-    void openGameMenu(Player player) {
-        player.sendMessage("open game");
+    BukkitRunnable openGameMenu(Player player) {
+        return new BukkitRunnable() {
+            @Override
+            public void run() {
+                player.sendMessage("open game");
+            }
+        };
     }
 
-    void openProfileMenu(Player player) {
-        player.sendMessage("open profile");
+    BukkitRunnable openProfileMenu(Player player) {
+        return new BukkitRunnable() {
+            @Override
+            public void run() {
+                player.sendMessage("open profile");
+            }
+        };
     }
 
-    void openCosmeticsMenu(Player player) {
-        player.sendMessage("open cosmetics");
+    BukkitRunnable openCosmeticsMenu(Player player) {
+        return new BukkitRunnable() {
+            @Override
+            public void run() {
+                player.sendMessage("open cosmetics");
+            }
+        };
     }
 
-    void openShopMenu(Player player) {
-        player.sendMessage("open shop");
+    BukkitRunnable openShopMenu(Player player) {
+        return new BukkitRunnable() {
+            @Override
+            public void run() {
+                player.sendMessage("open shop");
+            }
+        };
     }
 
-    void openLobbyMenu(Player player) {
-        player.sendMessage("open lobby");
+    BukkitRunnable openLobbyMenu(Player player) {
+        return new BukkitRunnable() {
+            @Override
+            public void run() {
+                Inventory lobbyMenu = _javaPlugin.getServer().createInventory(player, 54, "Lobby Menu");
+
+                JedisPooled jedis = _pluginDatabase.getJedisPooled();
+                jedis.smembers(ServerQueries.SERVERS_ACTIVE())
+                        .stream()
+                        .map(UUID::fromString)
+                        .map(uuid -> new ServerData(jedis.hgetAll(ServerQueries.SERVER(uuid))))
+                        .filter(serverData -> serverData._name.split("-")[0].equals("Lobby"))
+                        .forEach(serverData -> {
+                            ItemStack serverItem = new ItemStack(Material.EMERALD_BLOCK);
+                            ItemMeta serverItemMeta = serverItem.getItemMeta();
+                            serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby " + serverData._name.split("-")[1]);
+                            serverItemMeta.setLore(List.of(C.cGray + "Click to join"));
+                            serverItem.setItemMeta(serverItemMeta);
+                            lobbyMenu.addItem(serverItem);
+                        });
+                player.openInventory(lobbyMenu);
+            }
+        };
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
