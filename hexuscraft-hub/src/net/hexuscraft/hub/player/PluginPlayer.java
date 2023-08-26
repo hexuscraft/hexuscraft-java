@@ -19,6 +19,7 @@ import net.hexuscraft.hub.player.command.CommandSpawn;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -150,15 +151,15 @@ public class PluginPlayer extends MiniPlugin {
         String displayName = currentItemMeta.getDisplayName();
 
         if (itemType.equals(Material.COMPASS) && displayName.contains("Game Menu")) {
-            openGameMenu(player).run();
+            openGameMenu(player).runTaskAsynchronously(_javaPlugin);
         } else if (itemType.equals(Material.SKULL_ITEM) && displayName.contains(player.getName())) {
-            openProfileMenu(player).run();
+            openProfileMenu(player).runTaskAsynchronously(_javaPlugin);
         } else if (itemType.equals(Material.CHEST) && displayName.contains("Cosmetics Menu")) {
-            openCosmeticsMenu(player).run();
+            openCosmeticsMenu(player).runTaskAsynchronously(_javaPlugin);
         } else if (itemType.equals(Material.EMERALD) && displayName.contains("Shop Menu")) {
-            openShopMenu(player).run();
+            openShopMenu(player).runTaskAsynchronously(_javaPlugin);
         } else if (itemType.equals(Material.WATCH) && displayName.contains("Lobby Menu")) {
-            openLobbyMenu(player).run();
+            openLobbyMenu(player).runTaskAsynchronously(_javaPlugin);
         }
     }
 
@@ -198,6 +199,11 @@ public class PluginPlayer extends MiniPlugin {
             }
 
             final int lobbyId = Integer.parseInt(currentItemMeta.getDisplayName().split("Lobby ", 2)[1]);
+            if (_pluginPortal._serverName.equals("Lobby-" + lobbyId)) {
+                player.playSound(player.getLocation(), Sound.ANVIL_LAND, Integer.MAX_VALUE, 0.8F);
+                return;
+            }
+
             _pluginPortal.teleport(player.getName(), "Lobby-" + lobbyId);
         }
 
@@ -252,12 +258,22 @@ public class PluginPlayer extends MiniPlugin {
                         .map(uuid -> new ServerData(jedis.hgetAll(ServerQueries.SERVER(uuid))))
                         .filter(serverData -> serverData._name.split("-")[0].equals("Lobby"))
                         .forEach(serverData -> {
-                            ItemStack serverItem = new ItemStack(Material.EMERALD_BLOCK);
+                            final int lobbyId = Integer.parseInt(serverData._name.split("-")[1]);
+                            final boolean isCurrentServer = serverData._name.equals(_pluginPortal._serverName);
+
+                            ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
+                            serverItem.setAmount(lobbyId);
+
                             ItemMeta serverItemMeta = serverItem.getItemMeta();
-                            serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby " + serverData._name.split("-")[1]);
-                            serverItemMeta.setLore(List.of(C.cGray + "Click to join"));
+                            serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby " + lobbyId);
+                            serverItemMeta.setLore(List.of(
+                                    C.cGray + (isCurrentServer ? "You are here" : "Click to join"),
+                                    "",
+                                    F.fItem(serverData._playerCount + "/" + serverData._maxPlayers + " Players")
+                            ));
+
                             serverItem.setItemMeta(serverItemMeta);
-                            lobbyMenu.addItem(serverItem);
+                            lobbyMenu.setItem(lobbyId - 1, serverItem);
                         });
                 player.openInventory(lobbyMenu);
             }
