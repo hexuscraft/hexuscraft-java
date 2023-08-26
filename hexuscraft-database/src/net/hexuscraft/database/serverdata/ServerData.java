@@ -11,6 +11,7 @@ public class ServerData {
     public final long _lastUpdate;
     public final String _serverIp;
     public final int _serverPort;
+    public final int _playerCount;
     public final UUID _host;
 
     public ServerData(Map<String, String> serverData) {
@@ -20,6 +21,7 @@ public class ServerData {
         _lastUpdate = Long.parseLong(serverData.getOrDefault("lastUpdate", "0"));
         _serverIp = serverData.getOrDefault("serverIp", "127.0.0.1");
         _serverPort = Integer.parseInt(serverData.getOrDefault("serverPort", "0"));
+        _playerCount = Integer.parseInt(serverData.getOrDefault("playerCount", "0"));
         _host = serverData.containsKey("host") ? UUID.fromString(serverData.get("host")) : null;
     }
 
