@@ -19,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
@@ -181,12 +182,14 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         _lastUpdateTask = new BukkitRunnable() {
             @Override
             public void run() {
-                JedisPooled jedisPooled = _pluginDatabase.getJedisPooled();
-                jedisPooled.hset(ServerQueries.SERVER(_serverUuid), "lastUpdate", Long.toString(System.currentTimeMillis()));
-                jedisPooled.hset(ServerQueries.SERVER(_serverUuid), "serverIp", _serverIp);
-                jedisPooled.hset(ServerQueries.SERVER(_serverUuid), "serverPort", _serverPort);
-                jedisPooled.sadd(ServerQueries.SERVERS_ACTIVE(), _serverUuid.toString());
-                jedisPooled.sadd(ServerQueries.SERVERS_HISTORY(), _serverUuid.toString());
+                JedisPooled jedis = _pluginDatabase.getJedisPooled();
+                BukkitScheduler scheduler = _javaPlugin.getServer().getScheduler();
+                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.hset(ServerQueries.SERVER(_serverUuid), "lastUpdate", Long.toString(System.currentTimeMillis())));
+                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.hset(ServerQueries.SERVER(_serverUuid), "serverIp", _serverIp));
+                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.hset(ServerQueries.SERVER(_serverUuid), "serverPort", _serverPort));
+                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.hset(ServerQueries.SERVER(_serverUuid), "playerCount", Integer.toString(_javaPlugin.getServer().getOnlinePlayers().size())));
+                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.sadd(ServerQueries.SERVERS_ACTIVE(), _serverUuid.toString()));
+                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.sadd(ServerQueries.SERVERS_HISTORY(), _serverUuid.toString()));
             }
         };
         _lastUpdateTask.runTaskTimerAsynchronously(_javaPlugin, 0, 20);
