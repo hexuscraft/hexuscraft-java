@@ -69,7 +69,7 @@ public class PluginDatabase {
         return _database._jedisPooled;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
+    @SuppressWarnings({"UnusedReturnValue", "unused"})
     public UUID registerCallback(String channelName, MessagedRunnable callback) {
         UUID id = UUID.randomUUID();
         if (!_callbacks.containsKey(channelName)) {
