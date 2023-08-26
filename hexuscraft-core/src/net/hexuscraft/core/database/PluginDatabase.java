@@ -67,6 +67,11 @@ public class PluginDatabase extends MiniPlugin {
                                 });
                             }
 
+                            @Override
+                            public void onPSubscribe(String pattern, int subscribedChannels) {
+                                log("[JEDIS] Subscribed to '" + pattern + "' (" + subscribedChannels + ")");
+                            }
+
                         }, "*");
                     } catch(JedisConnectionException ex) {
                         log("[JEDIS] Exception while connecting to database: " + ex.getMessage());

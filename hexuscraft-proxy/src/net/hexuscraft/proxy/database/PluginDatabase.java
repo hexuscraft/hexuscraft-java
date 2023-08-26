@@ -55,6 +55,11 @@ public class PluginDatabase {
                             });
                         }
 
+                        @Override
+                        public void onPSubscribe(String pattern, int subscribedChannels) {
+                            System.out.println("[JEDIS] Subscribed to '" + pattern + "' (" + subscribedChannels + ")");
+                        }
+
                     }, "*");
                 } catch (JedisConnectionException ex) {
                     System.out.println("[JEDIS] Exception while connecting to database: " + ex.getMessage());
