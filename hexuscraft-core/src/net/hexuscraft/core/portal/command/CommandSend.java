@@ -2,6 +2,7 @@ package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
+import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.portal.PluginPortal;
 import org.bukkit.command.CommandSender;
 
@@ -20,10 +21,22 @@ public class CommandSend extends BaseCommand {
             return;
         }
 
+        String targetName = args[0];
+        String serverName = args[1];
+
+        if (PlayerSearch.fetchMojangProfile(targetName, sender) == null) {
+            return;
+        }
+
+        if (!((PluginPortal) _miniPlugin).isServerActive(serverName)) {
+            sender.sendMessage(F.fMain(this) + "Could not locate a server with name " + F.fItem(serverName) + ".");
+            return;
+        }
+
         PluginPortal pluginPortal = (PluginPortal) _miniPlugin;
 
-        sender.sendMessage(F.fMain(this) + "Sending " + F.fItem(args[0]) + " to server " + F.fItem(args[1]) + ".");
-        pluginPortal.teleport(args[0], args[1], sender.getName());
+        sender.sendMessage(F.fMain(this) + "Sending " + F.fItem(targetName) + " to server " + F.fItem(serverName) + ".");
+        pluginPortal.teleport(targetName, serverName, sender.getName());
     }
 
 }

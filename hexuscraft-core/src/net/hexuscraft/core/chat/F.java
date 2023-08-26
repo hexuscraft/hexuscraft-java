@@ -153,9 +153,9 @@ public class F {
         return fCurrency(currencyType.getColor(), currencyType.getNameSingular(), currencyType.getNamePlural(), amount);
     }
 
-    public static String fCommand(String alias, String usage, String description, ChatColor color) {
+    public static String fCommand(String alias, String usage, String description, String prefix) {
         StringBuilder builder = new StringBuilder();
-        builder.append(color).append("/").append(alias);
+        builder.append(prefix).append("/").append(alias);
         if (!usage.isEmpty()) {
             builder.append(" ").append(usage);
         }
@@ -164,15 +164,19 @@ public class F {
     }
 
     public static String fCommand(String alias, String usage, String description) {
-        return fCommand(alias, usage, description, ChatColor.WHITE);
+        return fCommand(alias, usage, description, C.cWhite);
     }
 
-    public static String fCommand(BaseCommand command, String alias, ChatColor color) {
-        return fCommand(alias, command.getUsage(), command.getDescription(), color);
+    public static String fCommand(BaseCommand command, String alias, String prefix) {
+        return fCommand(alias, command.getUsage(), command.getDescription(), prefix);
     }
 
     public static String fCommand(BaseCommand command, String alias) {
         return fCommand(alias, command.getUsage(), command.getDescription());
+    }
+
+    public static String fChat(int level) {
+        return C.cGray + level + SPACER + C.cYellow + "%s" + SPACER + "%s";
     }
 
     public static String fChat(int level, PermissionGroup permissionGroup) {

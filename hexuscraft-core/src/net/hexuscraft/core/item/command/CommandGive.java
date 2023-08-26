@@ -2,6 +2,7 @@ package net.hexuscraft.core.item.command;
 
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
+import net.hexuscraft.core.item.MaterialSearch;
 import net.hexuscraft.core.item.PluginItem;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.Material;
@@ -25,27 +26,8 @@ public class CommandGive extends BaseCommand {
             return;
         }
 
-        final Player[] targets;
-
-        switch (args[0]) {
-            case "." -> {
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage(F.fMain(this) + "Only players can use this selector.");
-                    return;
-                }
-                targets = new Player[]{(Player) sender};
-            }
-            case "*" -> targets = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().toArray(new Player[0]);
-
-            case "**" ->
-                    targets = (Player[]) _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream().filter(player -> !player.getName().equals(sender.getName())).toArray();
-
-            default ->
-                    targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0]);
-        }
-
+        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0], sender);
         if (targets.length == 0) {
-            sender.sendMessage(F.fMain(this) + "Found no players with name " + F.fItem(args[0]) + ".");
             return;
         }
 
@@ -77,14 +59,8 @@ public class CommandGive extends BaseCommand {
         }
 
         for (String materialSearchName : args[1].split(",")) {
-            Material[] targetMaterials = materialSearch(materialSearchName);
+            Material[] targetMaterials = MaterialSearch.materialSearch(materialSearchName, sender);
             if (targetMaterials.length != 1) {
-                StringBuilder builder = new StringBuilder();
-                builder.append(F.fMain("Material Search")).append(F.fItem(targetMaterials.length + " Matches")).append(" for ").append(F.fItem(materialSearchName)).append(".");
-                if (targetMaterials.length > 1) {
-                    builder.append(F.fMain()).append(F.fList(Arrays.stream(targetMaterials).map(Material::name).toArray(String[]::new)));
-                }
-                sender.sendMessage(builder.toString());
                 continue;
             }
 
@@ -101,26 +77,6 @@ public class CommandGive extends BaseCommand {
         }
     }
 
-    @SuppressWarnings("ReassignedVariable")
-    private Material[] materialSearch(String targetName) {
-        targetName = targetName.toLowerCase();
-
-        List<Material> materialMatches = new ArrayList<>();
-        for (Material material : Material.values()) {
-            String materialName = material.name();
-            if (materialName.equalsIgnoreCase(targetName)) {
-                materialMatches.clear();
-                materialMatches.add(material);
-                break;
-            }
-            if (!materialName.toLowerCase().contains(targetName)) {
-                continue;
-            }
-            materialMatches.add(material);
-        }
-        return materialMatches.toArray(new Material[0]);
-    }
-
     @Override
     public List<String> tab(CommandSender sender, String alias, String[] args) {
         List<String> names = new ArrayList<>();
@@ -129,12 +85,7 @@ public class CommandGive extends BaseCommand {
                 names.add(".");
                 names.add("*");
                 names.add("**");
-                names.addAll(_miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream().filter(target -> {
-                    if (sender instanceof Player player) {
-                        return player.canSee(target);
-                    }
-                    return true;
-                }).map(Player::getName).toList());
+                names.addAll(_miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
             }
             case 2 -> names.addAll(Arrays.stream(Material.values()).map(Material::name).toList());
             case 3 -> {
@@ -145,15 +96,6 @@ public class CommandGive extends BaseCommand {
             default -> names.addAll(Arrays.stream(Enchantment.values()).map(Enchantment::getName).toList());
         }
         return names;
-    }
-
-    @Override
-    public String help(String alias) {
-        return super.help(alias) + "\n"
-                + F.fMain() + "Player selectors:\n"
-                + F.fList(1) + "Yourself - " + F.fItem(".") + "\n"
-                + F.fList(2) + "Everyone - " + F.fItem("*") + "\n"
-                + F.fList(3) + "Others - " + F.fItem("**");
     }
 
 }

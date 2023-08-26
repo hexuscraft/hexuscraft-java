@@ -16,6 +16,11 @@ public class CommandRules extends BaseCommand {
 
     @Override
     public final void run(CommandSender sender, String alias, String[] args) {
+        if (args.length > 0) {
+            sender.sendMessage(help(alias));
+            return;
+        }
+
         sender.sendMessage(F.fMain(this) + "Listing Rules:");
         sender.sendMessage(F.fMain() + F.fList(1) + "Don't use gameplay-affecting client modifications");
         sender.sendMessage(F.fMain() + F.fList(2) + "Don't be a dick");

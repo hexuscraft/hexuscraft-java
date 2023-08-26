@@ -202,11 +202,20 @@ public class PluginPunish extends MiniPlugin {
     }
 
     void punish(UUID targetUuid, UUID staffUuid, PunishType punishType, long length, String reason) {
-        PunishData punishData = new PunishData(UUID.randomUUID(), punishType, true, System.currentTimeMillis(), length, reason, DEFAULT_UUID, staffUuid, DEFAULT_UUID, null, null, null, null, null);
+        PunishData punishData = new PunishData(Map.of(
+                "id", UUID.randomUUID().toString(),
+                "type", punishType.name(),
+                "active", "true",
+                "origin", Long.toString(System.currentTimeMillis()),
+                "length", Long.toString(length),
+                "reason", reason,
+                "serverId", DEFAULT_UUID.toString(),
+                "staffId", staffUuid.toString(),
+                "staffServerId", DEFAULT_UUID.toString()
 
-        Map<String, String> punishDataMap = punishData.toMap();
+        ));
 
-        _pluginDatabase.getJedisPooled().hset(PunishQueries.PUNISHMENT(punishData.id.toString()), punishDataMap);
+        _pluginDatabase.getJedisPooled().hset(PunishQueries.PUNISHMENT(punishData.id.toString()), punishData.toMap());
         _pluginDatabase.getJedisPooled().sadd(PunishQueries.LIST(targetUuid.toString()), punishData.id.toString());
         _pluginDatabase.getJedisPooled().publish("punishment", targetUuid + "," + punishData.id);
     }

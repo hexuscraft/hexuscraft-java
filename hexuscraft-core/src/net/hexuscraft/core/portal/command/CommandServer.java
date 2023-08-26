@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Set;
+import java.util.UUID;
 
 public class CommandServer extends BaseCommand {
 
@@ -22,16 +23,24 @@ public class CommandServer extends BaseCommand {
                 sender.sendMessage(F.fMain(this) + "Only players can teleport to a server.");
                 return;
             }
-            String server = args[0];
-            if (server.matches("^(Staff-)\\d+$") && !sender.hasPermission(PermissionGroup.TRAINEE.name())) {
-                sender.sendMessage(F.fPermissionGroup(PermissionGroup.TRAINEE));
+            String serverName = args[0];
+            if (serverName.matches("^(Staff-)\\d+$") && !sender.hasPermission(PermissionGroup.TRAINEE.name())) {
+                sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
-            if (server.matches("^(Build-)\\d+$") && !sender.hasPermission(PermissionGroup.BUILDER.name())) {
-                sender.sendMessage(F.fPermissionGroup(PermissionGroup.BUILDER));
+            if (serverName.matches("^(Build-)\\d+$") && !sender.hasPermission(PermissionGroup.BUILDER.name())) {
+                sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
-            ((PluginPortal) _miniPlugin).teleport(sender.getName(), server);
+            if (((PluginPortal) _miniPlugin)._serverName.equals(serverName)) {
+                sender.sendMessage(F.fMain(this) + "You are already connected to " + F.fItem(serverName) + ".");
+                return;
+            }
+            if (!((PluginPortal) _miniPlugin).isServerActive(serverName)) {
+                sender.sendMessage(F.fMain(this) + "Could not locate a server with name " + F.fItem(serverName) + ".");
+                return;
+            }
+            ((PluginPortal) _miniPlugin).teleport(sender.getName(), serverName);
             return;
         }
         if (args.length == 0) {

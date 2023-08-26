@@ -1,26 +1,26 @@
-package net.hexuscraft.core.report;
+package net.hexuscraft.core.party;
 
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
+import net.hexuscraft.core.party.command.PartyCommand;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.report.command.CommandReport;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 
-public class PluginReport extends MiniPlugin {
+public class PluginParty extends MiniPlugin {
 
     public enum PERM implements IPermission {
-        COMMAND_REPORT
+        COMMAND_PARTY
     }
 
     PluginCommand _pluginCommand;
 
-    public PluginReport(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Reports");
+    public PluginParty(JavaPlugin javaPlugin) {
+        super(javaPlugin, "Party");
 
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_REPORT);
+        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_PARTY);
     }
 
     @Override
@@ -30,7 +30,6 @@ public class PluginReport extends MiniPlugin {
 
     @Override
     public void onEnable() {
-        _pluginCommand.register(new CommandReport(this));
+        _pluginCommand.register(new PartyCommand(this));
     }
-
 }

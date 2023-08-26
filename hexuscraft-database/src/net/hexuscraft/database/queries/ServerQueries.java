@@ -2,6 +2,7 @@ package net.hexuscraft.database.queries;
 
 import net.hexuscraft.database.Database;
 
+import javax.xml.crypto.Data;
 import java.util.UUID;
 
 public class ServerQueries {
@@ -20,6 +21,10 @@ public class ServerQueries {
 
     public static String SERVERS_QUEUE() {
         return Database.buildQuery("servers", "queue");
+    }
+
+    public static String SERVERS_MOTD() {
+        return Database.buildQuery("servers", "motd");
     }
 
     public static String SERVERGROUP(UUID uuid) {

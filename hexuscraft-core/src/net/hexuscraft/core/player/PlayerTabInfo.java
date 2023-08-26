@@ -1,6 +1,8 @@
 package net.hexuscraft.core.player;
 
+import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -23,6 +25,10 @@ public class PlayerTabInfo {
         }
 
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
+    }
+
+    public static void sendActionText(Player player, String message) {
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutChat(new ChatComponentText(message), (byte) 2));
     }
 
 }

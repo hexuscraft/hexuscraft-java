@@ -49,11 +49,13 @@ public class PluginPermission extends MiniPlugin {
         _permissionAttachmentMap = new HashMap<>();
 
         PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_RANK);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RANK_ADD);
         PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_RANK_INFO);
         PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_RANK_LIST);
+
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RANK_ADD);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RANK_REMOVE);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RANK_SET);
+
         PermissionGroup.DEVELOPER._permissions.add(PERM.OPERATOR);
     }
 
@@ -90,7 +92,7 @@ public class PluginPermission extends MiniPlugin {
     }
 
     private void onPlayerJoin(Player player) {
-        _primaryGroupMap.put(player, PermissionGroup.DEFAULT);
+        _primaryGroupMap.put(player, PermissionGroup.MEMBER);
         _secondaryGroupsMap.put(player, Set.of());
 
         JedisPooled jedis = _pluginDatabase.getJedisPooled();

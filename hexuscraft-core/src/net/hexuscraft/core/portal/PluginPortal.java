@@ -10,17 +10,21 @@ import net.hexuscraft.core.database.MessagedRunnable;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.portal.command.CommandRestart;
-import net.hexuscraft.core.portal.command.CommandSend;
-import net.hexuscraft.core.portal.command.CommandServer;
+import net.hexuscraft.core.portal.command.*;
+import net.hexuscraft.database.queries.ServerQueries;
+import net.hexuscraft.database.serverdata.ServerData;
+import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.bukkit.scheduler.BukkitRunnable;
+import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -33,7 +37,11 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         COMMAND_RESTART_GROUP,
         COMMAND_RESTART_SERVER,
         COMMAND_SEND,
-        COMMAND_SERVER
+        COMMAND_SERVER,
+        COMMAND_MOTD,
+        COMMAND_MOTD_VIEW,
+        COMMAND_MOTD_SET,
+        COMMAND_HOSTSERVER
     }
 
     final String PROXY_CHANNEL = "BungeeCord";
@@ -43,17 +51,24 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
     PluginCommand _pluginCommand;
     PluginDatabase _pluginDatabase;
 
+    public UUID _serverUuid;
     public String _serverName;
+    public UUID _serverGroup;
+
     public String _serverIp;
     public String _serverPort;
     public String _serverJar;
     public String _serverWebsite;
 
     private Messenger _messenger;
-    Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
+    private final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
+    private BukkitRunnable _lastUpdateTask;
 
     public PluginPortal(JavaPlugin javaPlugin) {
         super(javaPlugin, "Portal");
+
+        _serverUuid = UUID.randomUUID();
+        _callbacks = new HashMap<>();
     }
 
     @Override
@@ -63,15 +78,18 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SERVER);
 
+        PermissionGroup.MVP._permissions.add(PERM.COMMAND_HOSTSERVER);
+
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RESTART);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RESTART_GROUP);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RESTART_SERVER);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_SEND);
-
-        _callbacks = new HashMap<>();
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_MOTD);
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_MOTD_VIEW);
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_MOTD_SET);
 
         try {
-            _serverName = read(new File("_name.dat"));
+            _serverUuid = UUID.fromString(read(new File("_uuid.dat")));
             _serverIp = read(new File("_ip.dat"));
             _serverPort = read(new File("_port.dat"));
             _serverJar = read(new File("_jar.dat"));
@@ -79,6 +97,10 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
+
+        Map<String, String> serverData = _pluginDatabase.getJedisPooled().hgetAll(ServerQueries.SERVER(_serverUuid));
+        _serverName = serverData.get("name");
+        _serverGroup = UUID.fromString(serverData.get("group"));
 
         _messenger = _javaPlugin.getServer().getMessenger();
         _messenger.registerOutgoingPluginChannel(_javaPlugin, PROXY_CHANNEL);
@@ -90,6 +112,8 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         _pluginCommand.register(new CommandServer(this));
         _pluginCommand.register(new CommandSend(this));
         _pluginCommand.register(new CommandRestart(this));
+        _pluginCommand.register(new CommandMotd(this, _pluginDatabase));
+        _pluginCommand.register(new CommandHostServer(this, _pluginDatabase));
 
         _pluginDatabase.registerCallback(TELEPORT_CHANNEL, new MessagedRunnable(this) {
 
@@ -155,6 +179,19 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
             }
 
         });
+
+        _lastUpdateTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                JedisPooled jedisPooled = _pluginDatabase.getJedisPooled();
+                jedisPooled.hset(ServerQueries.SERVER(_serverUuid), "lastUpdate", Long.toString(System.currentTimeMillis()));
+                jedisPooled.hset(ServerQueries.SERVER(_serverUuid), "serverIp", _serverIp);
+                jedisPooled.hset(ServerQueries.SERVER(_serverUuid), "serverPort", _serverPort);
+                jedisPooled.sadd(ServerQueries.SERVERS_ACTIVE(), _serverUuid.toString());
+                jedisPooled.sadd(ServerQueries.SERVERS_HISTORY(), _serverUuid.toString());
+            }
+        };
+        _lastUpdateTask.runTaskTimerAsynchronously(_javaPlugin, 0, 20);
     }
 
     @Override
@@ -188,6 +225,18 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
             return;
         }
         _pluginDatabase.getJedisPooled().publish(TELEPORT_CHANNEL, player + "," + server);
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean isServerActive(String name) {
+        for (UUID uuid : _pluginDatabase.getJedisPooled().smembers(ServerQueries.SERVERS_ACTIVE()).stream().map(UUID::fromString).toList()) {
+            ServerData serverData = new ServerData(_pluginDatabase.getJedisPooled().hgetAll(ServerQueries.SERVER(uuid)));
+            if (!serverData._name.equals(name)) {
+                continue;
+            }
+            return true;
+        }
+        return false;
     }
 
     public void restartServer(String server) {

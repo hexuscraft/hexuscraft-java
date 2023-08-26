@@ -1,9 +1,12 @@
 package net.hexuscraft.core.player;
 
+import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,7 +18,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PlayerSearch {
 
@@ -39,10 +41,6 @@ public class PlayerSearch {
     }
 
     public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers, final String searchName, final CommandSender sender) {
-        if (searchName.equals(".")) {
-            return sender instanceof Player ? new Player[]{(Player) sender} : new Player[0];
-        }
-
         List<? extends Player> onlinePlayersList = new ArrayList<>(onlinePlayers);
 
         if (searchName.equals("**") && sender instanceof Player player) {
@@ -50,22 +48,10 @@ public class PlayerSearch {
         }
 
         final Player[] matches = onlinePlayerSearch(onlinePlayersList, searchName);
-        final List<String> names = new ArrayList<>();
-        Arrays.stream(matches).toList().forEach(match -> names.add(match.getName()));
 
         sender.sendMessage(F.fMain("Player Search") + F.fItem(matches.length + (matches.length == 1 ? " Match" : " Matches")) + " for " + F.fItem(searchName) + (matches.length == 0 ? "." : ":\n" +
-                F.fMain() + F.fList(names.toArray(String[]::new))));
+                F.fMain() + F.fList(Arrays.stream(matches).map(Player::getName).toArray(String[]::new))));
 
-        /*
-        if (matches.length != 1) {
-            if (matches.length == 0) {
-                sender.sendMessage(F.fMain("Player Search") + F.fItem(matches.length + " Matches") + " for " + F.fItem(searchName) + ".");
-            } else {
-                sender.sendMessage(F.fMain("Player Search") + F.fItem(matches.length + " Matches") + " for " + F.fItem(searchName) + ". Matches:\n"
-                        + F.fMain() + F.fList(names.toArray(String[]::new)));
-            }
-        }
-        */
         return matches;
     }
 

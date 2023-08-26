@@ -28,6 +28,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Map;
@@ -41,6 +42,8 @@ public class PluginPlayer extends MiniPlugin {
     PluginCommand _pluginCommand;
     PluginPermission _pluginPermission;
     PluginPortal _pluginPortal;
+
+    BukkitRunnable _actionTextTask;
 
     public PluginPlayer(Hub hub) {
         super(hub, "Player");
@@ -56,6 +59,23 @@ public class PluginPlayer extends MiniPlugin {
     @Override
     public void onEnable() {
         _pluginCommand.register(new CommandSpawn(this));
+
+        _actionTextTask = new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                _javaPlugin.getServer().getOnlinePlayers().forEach(player -> {
+                    PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + _pluginPortal._serverWebsite.toUpperCase());
+                });
+            }
+
+        };
+        _actionTextTask.runTaskTimer(_javaPlugin, 0, 20);
+    }
+
+    @Override
+    public void onDisable() {
+        _actionTextTask.cancel();
     }
 
     @EventHandler

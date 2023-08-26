@@ -10,7 +10,7 @@ import java.util.Set;
 public class CommandBuildVersion extends BaseCommand {
 
     public CommandBuildVersion(PluginBuildVersion plugin) {
-        super(plugin, "buildversion", "", "", Set.of(), PluginBuildVersion.PERM.COMMAND_BUILDVERSION);
+        super(plugin, "buildversion", "", "View information about the current plugin.", Set.of("bv"), PluginBuildVersion.PERM.COMMAND_BUILDVERSION);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class CommandBuildVersion extends BaseCommand {
                 + F.fMain() + "Version: " + F.fItem(plugin._javaPlugin.getDescription().getVersion() + "\n")
                 + F.fMain() + "Load: " + F.fItem(plugin._javaPlugin.getDescription().getLoad().name() + "\n")
                 + F.fMain() + "Last Modified: " + F.fItem(F.fTime(System.currentTimeMillis() - lastModified)) + " (" + lastModified + ")\n"
-                + F.fMain() + "File Size: " + F.fItem(fileSize + "B")
+                + F.fMain() + "File Size: " + F.fItem(fileSize + " Bytes")
         );
     }
 

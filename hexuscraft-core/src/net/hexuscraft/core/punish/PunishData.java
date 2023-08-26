@@ -23,24 +23,6 @@ public class PunishData {
     public final UUID removeStaffId;
     public final UUID removeStaffServerId;
 
-    public PunishData(UUID id, PunishType type, boolean active, Long origin, Long length, String reason, UUID serverId, UUID staffId, UUID staffServerId, Long removeOrigin, String removeReason, UUID removeServerId, UUID removeStaffId, UUID removeStaffServerId) {
-        this.id = id;
-        this.type = type;
-        this.active = active;
-        this.origin = origin;
-        this.length = length;
-        this.reason = reason;
-        this.serverId = serverId;
-        this.staffId = staffId;
-        this.staffServerId = staffServerId;
-
-        this.removeOrigin = removeOrigin;
-        this.removeReason = removeReason;
-        this.removeServerId = removeServerId;
-        this.removeStaffId = removeStaffId;
-        this.removeStaffServerId = removeStaffServerId;
-    }
-
     public PunishData(Map<String, String> rawData) {
         id = UUID.fromString(rawData.get("id"));
         type = PunishType.valueOf(rawData.get("type"));

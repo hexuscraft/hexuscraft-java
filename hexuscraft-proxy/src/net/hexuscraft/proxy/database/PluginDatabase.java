@@ -1,10 +1,6 @@
-package net.hexuscraft.core.database;
+package net.hexuscraft.proxy.database;
 
-import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.database.Database;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.JedisPubSub;
 
@@ -15,17 +11,13 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class PluginDatabase extends MiniPlugin {
+public class PluginDatabase {
 
-    private Database _database;
+    private final Database _database;
 
     private final Map<String, Map<UUID, MessagedRunnable>> _callbacks;
 
-    private BukkitRunnable _asyncMessageRunnable;
-
-    public PluginDatabase(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Database");
-
+    public PluginDatabase() {
         _callbacks = new HashMap<>();
 
         final String host;
@@ -42,39 +34,26 @@ public class PluginDatabase extends MiniPlugin {
 
         try {
             _database = new Database(host, port);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-    }
 
-    @Override
-    public void onEnable() {
-        _asyncMessageRunnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                getJedisPooled().psubscribe(new JedisPubSub() {
+        new Thread(() -> {
+            getJedisPooled().psubscribe(new JedisPubSub() {
 
-                    @Override
-                    public void onPMessage(String pattern, String channel, String message) {
-                        if (!_callbacks.containsKey(channel)) {
-                            return;
-                        }
-                        _callbacks.get(channel).forEach((uuid, callback) -> {
-                            callback.setMessage(message);
-                            callback.run();
-                        });
+                @Override
+                public void onPMessage(String pattern, String channel, String message) {
+                    if (!_callbacks.containsKey(channel)) {
+                        return;
                     }
+                    _callbacks.get(channel).forEach((uuid, callback) -> {
+                        callback.setMessage(message);
+                        callback.run();
+                    });
+                }
 
-                }, "*");
-            }
-        };
-        _asyncMessageRunnable.runTaskAsynchronously(_javaPlugin);
-    }
-
-    @Override
-    public void onDisable() {
-        _callbacks.clear();
-        _asyncMessageRunnable.cancel();
+            }, "*");
+        });
     }
 
     public JedisPooled getJedisPooled() {

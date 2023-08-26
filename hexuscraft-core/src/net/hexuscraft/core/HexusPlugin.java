@@ -10,6 +10,7 @@ import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.disguise.PluginDisguise;
 import net.hexuscraft.core.gamemode.PluginGameMode;
 import net.hexuscraft.core.item.PluginItem;
+import net.hexuscraft.core.party.PluginParty;
 import net.hexuscraft.core.permission.PluginPermission;
 import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.core.punish.PluginPunish;
@@ -42,6 +43,7 @@ public class HexusPlugin extends JavaPlugin {
         register(new PluginDisguise(this));
         register(new PluginGameMode(this));
         register(new PluginItem(this));
+        register(new PluginParty(this));
         register(new PluginPermission(this));
         register(new PluginPortal(this));
         register(new PluginPunish(this));

@@ -8,6 +8,7 @@ import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.permission.PluginPermission;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -78,7 +79,7 @@ public class PluginChat extends MiniPlugin {
                 String[] args = message.split(",", 3);
                 String senderName = args[0];
                 String groupName = args[1];
-                String announcementMessage = args[2];
+                String announcementMessage = ChatColor.translateAlternateColorCodes('&', args[2]);
 
                 PermissionGroup permissionGroup = PermissionGroup.valueOf(groupName);
 
@@ -118,7 +119,12 @@ public class PluginChat extends MiniPlugin {
     @EventHandler
     private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        event.setFormat(F.fChat(0, _pluginPermission._primaryGroupMap.get(player)));
+
+        if (player.hasPermission(PERM.CHAT_PREFIX.name())) {
+            event.setFormat(F.fChat(0, _pluginPermission._primaryGroupMap.get(player)));
+        } else {
+            event.setFormat(F.fChat(0));
+        }
 
         if (!_chatMuted) {
             return;
