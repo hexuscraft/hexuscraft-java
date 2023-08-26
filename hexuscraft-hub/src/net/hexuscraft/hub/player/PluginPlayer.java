@@ -4,6 +4,7 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.PluginCommand;
+import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.disguise.DisguiseEvent;
 import net.hexuscraft.core.item.UtilItem;
 import net.hexuscraft.core.permission.IPermission;
@@ -11,11 +12,12 @@ import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.permission.PluginPermission;
 import net.hexuscraft.core.player.PlayerTabInfo;
 import net.hexuscraft.core.portal.PluginPortal;
+import net.hexuscraft.database.queries.ServerQueries;
+import net.hexuscraft.database.serverdata.ServerData;
+import net.hexuscraft.database.serverdata.ServerGroupData;
 import net.hexuscraft.hub.Hub;
 import net.hexuscraft.hub.player.command.CommandSpawn;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -25,13 +27,18 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import redis.clients.jedis.JedisPooled;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class PluginPlayer extends MiniPlugin {
 
@@ -42,6 +49,7 @@ public class PluginPlayer extends MiniPlugin {
     PluginCommand _pluginCommand;
     PluginPermission _pluginPermission;
     PluginPortal _pluginPortal;
+    PluginDatabase _pluginDatabase;
 
     BukkitRunnable _actionTextTask;
 
@@ -54,6 +62,7 @@ public class PluginPlayer extends MiniPlugin {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginPermission = (PluginPermission) dependencies.get(PluginPermission.class);
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
+        _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
     }
 
     @Override
@@ -149,7 +158,28 @@ public class PluginPlayer extends MiniPlugin {
         } else if (itemType.equals(Material.EMERALD) && displayName.contains("Shop Menu")) {
             openShopMenu(player);
         } else if (itemType.equals(Material.WATCH) && displayName.contains("Lobby Menu")) {
-            openLobbyMenu(player);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Inventory lobbyMenu = _javaPlugin.getServer().createInventory(player, 54, "Lobby Menu");
+
+                    JedisPooled jedis = _pluginDatabase.getJedisPooled();
+                    jedis.smembers(ServerQueries.SERVERS_ACTIVE())
+                            .stream()
+                            .map(UUID::fromString)
+                            .map(uuid -> new ServerData(jedis.hgetAll(ServerQueries.SERVER(uuid))))
+                            .filter(serverData -> serverData._name.split("-")[0].equals("Lobby"))
+                            .forEach(serverData -> {
+                                ItemStack serverItem = new ItemStack(Material.EMERALD_BLOCK);
+                                ItemMeta serverItemMeta = serverItem.getItemMeta();
+                                serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby " + serverData._name.split("-")[1]);
+                                serverItemMeta.setLore(List.of(C.cGray + "Click to join"));
+                                serverItem.setItemMeta(serverItemMeta);
+                                lobbyMenu.addItem(serverItem);
+                            });
+                    player.openInventory(lobbyMenu);
+                }
+            }.runTaskAsynchronously(_javaPlugin);
         }
     }
 
@@ -163,18 +193,35 @@ public class PluginPlayer extends MiniPlugin {
             return;
         }
 
-        event.setCancelled(true);
+        if (event.getClickedInventory().equals(player.getInventory())) {
+            event.setCancelled(true);
 
-        if (!event.getClickedInventory().equals(player.getInventory())) {
+            ItemStack currentItem = event.getCurrentItem();
+            if (currentItem == null) {
+                return;
+            }
+
+            onItemInteract(player, currentItem);
             return;
         }
 
-        ItemStack currentItem = event.getCurrentItem();
-        if (currentItem == null) {
-            return;
+        if (event.getClickedInventory().getName().equals("Lobby Menu")) {
+            event.setCancelled(true);
+
+            ItemStack currentItem = event.getCurrentItem();
+            if (!currentItem.hasItemMeta()) {
+                return;
+            }
+
+            ItemMeta currentItemMeta = currentItem.getItemMeta();
+            if (!currentItemMeta.hasDisplayName()) {
+                return;
+            }
+
+            final int lobbyId = Integer.parseInt(currentItemMeta.getDisplayName().split("Lobby ", 2)[1]);
+            _pluginPortal.teleport(player.getName(), "Lobby-" + lobbyId);
         }
 
-        onItemInteract(player, currentItem);
     }
 
     void openGameMenu(Player player) {
