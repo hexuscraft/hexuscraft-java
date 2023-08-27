@@ -13,13 +13,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PluginCheat extends MiniPlugin {
+public class PluginAntiCheat extends MiniPlugin {
 
     Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies;
 
     Map<Player, CheatClient> cheatClientMap;
 
-    public PluginCheat(JavaPlugin javaPlugin) {
+    public PluginAntiCheat(JavaPlugin javaPlugin) {
         super(javaPlugin, "Anti Cheat");
     }
 

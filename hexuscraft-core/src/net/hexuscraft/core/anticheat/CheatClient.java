@@ -21,8 +21,8 @@ public class CheatClient extends MiniPluginClient {
     private Map<String, Integer> violations;
     private List<Guardian> guardians;
 
-    public CheatClient(PluginCheat pluginCheat, Player player) {
-        super(pluginCheat, player);
+    public CheatClient(PluginAntiCheat pluginAntiCheat, Player player) {
+        super(pluginAntiCheat, player);
     }
 
     @Override

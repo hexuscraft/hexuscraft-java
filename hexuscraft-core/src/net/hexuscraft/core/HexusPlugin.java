@@ -1,7 +1,7 @@
 package net.hexuscraft.core;
 
-import net.hexuscraft.core.anticheat.PluginCheat;
-import net.hexuscraft.core.authentication.PluginAuth;
+import net.hexuscraft.core.anticheat.PluginAntiCheat;
+import net.hexuscraft.core.authentication.PluginAuthentication;
 import net.hexuscraft.core.buildversion.PluginBuildVersion;
 import net.hexuscraft.core.chat.PluginChat;
 import net.hexuscraft.core.combat.PluginCombat;
@@ -10,6 +10,7 @@ import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.disguise.PluginDisguise;
 import net.hexuscraft.core.gamemode.PluginGameMode;
 import net.hexuscraft.core.item.PluginItem;
+import net.hexuscraft.core.netstat.PluginNetStat;
 import net.hexuscraft.core.party.PluginParty;
 import net.hexuscraft.core.permission.PluginPermission;
 import net.hexuscraft.core.portal.PluginPortal;
@@ -33,9 +34,9 @@ public class HexusPlugin extends JavaPlugin {
 
         _miniPluginClassMap = new HashMap<>();
 
-        register(new PluginAuth(this));
+        register(new PluginAntiCheat(this));
+        register(new PluginAuthentication(this));
         register(new PluginBuildVersion(this));
-        register(new PluginCheat(this));
         register(new PluginChat(this));
         register(new PluginCombat(this));
         register(new PluginCommand(this));
@@ -43,6 +44,7 @@ public class HexusPlugin extends JavaPlugin {
         register(new PluginDisguise(this));
         register(new PluginGameMode(this));
         register(new PluginItem(this));
+        register(new PluginNetStat(this));
         register(new PluginParty(this));
         register(new PluginPermission(this));
         register(new PluginPortal(this));

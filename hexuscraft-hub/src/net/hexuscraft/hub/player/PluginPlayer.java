@@ -252,29 +252,33 @@ public class PluginPlayer extends MiniPlugin {
                 Inventory lobbyMenu = _javaPlugin.getServer().createInventory(player, 54, "Lobby Menu");
 
                 JedisPooled jedis = _pluginDatabase.getJedisPooled();
-                jedis.smembers(ServerQueries.SERVERS_ACTIVE())
+
+                ServerData[] lobbyServers = jedis.smembers(ServerQueries.SERVERS_ACTIVE())
                         .stream()
                         .map(UUID::fromString)
-                        .map(uuid -> new ServerData(jedis.hgetAll(ServerQueries.SERVER(uuid))))
-                        .filter(serverData -> serverData._name.split("-")[0].equals("Lobby"))
-                        .forEach(serverData -> {
-                            final int lobbyId = Integer.parseInt(serverData._name.split("-")[1]);
-                            final boolean isCurrentServer = serverData._name.equals(_pluginPortal._serverName);
+                        .map(ServerQueries::SERVER)
+                        .map(jedis::hgetAll)
+                        .map(ServerData::new)
+                        .toArray(ServerData[]::new);
 
-                            ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
-                            serverItem.setAmount(lobbyId);
-
-                            ItemMeta serverItemMeta = serverItem.getItemMeta();
-                            serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby " + lobbyId);
-                            serverItemMeta.setLore(List.of(
-                                    C.cGray + (isCurrentServer ? "You are here" : "Click to join"),
-                                    "",
-                                    F.fItem(serverData._playerCount + "/" + serverData._maxPlayers + " Players")
-                            ));
-
-                            serverItem.setItemMeta(serverItemMeta);
-                            lobbyMenu.setItem(lobbyId - 1, serverItem);
-                        });
+//                        .forEach(serverData -> {
+//                            final int lobbyId = Integer.parseInt(serverData._name.split("-")[1]);
+//                            final boolean isCurrentServer = serverData._name.equals(_pluginPortal._serverName);
+//
+//                            ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
+//                            serverItem.setAmount(lobbyId);
+//
+//                            ItemMeta serverItemMeta = serverItem.getItemMeta();
+//                            serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby " + lobbyId);
+//                            serverItemMeta.setLore(List.of(
+//                                    C.cGray + (isCurrentServer ? "You are here" : "Click to join"),
+//                                    "",
+//                                    F.fItem(serverData._playerCount + "/" + serverData._maxPlayers + " Players")
+//                            ));
+//
+//                            serverItem.setItemMeta(serverItemMeta);
+//                            lobbyMenu.setItem(lobbyId - 1, serverItem);
+//                        });
                 player.openInventory(lobbyMenu);
             }
         };

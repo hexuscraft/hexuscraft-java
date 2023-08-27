@@ -8,13 +8,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class PluginAuth extends MiniPlugin {
+public class PluginAuthentication extends MiniPlugin {
 
     public enum PERM implements IPermission {
         REQUIRE_AUTHENTICATION
     }
 
-    public PluginAuth(JavaPlugin plugin) {
+    public PluginAuthentication(JavaPlugin plugin) {
         super(plugin, "Authentication");
 
         PermissionGroup.TRAINEE._permissions.add(PERM.REQUIRE_AUTHENTICATION);
