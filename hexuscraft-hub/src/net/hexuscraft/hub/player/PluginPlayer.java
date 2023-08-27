@@ -4,6 +4,8 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.PluginCommand;
+import net.hexuscraft.core.database.AsyncRunnable;
+import net.hexuscraft.core.database.ParameterizedRunnable;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.disguise.DisguiseEvent;
 import net.hexuscraft.core.item.UtilItem;
@@ -151,15 +153,15 @@ public class PluginPlayer extends MiniPlugin {
         String displayName = currentItemMeta.getDisplayName();
 
         if (itemType.equals(Material.COMPASS) && displayName.contains("Game Menu")) {
-            openGameMenu(player).runTaskAsynchronously(_javaPlugin);
+            openGameMenu(player);
         } else if (itemType.equals(Material.SKULL_ITEM) && displayName.contains(player.getName())) {
-            openProfileMenu(player).runTaskAsynchronously(_javaPlugin);
+            openProfileMenu(player);
         } else if (itemType.equals(Material.CHEST) && displayName.contains("Cosmetics Menu")) {
-            openCosmeticsMenu(player).runTaskAsynchronously(_javaPlugin);
+            openCosmeticsMenu(player);
         } else if (itemType.equals(Material.EMERALD) && displayName.contains("Shop Menu")) {
-            openShopMenu(player).runTaskAsynchronously(_javaPlugin);
+            openShopMenu(player);
         } else if (itemType.equals(Material.WATCH) && displayName.contains("Lobby Menu")) {
-            openLobbyMenu(player).runTaskAsynchronously(_javaPlugin);
+            openLobbyMenu(player);
         }
     }
 
@@ -209,79 +211,64 @@ public class PluginPlayer extends MiniPlugin {
 
     }
 
-    BukkitRunnable openGameMenu(Player player) {
-        return new BukkitRunnable() {
-            @Override
-            public void run() {
-                player.sendMessage("open game");
-            }
-        };
+    void openGameMenu(Player player) {
+        player.sendMessage("open game");
     }
 
-    BukkitRunnable openProfileMenu(Player player) {
-        return new BukkitRunnable() {
-            @Override
-            public void run() {
-                player.sendMessage("open profile");
-            }
-        };
+    void openProfileMenu(Player player) {
+        player.sendMessage("open profile");
     }
 
-    BukkitRunnable openCosmeticsMenu(Player player) {
-        return new BukkitRunnable() {
-            @Override
-            public void run() {
-                player.sendMessage("open cosmetics");
-            }
-        };
+    void openCosmeticsMenu(Player player) {
+        player.sendMessage("open cosmetics");
     }
 
-    BukkitRunnable openShopMenu(Player player) {
-        return new BukkitRunnable() {
-            @Override
-            public void run() {
-                player.sendMessage("open shop");
-            }
-        };
+    void openShopMenu(Player player) {
+        player.sendMessage("open shop");
     }
 
-    BukkitRunnable openLobbyMenu(Player player) {
-        return new BukkitRunnable() {
-            @Override
-            public void run() {
-                Inventory lobbyMenu = _javaPlugin.getServer().createInventory(player, 54, "Lobby Menu");
+    void openLobbyMenu(Player player) {
+        Inventory lobbyMenu = _javaPlugin.getServer().createInventory(player, 54, "Lobby Menu");
 
+        new AsyncRunnable(this, new ParameterizedRunnable() {
+            @Override
+            public Object run(Object... params) {
                 JedisPooled jedis = _pluginDatabase.getJedisPooled();
-
-                ServerData[] lobbyServers = jedis.smembers(ServerQueries.SERVERS_ACTIVE())
+                return jedis.smembers(ServerQueries.SERVERS_ACTIVE())
                         .stream()
                         .map(UUID::fromString)
                         .map(ServerQueries::SERVER)
                         .map(jedis::hgetAll)
                         .map(ServerData::new)
-                        .toArray(ServerData[]::new);
-
-//                        .forEach(serverData -> {
-//                            final int lobbyId = Integer.parseInt(serverData._name.split("-")[1]);
-//                            final boolean isCurrentServer = serverData._name.equals(_pluginPortal._serverName);
-//
-//                            ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
-//                            serverItem.setAmount(lobbyId);
-//
-//                            ItemMeta serverItemMeta = serverItem.getItemMeta();
-//                            serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby " + lobbyId);
-//                            serverItemMeta.setLore(List.of(
-//                                    C.cGray + (isCurrentServer ? "You are here" : "Click to join"),
-//                                    "",
-//                                    F.fItem(serverData._playerCount + "/" + serverData._maxPlayers + " Players")
-//                            ));
-//
-//                            serverItem.setItemMeta(serverItemMeta);
-//                            lobbyMenu.setItem(lobbyId - 1, serverItem);
-//                        });
-                player.openInventory(lobbyMenu);
+                        .toArray(Object[]::new);
             }
-        };
+        }, new ParameterizedRunnable() {
+            @Override
+            public Object run(Object... params) {
+                ServerData[] lobbyServers = (ServerData[]) params[0];
+                for (ServerData serverData : lobbyServers) {
+                    final int lobbyId = Integer.parseInt(serverData._name.split("-")[1]);
+                    final boolean isCurrentServer = serverData._name.equals(_pluginPortal._serverName);
+
+                    ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
+                    serverItem.setAmount(lobbyId);
+
+                    ItemMeta serverItemMeta = serverItem.getItemMeta();
+                    serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby " + lobbyId);
+                    serverItemMeta.setLore(List.of(
+                            C.cGray + (isCurrentServer ? "You are here" : "Click to join"),
+                            "",
+                            F.fItem(serverData._playerCount + "/" + serverData._maxPlayers + " Players")
+                    ));
+
+                    serverItem.setItemMeta(serverItemMeta);
+                    lobbyMenu.setItem(lobbyId - 1, serverItem);
+                }
+                player.openInventory(lobbyMenu);
+                return null;
+            }
+        });
+
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

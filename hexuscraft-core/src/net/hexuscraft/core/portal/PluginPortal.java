@@ -40,7 +40,8 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         COMMAND_MOTD,
         COMMAND_MOTD_VIEW,
         COMMAND_MOTD_SET,
-        COMMAND_HOSTSERVER
+        COMMAND_HOSTSERVER,
+        COMMAND_HOSTEVENT
     }
 
     final String PROXY_CHANNEL = "BungeeCord";
@@ -112,6 +113,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         _pluginCommand.register(new CommandSend(this));
         _pluginCommand.register(new CommandRestart(this));
         _pluginCommand.register(new CommandMotd(this, _pluginDatabase));
+        _pluginCommand.register(new CommandHostEvent(this, _pluginDatabase));
         _pluginCommand.register(new CommandHostServer(this, _pluginDatabase));
 
         _pluginDatabase.registerCallback(TELEPORT_CHANNEL, new MessagedRunnable(this) {

@@ -7,7 +7,6 @@ import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -21,7 +20,8 @@ public class CommandHostEvent extends BaseCommand {
     Set<Player> _pending;
 
     public CommandHostEvent(PluginPortal pluginPortal, PluginDatabase pluginDatabase) {
-        super(pluginPortal, "hostevent", "", "Start a new private server.", Set.of("privateserver", "hps", "mps"), PluginPortal.PERM.COMMAND_HOSTSERVER);
+        //noinspection SpellCheckingInspection
+        super(pluginPortal, "hostevent", "", "Start a new private server.", Set.of("privateserver", "hps", "mps"), PluginPortal.PERM.COMMAND_HOSTEVENT);
 
         _pending = new HashSet<>();
         _pluginDatabase = pluginDatabase;

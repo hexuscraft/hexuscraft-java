@@ -8,7 +8,7 @@ import java.util.Set;
 public class CommandNetStat extends BaseMultiCommand {
 
     public CommandNetStat(PluginNetStat pluginNetStat) {
-        super(pluginNetStat, "netstat", "Manage the network.", Set.of(), PluginNetStat.PERM.COMMAND_NETSTAT, Set.of(
+        super(pluginNetStat, "netstat", "Manage the network.", Set.of("net"), PluginNetStat.PERM.COMMAND_NETSTAT, Set.of(
                 new CommandNetStatGroup(pluginNetStat),
                 new CommandNetStatServer(pluginNetStat)
         ));

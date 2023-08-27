@@ -11,7 +11,7 @@ import java.util.Map;
 public class PluginNetStat extends MiniPlugin {
 
     public PluginNetStat(JavaPlugin javaPlugin) {
-        super(javaPlugin, "NetStat");
+        super(javaPlugin, "Network Statistics");
     }
 
     public enum PERM implements IPermission {

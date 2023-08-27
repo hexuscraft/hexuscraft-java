@@ -5,7 +5,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class AsyncRunnable {
 
-    AsyncRunnable(MiniPlugin miniPlugin, ParameterizedRunnable request, ParameterizedRunnable callback) {
+    public AsyncRunnable(MiniPlugin miniPlugin, ParameterizedRunnable request, ParameterizedRunnable callback) {
         new BukkitRunnable() {
             @Override
             public void run() {
