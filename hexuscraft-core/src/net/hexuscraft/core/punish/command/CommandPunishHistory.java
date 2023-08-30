@@ -20,6 +20,7 @@ public class CommandPunishHistory extends BaseCommand {
         super(pluginPunish, "punishmenthistory", "[Player]", "View the history of punishments.", Set.of("punishhistory", "xh"), PluginPunish.PERM.COMMAND_PUNISH_HISTORY);
     }
 
+    @SuppressWarnings({"unused", "UnusedAssignment"})
     @Override
     public final void run(CommandSender sender, String alias, String[] args) {
         if (args.length > 1) {
@@ -27,7 +28,6 @@ public class CommandPunishHistory extends BaseCommand {
             return;
         }
 
-        //noinspection unused
         final UUID targetUUID;
         final String targetName;
 
