@@ -14,7 +14,7 @@ import java.util.Set;
 public class CommandSpawn extends BaseCommand {
 
     public CommandSpawn(PluginPlayer pluginPlayer) {
-        super(pluginPlayer, "spawn", "[Player]", "Warp to spawn.", Set.of("stuck", "hub"), PluginPlayer.PERM.COMMAND_SPAWN);
+        super(pluginPlayer, "spawn", "[Player]", "Warp to spawn.", Set.of("stuck", "hub", "lobby"), PluginPlayer.PERM.COMMAND_SPAWN);
     }
 
     @Override
