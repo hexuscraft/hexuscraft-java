@@ -8,18 +8,13 @@ import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import redis.clients.jedis.JedisPooled;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class CommandHostServer extends BaseCommand {
 
@@ -77,9 +72,7 @@ public class CommandHostServer extends BaseCommand {
                     player.sendMessage(F.fMain(this) + "You are already the host of a private server!\n" + F.fMain() + "Connect to it with " + F.fItem("/server " + serverName + "."));
                 });
             } catch (Exception e) {
-                scheduler.runTask(_miniPlugin._javaPlugin, () -> {
-                    player.sendMessage(F.fMain(this) + F.fError("There was an error while contacting the database. Maybe try again later?"));
-                });
+                scheduler.runTask(_miniPlugin._javaPlugin, () -> player.sendMessage(F.fMain(this) + F.fError("There was an error while contacting the database. Maybe try again later?")));
             } finally {
                 _pending.remove(player);
             }
