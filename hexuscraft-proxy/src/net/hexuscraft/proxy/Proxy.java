@@ -21,6 +21,7 @@ import net.hexuscraft.database.serverdata.ServerGroupData;
 import net.hexuscraft.database.serverdata.ServerGroupType;
 import net.hexuscraft.proxy.database.PluginDatabase;
 import net.kyori.adventure.text.Component;
+import redis.clients.jedis.JedisPooled;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -62,9 +63,11 @@ public class Proxy {
             _motd = MOTD_PREFIX + _pluginDatabase.getJedisPooled().get(ServerQueries.SERVERS_MOTD());
 
             Map<String, InetSocketAddress> serverInfoMap = new HashMap<>();
-            _pluginDatabase.getJedisPooled().smembers(ServerQueries.SERVERS_ACTIVE()).stream().map(UUID::fromString).forEach(uuid -> {
-                ServerData serverData = new ServerData(_pluginDatabase.getJedisPooled().hgetAll(ServerQueries.SERVER(uuid)));
-                ServerGroupData groupData = new ServerGroupData(_pluginDatabase.getJedisPooled().hgetAll(ServerQueries.SERVERGROUP(serverData._group)));
+
+            JedisPooled jedis = _pluginDatabase.getJedisPooled();
+            jedis.smembers(ServerQueries.SERVERS_ACTIVE()).stream().map(UUID::fromString).forEach(uuid -> {
+                ServerData serverData = new ServerData(uuid, jedis.hgetAll(ServerQueries.SERVER(uuid)));
+                ServerGroupData groupData = new ServerGroupData(serverData._group, jedis.hgetAll(ServerQueries.SERVERGROUP(serverData._group)));
                 if (groupData._type != ServerGroupType.DEDICATED) {
                     return;
                 }
