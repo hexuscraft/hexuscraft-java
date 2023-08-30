@@ -6,24 +6,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class PluginScoreboard extends MiniPlugin {
 
-    Map<Class<? extends MiniPlugin>, MiniPlugin> miniPluginClassMap;
-
-    Map<Player, ClientScoreboard> scoreboardClientMap;
+    private final Map<Player, Scoreboard> _scoreboardMap;
 
     public PluginScoreboard(JavaPlugin javaPlugin) {
         super(javaPlugin, "Scoreboard");
-    }
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> miniPluginClassMap) {
-        this.miniPluginClassMap = miniPluginClassMap;
-        scoreboardClientMap = new HashMap<>();
+        _scoreboardMap = new HashMap<>();
     }
 
     @Override
@@ -38,24 +35,28 @@ public class PluginScoreboard extends MiniPlugin {
         for (Player player : _javaPlugin.getServer().getOnlinePlayers()) {
             onPlayerQuit(new PlayerQuitEvent(player, null));
         }
-        scoreboardClientMap.clear();
-        scoreboardClientMap = null;
+        _scoreboardMap.clear();
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        ClientScoreboard client = new ClientScoreboard(this, player);
-        scoreboardClientMap.put(player, client);
-        client.load(miniPluginClassMap);
-        client.enable();
+
+        Scoreboard scoreboard = _javaPlugin.getServer().getScoreboardManager().getNewScoreboard();
+        player.setScoreboard(scoreboard);
+        _scoreboardMap.put(player, scoreboard);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        scoreboardClientMap.get(player).disable();
-        scoreboardClientMap.remove(player);
+        player.setScoreboard(_javaPlugin.getServer().getScoreboardManager().getMainScoreboard());
+
+        Scoreboard scoreboard = _scoreboardMap.get(player);
+        scoreboard.getTeams().forEach(Team::unregister);
+        scoreboard.getEntries().forEach(scoreboard::resetScores);
+        scoreboard.getObjectives().forEach(Objective::unregister);
+        _scoreboardMap.remove(player);
     }
 
 }
