@@ -8,9 +8,9 @@ import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CommandGameMode extends BaseCommand {
 
@@ -59,11 +59,12 @@ public class CommandGameMode extends BaseCommand {
 
     @Override
     public List<String> tab(CommandSender sender, String alias, String[] args) {
-        List<String> names = new ArrayList<>();
-        if (args.length == 1) {
-            _miniPlugin._javaPlugin.getServer().getOnlinePlayers().forEach(player -> names.add(player.getName()));
+        //noinspection ReassignedVariable
+        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+        if (sender instanceof Player player) {
+            streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
         }
-        return names;
+        return streamedOnlinePlayers.map(Player::getName).toList();
     }
 
 }

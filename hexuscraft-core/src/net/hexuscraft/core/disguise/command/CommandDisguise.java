@@ -7,7 +7,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CommandDisguise extends BaseCommand {
 
@@ -39,6 +42,26 @@ public class CommandDisguise extends BaseCommand {
             ex.printStackTrace();
             player.sendMessage(F.fMain(this) + F.fError("There was an error while applying your disguise:\n") + F.fMain() + ex.getMessage());
         }
+    }
+
+    @Override
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        if (args.length > 1) {
+            return List.of();
+        }
+
+        List<String> names = new ArrayList<>();
+
+        //noinspection ReassignedVariable
+        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+        if (sender instanceof Player player) {
+            streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+        }
+
+        names.addAll(List.of("*", "**"));
+        names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
+
+        return names;
     }
 
 }

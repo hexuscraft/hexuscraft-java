@@ -9,9 +9,11 @@ import net.hexuscraft.core.report.PluginReport;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CommandReport extends BaseCommand {
 
@@ -49,4 +51,21 @@ public class CommandReport extends BaseCommand {
 
         sender.sendMessage(F.fMain(this) + "Report against " + F.fItem(targetProfile.name) + " has been submitted for review. You will receive a response shortly.");
     }
+
+    @Override
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        List<String> names = new ArrayList<>();
+        if (args.length == 1) {
+            //noinspection ReassignedVariable
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+            if (sender instanceof Player player) {
+                streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+            }
+
+            names.addAll(List.of("*", "**"));
+            names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
+        }
+        return names;
+    }
+
 }

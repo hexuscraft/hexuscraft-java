@@ -9,13 +9,17 @@ import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.scoreboard.PluginScoreboard;
 import net.hexuscraft.database.queries.PermissionQueries;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CommandRankAdd extends BaseCommand {
 
@@ -73,18 +77,21 @@ public class CommandRankAdd extends BaseCommand {
 
     @Override
     public List<String> tab(CommandSender sender, String alias, String[] args) {
-        if (args.length == 1) {
-            return _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream().map(HumanEntity::getName).toList();
-        }
-        if (args.length == 2) {
-            return Arrays.stream(PermissionGroup.values()).map(permissionGroup -> {
-                if (permissionGroup.name().startsWith("_")) {
-                    return null;
+        List<String> names = new ArrayList<>();
+        switch (args.length) {
+            case 1 -> {
+                //noinspection ReassignedVariable
+                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+                if (sender instanceof Player player) {
+                    streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
                 }
-                return permissionGroup.name();
-            }).toList();
+
+                names.addAll(List.of("*", "**"));
+                names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
+            }
+            case 2 -> names.addAll(Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(s -> !s.startsWith("_")).toList());
         }
-        return List.of();
+        return names;
     }
 
 }

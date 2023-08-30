@@ -42,4 +42,11 @@ public class CommandAnnouncement extends BaseCommand {
         sender.sendMessage(F.fMain(this) + "Message has been broadcast.");
     }
 
+    @Override
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        if (args.length == 1) {
+            return Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).toList();
+        }
+        return List.of();
+    }
 }

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class CommandGive extends BaseCommand {
 
@@ -82,10 +83,14 @@ public class CommandGive extends BaseCommand {
         List<String> names = new ArrayList<>();
         switch (args.length) {
             case 1 -> {
-                names.add(".");
-                names.add("*");
-                names.add("**");
-                names.addAll(_miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
+                //noinspection ReassignedVariable
+                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+                if (sender instanceof Player player) {
+                    streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+                }
+
+                names.addAll(List.of("*", "**"));
+                names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
             }
             case 2 -> names.addAll(Arrays.stream(Material.values()).map(Material::name).toList());
             case 3 -> {

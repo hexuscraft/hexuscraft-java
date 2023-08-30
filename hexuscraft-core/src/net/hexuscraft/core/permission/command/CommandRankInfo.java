@@ -10,9 +10,13 @@ import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.database.queries.PermissionQueries;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CommandRankInfo extends BaseCommand {
 
@@ -47,11 +51,12 @@ public class CommandRankInfo extends BaseCommand {
     }
 
     @Override
-    public final List<String> tab(CommandSender sender, String alias, String[] args) {
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        List<String> names = new ArrayList<>();
         if (args.length == 1) {
-            return _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream().map(HumanEntity::getName).toList();
+            names.addAll(Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(s -> !s.startsWith("_")).toList());
         }
-        return List.of();
+        return names;
     }
 
 }

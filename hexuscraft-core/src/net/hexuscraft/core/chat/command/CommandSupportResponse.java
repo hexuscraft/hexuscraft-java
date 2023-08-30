@@ -10,8 +10,11 @@ import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CommandSupportResponse extends BaseCommand {
 
@@ -58,4 +61,25 @@ public class CommandSupportResponse extends BaseCommand {
 
         sender.sendMessage(help(alias));
     }
+
+    @Override
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        if (args.length > 1) {
+            return List.of();
+        }
+
+        List<String> names = new ArrayList<>();
+
+        //noinspection ReassignedVariable
+        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+        if (sender instanceof Player player) {
+            streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+        }
+
+        names.addAll(List.of("*", "**"));
+        names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
+
+        return names;
+    }
+
 }

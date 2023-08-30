@@ -16,9 +16,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CommandPunish extends BaseCommand {
 
@@ -47,10 +49,18 @@ public class CommandPunish extends BaseCommand {
 
     @Override
     public List<String> tab(CommandSender sender, String alias, String[] args) {
+        List<String> names = new ArrayList<>();
         if (args.length == 1) {
-            return _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+            //noinspection ReassignedVariable
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+            if (sender instanceof Player player) {
+                streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+            }
+
+            names.addAll(List.of("*", "**"));
+            names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
         }
-        return List.of();
+        return names;
     }
 
     public final void openGui(Player player, MojangProfile targetProfile, String reasonMessage) {
