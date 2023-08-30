@@ -27,6 +27,7 @@ public class CommandPunishHistory extends BaseCommand {
             return;
         }
 
+        //noinspection unused
         final UUID targetUUID;
         final String targetName;
 
