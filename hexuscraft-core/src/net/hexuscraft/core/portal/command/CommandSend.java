@@ -5,8 +5,12 @@ import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.portal.PluginPortal;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CommandSend extends BaseCommand {
 
@@ -37,6 +41,22 @@ public class CommandSend extends BaseCommand {
 
         sender.sendMessage(F.fMain(this) + "Sending " + F.fItem(targetName) + " to server " + F.fItem(serverName) + ".");
         pluginPortal.teleport(targetName, serverName, sender.getName());
+    }
+
+    @Override
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        List<String> names = new ArrayList<>();
+        if (args.length == 1) {
+            //noinspection ReassignedVariable
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+            if (sender instanceof Player player) {
+                streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+            }
+
+            names.addAll(List.of("*", "**"));
+            names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
+        }
+        return names;
     }
 
 }
