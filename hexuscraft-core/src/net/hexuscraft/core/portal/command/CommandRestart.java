@@ -8,7 +8,7 @@ import java.util.Set;
 public class CommandRestart extends BaseMultiCommand {
 
     public CommandRestart(PluginPortal pluginPortal) {
-        super(pluginPortal, "reboot", "Restart a server or group of servers.", Set.of("rs"), PluginPortal.PERM.COMMAND_RESTART, Set.of(
+        super(pluginPortal, "reboot", "Restart a server or group of servers.", Set.of("rb"), PluginPortal.PERM.COMMAND_RESTART, Set.of(
                 new CommandRestartServer(pluginPortal),
                 new CommandRestartGroup(pluginPortal)
         ));
