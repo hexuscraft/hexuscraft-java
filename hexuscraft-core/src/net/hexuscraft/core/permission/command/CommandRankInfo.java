@@ -9,14 +9,11 @@ import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.database.queries.PermissionQueries;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public class CommandRankInfo extends BaseCommand {
 

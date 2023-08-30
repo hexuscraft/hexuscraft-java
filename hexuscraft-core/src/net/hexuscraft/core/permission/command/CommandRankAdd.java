@@ -9,10 +9,7 @@ import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.scoreboard.PluginScoreboard;
 import net.hexuscraft.database.queries.PermissionQueries;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
