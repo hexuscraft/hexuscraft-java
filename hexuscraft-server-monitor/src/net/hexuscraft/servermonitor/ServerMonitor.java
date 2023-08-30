@@ -3,6 +3,7 @@ package net.hexuscraft.servermonitor;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import net.hexuscraft.servermonitor.database.PluginDatabase;
+import redis.clients.jedis.JedisPooled;
 
 import java.io.Console;
 import java.util.UUID;
@@ -27,15 +28,17 @@ public class ServerMonitor implements Runnable {
     }
 
     private void tick() {
-        _database.getJedisPooled().smembers(ServerQueries.SERVERS_QUEUE()).stream().map(UUID::fromString).forEach(uuid -> {
-            _database.getJedisPooled().srem(ServerQueries.SERVERS_QUEUE(), uuid.toString());
+        JedisPooled jedis = _database.getJedisPooled();
+
+        jedis.smembers(ServerQueries.SERVERS_QUEUE()).stream().map(UUID::fromString).forEach(uuid -> {
+            jedis.srem(ServerQueries.SERVERS_QUEUE(), uuid.toString());
             log("Starting server with UUID '" + uuid + "'...");
         });
 
-        _database.getJedisPooled().smembers(ServerQueries.SERVERS_ACTIVE()).stream().map(UUID::fromString).forEach(uuid -> {
-            final ServerData serverData = new ServerData(_database.getJedisPooled().hgetAll(ServerQueries.SERVER(uuid)));
+        jedis.smembers(ServerQueries.SERVERS_ACTIVE()).stream().map(UUID::fromString).forEach(uuid -> {
+            final ServerData serverData = new ServerData(uuid, jedis.hgetAll(ServerQueries.SERVER(uuid)));
             if ((System.currentTimeMillis() - serverData._lastUpdate) > 5000L) {
-                _database.getJedisPooled().srem(ServerQueries.SERVERS_ACTIVE(), uuid.toString());
+                jedis.srem(ServerQueries.SERVERS_ACTIVE(), uuid.toString());
                 log("Server with uuid '" + uuid + "' has not updated within 5 seconds. Removed it from the 'servers.active' set.");
             }
         });
