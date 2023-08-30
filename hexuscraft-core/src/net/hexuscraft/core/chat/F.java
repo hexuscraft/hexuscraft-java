@@ -5,6 +5,7 @@ import net.hexuscraft.core.anticheat.CheatSeverity;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.currency.CurrencyType;
 import net.hexuscraft.core.permission.PermissionGroup;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -203,19 +204,15 @@ public class F {
     }
 
     public static String fBoolean(boolean toggle) {
-        return RESET + (toggle ? (C.cGreen + "True") : (C.cRed + "False")) + RESET_GRAY;
-    }
-
-    public static String fBoolean(String action, boolean toggle) {
-        return RESET + (toggle ? C.cGreen : C.cRed) + action + RESET_GRAY;
+        return RESET + (toggle ? C.cGreen : C.cRed) + StringUtils.capitalize(Boolean.toString(toggle)) + RESET_GRAY;
     }
 
     public static String fSuccess(String action) {
-        return fBoolean(action, true);
+        return RESET + C.cGreen + action + RESET_GRAY;
     }
 
     public static String fError(String action) {
-        return fBoolean(action, false);
+        return RESET + C.cRed + action + RESET_GRAY;
     }
 
     public static String fPunishBan(UUID id, String reason, long length) {
@@ -226,10 +223,10 @@ public class F {
                 + C.cDGray + id.toString();
     }
 
-    public static String fCheat(String prefix, String name, String color, String reason, int count, String... server) {
+    public static String fCheat(String name, String color, String reason, int count, String... server) {
         StringBuilder builder = new StringBuilder(C.cAqua).append(C.fMagic).append("H")
                 .append(SPACER)
-                .append(C.cRed).append(C.fBold).append(prefix.toUpperCase()).append(" >")
+                .append(C.cRed).append(C.fBold).append("HAC").append(" >")
                 .append(SPACER)
                 .append(C.cGold).append(name)
                 .append(SPACER)
@@ -247,12 +244,8 @@ public class F {
         return builder.toString();
     }
 
-    public static String fCheat(String prefix, Player player, CheatSeverity severity, String reason, int count, String... server) {
-        return fCheat(prefix, player.getName(), severity.getColor(), reason, count, server);
-    }
-
-    public static String fCheat(MiniPlugin miniPlugin, Player player, CheatSeverity severity, String reason, int count, String... server) {
-        return fCheat(miniPlugin._name, player, severity, reason, count, server);
+    public static String fCheat(Player player, CheatSeverity severity, String reason, int count, String... server) {
+        return fCheat(player.getName(), severity.getColor(), reason, count, server);
     }
 
     private static final double MILLIS_PER_SECOND = 1000;
