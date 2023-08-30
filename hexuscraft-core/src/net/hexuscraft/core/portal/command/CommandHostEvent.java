@@ -116,9 +116,7 @@ public class CommandHostEvent extends BaseCommand {
                     player.sendMessage(F.fMain(this) + F.fItem(eventServerGroupData._prefix + "-" + newServerId) + " is being created...\n" + F.fMain() + "You will be teleported in around " + F.fItem("30 Seconds") + ".");
                 });
             } catch (Exception e) {
-                scheduler.runTask(_miniPlugin._javaPlugin, () -> {
-                    player.sendMessage(F.fMain(this) + F.fError("There was an error while contacting the database. Maybe try again later?"));
-                });
+                scheduler.runTask(_miniPlugin._javaPlugin, () -> player.sendMessage(F.fMain(this) + F.fError("There was an error while contacting the database. Maybe try again later?")));
             } finally {
                 _pending.remove(player);
             }
