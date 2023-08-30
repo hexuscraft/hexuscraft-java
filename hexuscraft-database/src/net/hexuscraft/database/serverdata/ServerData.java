@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public class ServerData {
 
+    public final UUID _uuid;
     public final String _name;
     public final UUID _group;
     public final int _maxPlayers;
@@ -14,7 +15,8 @@ public class ServerData {
     public final int _playerCount;
     public final UUID _host;
 
-    public ServerData(Map<String, String> serverData) {
+    public ServerData(UUID uuid, Map<String, String> serverData) {
+        _uuid = uuid;
         _name = serverData.get("name");
         _group = UUID.fromString(serverData.get("group"));
         _maxPlayers = Integer.parseInt(serverData.getOrDefault("maxPlayers", "0"));
