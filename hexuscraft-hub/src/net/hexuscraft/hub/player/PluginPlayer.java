@@ -58,6 +58,8 @@ public class PluginPlayer extends MiniPlugin {
 
     public PluginPlayer(Hub hub) {
         super(hub, "Player");
+
+        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SPAWN);
     }
 
     @Override
@@ -237,9 +239,7 @@ public class PluginPlayer extends MiniPlugin {
                 return jedis.smembers(ServerQueries.SERVERS_ACTIVE())
                         .stream()
                         .map(UUID::fromString)
-                        .map(ServerQueries::SERVER)
-                        .map(jedis::hgetAll)
-                        .map(ServerData::new)
+                        .map(uuid -> new ServerData(uuid, jedis.hgetAll(ServerQueries.SERVER(uuid))))
                         .toArray(Object[]::new);
             }
         }, new ParameterizedRunnable() {
