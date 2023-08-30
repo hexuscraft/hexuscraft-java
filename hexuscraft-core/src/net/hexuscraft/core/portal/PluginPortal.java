@@ -24,10 +24,7 @@ import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
@@ -77,16 +74,17 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
 
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SERVER);
-
         PermissionGroup.MVP._permissions.add(PERM.COMMAND_HOSTSERVER);
-
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RESTART);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RESTART_GROUP);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RESTART_SERVER);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_SEND);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_MOTD);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_MOTD_VIEW);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_MOTD_SET);
+        PermissionGroup.ADMINISTRATOR._permissions.addAll(List.of(
+                PERM.COMMAND_RESTART,
+                PERM.COMMAND_RESTART_GROUP,
+                PERM.COMMAND_RESTART_SERVER,
+                PERM.COMMAND_SEND,
+                PERM.COMMAND_MOTD,
+                PERM.COMMAND_MOTD_VIEW,
+                PERM.COMMAND_MOTD_SET
+        ));
+        PermissionGroup.EVENT_LEAD._permissions.add(PERM.COMMAND_HOSTEVENT);
 
         try {
             _serverUuid = UUID.fromString(read(new File("_uuid.dat")));
@@ -234,7 +232,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isServerActive(String name) {
         for (UUID uuid : _pluginDatabase.getJedisPooled().smembers(ServerQueries.SERVERS_ACTIVE()).stream().map(UUID::fromString).toList()) {
-            ServerData serverData = new ServerData(_pluginDatabase.getJedisPooled().hgetAll(ServerQueries.SERVER(uuid)));
+            ServerData serverData = new ServerData(uuid, _pluginDatabase.getJedisPooled().hgetAll(ServerQueries.SERVER(uuid)));
             if (!serverData._name.equals(name)) {
                 continue;
             }
