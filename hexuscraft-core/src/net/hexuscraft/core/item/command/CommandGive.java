@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public class CommandGive extends BaseCommand {
 
     public CommandGive(PluginItem itemCenter) {
-        super(itemCenter, "give", "<Players> <Item> [Amount] [Enchantment:Level,...]", "Give items to players.", Set.of("g", "item", "i"), PluginItem.PERM.COMMAND_GIVE);
+        super(itemCenter, "give", "<Players> <Item> [Amount] [Enchantment:Level ...]", "Give items to players.", Set.of("g", "item", "i"), PluginItem.PERM.COMMAND_GIVE);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class CommandGive extends BaseCommand {
 
         final HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
         if (args.length > 3) {
-            Arrays.stream(args[3].split(",")).map(s -> s.split(":")).forEach(strings -> {
+            Arrays.stream(Arrays.copyOfRange(args, 3, args.length)).map(s -> s.split(":")).forEach(strings -> {
                 Enchantment enchantment = Enchantment.getByName(strings[0]);
                 if (enchantment == null) {
                     sender.sendMessage(F.fMain(this) + "Unknown enchantment named " + F.fItem(strings[0]) + ". Listing Enchantments:\n"
