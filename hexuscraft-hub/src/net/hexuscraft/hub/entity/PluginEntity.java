@@ -19,11 +19,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class PluginEntity extends MiniPlugin {
 
@@ -39,8 +37,10 @@ public class PluginEntity extends MiniPlugin {
     public PluginEntity(JavaPlugin javaPlugin) {
         super(javaPlugin, "Entity");
 
-        PermissionGroup.BUILDER._permissions.add(PERM.COMMAND_ENTITY);
-        PermissionGroup.BUILDER._permissions.add(PERM.COMMAND_ENTITY_LIST);
+        PermissionGroup.BUILDER._permissions.addAll(List.of(
+                PERM.COMMAND_ENTITY,
+                PERM.COMMAND_ENTITY_LIST
+        ));
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_ENTITY_REFRESH);
 
@@ -56,7 +56,7 @@ public class PluginEntity extends MiniPlugin {
     public void onEnable() {
         _pluginCommand.register(new CommandEntity(this));
 
-//        _javaPlugin.getServer().getWorlds().forEach(this::refreshNPCs);
+        _javaPlugin.getServer().getWorlds().forEach(this::refreshNPCs);
     }
 
     @Override
@@ -69,6 +69,7 @@ public class PluginEntity extends MiniPlugin {
         Location location = new Location(world, x, y, z, yaw, pitch);
         //noinspection ReassignedVariable
         Entity entity = null;
+        world.getPlayers().forEach(player -> player.sendMessage("'" + String.join("','", data) + "'"));
         if (data[0].equals("REWARDS")) {
 //            Creeper creeper = (Creeper) world.spawnEntity(location, EntityType.CREEPER);
             Creeper creeper = world.spawn(location, Creeper.class);
@@ -156,15 +157,18 @@ public class PluginEntity extends MiniPlugin {
     public void refreshNPCs(World world) {
         removeNPCs(world);
 
-        String npcFileContent;
+        final List<String> npcStrings = new ArrayList<>();
+
         try {
-            npcFileContent = new Scanner(Path.of(world.getWorldFolder().getPath(), "npcs.dat").toFile()).useDelimiter("\\Z").next();
-        } catch (IOException ex) {
+            Scanner scanner = new Scanner(Path.of( world.getWorldFolder().getPath(), "_npcs.dat").toFile());
+            while (scanner.hasNextLine()) {
+                npcStrings.add(scanner.nextLine());
+            }
+        } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
 
-        Arrays.asList(npcFileContent.split("\\n")).forEach(s -> {
-//            log(s);
+        npcStrings.forEach(s -> {
             String[] npc = s.split(",");
             double x = Double.parseDouble(npc[0]);
             double y = Double.parseDouble(npc[1]);
