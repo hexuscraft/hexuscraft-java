@@ -23,16 +23,18 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HexusPlugin extends JavaPlugin {
+public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
 
-    Map<Class<? extends MiniPlugin>, MiniPlugin> _miniPluginClassMap;
+    private final Map<Class<? extends MiniPlugin>, MiniPlugin> _miniPluginClassMap;
+
+    public HexusPlugin() {
+        _miniPluginClassMap = new HashMap<>();
+    }
 
     @Override
     public final void onLoad() {
         log("Loading...");
         long start = System.currentTimeMillis();
-
-        _miniPluginClassMap = new HashMap<>();
 
         register(new PluginAntiCheat(this));
         register(new PluginAuthentication(this));
@@ -58,9 +60,6 @@ public class HexusPlugin extends JavaPlugin {
         log("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public void load() {
-    }
-
     @Override
     public final void onEnable() {
         log("Enabling...");
@@ -70,10 +69,6 @@ public class HexusPlugin extends JavaPlugin {
         _miniPluginClassMap.values().forEach(MiniPlugin::enable);
 
         log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
-    }
-
-    @SuppressWarnings("EmptyMethod")
-    public void enable() {
     }
 
     @Override
@@ -86,10 +81,6 @@ public class HexusPlugin extends JavaPlugin {
         _miniPluginClassMap.clear();
 
         log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
-    }
-
-    @SuppressWarnings("EmptyMethod")
-    public void disable() {
     }
 
     public final void register(MiniPlugin miniPlugin) {
