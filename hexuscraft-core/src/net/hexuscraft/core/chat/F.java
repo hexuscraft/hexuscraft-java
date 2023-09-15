@@ -113,10 +113,6 @@ public class F {
         return fItem(entity.getName());
     }
 
-//    public static String fItem(OfflinePlayer offlinePlayer) {
-//        return fItem(offlinePlayer.getName());
-//    }
-
     public static String fItem(Material material) {
         return fItem(material.name());
     }
