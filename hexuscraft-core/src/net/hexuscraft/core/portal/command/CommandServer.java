@@ -11,8 +11,11 @@ import java.util.Set;
 
 public class CommandServer extends BaseCommand {
 
+    private final PluginPortal _portal;
+
     public CommandServer(PluginPortal pluginPortal) {
         super(pluginPortal, "server", "[Name]", "Teleport to a server.", Set.of("sv", "portal"), PluginPortal.PERM.COMMAND_SERVER);
+        _portal = pluginPortal;
     }
 
     @Override
@@ -31,19 +34,19 @@ public class CommandServer extends BaseCommand {
                 sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
-            if (((PluginPortal) _miniPlugin)._serverName.equals(serverName)) {
+            if (_portal._serverName.equals(serverName)) {
                 sender.sendMessage(F.fMain(this) + "You are already connected to " + F.fItem(serverName) + ".");
                 return;
             }
-            if (!((PluginPortal) _miniPlugin).isServerActive(serverName)) {
+            if (!_portal.isServerActive(serverName)) {
                 sender.sendMessage(F.fMain(this) + "Could not locate a server with name " + F.fItem(serverName) + ".");
                 return;
             }
-            ((PluginPortal) _miniPlugin).teleport(sender.getName(), serverName);
+            _portal.teleport(sender.getName(), serverName);
             return;
         }
         if (args.length == 0) {
-            sender.sendMessage(F.fMain(this) + "You are connected to " + F.fItem(((PluginPortal) _miniPlugin)._serverName) + ".");
+            sender.sendMessage(F.fMain(this) + "You are connected to " + F.fItem(_portal._serverName) + ".");
             return;
         }
         sender.sendMessage(help(alias));
