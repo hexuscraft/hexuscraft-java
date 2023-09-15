@@ -18,7 +18,7 @@ public class ServerGroupData {
         _requiredPermission = serverGroupData.get("requiredPermission");
         _minPort = Integer.parseInt(serverGroupData.getOrDefault("minPort", "0"));
         _maxPort = Integer.parseInt(serverGroupData.getOrDefault("maxPort", "0"));
-        _type = ServerGroupType.valueOf(serverGroupData.get("type"));
+        _type = serverGroupData.containsKey("type") ? ServerGroupType.valueOf(serverGroupData.get("type")) : ServerGroupType.DEDICATED;
     }
 
 }
