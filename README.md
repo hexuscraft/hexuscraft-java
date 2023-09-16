@@ -40,12 +40,15 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 ### SET user.(UUID).punishments
 
-- **UUID**
+- UUID
 
 ### STRING user.(UUID).permission.primary
 
-- **String** (Rank)
+- Rank Enum
 
 ### SET user.(UUID).permission.additional
 
-- **String** (Rank)
+- Rank Enum
+
+### STRING motd
+- *Anything*
