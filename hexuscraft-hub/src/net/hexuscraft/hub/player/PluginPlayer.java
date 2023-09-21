@@ -16,12 +16,10 @@ import net.hexuscraft.core.player.PlayerTabInfo;
 import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
+import net.hexuscraft.database.serverdata.ServerGroupData;
 import net.hexuscraft.hub.Hub;
 import net.hexuscraft.hub.player.command.CommandSpawn;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -36,12 +34,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 import redis.clients.jedis.JedisPooled;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PluginPlayer extends MiniPlugin {
 
@@ -49,17 +46,26 @@ public class PluginPlayer extends MiniPlugin {
         COMMAND_SPAWN
     }
 
-    PluginCommand _pluginCommand;
-    PluginPermission _pluginPermission;
-    PluginPortal _pluginPortal;
-    PluginDatabase _pluginDatabase;
+    private PluginCommand _pluginCommand;
+    private PluginPermission _pluginPermission;
+    private PluginPortal _pluginPortal;
+    private PluginDatabase _pluginDatabase;
 
-    BukkitRunnable _actionTextTask;
+    private final BukkitRunnable _actionTextTask;
 
     public PluginPlayer(Hub hub) {
         super(hub, "Player");
 
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SPAWN);
+
+        _actionTextTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                _javaPlugin.getServer()
+                        .getOnlinePlayers()
+                        .forEach(player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET"));
+            }
+        };
     }
 
     @Override
@@ -73,15 +79,6 @@ public class PluginPlayer extends MiniPlugin {
     @Override
     public void onEnable() {
         _pluginCommand.register(new CommandSpawn(this));
-
-        _actionTextTask = new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                _javaPlugin.getServer().getOnlinePlayers().forEach(player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + _pluginPortal._serverWebsite.toUpperCase()));
-            }
-
-        };
         _actionTextTask.runTaskTimer(_javaPlugin, 0, 20);
     }
 
@@ -95,6 +92,18 @@ public class PluginPlayer extends MiniPlugin {
         Hub hub = (Hub) _javaPlugin;
         Location spawn = hub.getSpawn();
 
+        Player player = getPlayer(event, hub);
+        player.getInventory().setHeldItemSlot(0);
+        refreshInventory(player);
+        player.teleport(spawn);
+
+        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), F.fTabFooter("WWW.HEXUSCRAFT.NET"));
+
+        PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
+        event.setJoinMessage(F.fSub("Join") + F.fPermissionGroup(primaryGroup, true).toUpperCase() + " " + F.fItem(player.getName()));
+    }
+
+    private static Player getPlayer(PlayerJoinEvent event, Hub hub) {
         Player player = event.getPlayer();
         player.setFallDistance(0);
         player.setFlying(false);
@@ -109,14 +118,7 @@ public class PluginPlayer extends MiniPlugin {
         player.setFoodLevel(20);
         player.setExhaustion(0);
         player.setExp(0);
-        player.getInventory().setHeldItemSlot(0);
-        refreshInventory(player);
-        player.teleport(spawn);
-
-        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), F.fTabFooter(_pluginPortal._serverWebsite));
-
-        PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
-        event.setJoinMessage(F.fSub("Join") + F.fPermissionGroup(primaryGroup, true).toUpperCase() + " " + F.fItem(player.getName()));
+        return player;
     }
 
     void refreshInventory(Player player) {
@@ -141,18 +143,18 @@ public class PluginPlayer extends MiniPlugin {
         refreshInventory(event._player);
     }
 
-    void onItemInteract(Player player, ItemStack itemStack) {
-        Material itemType = itemStack.getType();
+    private void onItemInteract(final Player player, final ItemStack itemStack) {
+        final Material itemType = itemStack.getType();
 
         if (!itemStack.hasItemMeta()) {
             return;
         }
-        ItemMeta currentItemMeta = itemStack.getItemMeta();
+        final ItemMeta currentItemMeta = itemStack.getItemMeta();
 
         if (!currentItemMeta.hasDisplayName()) {
             return;
         }
-        String displayName = currentItemMeta.getDisplayName();
+        final String displayName = currentItemMeta.getDisplayName();
 
         if (itemType.equals(Material.COMPASS) && displayName.contains("Game Menu")) {
             openGameMenu(player);
@@ -168,8 +170,8 @@ public class PluginPlayer extends MiniPlugin {
     }
 
     @EventHandler
-    void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) {
+    private void onInventoryClick(final InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof final Player player)) {
             return;
         }
 
@@ -192,83 +194,67 @@ public class PluginPlayer extends MiniPlugin {
         if (event.getClickedInventory().getName().equals("Lobby Menu")) {
             event.setCancelled(true);
 
-            ItemStack currentItem = event.getCurrentItem();
+            final ItemStack currentItem = event.getCurrentItem();
             if (!currentItem.hasItemMeta()) {
                 return;
             }
 
-            ItemMeta currentItemMeta = currentItem.getItemMeta();
+            final ItemMeta currentItemMeta = currentItem.getItemMeta();
             if (!currentItemMeta.hasDisplayName()) {
                 return;
             }
 
-            final int lobbyId = Integer.parseInt(currentItemMeta.getDisplayName().split("Lobby ", 2)[1]);
-            if (_pluginPortal._serverName.equals("Lobby-" + lobbyId)) {
-                player.playSound(player.getLocation(), Sound.ANVIL_LAND, Integer.MAX_VALUE, 0.8F);
-                return;
-            }
-
-            _pluginPortal.teleport(player.getName(), "Lobby-" + lobbyId);
+            _pluginPortal.teleport(player.getName(), ChatColor.stripColor(currentItemMeta.getDisplayName()));
         }
 
     }
 
-    void openGameMenu(Player player) {
+    void openGameMenu(final Player player) {
         player.sendMessage("open game");
     }
 
-    void openProfileMenu(Player player) {
+    void openProfileMenu(final Player player) {
         player.sendMessage("open profile");
     }
 
-    void openCosmeticsMenu(Player player) {
+    void openCosmeticsMenu(final Player player) {
         player.sendMessage("open cosmetics");
     }
 
-    void openShopMenu(Player player) {
+    void openShopMenu(final Player player) {
         player.sendMessage("open shop");
     }
 
-    void openLobbyMenu(Player player) {
-        Inventory lobbyMenu = _javaPlugin.getServer().createInventory(player, 54, "Lobby Menu");
+    void openLobbyMenu(final Player player) {
+        final Inventory lobbyMenu = _javaPlugin.getServer().createInventory(player, 54, "Lobby Menu");
 
-        new AsyncRunnable(this, new ParameterizedRunnable() {
-            @Override
-            public Object run(Object... params) {
-                JedisPooled jedis = _pluginDatabase.getJedisPooled();
-                return jedis.smembers(ServerQueries.SERVERS_ACTIVE())
-                        .stream()
-                        .map(UUID::fromString)
-                        .map(uuid -> new ServerData(uuid, jedis.hgetAll(ServerQueries.SERVER(uuid))))
-                        .toArray(Object[]::new);
-            }
-        }, new ParameterizedRunnable() {
-            @Override
-            public Object run(Object... params) {
-                ServerData[] lobbyServers = (ServerData[]) params[0];
-                for (ServerData serverData : lobbyServers) {
+        final BukkitScheduler scheduler = _javaPlugin.getServer().getScheduler();
+        scheduler.runTaskAsynchronously(_javaPlugin, () -> {
+            final JedisPooled jedis = _pluginDatabase.getJedisPooled();
+            final ServerGroupData lobbyGroupData = ServerQueries.getServerGroup(jedis, "lobby-main");
+            final ServerData[] serverDataArray = ServerQueries.getServers(jedis, lobbyGroupData);
+            scheduler.runTask(_javaPlugin, () -> {
+                for (ServerData serverData : serverDataArray) {
                     final int lobbyId = Integer.parseInt(serverData._name.split("-")[1]);
                     final boolean isCurrentServer = serverData._name.equals(_pluginPortal._serverName);
 
-                    ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
+                    final ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
                     serverItem.setAmount(lobbyId);
 
-                    ItemMeta serverItemMeta = serverItem.getItemMeta();
-                    serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby " + lobbyId);
+                    final ItemMeta serverItemMeta = serverItem.getItemMeta();
+                    serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby-" + lobbyId);
                     serverItemMeta.setLore(List.of(
                             C.cGray + (isCurrentServer ? "You are here" : "Click to join"),
                             "",
-                            F.fItem(serverData._playerCount + "/" + serverData._maxPlayers + " Players")
+                            F.fItem(serverData._players + "/" + serverData._capacity + " Players")
                     ));
 
                     serverItem.setItemMeta(serverItemMeta);
                     lobbyMenu.setItem(lobbyId - 1, serverItem);
                 }
                 player.openInventory(lobbyMenu);
-                return null;
-            }
+            });
         });
-
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

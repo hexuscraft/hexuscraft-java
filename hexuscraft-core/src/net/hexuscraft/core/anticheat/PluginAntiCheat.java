@@ -3,9 +3,15 @@ package net.hexuscraft.core.anticheat;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
+import net.hexuscraft.core.entity.NBTEditor;
+import net.hexuscraft.core.entity.UtilEntity;
+import net.hexuscraft.core.permission.IPermission;
+import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.PluginPortal;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftGuardian;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Guardian;
 import org.bukkit.entity.Player;
@@ -15,15 +21,17 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PluginAntiCheat extends MiniPlugin {
+
+    public enum PERM implements IPermission {
+        COMMAND_TESTBAN
+    }
 
     private PluginPortal _pluginPortal;
 
@@ -36,6 +44,8 @@ public class PluginAntiCheat extends MiniPlugin {
 
         _violations = new HashMap<>();
         _guardians = new HashMap<>();
+
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_TESTBAN);
     }
 
     @Override
@@ -127,29 +137,54 @@ public class PluginAntiCheat extends MiniPlugin {
         guardian.setMetadata("Silent", new FixedMetadataValue(_javaPlugin, 1));
         guardian.setMetadata("NoAI", new FixedMetadataValue(_javaPlugin, 1));
         guardian.setMetadata("CustomName", new FixedMetadataValue(_javaPlugin, guardian.getCustomName()));
+        guardian.setMetadata("0Gravity", new FixedMetadataValue(_javaPlugin, 0));
         guardian.teleport(location);
+
+        NBTEditor.set(guardian, 1, "NoAI");
+        NBTEditor.set(guardian, 0, "Gravity");
+
         return guardian;
     }
 
-    @SuppressWarnings("unused")
-    private void ban(Player player, String reason, CheatSeverity severity, int count) {
-        List<Guardian> guardians = List.of(
-                spawnGuardian(player.getLocation().add(new Vector(3, 3, 0))),
-                spawnGuardian(player.getLocation().add(new Vector(-3, 3, 0))),
-                spawnGuardian(player.getLocation().add(new Vector(0, 3, 3))),
-                spawnGuardian(player.getLocation().add(new Vector(0, 3, -3)))
-        );
+    final int MAX_POINTS = 180;
+    final int RADIUS = 3;
 
-        _guardians.get(player).addAll(guardians);
+    private Location calculateGuardianOffset(int index, long elapsedTimeMs) {
+        // x^2 + y^2 = r^2 - thanks a level maths... (I still googled it)
+
+        final double finalMs = (elapsedTimeMs ^ 2) % 1000;
+        final double angle = Math.toRadians(((double) index / MAX_POINTS) * 360d);
+
+        return null;
+    }
+
+    public final void ban(Player player, String reason) {
+        // TODO: actually ban the player
+        animation(player, reason);
+    }
+
+    public final void animation(Player player, String reason) {
+        Guardian[] guardians = new Guardian[]{
+                spawnGuardian(player.getLocation().add(new Vector(3, 6, 0))),
+                spawnGuardian(player.getLocation().add(new Vector(-3, 6, 0))),
+                spawnGuardian(player.getLocation().add(new Vector(0, 6, 3))),
+                spawnGuardian(player.getLocation().add(new Vector(0, 6, -3)))
+        };
+
+        for (int i = 0; i < guardians.length; i++) {
+//            if ()
+        }
+
+        _guardians.get(player).addAll(Arrays.stream(guardians).toList());
     }
 
     @SuppressWarnings("unused")
-    private void kick(Player player, String reason, CheatSeverity severity, int count) {
+    public final void kick(Player player, String reason, CheatSeverity severity, int count) {
         _javaPlugin.getServer().broadcastMessage(F.fMain(this) + F.fItem(player) + " kicked for " + severity.getColor() + reason);
         player.kickPlayer(C.cRed + C.fBold + "You were kicked by Anti-Cheat" + C.fReset + C.cWhite + "\n" + reason);
     }
 
-    private void alert(Player player, String reason, CheatSeverity severity, int count) {
+    public final void alert(Player player, String reason, CheatSeverity severity, int count) {
 //        _javaPlugin.getServer().broadcastMessage(F.fMain(this, F.fPlayer(player) + " suspected of " + severity.getColor() + reason));
         _javaPlugin.getServer().broadcastMessage(F.fCheat(player, severity, reason, count, _pluginPortal._serverName));
     }
@@ -166,8 +201,8 @@ public class PluginAntiCheat extends MiniPlugin {
         violations.put(keyName, newCount);
 
         alert(player, reason, severity, newCount);
-        if (newCount % 10 == 0) {
-            ban(player, reason, severity, newCount);
+        if (newCount == 10) {
+            ban(player, reason);
         }
     }
 

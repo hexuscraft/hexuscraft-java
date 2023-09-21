@@ -2,9 +2,7 @@ package net.hexuscraft.database;
 
 import redis.clients.jedis.Connection;
 import redis.clients.jedis.JedisPooled;
-import redis.clients.jedis.Protocol;
 import redis.clients.jedis.util.Pool;
-import redis.clients.jedis.util.SafeEncoder;
 
 public class Database {
 
@@ -16,8 +14,7 @@ public class Database {
         _jedisPooled = new JedisPooled(host, port);
         Pool<Connection> pool = _jedisPooled.getPool();
         pool.preparePool();
-        byte[] result = (byte[]) _jedisPooled.sendCommand(Protocol.Command.PING);
-        assert (SafeEncoder.encode(result).equals("PONG"));
+        assert (_jedisPooled.ping().equals("PONG"));
     }
 
     public static String buildQuery(String... args) {

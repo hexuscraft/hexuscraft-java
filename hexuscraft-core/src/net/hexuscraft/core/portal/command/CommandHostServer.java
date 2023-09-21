@@ -9,11 +9,9 @@ import net.hexuscraft.database.serverdata.ServerData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
-import redis.clients.jedis.JedisPooled;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 
 public class CommandHostServer extends BaseCommand {
@@ -23,7 +21,7 @@ public class CommandHostServer extends BaseCommand {
     Set<Player> _pending;
 
     public CommandHostServer(PluginPortal pluginPortal, PluginDatabase pluginDatabase) {
-        super(pluginPortal, "hostserver", "", "Start a new private server.", Set.of("privateserver", "hps", "mps"), PluginPortal.PERM.COMMAND_HOSTSERVER);
+        super(pluginPortal, "hostserver", "", "Start a new private server.", Set.of("hps"), PluginPortal.PERM.COMMAND_HOSTSERVER);
 
         _pending = new HashSet<>();
         _pluginDatabase = pluginDatabase;
@@ -36,8 +34,8 @@ public class CommandHostServer extends BaseCommand {
             return;
         }
 
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage("Only players can create private servers. Maybe try " + F.fItem("/hostevent") + " instead?");
+        if (!(sender instanceof final Player player)) {
+            sender.sendMessage("Only players can create private servers.");
             return;
         }
 
@@ -48,18 +46,14 @@ public class CommandHostServer extends BaseCommand {
 
         _pending.add(player);
 
-        BukkitScheduler scheduler = _miniPlugin._javaPlugin.getServer().getScheduler();
+        final BukkitScheduler scheduler = _miniPlugin._javaPlugin.getServer().getScheduler();
         scheduler.runTaskAsynchronously(_miniPlugin._javaPlugin, () -> {
             try {
-                JedisPooled jedis = _pluginDatabase.getJedisPooled();
-
                 final String serverName = ((Callable<String>) () -> {
-                    for (UUID serverUuid : jedis.smembers(ServerQueries.SERVERS_ACTIVE()).stream().map(UUID::fromString).toList()) {
-                        ServerData serverData = new ServerData(serverUuid, jedis.hgetAll(ServerQueries.SERVER(serverUuid)));
-                        if (!serverData._host.equals(player.getUniqueId())) {
-                            continue;
+                    for (ServerData serverData : ServerQueries.getServers(_pluginDatabase.getJedisPooled())) {
+                        if (serverData._group.split("-", 2)[0].equals(player.getName())) {
+                            return serverData._name;
                         }
-                        return serverData._name;
                     }
                     return null;
                 }).call();

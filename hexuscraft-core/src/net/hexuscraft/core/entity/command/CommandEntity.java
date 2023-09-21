@@ -1,7 +1,7 @@
-package net.hexuscraft.hub.entity.command;
+package net.hexuscraft.core.entity.command;
 
 import net.hexuscraft.core.command.BaseMultiCommand;
-import net.hexuscraft.hub.entity.PluginEntity;
+import net.hexuscraft.core.entity.PluginEntity;
 
 import java.util.Set;
 

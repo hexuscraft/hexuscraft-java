@@ -9,8 +9,11 @@ import java.util.Set;
 
 public class CommandRestartGroup extends BaseCommand {
 
+    PluginPortal _portal;
+
     public CommandRestartGroup(PluginPortal pluginPortal) {
         super(pluginPortal, "group", "<Server Group>", "Restart all servers of a group.", Set.of("g"), PluginPortal.PERM.COMMAND_RESTART_GROUP);
+        _portal = pluginPortal;
     }
 
     @Override
@@ -21,7 +24,7 @@ public class CommandRestartGroup extends BaseCommand {
         }
 
         sender.sendMessage(F.fMain(this) + "Sending restart command to servers of group " + F.fItem(args[0]) + ".");
-        ((PluginPortal) _miniPlugin).restartGroup(args[0]);
+        _portal.restartGroup(args[0]);
     }
 
 }

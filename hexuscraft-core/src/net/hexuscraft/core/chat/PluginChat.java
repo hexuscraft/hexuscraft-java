@@ -118,7 +118,7 @@ public class PluginChat extends MiniPlugin {
 
     @EventHandler
     private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
 
         if (player.hasPermission(PERM.CHAT_PREFIX.name())) {
             event.setFormat(F.fChat(0, _pluginPermission._primaryGroupMap.get(player)));

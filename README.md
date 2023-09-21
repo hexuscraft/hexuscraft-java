@@ -32,11 +32,12 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 | Field    | Type                         |
 |----------|------------------------------|
-| address  | **Integer**                  |
+| address  | **String**                   |
 | capacity | **Integer**                  |
 | group    | **String** (servergroup.###) |
 | players  | **Integer**                  |
 | port     | **Integer**                  |
+| updated  | **Long**                     |
 
 ### SET user.(UUID).punishments
 

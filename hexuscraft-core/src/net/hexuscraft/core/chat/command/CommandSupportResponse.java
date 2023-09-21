@@ -34,20 +34,14 @@ public class CommandSupportResponse extends BaseCommand {
                 return;
             }
 
-            PermissionGroup permissionGroup;
-
-            if (sender instanceof Player) {
-                permissionGroup = pluginPermission._primaryGroupMap.get((Player) sender);
-            } else {
-                permissionGroup = PermissionGroup.OWNER;
-            }
+            final PermissionGroup permissionGroup = sender instanceof Player ? pluginPermission._primaryGroupMap.get((Player) sender) : null;
 
             for (Player player : _miniPlugin._javaPlugin.getServer().getOnlinePlayers()) {
                 if (player.equals(sender) || player.equals(target) || player.hasPermission(PermissionGroup.TRAINEE.toString())) {
-                    PermissionGroup targetGroup = pluginPermission._primaryGroupMap.get(player);
+                    final PermissionGroup targetGroup = pluginPermission._primaryGroupMap.get(player);
 
-                    String sourceStr = F.fPermissionGroup(permissionGroup) + " " + permissionGroup._color + sender.getName();
-                    String targetStr = F.fPermissionGroup(targetGroup) + " " + targetGroup._color + player.getName();
+                    final String sourceStr = F.fPermissionGroup(permissionGroup) + " " + sender.getName();
+                    final String targetStr = F.fPermissionGroup(targetGroup) + " " + player.getName();
 
                     player.sendMessage(sourceStr + C.fReset + C.cPurple + " -> " + C.fReset + targetStr + C.fReset + " " + C.cPurple + String.join(" ", Arrays.stream(args).toList().subList(1, args.length)));
                     if (player.equals(target)) {

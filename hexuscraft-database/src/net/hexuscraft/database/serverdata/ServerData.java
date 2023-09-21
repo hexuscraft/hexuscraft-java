@@ -1,30 +1,71 @@
 package net.hexuscraft.database.serverdata;
 
+import net.hexuscraft.database.queries.ServerQueries;
+import redis.clients.jedis.Builder;
+import redis.clients.jedis.JedisPooled;
+
 import java.util.Map;
-import java.util.UUID;
 
 public class ServerData {
 
-    public final UUID _uuid;
     public final String _name;
-    public final UUID _group;
-    public final int _maxPlayers;
-    public final long _lastUpdate;
-    public final String _serverIp;
-    public final int _serverPort;
-    public final int _playerCount;
-    public final UUID _host;
 
-    public ServerData(UUID uuid, Map<String, String> serverData) {
-        _uuid = uuid;
-        _name = serverData.get("name");
-        _group = UUID.fromString(serverData.get("group"));
-        _maxPlayers = Integer.parseInt(serverData.getOrDefault("maxPlayers", "0"));
-        _lastUpdate = Long.parseLong(serverData.getOrDefault("lastUpdate", "0"));
-        _serverIp = serverData.getOrDefault("serverIp", "127.0.0.1");
-        _serverPort = Integer.parseInt(serverData.getOrDefault("serverPort", "0"));
-        _playerCount = Integer.parseInt(serverData.getOrDefault("playerCount", "0"));
-        _host = serverData.containsKey("host") ? UUID.fromString(serverData.get("host")) : null;
+    public final String _group;
+    public final long _created;
+    public final long _updated;
+    public final String _address;
+    public final int _port;
+    public final int _players;
+    public final int _capacity;
+    public final String _motd;
+    public final double _tps;
+
+    public ServerData(final String name, final Map<String, String> serverData) {
+        _name = name;
+
+        _group = serverData.get("group");
+        _created = Long.parseLong(serverData.getOrDefault("created", "0"));
+        _updated = Long.parseLong(serverData.getOrDefault("updated", "0"));
+        _address = serverData.getOrDefault("address", "127.0.0.1");
+        _port = Integer.parseInt(serverData.getOrDefault("port", "0"));
+        _players = Integer.parseInt(serverData.getOrDefault("players", "0"));
+        _capacity = Integer.parseInt(serverData.getOrDefault("capacity", "0"));
+        _motd = serverData.getOrDefault("motd", "");
+        _tps = Double.parseDouble(serverData.getOrDefault("tps", "20"));
+    }
+
+    public ServerData(final String name, final String group, final long created, final long updated,
+                      final String address, final int port, final int players, final int capacity, final String motd,
+                      final double tps) {
+        _name = name;
+
+        _group = group;
+        _created = created;
+        _updated = updated;
+        _address = address;
+        _port = port;
+        _players = players;
+        _capacity = capacity;
+        _motd = motd;
+        _tps = tps;
+    }
+
+    public final Map<String, String> toMap() {
+        return Map.of(
+                "group", _group,
+                "created", Long.toString(_created),
+                "updated", Long.toString(_updated),
+                "address", _address,
+                "port", Integer.toString(_port),
+                "players", Integer.toString(_players),
+                "capacity", Integer.toString(_capacity),
+                "motd", _motd,
+                "tps", Double.toString(_tps)
+        );
+    }
+
+    public final void update(final JedisPooled jedis) {
+        jedis.hset(ServerQueries.SERVER(_name), toMap());
     }
 
 }

@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class CommandMotdView extends BaseCommand {
 
-    PluginDatabase _pluginDatabase;
+    private final PluginDatabase _pluginDatabase;
 
     CommandMotdView(PluginPortal pluginPortal, PluginDatabase pluginDatabase) {
         super(pluginPortal, "view", "", "View the current MOTD.", Set.of("v"), PluginPortal.PERM.COMMAND_MOTD_VIEW);
@@ -23,7 +23,9 @@ public class CommandMotdView extends BaseCommand {
 
     @Override
     public void run(CommandSender sender, String alias, String[] args) {
-        sender.sendMessage(F.fMain(this) + "Viewing the current MOTD:\n" + F.fMain(C.cDGray + C.fBold) + C.fReset + ChatColor.translateAlternateColorCodes('&', _pluginDatabase.getJedisPooled().get(ServerQueries.SERVERS_MOTD())));
+        sender.sendMessage(F.fMain(this) + "Viewing the current MOTD:\n"
+                + F.fMain(C.cDGray + C.fBold) + C.fReset + ChatColor.translateAlternateColorCodes('&', ServerQueries.getMotd(_pluginDatabase.getJedisPooled()))
+        );
     }
 
 }

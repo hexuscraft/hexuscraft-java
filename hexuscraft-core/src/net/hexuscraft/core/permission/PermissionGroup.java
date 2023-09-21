@@ -42,10 +42,9 @@ public enum PermissionGroup {
     MODERATOR("Mod", C.cGold, TRAINEE),
     SENIOR_MODERATOR("Sr.Mod", C.cGold, MODERATOR),
     ADMINISTRATOR("Admin", C.cGold, SENIOR_MODERATOR, SENIOR_BUILDER, MEDIA, EVENT_LEAD, QUALITY_ASSURANCE),
+    DEVELOPER("Dev", C.cGold, ADMINISTRATOR),
 
-    DEVELOPER("Dev", C.cRed, ADMINISTRATOR),
-    LEADER("Leader", C.cRed, DEVELOPER),
-    OWNER("Owner", C.cRed, LEADER);
+    ;
 
     public final String _prefix;
     public final String _color;

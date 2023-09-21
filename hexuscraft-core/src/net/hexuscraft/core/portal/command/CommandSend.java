@@ -14,8 +14,12 @@ import java.util.stream.Stream;
 
 public class CommandSend extends BaseCommand {
 
+    private final PluginPortal _portal;
+
     public CommandSend(PluginPortal pluginPortal) {
         super(pluginPortal, "send", "<Player> <Name>", "Teleport a player to a server.", Set.of(), PluginPortal.PERM.COMMAND_SEND);
+
+        _portal = pluginPortal;
     }
 
     @Override
@@ -32,15 +36,13 @@ public class CommandSend extends BaseCommand {
             return;
         }
 
-        if (!((PluginPortal) _miniPlugin).isServerActive(serverName)) {
-            sender.sendMessage(F.fMain(this) + "Could not locate a server with name " + F.fItem(serverName) + ".");
+        if (!_portal.doesServerExist(serverName)) {
+            sender.sendMessage(F.fMain(this) + F.fError("Could not locate a server with name ", F.fItem(serverName), "."));
             return;
         }
 
-        PluginPortal pluginPortal = (PluginPortal) _miniPlugin;
-
         sender.sendMessage(F.fMain(this) + "Sending " + F.fItem(targetName) + " to server " + F.fItem(serverName) + ".");
-        pluginPortal.teleport(targetName, serverName, sender.getName());
+        _portal.teleport(targetName, serverName, sender.getName());
     }
 
     @Override

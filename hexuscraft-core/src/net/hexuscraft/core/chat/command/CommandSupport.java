@@ -15,32 +15,26 @@ import java.util.Set;
 
 public class CommandSupport extends BaseCommand {
 
-    final Set<CommandSender> receivedTipSet;
-    final PluginPermission pluginPermission;
+    private final Set<CommandSender> receivedTipSet;
+    private final PluginPermission pluginPermission;
 
-    public CommandSupport(PluginChat pluginChat, PluginPermission pluginPermission) {
+    public CommandSupport(final PluginChat pluginChat, final PluginPermission pluginPermission) {
         super(pluginChat, "support", "<Message>", "Request help from a staff member.", Set.of("a", "helpop"), PluginChat.PERM.COMMAND_SUPPORT);
         this.pluginPermission = pluginPermission;
         receivedTipSet = new HashSet<>();
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public final void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 0) {
-            PermissionGroup permissionGroup;
-
-            if (sender instanceof Player) {
-                permissionGroup = pluginPermission._primaryGroupMap.get((Player) sender);
-            } else {
-                permissionGroup = PermissionGroup.OWNER;
-            }
+            final PermissionGroup permissionGroup = pluginPermission._primaryGroupMap.getOrDefault((Player) sender, PermissionGroup.MEMBER);
 
             if (!receivedTipSet.contains(sender)) {
                 receivedTipSet.add(sender);
                 sender.sendMessage(F.fMain(this) + "You should receive a reply shortly if a staff member is in your server. You can also report rule-breakers with " + F.fItem("/report") + ".");
             }
 
-            for (Player player : _miniPlugin._javaPlugin.getServer().getOnlinePlayers()) {
+            for (final Player player : _miniPlugin._javaPlugin.getServer().getOnlinePlayers()) {
                 if (player.equals(sender) || player.hasPermission(PermissionGroup.TRAINEE.toString())) {
                     player.sendMessage(F.fPermissionGroup(permissionGroup) + " " + permissionGroup._color + sender.getName() + C.fReset + " " + C.cPurple + String.join(" ", args));
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, Integer.MAX_VALUE, 2);

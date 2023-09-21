@@ -8,6 +8,7 @@ import net.hexuscraft.core.combat.PluginCombat;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.disguise.PluginDisguise;
+import net.hexuscraft.core.entity.PluginEntity;
 import net.hexuscraft.core.gamemode.PluginGameMode;
 import net.hexuscraft.core.item.PluginItem;
 import net.hexuscraft.core.netstat.PluginNetStat;
@@ -44,6 +45,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
         register(new PluginCommand(this));
         register(new PluginDatabase(this));
         register(new PluginDisguise(this));
+        register(new PluginEntity(this));
         register(new PluginGameMode(this));
         register(new PluginItem(this));
         register(new PluginNetStat(this));

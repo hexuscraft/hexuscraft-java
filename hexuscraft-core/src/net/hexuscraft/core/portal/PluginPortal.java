@@ -13,17 +13,19 @@ import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.command.*;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
+import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 public class PluginPortal extends MiniPlugin implements PluginMessageListener {
@@ -41,35 +43,40 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         COMMAND_HOSTEVENT
     }
 
-    final String PROXY_CHANNEL = "BungeeCord";
-    final String TELEPORT_CHANNEL = "PortalTeleport";
-    final String RESTART_CHANNEL = "PortalRestart";
+    private final String PROXY_CHANNEL = "BungeeCord";
+    private final String TELEPORT_CHANNEL = "PortalTeleport";
+    private final String RESTART_CHANNEL = "PortalRestart";
 
-    PluginCommand _pluginCommand;
-    PluginDatabase _pluginDatabase;
+    private PluginCommand _pluginCommand;
+    private PluginDatabase _pluginDatabase;
 
-    public UUID _serverUuid;
-    public String _serverName;
-    public UUID _serverGroup;
+    public final long _created;
+    public final String _serverName;
+    public final String _serverGroup;
 
-    public String _serverIp;
-    public String _serverPort;
-    public String _serverJar;
-    public String _serverWebsite;
-
-    private Messenger _messenger;
+    private final Messenger _messenger;
     private final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
-    private BukkitRunnable _lastUpdateTask;
 
     public PluginPortal(JavaPlugin javaPlugin) {
         super(javaPlugin, "Portal");
 
-        _serverUuid = UUID.randomUUID();
+        _created = System.currentTimeMillis();
         _callbacks = new HashMap<>();
+
+        try {
+            _serverName = read(new File("_name.dat"));
+            _serverGroup = read(new File("_group.dat"));
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        _messenger = _javaPlugin.getServer().getMessenger();
+        _messenger.registerOutgoingPluginChannel(_javaPlugin, PROXY_CHANNEL);
+        _messenger.registerIncomingPluginChannel(_javaPlugin, PROXY_CHANNEL, this);
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public final void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
 
@@ -86,28 +93,11 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         ));
         PermissionGroup.EVENT_LEAD._permissions.add(PERM.COMMAND_HOSTEVENT);
 
-        try {
-            _serverUuid = UUID.fromString(read(new File("_uuid.dat")));
-            _serverIp = read(new File("_ip.dat"));
-            _serverPort = read(new File("_port.dat"));
-            _serverJar = read(new File("_jar.dat"));
-            _serverWebsite = read(new File("_website.dat"));
-        } catch (FileNotFoundException ex) {
-            throw new RuntimeException(ex);
-        }
-
-        Map<String, String> serverData = _pluginDatabase.getJedisPooled().hgetAll(ServerQueries.SERVER(_serverUuid));
-        _serverName = serverData.get("name");
-        _serverGroup = UUID.fromString(serverData.get("group"));
-
-        _messenger = _javaPlugin.getServer().getMessenger();
-        _messenger.registerOutgoingPluginChannel(_javaPlugin, PROXY_CHANNEL);
-        _messenger.registerIncomingPluginChannel(_javaPlugin, PROXY_CHANNEL, this);
     }
 
     @Override
-    public void onEnable() {
-        _pluginCommand.register(new CommandServer(this));
+    public final void onEnable() {
+        _pluginCommand.register(new CommandServer(this, _pluginDatabase));
         _pluginCommand.register(new CommandSend(this));
         _pluginCommand.register(new CommandRestart(this));
         _pluginCommand.register(new CommandMotd(this, _pluginDatabase));
@@ -156,56 +146,70 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
             @Override
             public void run() {
-                String[] args = getMessage().split(",");
-                String restartType = args[0];
+                final String[] args = getMessage().split(",");
+                final String restartType = args[0];
 
                 if (restartType.equals("server")) {
-                    String serverName = args[1];
-                    if (!_serverName.equals(serverName)) {
+                    if (!_serverName.equals(args[1])) {
                         return;
                     }
                 } else if (restartType.equals("group")) {
-                    String groupName = args[1];
-                    if (!_serverName.split("-")[0].equals(groupName)) {
+                    if (!_serverGroup.equals(args[1])) {
                         return;
                     }
+                } else {
+                    log("Received unknown restart type: " + restartType);
+                    return;
                 }
 
-                Server server = _javaPlugin.getServer();
+                final Server server = _javaPlugin.getServer();
+                final BukkitScheduler scheduler = server.getScheduler();
                 server.broadcastMessage(F.fMain(this) + "The server you are currently connected to is restarting. Sending you to a lobby.");
-                server.getScheduler().runTaskLater(_javaPlugin, () -> server.getOnlinePlayers().forEach(player -> teleport(player.getName(), "Lobby")), 80);
-                server.getScheduler().runTaskLater(_javaPlugin, server.spigot()::restart, 160);
+                scheduler.runTaskLater(_javaPlugin, () -> server.getOnlinePlayers().forEach(player -> teleport(player.getName(), "Lobby")), 80);
+                scheduler.runTaskLater(_javaPlugin, server.spigot()::restart, 160);
             }
 
         });
 
-        _lastUpdateTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                JedisPooled jedis = _pluginDatabase.getJedisPooled();
-                BukkitScheduler scheduler = _javaPlugin.getServer().getScheduler();
-                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.hset(ServerQueries.SERVER(_serverUuid), "lastUpdate", Long.toString(System.currentTimeMillis())));
-                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.hset(ServerQueries.SERVER(_serverUuid), "serverIp", _serverIp));
-                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.hset(ServerQueries.SERVER(_serverUuid), "serverPort", _serverPort));
-                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.hset(ServerQueries.SERVER(_serverUuid), "playerCount", Integer.toString(_javaPlugin.getServer().getOnlinePlayers().size())));
-                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.sadd(ServerQueries.SERVERS_ACTIVE(), _serverUuid.toString()));
-                scheduler.runTaskAsynchronously(_javaPlugin, () -> jedis.sadd(ServerQueries.SERVERS_HISTORY(), _serverUuid.toString()));
-            }
-        };
-        _lastUpdateTask.runTaskTimerAsynchronously(_javaPlugin, 0, 20);
+        final JedisPooled jedis = _pluginDatabase.getJedisPooled();
+        final Server server = _javaPlugin.getServer();
+        final BukkitScheduler scheduler = server.getScheduler();
+
+        final double[] recentTps = MinecraftServer.getServer().recentTps;
+        final OptionalDouble averageTps = Arrays.stream(recentTps).average();
+
+        // Server ping event here so other mini-plugins can handle this data, such as not showing vanished players.
+        // Also its not possible to change some of these without nms. And that's scary. And breaks.
+        final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress("127.0.0.1", 0).getAddress(), "", 0, 0);
+        server.getPluginManager().callEvent(ping);
+
+        scheduler.runTaskTimerAsynchronously(_javaPlugin, () -> new ServerData(
+                _serverName,
+                _serverGroup,
+                _created,
+                System.currentTimeMillis(),
+                server.getIp(),
+                server.getPort(),
+                server.getOnlinePlayers().size(),
+                server.getMaxPlayers(),
+                ping.getMotd(),
+                averageTps.orElse(20D)
+        ).update(jedis), 0, 20);
     }
 
     @Override
-    public void onDisable() {
+    public final void onDisable() {
         _messenger.unregisterOutgoingPluginChannel(_javaPlugin, PROXY_CHANNEL);
         _messenger.unregisterIncomingPluginChannel(_javaPlugin, PROXY_CHANNEL);
 
         _callbacks.clear();
-        _lastUpdateTask.cancel();
+//        _lastUpdateTask.cancel();
+
+        _pluginDatabase.getJedisPooled().del(ServerQueries.SERVER(_serverName));
     }
 
     @Override
-    public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+    public final void onPluginMessageReceived(String channel, Player player, byte[] message) {
         //noinspection UnstableApiUsage
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
 
@@ -221,40 +225,41 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         }
     }
 
-    public void teleport(String player, String server, String... sender) {
-        if (sender.length > 0) {
-            _pluginDatabase.getJedisPooled().publish(TELEPORT_CHANNEL, player + "," + server + "," + sender[0]);
+    public final void teleport(final String player, final String server, final String sender) {
+        if (sender != null) {
+            _pluginDatabase.getJedisPooled().publish(TELEPORT_CHANNEL, String.join(",", player, server, sender));
             return;
         }
-        _pluginDatabase.getJedisPooled().publish(TELEPORT_CHANNEL, player + "," + server);
+        _pluginDatabase.getJedisPooled().publish(TELEPORT_CHANNEL, String.join(",", player, server));
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean isServerActive(String name) {
-        for (UUID uuid : _pluginDatabase.getJedisPooled().smembers(ServerQueries.SERVERS_ACTIVE()).stream().map(UUID::fromString).toList()) {
-            ServerData serverData = new ServerData(uuid, _pluginDatabase.getJedisPooled().hgetAll(ServerQueries.SERVER(uuid)));
-            if (!serverData._name.equals(name)) {
-                continue;
+    public final void teleport(final String player, final String server) {
+        teleport(player, server, null);
+    }
+
+    public final boolean doesServerExist(String name) {
+        for (ServerData serverData : ServerQueries.getServers(_pluginDatabase.getJedisPooled())) {
+            if (serverData._name.equals(name)) {
+                return true;
             }
-            return true;
         }
         return false;
     }
 
-    public void restartServer(String server) {
-        _pluginDatabase.getJedisPooled().publish(RESTART_CHANNEL, "server," + server);
+    public final void restartServer(String server) {
+        _pluginDatabase.getJedisPooled().publish(RESTART_CHANNEL, String.join(",", "server", server));
     }
 
-    public void restartGroup(String group) {
-        _pluginDatabase.getJedisPooled().publish(RESTART_CHANNEL, "group," + group);
+    public final void restartGroup(String group) {
+        _pluginDatabase.getJedisPooled().publish(RESTART_CHANNEL, String.join(",", "group", group));
     }
 
-    public String read(File file) throws FileNotFoundException {
+    public final String read(File file) throws FileNotFoundException {
         return new Scanner(file).nextLine();
     }
 
     @SuppressWarnings({"SameReturnValue", "unused"})
-    public int getPlayerCount(String name) {
+    public final int getPlayerCount(String name) {
         //noinspection UnstableApiUsage
         ByteArrayDataOutput outServer = ByteStreams.newDataOutput();
         outServer.writeUTF("PlayerCount");
@@ -265,7 +270,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
     }
 
     @SuppressWarnings("unused")
-    public UUID registerCallback(String channelName, ByteArrayDataInputRunnable callback) {
+    public final UUID registerCallback(String channelName, ByteArrayDataInputRunnable callback) {
         UUID id = UUID.randomUUID();
         if (!_callbacks.containsKey(channelName)) {
             _callbacks.put(channelName, new HashMap<>());
@@ -275,7 +280,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
     }
 
     @SuppressWarnings("unused")
-    public void unregisterCallback(UUID id) {
+    public final void unregisterCallback(UUID id) {
         _callbacks.forEach((s, uuidRunnableMap) -> {
             if (!uuidRunnableMap.containsKey(id)) {
                 return;
@@ -285,7 +290,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
     }
 
     @SuppressWarnings("unused")
-    public void sendProxyMessage(String... data) {
+    public final void sendProxyMessage(String... data) {
         //noinspection UnstableApiUsage
         ByteArrayDataOutput outServer = ByteStreams.newDataOutput();
         for (String s : data) {
