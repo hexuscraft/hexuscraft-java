@@ -4,8 +4,6 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.PluginCommand;
-import net.hexuscraft.core.database.AsyncRunnable;
-import net.hexuscraft.core.database.ParameterizedRunnable;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.disguise.DisguiseEvent;
 import net.hexuscraft.core.item.UtilItem;
@@ -19,7 +17,10 @@ import net.hexuscraft.database.serverdata.ServerData;
 import net.hexuscraft.database.serverdata.ServerGroupData;
 import net.hexuscraft.hub.Hub;
 import net.hexuscraft.hub.player.command.CommandSpawn;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -38,7 +39,8 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 import redis.clients.jedis.JedisPooled;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class PluginPlayer extends MiniPlugin {
 

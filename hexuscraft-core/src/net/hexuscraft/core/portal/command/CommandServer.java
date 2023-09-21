@@ -3,7 +3,6 @@ package net.hexuscraft.core.portal.command;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
@@ -12,7 +11,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.JedisPooled;
 
-import java.util.Objects;
 import java.util.Set;
 
 public class CommandServer extends BaseCommand {
