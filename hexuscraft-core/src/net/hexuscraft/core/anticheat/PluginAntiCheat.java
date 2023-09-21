@@ -1,8 +1,10 @@
 package net.hexuscraft.core.anticheat;
 
 import net.hexuscraft.core.MiniPlugin;
+import net.hexuscraft.core.anticheat.command.CommandTestBan;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
+import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.entity.NBTEditor;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
@@ -47,6 +49,9 @@ public class PluginAntiCheat extends MiniPlugin {
     @Override
     public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
+
+        final PluginCommand pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
+        pluginCommand.register(new CommandTestBan(this));
     }
 
     @Override
