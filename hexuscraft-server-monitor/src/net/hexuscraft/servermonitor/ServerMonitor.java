@@ -1,6 +1,5 @@
 package net.hexuscraft.servermonitor;
 
-import jdk.jfr.SettingDescriptor;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import net.hexuscraft.database.serverdata.ServerGroupData;
@@ -9,8 +8,10 @@ import redis.clients.jedis.JedisPooled;
 
 import java.io.Console;
 import java.io.IOException;
-import java.time.chrono.IsoEra;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class ServerMonitor implements Runnable {
 

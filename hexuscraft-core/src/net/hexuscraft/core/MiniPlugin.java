@@ -1,13 +1,10 @@
 package net.hexuscraft.core;
 
-import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.OptionalDouble;
 
 public abstract class MiniPlugin implements Listener {
 

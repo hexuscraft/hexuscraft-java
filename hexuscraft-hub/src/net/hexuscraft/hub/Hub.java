@@ -1,7 +1,6 @@
 package net.hexuscraft.hub;
 
 import net.hexuscraft.core.HexusPlugin;
-import net.hexuscraft.core.entity.PluginEntity;
 import net.hexuscraft.hub.player.PluginPlayer;
 import net.hexuscraft.hub.team.PluginTeam;
 import org.bukkit.GameMode;
