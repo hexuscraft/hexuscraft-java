@@ -74,12 +74,12 @@ public class CommandPunish extends BaseCommand {
         ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
         ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "1 Day Mute", "Severity 1","Light chat offense","","Refer to guidelines for details.");
         ItemStack chat2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cYellow + C.fBold + "3 Days Mute", "Severity 2","Moderate chat offense","","Refer to guidelines for details.");
-        ItemStack chat3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cRed + C.fBold + "5 Days Mute", "Severity 3","Heavy chat offense","","Refer to guidelines for details.");
+        ItemStack chat3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "5 Days Mute", "Severity 3","Heavy chat offense","","Refer to guidelines for details.");
 
         ItemStack gameplayHeader = UtilItem.createItem(Material.IRON_BLOCK, C.cBlue + C.fBold + "Gameplay Offenses");
         ItemStack gameplay1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "1 Day Ban", "Severity 1","Light gameplay offense","","Refer to guidelines for details.");
-        ItemStack gameplay2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cGreen + C.fBold + "3 Days Ban", "Severity 2","Moderate gameplay offense","","Refer to guidelines for details.");
-        ItemStack gameplay3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGreen + C.fBold + "5 Days Ban", "Severity 3","Heavy gameplay offense","","Refer to guidelines for details.");
+        ItemStack gameplay2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cYellow + C.fBold + "3 Days Ban", "Severity 2","Moderate gameplay offense","","Refer to guidelines for details.");
+        ItemStack gameplay3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "5 Days Ban", "Severity 3","Heavy gameplay offense","","Refer to guidelines for details.");
 
         ItemStack clientHeader = UtilItem.createItem(Material.IRON_SWORD, C.cBlue + C.fBold + "Client Offenses");
         ItemStack client1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "7 Days Ban", "Severity 1","Light client offense","","Refer to guidelines for details.");
