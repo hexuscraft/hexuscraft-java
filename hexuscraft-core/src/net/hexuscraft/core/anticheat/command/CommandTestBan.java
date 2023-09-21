@@ -1,10 +1,8 @@
 package net.hexuscraft.core.anticheat.command;
 
-import net.hexuscraft.core.anticheat.CheatSeverity;
 import net.hexuscraft.core.anticheat.PluginAntiCheat;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.entity.UtilEntity;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -18,7 +16,7 @@ public class CommandTestBan extends BaseCommand {
 
     private final PluginAntiCheat _antiCheat;
 
-    protected CommandTestBan(final PluginAntiCheat antiCheat) {
+    public CommandTestBan(final PluginAntiCheat antiCheat) {
         super(antiCheat, "testhacban", "<Player>",
                 "Test the HAC ban sequence on a player. (doesn't actually ban them)",
                 Set.of(),
