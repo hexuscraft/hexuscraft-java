@@ -83,4 +83,10 @@ public class ServerQueries {
         jedis.set(MOTD(), value);
     }
 
+    public static void markServerAsDead(JedisPooled jedis, String serverName) {
+        ServerData serverData = getServer(jedis, serverName);
+        if (serverData == null) return;
+
+        new ServerData(serverData._name + "-DEAD", serverData.toMap()).update(jedis);
+    }
 }
