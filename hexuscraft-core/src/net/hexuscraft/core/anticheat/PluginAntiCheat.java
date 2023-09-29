@@ -11,16 +11,21 @@ import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.PluginPortal;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Guardian;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -32,16 +37,19 @@ public class PluginAntiCheat extends MiniPlugin {
     }
 
     private PluginPortal _pluginPortal;
+    private PluginCommand _pluginCommand;
 
     private final Map<Player, Map<String, Integer>> _violations;
 
-    private final Map<Player, List<Guardian>> _guardians;
+    private final Map<Player, Set<Guardian>> _guardians;
+    private final Set<Player> _inAnimation;
 
     public PluginAntiCheat(JavaPlugin javaPlugin) {
         super(javaPlugin, "Anti Cheat");
 
         _violations = new HashMap<>();
         _guardians = new HashMap<>();
+        _inAnimation = new HashSet<>();
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_TESTBAN);
     }
@@ -49,9 +57,7 @@ public class PluginAntiCheat extends MiniPlugin {
     @Override
     public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
-
-        final PluginCommand pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
-        pluginCommand.register(new CommandTestBan(this));
+        _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
     }
 
     @Override
@@ -59,6 +65,8 @@ public class PluginAntiCheat extends MiniPlugin {
         for (Player player : _javaPlugin.getServer().getOnlinePlayers()) {
             onPlayerJoin(new PlayerJoinEvent(player, null));
         }
+
+        _pluginCommand.register(new CommandTestBan(this));
     }
 
     @Override
@@ -71,7 +79,7 @@ public class PluginAntiCheat extends MiniPlugin {
     private void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         _violations.put(player, new HashMap<>());
-        _guardians.put(player, new ArrayList<>());
+        _guardians.put(player, new HashSet<>());
     }
 
     @EventHandler
@@ -151,10 +159,9 @@ public class PluginAntiCheat extends MiniPlugin {
     final int RADIUS = 3;
 
     private Location calculateGuardianOffset(int index, long elapsedTimeMs) {
-        // x^2 + y^2 = r^2 - thanks a level maths... (I still googled it)
-
         final double finalMs = (elapsedTimeMs ^ 2) % 1000;
         final double angle = Math.toRadians(((double) index / MAX_POINTS) * 360d);
+
 
         return null;
     }
@@ -165,18 +172,61 @@ public class PluginAntiCheat extends MiniPlugin {
     }
 
     public final void animation(Player player, String reason) {
-        Guardian[] guardians = new Guardian[]{
-                spawnGuardian(player.getLocation().add(new Vector(3, 6, 0))),
-                spawnGuardian(player.getLocation().add(new Vector(-3, 6, 0))),
-                spawnGuardian(player.getLocation().add(new Vector(0, 6, 3))),
-                spawnGuardian(player.getLocation().add(new Vector(0, 6, -3)))
-        };
+        if (_inAnimation.contains(player)) return;
 
-        for (int i = 0; i < guardians.length; i++) {
-//            if ()
+        _inAnimation.add(player);
+
+        float oldWalkSpeed = player.getWalkSpeed();
+        player.setWalkSpeed(0);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 999999, -10));
+
+        double radius = 4;
+        double heightAdj = 8;
+
+        double baseDeg = 18;
+
+        Guardian north = spawnGuardian(player.getLocation().add(0, heightAdj, -radius));
+        Guardian east = spawnGuardian(player.getLocation().add(radius, heightAdj, 0));
+        Guardian south = spawnGuardian(player.getLocation().add(0, heightAdj, radius));
+        Guardian west = spawnGuardian(player.getLocation().add(-radius, heightAdj, 0));
+        _guardians.get(player).addAll(List.of(north, east, south, west));
+        _guardians.get(player).forEach(guardian -> guardian.setTarget(player));
+
+        _javaPlugin.getServer().getScheduler().runTaskTimer(_javaPlugin, () -> {
+            Location northBeforeLook = player.getLocation().add(0, heightAdj, -radius);
+            north.teleport(northBeforeLook.setDirection(northBeforeLook.subtract(player.getLocation()).toVector()));
+
+            Location eastBeforeLook = player.getLocation().add(0, heightAdj, -radius);
+            east.teleport(eastBeforeLook.setDirection(eastBeforeLook.subtract(player.getLocation()).toVector()));
+
+            Location southBeforeLook = player.getLocation().add(0, heightAdj, -radius);
+            south.teleport(southBeforeLook.setDirection(southBeforeLook.subtract(player.getLocation()).toVector()));
+
+            Location westBeforeLook = player.getLocation().add(0, heightAdj, -radius);
+            west.teleport(westBeforeLook.setDirection(westBeforeLook.subtract(player.getLocation()).toVector()));
+        }, 0, 1L);
+    }
+
+    @EventHandler
+    public final void on(PlayerMoveEvent event) {
+        if (!_inAnimation.contains(event.getPlayer())) return;
+
+        final Location from = event.getFrom();
+        final Location to = event.getTo();
+        if (from.getX() == to.getX() && from.getZ() == to.getZ()) return;
+
+        event.setCancelled(true);
+        event.getPlayer().teleport(from);
+    }
+
+    @EventHandler
+    public final void on(EntityDamageEvent event) {
+        final Entity entity = event.getEntity();
+        for (Set<Guardian> guardians : _guardians.values()) {
+            if (!guardians.contains(entity)) continue;
+            event.setCancelled(true);
+            break;
         }
-
-        _guardians.get(player).addAll(Arrays.stream(guardians).toList());
     }
 
     @SuppressWarnings("unused")
