@@ -32,7 +32,7 @@ public class CommandRankInfo extends BaseCommand {
         }
 
         final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
-        if (profile == null) { return; }
+        if (profile == null) return;
 
         //noinspection ReassignedVariable
         String primaryName = _pluginDatabase.getJedisPooled().get(PermissionQueries.PRIMARY(profile.uuid.toString()));

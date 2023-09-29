@@ -40,7 +40,7 @@ public class CommandPunish extends BaseCommand {
         }
 
         final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
-        if (profile == null) { return; }
+        if (profile == null) return;
 
         String reasonMessage = String.join(" ", Arrays.stream(args).toList().subList(1, args.length));
 

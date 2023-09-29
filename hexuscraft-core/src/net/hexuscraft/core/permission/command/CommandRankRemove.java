@@ -55,15 +55,13 @@ public class CommandRankRemove extends BaseCommand {
         }
 
         final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
-        if (profile == null) { return; }
+        if (profile == null) return;
 
         pluginDatabase.getJedisPooled().srem(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.toString());
         sender.sendMessage(F.fMain(this) + "Removed sub-group " + F.fPermissionGroup(targetGroup) + " from " + F.fItem(profile.name) + ".");
 
         Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
-        if (player == null) {
-            return;
-        }
+        if (player == null) return;
 
         player.sendMessage(F.fMain(this) + "You no longer have sub-group " + F.fPermissionGroup(targetGroup) + ".");
         ((PluginPermission) _miniPlugin).refreshPermissions(player);

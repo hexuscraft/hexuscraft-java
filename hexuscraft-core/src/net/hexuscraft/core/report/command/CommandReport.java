@@ -43,7 +43,7 @@ public class CommandReport extends BaseCommand {
         String reason = String.join(" ", reasonArgs);
 
         _miniPlugin._javaPlugin.getServer().getOnlinePlayers().forEach(onlinePlayer -> {
-            if (!onlinePlayer.hasPermission(PermissionGroup.TRAINEE.name())) { return; }
+            if (!onlinePlayer.hasPermission(PermissionGroup.TRAINEE.name())) return;
             onlinePlayer.sendMessage(F.fMain(this) + "Report from " + F.fItem(sender) + ":");
             onlinePlayer.sendMessage(F.fMain() + "Target: " + F.fItem(targetProfile.name));
             onlinePlayer.sendMessage(F.fMain() + "Reason: " + F.fItem(reason));
@@ -57,10 +57,10 @@ public class CommandReport extends BaseCommand {
         List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
-            if (sender instanceof Player player) {
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer()
+                    .getOnlinePlayers().stream();
+            if (sender instanceof Player player)
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
-            }
 
             names.addAll(List.of("*", "**"));
             names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
