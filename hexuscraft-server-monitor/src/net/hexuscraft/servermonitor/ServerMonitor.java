@@ -63,30 +63,30 @@ public class ServerMonitor implements Runnable {
 
             // Kill dead servers
             if ((System.currentTimeMillis() - serverData._updated) > MAX_SERVER_IDLE_MS) {
-                killServer(jedis, serverData, "Dead");
+                killServer(jedis, serverData, "Unresponsive");
                 return;
             }
 
             // Kill pending death servers
-            final String[] nameArray = serverData._name.split("-",3);
-            if (nameArray.length > 3 && nameArray[2].equals("KILL")) {
-                killServer(jedis, serverData, "Pending");
+            if (serverData._name.endsWith("-DEAD")) {
+                killServer(jedis, serverData, "Pending Death");
                 return;
             }
 
             // Count total and joinable servers
             final ServerGroupData serverGroupData = _serverGroupDataMap.get(serverData._group);
             totalServersMap.get(serverGroupData).add(serverData);
-            if (serverData._players < serverData._capacity) {
-                joinableServersMap.get(serverGroupData).add(serverData);
-            }
 
+            if (serverData._motd.startsWith("LIVE")) return;
+            if (serverData._players < serverData._capacity) return;
+
+            joinableServersMap.get(serverGroupData).add(serverData);
         });
 
         _serverGroupDataMap.forEach((serverGroupName, serverGroupData) -> {
-
             final Set<ServerData> totalServers = totalServersMap.get(serverGroupData);
             final int totalServersAmount = totalServers.size();
+
             final Set<ServerData> joinableServers = joinableServersMap.get(serverGroupData);
             final int joinableServersAmount = joinableServers.size();
 
@@ -97,13 +97,15 @@ public class ServerMonitor implements Runnable {
             final boolean isOverflowJoinableServers = joinableServersAmount > serverGroupData._joinableServers;
 
             // Start minimum servers
-            if (!isEnoughTotalServers) {
-                startServer(jedis, serverGroupData, "Insufficient Total Servers");
+            if (!isEnoughTotalServers || !isEnoughJoinableServers) {
+                startServer(jedis, serverGroupData, "Insufficient Servers");
             }
 
             // Kill excess servers
-            if (isOverflowTotalServers && !isOverflowJoinableServers) {
-
+            if (isOverflowTotalServers && isOverflowJoinableServers) {
+                final ServerData bestServerToKill = getBestServerToKill(jedis, serverGroupData);
+                if (bestServerToKill != null)
+                    killServer(jedis, bestServerToKill._name, "Excess Servers");
             }
 
         });
@@ -138,9 +140,13 @@ public class ServerMonitor implements Runnable {
         killServer(jedis, serverData._name, reason);
     }
 
-    private void getBestServerToKill(final JedisPooled jedis, final ServerGroupData serverGroupData) {
-        int selectedServerPlayers = 0;
-
+    private ServerData getBestServerToKill(final JedisPooled jedis, final ServerGroupData serverGroupData) {
+        for (ServerData serverData : ServerQueries.getServers(jedis, serverGroupData)) {
+            if (serverData._motd.startsWith("LIVE")) continue;
+            if (serverData._players > (serverData._capacity / 3)) continue;
+            return serverData;
+        }
+        return null;
     }
 
     private void startServer(final JedisPooled jedis, final ServerGroupData serverGroupData, final String reason) {
@@ -189,7 +195,8 @@ public class ServerMonitor implements Runnable {
                     serverGroupData._plugin,
                     serverGroupData._name,
                     serverGroupData._prefix + "-" + lowestId,
-                    "false"
+                    "false",
+                    Integer.toString(serverGroupData._capacity)
             ).start();
             log("Waiting for server to startup...");
 
@@ -223,7 +230,7 @@ public class ServerMonitor implements Runnable {
         while (true) {
             try {
                 tick();
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 //noinspection CallToPrintStackTrace
                 ex.printStackTrace();
             }
@@ -231,7 +238,7 @@ public class ServerMonitor implements Runnable {
             try {
                 //noinspection BusyWait
                 Thread.sleep(NATURAL_TIMEOUT_MS);
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
