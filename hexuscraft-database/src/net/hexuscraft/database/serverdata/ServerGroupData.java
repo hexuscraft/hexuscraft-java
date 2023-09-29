@@ -18,12 +18,13 @@ public class ServerGroupData {
     public final String _plugin;
     public final String _worldZip;
     public final int _ram;
+    public final int _capacity;
 
     public ServerGroupData(final String name, final Map<String, String> serverGroupData) {
         _name = name;
 
-        _prefix = serverGroupData.get("prefix");
-        _requiredPermission = serverGroupData.get("requiredPermission");
+        _prefix = serverGroupData.getOrDefault("prefix", name);
+        _requiredPermission = serverGroupData.getOrDefault("requiredPermission", "MEMBER");
         _minPort = Integer.parseInt(serverGroupData.getOrDefault("minPort", "0"));
         _maxPort = Integer.parseInt(serverGroupData.getOrDefault("maxPort", "0"));
         _totalServers = Integer.parseInt(serverGroupData.getOrDefault("totalServers", "0"));
@@ -31,11 +32,12 @@ public class ServerGroupData {
         _plugin = serverGroupData.getOrDefault("plugin", "");
         _worldZip = serverGroupData.getOrDefault("worldZip", "");
         _ram = Integer.parseInt(serverGroupData.getOrDefault("ram", "512"));
+        _capacity = Integer.parseInt(serverGroupData.getOrDefault("capacity", "20"));
     }
 
     public ServerGroupData(final String name, final String prefix, final String requiredPermission,
                            final int minPort, final int maxPort, final int totalServers, final int joinableServers,
-                           final String plugin, final String worldZip, final int ram) {
+                           final String plugin, final String worldZip, final int ram, final int capacity) {
         _name = name;
 
         _prefix = prefix;
@@ -47,6 +49,7 @@ public class ServerGroupData {
         _plugin = plugin;
         _worldZip = worldZip;
         _ram = ram;
+        _capacity = capacity;
     }
 
     public final Map<String, String> toMap() {
@@ -59,7 +62,8 @@ public class ServerGroupData {
                 "joinableServers", Integer.toString(_joinableServers),
                 "plugin", _plugin,
                 "worldZip", _worldZip,
-                "ram", Integer.toString(_ram)
+                "ram", Integer.toString(_ram),
+                "capacity", Integer.toString(_capacity)
         );
     }
 
