@@ -20,8 +20,6 @@ import com.velocitypowered.api.util.Favicon;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.proxy.database.PluginDatabase;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import redis.clients.jedis.JedisPooled;
 
 import java.io.IOException;
@@ -29,6 +27,7 @@ import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 @Plugin(id = "hexuscraft-proxy", name = "Proxy", version = "1.0.0")
@@ -48,7 +47,7 @@ public class Proxy {
     private String _motd = MOTD_PREFIX;
 
     @Inject
-    public Proxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public Proxy(final ProxyServer server, final Logger logger, final @DataDirectory Path dataDirectory) {
         _server = server;
         _logger = logger;
         _dataDirectory = dataDirectory;
@@ -57,8 +56,8 @@ public class Proxy {
     }
 
     @Subscribe
-    public void onProxyInitialize(ProxyInitializeEvent event) {
-        CommandManager commandManager = _server.getCommandManager();
+    public void onProxyInitialize(final ProxyInitializeEvent event) {
+        final CommandManager commandManager = _server.getCommandManager();
         commandManager.unregister("server");
         commandManager.unregister("velocity");
 
@@ -78,41 +77,80 @@ public class Proxy {
     }
 
     @Subscribe
-    private void onProxyQuery(ProxyQueryEvent event) {
-        QueryResponse.Builder builder = QueryResponse.builder();
-        int playerCount = _server.getPlayerCount();
+    private void onProxyQuery(final ProxyQueryEvent event) {
+        final QueryResponse.Builder builder = QueryResponse.builder();
+
+        //noinspection ReassignedVariable
+        int playerCount = 0;
+        //noinspection ReassignedVariable
+        int maxPlayerCount = 0;
+
+        for (RegisteredServer registeredServer : _server.getAllServers()) {
+            try {
+                final Optional<ServerPing.Players> optionalPlayers = registeredServer.ping().get().getPlayers();
+                if (optionalPlayers.isEmpty()) continue;
+
+                final ServerPing.Players players = optionalPlayers.get();
+                playerCount += players.getOnline();
+                maxPlayerCount += players.getMax();
+            } catch (final InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
         builder.currentPlayers(playerCount);
-        builder.maxPlayers(playerCount + 1);
+        builder.maxPlayers(maxPlayerCount);
         event.setResponse(builder.build());
     }
 
     @Subscribe
-    private void onProxyPing(ProxyPingEvent event) {
-        ServerPing.Builder builder = ServerPing.builder();
-        int playerCount = _server.getPlayerCount();
+    private void onProxyPing(final ProxyPingEvent event) {
+        final ServerPing.Builder builder = ServerPing.builder();
+
+        //noinspection ReassignedVariable
+        int playerCount = 0;
+        //noinspection ReassignedVariable
+        int maxPlayerCount = 0;
+
+        for (RegisteredServer registeredServer : _server.getAllServers()) {
+            try {
+                final Optional<ServerPing.Players> optionalPlayers = registeredServer.ping().get().getPlayers();
+                if (optionalPlayers.isEmpty()) continue;
+
+                final ServerPing.Players players = optionalPlayers.get();
+                playerCount += players.getOnline();
+                maxPlayerCount += players.getMax();
+            } catch (final InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
         builder.onlinePlayers(playerCount);
-        builder.maximumPlayers(playerCount + 1);
+        builder.maximumPlayers(maxPlayerCount);
+
+//        int playerCount = _server.getPlayerCount();
+//        builder.onlinePlayers(playerCount);
+//        builder.maximumPlayers(playerCount + 1);
         builder.description(Component.text(_motd));
         builder.samplePlayers(
                 new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)),
                 new ServerPing.SamplePlayer("    §6§lHexuscraft§r §f§lNetwork§r    ", new UUID(0L, 0L)),
                 new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)),
-                new ServerPing.SamplePlayer("§f§l ▶ §rMini Games", new UUID(0L, 0L)),
-                new ServerPing.SamplePlayer("§f§l ▶ §rPlayer Servers", new UUID(0L, 0L)),
+                new ServerPing.SamplePlayer("  §f§l▶§r  Mini Games", new UUID(0L, 0L)),
+                new ServerPing.SamplePlayer("  §f§l▶§r  Private Servers", new UUID(0L, 0L)),
+                new ServerPing.SamplePlayer("  §f§l▶§r  Tournaments", new UUID(0L, 0L)),
                 new ServerPing.SamplePlayer("§r", new UUID(0L, 0L))
         );
         builder.version(new ServerPing.Version(Math.max(ProtocolVersion.MINECRAFT_1_8.getProtocol(), event.getConnection().getProtocolVersion().getProtocol()), "Minecraft 1.8"));
         try {
             builder.favicon(Favicon.create(Path.of("server-icon.png")));
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             throw new RuntimeException(ex);
         }
         event.setPing(builder.build());
     }
 
     @Subscribe
-    private void onKickedFromServer(KickedFromServerEvent event) {
-        Optional<Component> kickReason = event.getServerKickReason();
+    private void onKickedFromServer(final KickedFromServerEvent event) {
+        final Optional<Component> kickReason = event.getServerKickReason();
         if (kickReason.isEmpty()) {
             return; // let velocity handle this
         }
@@ -120,21 +158,22 @@ public class Proxy {
     }
 
     @Subscribe
-    private void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
+    private void onPlayerChooseInitialServer(final PlayerChooseInitialServerEvent event) {
         if (event.getPlayer().getProtocolVersion().getProtocol() < ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
             event.setInitialServer(null);
             final TextComponent kickComponent = Component.text()
                     .color(NamedTextColor.RED)
-                    .append(Component.text("You must be using Minecraft 1.8 or newer to play on "))
+                    .append(Component.text("You must be playing Minecraft 1.8 or newer to play on "))
                     .append(Component.text("Hexuscraft", NamedTextColor.YELLOW))
-                    .append(Component.text("!"))
+                    .append(Component.text(".\n\n"))
+                    .append(Component.text("www.hexuscraft.net", NamedTextColor.YELLOW))
                     .build();
             event.getPlayer().disconnect(kickComponent);
         }
 
-        RegisteredServer[] lobbyServers = _server.getAllServers().stream().filter(registeredServer -> registeredServer.getServerInfo().getName().split("-")[0].equals("Lobby")).toArray(RegisteredServer[]::new);
+        final RegisteredServer[] lobbyServers = _server.getAllServers().stream().filter(registeredServer -> registeredServer.getServerInfo().getName().split("-")[0].equals("Lobby")).toArray(RegisteredServer[]::new);
         if (lobbyServers.length == 0) {
-            return; // let velocity handle this. how are there even no lobbies available??!
+            return; // let velocity handle this. (how are there no lobbies available??)
         }
 
         event.setInitialServer(lobbyServers[new Random().nextInt(lobbyServers.length)]);
