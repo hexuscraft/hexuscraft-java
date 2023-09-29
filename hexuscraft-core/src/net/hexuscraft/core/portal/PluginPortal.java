@@ -21,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
@@ -56,6 +57,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
     private final Messenger _messenger;
     private final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
+    private BukkitTask _updateTask;
 
     public PluginPortal(JavaPlugin javaPlugin) {
         super(javaPlugin, "Portal");
@@ -183,7 +185,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress("127.0.0.1", 0).getAddress(), "", 0, 0);
         server.getPluginManager().callEvent(ping);
 
-        scheduler.runTaskTimerAsynchronously(_javaPlugin, () -> new ServerData(
+        _updateTask = scheduler.runTaskTimerAsynchronously(_javaPlugin, () -> new ServerData(
                 _serverName,
                 _serverGroup,
                 _created,
@@ -203,9 +205,11 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         _messenger.unregisterIncomingPluginChannel(_javaPlugin, PROXY_CHANNEL);
 
         _callbacks.clear();
-//        _lastUpdateTask.cancel();
 
-        _pluginDatabase.getJedisPooled().del(ServerQueries.SERVER(_serverName));
+        _updateTask.cancel();
+        _updateTask = null;
+
+        ServerQueries.markServerAsDead(_pluginDatabase.getJedisPooled(), _serverName);
     }
 
     @Override
