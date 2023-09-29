@@ -7,8 +7,10 @@ import java.util.Set;
 
 public class CommandGame extends BaseMultiCommand {
 
-    public CommandGame(PluginGame game) {
-        super(game, "game", "Manage the active game.", Set.of("gm"), PluginGame.PERM.COMMAND_GAME, Set.of());
+    public CommandGame(PluginGame pluginGame) {
+        super(pluginGame, "game", "Manage the active game.", Set.of("arcade"), PluginGame.PERM.COMMAND_GAME, Set.of(
+                new CommandGameSet(pluginGame)
+        ));
     }
 
 }
