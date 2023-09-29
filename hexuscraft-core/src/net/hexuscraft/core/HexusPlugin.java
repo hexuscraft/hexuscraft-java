@@ -37,24 +37,24 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
         log("Loading...");
         long start = System.currentTimeMillis();
 
-        register(new PluginAntiCheat(this));
-        register(new PluginAuthentication(this));
-        register(new PluginBuildVersion(this));
-        register(new PluginChat(this));
-        register(new PluginCombat(this));
-        register(new PluginCommand(this));
-        register(new PluginDatabase(this));
-        register(new PluginDisguise(this));
-        register(new PluginEntity(this));
-        register(new PluginGameMode(this));
-        register(new PluginItem(this));
-        register(new PluginNetStat(this));
-        register(new PluginParty(this));
-        register(new PluginPermission(this));
-        register(new PluginPortal(this));
-        register(new PluginPunish(this));
-        register(new PluginReport(this));
-        register(new PluginScoreboard(this));
+        require(new PluginAntiCheat(this));
+        require(new PluginAuthentication(this));
+        require(new PluginBuildVersion(this));
+        require(new PluginChat(this));
+        require(new PluginCombat(this));
+        require(new PluginCommand(this));
+        require(new PluginDatabase(this));
+        require(new PluginDisguise(this));
+        require(new PluginEntity(this));
+        require(new PluginGameMode(this));
+        require(new PluginItem(this));
+        require(new PluginNetStat(this));
+        require(new PluginParty(this));
+        require(new PluginPermission(this));
+        require(new PluginPortal(this));
+        require(new PluginPunish(this));
+        require(new PluginReport(this));
+        require(new PluginScoreboard(this));
 
         load();
         _miniPluginClassMap.values().forEach(miniPlugin -> miniPlugin.load(_miniPluginClassMap));
@@ -85,7 +85,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
         log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void register(MiniPlugin miniPlugin) {
+    public final void require(MiniPlugin miniPlugin) {
         _miniPluginClassMap.put(miniPlugin.getClass(), miniPlugin);
     }
 
