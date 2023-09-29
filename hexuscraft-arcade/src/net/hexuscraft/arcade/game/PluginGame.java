@@ -12,13 +12,15 @@ import java.util.Map;
 public class PluginGame extends MiniPlugin {
 
     public enum PERM implements IPermission {
-        COMMAND_GAME
+        COMMAND_GAME,
+        COMMAND_GAME_SET
     }
 
-    protected PluginGame(Arcade arcade) {
+    public PluginGame(Arcade arcade) {
         super(arcade, "Game");
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME);
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME_SET);
     }
 
     @Override
@@ -26,4 +28,5 @@ public class PluginGame extends MiniPlugin {
         final PluginCommand pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         pluginCommand.register(new CommandGame(this));
     }
+
 }
