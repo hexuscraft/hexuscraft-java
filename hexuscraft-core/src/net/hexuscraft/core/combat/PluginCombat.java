@@ -33,7 +33,7 @@ public class PluginCombat extends MiniPlugin {
         BukkitRunnable runnable = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!player.isDead()) { return; }
+                if (!player.isDead()) return;
                 player.spigot().respawn();
             }
         };
