@@ -4,6 +4,7 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.database.Database;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -14,6 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 
 public class PluginDatabase extends MiniPlugin {
 
@@ -21,7 +25,7 @@ public class PluginDatabase extends MiniPlugin {
 
     private final Map<String, Map<UUID, MessagedRunnable>> _callbacks;
 
-    private BukkitRunnable _asyncMessageRunnable;
+    private BukkitTask _asyncMessageTask;
 
     public PluginDatabase(JavaPlugin javaPlugin) {
         super(javaPlugin, "Database");
@@ -49,45 +53,39 @@ public class PluginDatabase extends MiniPlugin {
 
     @Override
     public void onEnable() {
-        _asyncMessageRunnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        getJedisPooled().psubscribe(new JedisPubSub() {
+        _asyncMessageTask = _javaPlugin.getServer().getScheduler().runTaskAsynchronously(_javaPlugin, () -> {
+            while (true) {
+                try {
+                    getJedisPooled().psubscribe(new JedisPubSub() {
 
-                            @Override
-                            public void onPMessage(String pattern, String channel, String message) {
-                                if (!_callbacks.containsKey(channel)) {
-                                    return;
-                                }
-                                _callbacks.get(channel).forEach((uuid, callback) -> {
-                                    callback.setMessage(message);
-                                    callback.run();
-                                });
-                            }
+                        @Override
+                        public void onPMessage(String pattern, String channel, String message) {
+                            if (!_callbacks.containsKey(channel)) return;
+                            _callbacks.get(channel).forEach((uuid, callback) -> {
+                                callback.setMessage(message);
+                                callback.run();
+                            });
+                        }
 
-                            @Override
-                            public void onPSubscribe(String pattern, int subscribedChannels) {
-                                log("[JEDIS] Subscribed to '" + pattern + "' (" + subscribedChannels + ")");
-                            }
+                        @Override
+                        public void onPSubscribe(String pattern, int subscribedChannels) {
+                            log("[JEDIS] Subscribed to '" + pattern + "' (" + subscribedChannels + ")");
+                        }
 
-                        }, "*");
-                    } catch(JedisConnectionException ex) {
-                        log("[JEDIS] Exception while connecting to database: " + ex.getMessage());
-                    } catch(Exception ex) {
-                        break;
-                    }
+                    }, "*");
+                } catch (JedisConnectionException ex) {
+                    log("[JEDIS] Exception while connecting to database: " + ex.getMessage());
+                } catch (Exception ex) {
+                    break;
                 }
             }
-        };
-        _asyncMessageRunnable.runTaskAsynchronously(_javaPlugin);
+        });
     }
 
     @Override
     public void onDisable() {
         _callbacks.clear();
-        _asyncMessageRunnable.cancel();
+        _asyncMessageTask.cancel();
     }
 
     public JedisPooled getJedisPooled() {
