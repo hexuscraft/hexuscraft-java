@@ -242,12 +242,11 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
     }
 
     public final boolean doesServerExist(String name) {
-        for (ServerData serverData : ServerQueries.getServers(_pluginDatabase.getJedisPooled())) {
-            if (serverData._name.equals(name)) {
-                return true;
-            }
-        }
-        return false;
+        return ServerQueries.getServer(_pluginDatabase.getJedisPooled(), name) != null;
+    }
+
+    public final boolean doesServerGroupExist(final String name) {
+        return ServerQueries.getServerGroup(_pluginDatabase.getJedisPooled(), name) != null;
     }
 
     public final void restartServer(String server) {
