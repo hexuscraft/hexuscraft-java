@@ -6,22 +6,23 @@ public class MessagedRunnable implements Runnable {
 
     public final MiniPlugin _plugin;
 
-    private String message;
+    private String _message;
 
     protected MessagedRunnable(MiniPlugin plugin) {
         _plugin = plugin;
     }
 
     public final void setMessage(String message) {
-        this.message = message;
+        _message = message;
     }
 
     public final String getMessage() {
-        return message;
+        return _message;
     }
 
     @Override
-    public void run() {}
+    public void run() {
+    }
 
     @Override
     public String toString() {
