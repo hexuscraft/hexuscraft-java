@@ -20,6 +20,8 @@ import com.velocitypowered.api.util.Favicon;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.proxy.database.PluginDatabase;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import redis.clients.jedis.JedisPooled;
 
 import java.io.IOException;
