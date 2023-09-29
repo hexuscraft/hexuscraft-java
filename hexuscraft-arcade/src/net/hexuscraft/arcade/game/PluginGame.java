@@ -16,6 +16,8 @@ public class PluginGame extends MiniPlugin {
         COMMAND_GAME_SET
     }
 
+    private PluginCommand _command;
+
     public PluginGame(Arcade arcade) {
         super(arcade, "Game");
 
@@ -25,8 +27,11 @@ public class PluginGame extends MiniPlugin {
 
     @Override
     public final void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
-        final PluginCommand pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
-        pluginCommand.register(new CommandGame(this));
+        _command = (PluginCommand) dependencies.get(PluginCommand.class);
     }
 
+    @Override
+    public void onEnable() {
+        _command.register(new CommandGame(this));
+    }
 }
