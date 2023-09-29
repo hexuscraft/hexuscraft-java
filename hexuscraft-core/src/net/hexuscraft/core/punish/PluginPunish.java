@@ -38,11 +38,11 @@ public class PluginPunish extends MiniPlugin {
         COMMAND_RULES
     }
 
-    PluginCommand _pluginCommand;
-    PluginDatabase _pluginDatabase;
-    PluginPortal _pluginPortal;
+    private PluginCommand _pluginCommand;
+    private PluginDatabase _pluginDatabase;
+    private PluginPortal _pluginPortal;
 
-    final UUID DEFAULT_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    private final UUID DEFAULT_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     public PluginPunish(JavaPlugin javaPlugin) {
         super(javaPlugin, "Punish");
