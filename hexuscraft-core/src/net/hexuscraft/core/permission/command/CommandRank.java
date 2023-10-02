@@ -11,11 +11,12 @@ public class CommandRank extends BaseMultiCommand {
 
     public CommandRank(PluginPermission pluginPermission, PluginDatabase pluginDatabase, PluginScoreboard pluginScoreboard) {
         super(pluginPermission, "rank", "Manage permission groups of players.", Set.of("ranks", "perm", "perms", "permission", "permissions"), PluginPermission.PERM.COMMAND_RANK, Set.of(
-                new CommandRankInfo(pluginPermission, pluginDatabase),
-                new CommandRankSet(pluginPermission, pluginDatabase, pluginScoreboard),
                 new CommandRankAdd(pluginPermission, pluginDatabase, pluginScoreboard),
+                new CommandRankClear(pluginPermission, pluginDatabase, pluginScoreboard),
+                new CommandRankInfo(pluginPermission, pluginDatabase),
+                new CommandRankList(pluginPermission),
                 new CommandRankRemove(pluginPermission, pluginDatabase, pluginScoreboard),
-                new CommandRankList(pluginPermission)
+                new CommandRankSet(pluginPermission, pluginDatabase, pluginScoreboard)
         ));
     }
 
