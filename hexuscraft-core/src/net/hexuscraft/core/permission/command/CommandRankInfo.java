@@ -9,11 +9,12 @@ import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.database.queries.PermissionQueries;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CommandRankInfo extends BaseCommand {
 
@@ -43,15 +44,22 @@ public class CommandRankInfo extends BaseCommand {
         }
 
         sender.sendMessage(F.fMain(this) + "Displaying group info for " + F.fItem(profile.name) + ":\n"
-                + F.fMain() + "Primary Group: " + F.fPermissionGroup(PermissionGroup.valueOf(primaryName)) + "\n"
-                + F.fMain() + "Sub Groups: " + F.fList(groupNames.stream().map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s))).distinct().toArray(String[]::new)));
+                + F.fMain("") + "Primary Group: " + F.fPermissionGroup(PermissionGroup.valueOf(primaryName)) + "\n"
+                + F.fMain("") + "Sub Groups: " + F.fList(groupNames.stream().map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s))).distinct().toArray(String[]::new)));
     }
 
     @Override
     public List<String> tab(CommandSender sender, String alias, String[] args) {
         List<String> names = new ArrayList<>();
         if (args.length == 1) {
-            names.addAll(Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(s -> !s.startsWith("_")).toList());
+            //noinspection ReassignedVariable
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+            if (sender instanceof Player player) {
+                streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+            }
+
+            names.addAll(List.of("*", "**"));
+            names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
         }
         return names;
     }
