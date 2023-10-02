@@ -29,6 +29,8 @@ public class PluginPermission extends MiniPlugin {
         COMMAND_RANK_LIST,
         COMMAND_RANK_REMOVE,
         COMMAND_RANK_SET,
+        COMMAND_RANK_CLEAR,
+
         OPERATOR
     }
 
