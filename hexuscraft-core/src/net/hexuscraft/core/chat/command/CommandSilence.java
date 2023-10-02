@@ -26,7 +26,7 @@ public class CommandSilence extends BaseCommand {
                     if (!player.hasPermission(PluginChat.PERM.COMMAND_SILENCE_SEE.name())) {
                         return;
                     }
-                    _pluginChat._javaPlugin.getServer().broadcastMessage(F.fStaff() + F.fMain(this) + F.fItem(sender) + " " + F.fSuccess("un-muted the global chat") + ".");
+                    _pluginChat._javaPlugin.getServer().broadcastMessage(F.fSub("Staff", F.fItem(sender), " ", F.fSuccess("un-muted the global chat"), "."));
                 });
                 return;
             }
@@ -35,7 +35,7 @@ public class CommandSilence extends BaseCommand {
                 if (!player.hasPermission(PluginChat.PERM.COMMAND_SILENCE_SEE.name())) {
                     return;
                 }
-                player.sendMessage(F.fStaff() + F.fMain(this) + F.fItem(sender) + " " + F.fError("muted the global chat") + ".");
+                player.sendMessage(F.fSub("Staff", F.fItem(sender), " ", F.fError("muted the global chat"), "."));
             });
 
             return;

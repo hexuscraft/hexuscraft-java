@@ -65,7 +65,7 @@ public class CommandHostEvent extends BaseCommand {
             serverGroupData.update(jedis);
 
             scheduler.runTask(_miniPlugin._javaPlugin, () -> {
-                player.sendMessage(F.fMain(this) + F.fItem(serverGroupData._prefix + "-1") + " is being created...\n" + F.fMain() + "You will be teleported in around " + F.fItem("20 Seconds") + ".");
+                player.sendMessage(F.fMain(this) + F.fItem(serverGroupData._prefix + "-1") + " is being created...\n" + F.fMain("") + "You will be teleported in around " + F.fItem("20 Seconds") + ".");
                 _pending.remove(player);
             });
 

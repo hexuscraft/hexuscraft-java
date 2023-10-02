@@ -24,12 +24,12 @@ public class CommandBuildVersion extends BaseCommand {
         long lastModified = plugin.getLastModifiedMillis();
         long fileSize = plugin.getSizeBytes();
         sender.sendMessage(F.fMain(this) + "Plugin Information:\n"
-                + F.fMain() + "Name: " + F.fItem(plugin._javaPlugin.getDescription().getName() + "\n")
-                + F.fMain() + "Main: " + F.fItem(plugin._javaPlugin.getDescription().getMain() + "\n")
-                + F.fMain() + "Version: " + F.fItem(plugin._javaPlugin.getDescription().getVersion() + "\n")
-                + F.fMain() + "Load: " + F.fItem(plugin._javaPlugin.getDescription().getLoad().name() + "\n")
-                + F.fMain() + "Last Modified: " + F.fItem(F.fTime(System.currentTimeMillis() - lastModified)) + " (" + lastModified + ")\n"
-                + F.fMain() + "File Size: " + F.fItem(fileSize + " Bytes")
+                + F.fMain("") + "Name: " + F.fItem(plugin._javaPlugin.getDescription().getName() + "\n")
+                + F.fMain("") + "Main: " + F.fItem(plugin._javaPlugin.getDescription().getMain() + "\n")
+                + F.fMain("") + "Version: " + F.fItem(plugin._javaPlugin.getDescription().getVersion() + "\n")
+                + F.fMain("") + "Load: " + F.fItem(plugin._javaPlugin.getDescription().getLoad().name() + "\n")
+                + F.fMain("") + "Last Modified: " + F.fItem(F.fTime(System.currentTimeMillis() - lastModified)) + " (" + lastModified + ")\n"
+                + F.fMain("") + "File Size: " + F.fItem(fileSize + " Bytes")
         );
     }
 

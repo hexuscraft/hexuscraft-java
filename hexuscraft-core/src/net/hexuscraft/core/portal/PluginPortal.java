@@ -120,7 +120,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
                         if (!player1.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
                             return;
                         }
-                        player1.sendMessage(F.fStaff() + F.fMain(this) + F.fItem(senderName) + " sent " + F.fItem(playerName) + " to " + F.fItem(serverName));
+                        player1.sendMessage(F.fSub(this) + F.fItem(senderName) + " sent " + F.fItem(playerName) + " to " + F.fItem(serverName));
                     });
                 }
 

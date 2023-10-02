@@ -45,8 +45,8 @@ public class CommandReport extends BaseCommand {
         _miniPlugin._javaPlugin.getServer().getOnlinePlayers().forEach(onlinePlayer -> {
             if (!onlinePlayer.hasPermission(PermissionGroup.TRAINEE.name())) return;
             onlinePlayer.sendMessage(F.fMain(this) + "Report from " + F.fItem(sender) + ":");
-            onlinePlayer.sendMessage(F.fMain() + "Target: " + F.fItem(targetProfile.name));
-            onlinePlayer.sendMessage(F.fMain() + "Reason: " + F.fItem(reason));
+            onlinePlayer.sendMessage(F.fMain("") + "Target: " + F.fItem(targetProfile.name));
+            onlinePlayer.sendMessage(F.fMain("") + "Reason: " + F.fItem(reason));
         });
 
         sender.sendMessage(F.fMain(this) + "Report against " + F.fItem(targetProfile.name) + " has been submitted for review. You will receive a response shortly.");

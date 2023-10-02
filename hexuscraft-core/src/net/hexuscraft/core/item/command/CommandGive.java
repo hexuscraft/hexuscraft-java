@@ -40,7 +40,7 @@ public class CommandGive extends BaseCommand {
                 Enchantment enchantment = Enchantment.getByName(strings[0]);
                 if (enchantment == null) {
                     sender.sendMessage(F.fMain(this) + "Unknown enchantment named " + F.fItem(strings[0]) + ". Listing Enchantments:\n"
-                            + F.fMain() + F.fList(Arrays.stream(Enchantment.values()).map(Enchantment::getName).toArray(String[]::new)));
+                            + F.fMain("") + F.fList(Arrays.stream(Enchantment.values()).map(Enchantment::getName).toArray(String[]::new)));
                     return;
                 }
 

@@ -29,7 +29,7 @@ public class CommandEntityList extends BaseCommand {
 
         sender.sendMessage(F.fMain(this) + "Listing entities:");
 
-        Arrays.stream(entities).toList().forEach(entity -> sender.sendMessage(F.fMain() + entity.getName() + " [" + entity.getLocation().toString() + "]"));
+        Arrays.stream(entities).toList().forEach(entity -> sender.sendMessage(F.fMain("") + entity.getName() + " [" + entity.getLocation().toString() + "]"));
 
         sender.sendMessage(F.fMain(this) + "Listed " + F.fItem(entities.length + " Entities") + ".");
 

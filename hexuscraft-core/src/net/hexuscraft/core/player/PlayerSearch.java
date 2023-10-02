@@ -47,7 +47,7 @@ public class PlayerSearch {
         final Player[] matches = onlinePlayerSearch(onlinePlayersList, searchName);
 
         sender.sendMessage(F.fMain("Player Search") + F.fItem(matches.length + (matches.length == 1 ? " Match" : " Matches")) + " for " + F.fItem(searchName) + (matches.length == 0 ? "." : ":\n" +
-                F.fMain() + F.fList(Arrays.stream(matches).map(Player::getName).toArray(String[]::new))));
+                F.fMain("") + F.fList(Arrays.stream(matches).map(Player::getName).toArray(String[]::new))));
 
         return matches;
     }
@@ -92,7 +92,7 @@ public class PlayerSearch {
             return fetchMojangProfile(name);
         } catch (IOException | URISyntaxException ex) {
             sender.sendMessage(F.fMain("Profile Fetcher") + F.fError("Error while fetching profile of ") + F.fItem(name) + F.fError(":") + "\n"
-                    + F.fMain() + ex.getMessage());
+                    + F.fMain("") + ex.getMessage());
             return null;
         }
     }
@@ -146,7 +146,7 @@ public class PlayerSearch {
             return fetchMojangSession(uuid);
         } catch (IOException ex) {
             sender.sendMessage(F.fMain("Session Fetcher") + F.fError("Error while fetching session of ") + F.fItem(uuid.toString()) + F.fError(":") + "\n"
-                    + F.fMain() + ex.getMessage());
+                    + F.fMain("") + ex.getMessage());
             return null;
         }
     }

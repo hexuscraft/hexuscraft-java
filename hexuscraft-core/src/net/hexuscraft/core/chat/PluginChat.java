@@ -85,7 +85,7 @@ public class PluginChat extends MiniPlugin {
 
                 _plugin._javaPlugin.getServer().getOnlinePlayers().forEach(player -> {
                     if (player.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
-                        player.sendMessage(F.fStaff() + F.fMain(this) + F.fItem(senderName) + " broadcast to " + F.fPermissionGroup(permissionGroup) + ".");
+                        player.sendMessage(F.fSub("Staff", F.fItem(senderName), " broadcast to ", F.fPermissionGroup(permissionGroup), "."));
                     }
 
                     if (!player.hasPermission(permissionGroup.name())) {
@@ -94,7 +94,7 @@ public class PluginChat extends MiniPlugin {
 
                     //noinspection deprecation
                     player.sendTitle(C.cYellow + "Announcement", announcementMessage);
-                    player.sendMessage(F.fAnnounce(announcementMessage));
+                    player.sendMessage(F.fMain("Announcement", C.cAqua + announcementMessage));
                 });
             }
 

@@ -92,7 +92,7 @@ public class PluginPunish extends MiniPlugin {
                 if (punishData.type.equals(PunishType.WARNING)) {
                     if (target != null) {
                         target.sendMessage(F.fMain(this) + "You received a warning.");
-                        target.sendMessage(F.fMain() + "Reason: " + C.cWhite + punishData.reason);
+                        target.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 1);
                     }
                     _javaPlugin.getServer().getOnlinePlayers().forEach(staff -> {
@@ -100,14 +100,14 @@ public class PluginPunish extends MiniPlugin {
                             return;
                         }
                         staff.sendMessage(F.fMain(this) + F.fItem(staffSession.name) + " warned " + F.fItem(targetSession.name) + ".");
-                        staff.sendMessage(F.fMain() + "Reason: " + C.cWhite + punishData.reason);
+                        staff.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
                     });
                     return;
                 }
                 if (punishData.type.equals(PunishType.MUTE)) {
                     if (target != null) {
                         target.sendMessage(F.fMain(this) + "You were muted for " + F.fItem(F.fTime(punishData.length) + "."));
-                        target.sendMessage(F.fMain() + "Reason: " + C.cWhite + punishData.reason);
+                        target.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 0.6F);
                     }
                     _javaPlugin.getServer().getOnlinePlayers().forEach(staff -> {
@@ -115,7 +115,7 @@ public class PluginPunish extends MiniPlugin {
                             return;
                         }
                         staff.sendMessage(F.fMain(this) + F.fItem(staffSession.name) + " muted " + F.fItem(targetSession.name) + " for " + F.fItem(F.fTime(punishData.length) + "."));
-                        staff.sendMessage(F.fMain() + "Reason: " + C.cWhite + punishData.reason);
+                        staff.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
                     });
                     return;
                 }
@@ -128,7 +128,7 @@ public class PluginPunish extends MiniPlugin {
                             return;
                         }
                         staff.sendMessage(F.fMain(this) + F.fItem(staffSession.name) + " banned " + F.fItem(targetSession.name) + " for " + F.fItem(F.fTime(punishData.length) + "."));
-                        staff.sendMessage(F.fMain() + "Reason: " + C.cWhite + punishData.reason);
+                        staff.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
                     });
                     return;
                 }

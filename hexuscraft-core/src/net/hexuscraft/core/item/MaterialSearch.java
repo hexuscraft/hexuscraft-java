@@ -33,7 +33,7 @@ public class MaterialSearch {
         final Material[] matches = materialSearch(searchName);
 
         sender.sendMessage(F.fMain("Material Search") + F.fItem(matches.length + (matches.length == 1 ? " Match" : " Matches")) + " for " + F.fItem(searchName) + (matches.length == 0 ? "." : ":\n" +
-                F.fMain() + F.fList(Arrays.stream(matches).map(Material::name).toArray(String[]::new))));
+                F.fMain("") + F.fList(Arrays.stream(matches).map(Material::name).toArray(String[]::new))));
 
         return matches;
     }

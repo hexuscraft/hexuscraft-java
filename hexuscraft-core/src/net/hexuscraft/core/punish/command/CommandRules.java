@@ -22,8 +22,8 @@ public class CommandRules extends BaseCommand {
         }
 
         sender.sendMessage(F.fMain(this) + "Listing Rules:");
-        sender.sendMessage(F.fMain() + F.fList(1) + "Don't use gameplay-affecting client modifications");
-        sender.sendMessage(F.fMain() + F.fList(2) + "Don't be a dick");
+        sender.sendMessage(F.fMain("") + F.fList(1) + "Don't use gameplay-affecting client modifications");
+        sender.sendMessage(F.fMain("") + F.fList(2) + "Don't be a dick");
     }
 
 }

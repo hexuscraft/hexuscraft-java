@@ -60,10 +60,10 @@ public class CommandHostServer extends BaseCommand {
 
                 scheduler.runTask(_miniPlugin._javaPlugin, () -> {
                     if (serverName == null) {
-                        player.sendMessage(F.fMain(this) + F.fItem(player.getName() + "-1") + " is being created...\n" + F.fMain() + "You will be teleported in around " + F.fItem("30 Seconds") + ".");
+                        player.sendMessage(F.fMain(this) + F.fItem(player.getName() + "-1") + " is being created...\n" + F.fMain("") + "You will be teleported in around " + F.fItem("30 Seconds") + ".");
                         return;
                     }
-                    player.sendMessage(F.fMain(this) + "You are already the host of a private server!\n" + F.fMain() + "Connect to it with " + F.fItem("/server " + serverName + "."));
+                    player.sendMessage(F.fMain(this) + "You are already the host of a private server!\n" + F.fMain("") + "Connect to it with " + F.fItem("/server " + serverName + "."));
                 });
             } catch (Exception e) {
                 scheduler.runTask(_miniPlugin._javaPlugin, () -> player.sendMessage(F.fMain(this) + F.fError("There was an error while contacting the database. Maybe try again later?")));

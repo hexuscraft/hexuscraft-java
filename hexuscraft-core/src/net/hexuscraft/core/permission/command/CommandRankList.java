@@ -23,7 +23,7 @@ public class CommandRankList extends BaseCommand {
         }
 
         sender.sendMessage(F.fMain(this) + "Listing Groups:\n"
-                + F.fMain() + F.fList(Arrays.stream(PermissionGroup.values()).map(group -> group._color + group.name()).toArray(String[]::new)));
+                + F.fMain("") + F.fList(Arrays.stream(PermissionGroup.values()).map(group -> group._color + group.name()).toArray(String[]::new)));
     }
 
 
