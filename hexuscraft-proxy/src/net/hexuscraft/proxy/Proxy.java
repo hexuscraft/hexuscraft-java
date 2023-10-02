@@ -46,6 +46,9 @@ public class Proxy {
             "§f§l ▶ §r"
     });
 
+    private int _playerCount = 0;
+    private int _maxPlayerCount = 0;
+
     private String _motd = MOTD_PREFIX;
 
     @Inject
@@ -63,25 +66,33 @@ public class Proxy {
         commandManager.unregister("server");
         commandManager.unregister("velocity");
 
-        _server.getScheduler().buildTask(this, () -> {
-            JedisPooled jedis = _pluginDatabase.getJedisPooled();
+        _server.getScheduler()
+                .buildTask(this, this::updateRegisteredServers)
+                .repeat(Duration.ofSeconds(1))
+                .delay(Duration.ofSeconds(0))
+                .schedule();
 
-            _motd = MOTD_PREFIX + ServerQueries.getMotd(jedis);
-
-            final Map<String, InetSocketAddress> serverInfoMap = new HashMap<>();
-            Arrays.stream(ServerQueries.getServers(jedis)).forEach(serverData -> {
-                serverInfoMap.put(serverData._name, new InetSocketAddress(serverData._address, serverData._port));
-            });
-
-            _server.getAllServers().forEach(registeredServer -> _server.unregisterServer(registeredServer.getServerInfo()));
-            serverInfoMap.forEach((name, address) -> _server.registerServer(new ServerInfo(name, address)));
-        }).repeat(Duration.ofSeconds(1)).delay(Duration.ofSeconds(0)).schedule();
+        _server.getScheduler()
+                .buildTask(this, this::updatePlayerCounts)
+                .repeat(Duration.ofSeconds(1))
+                .delay(Duration.ofSeconds(0))
+                .schedule();
     }
 
-    @Subscribe
-    private void onProxyQuery(final ProxyQueryEvent event) {
-        final QueryResponse.Builder builder = QueryResponse.builder();
+    private void updateRegisteredServers() {
+        JedisPooled jedis = _pluginDatabase.getJedisPooled();
 
+        _motd = MOTD_PREFIX + ServerQueries.getMotd(jedis);
+
+        final Set<ServerInfo> serverInfoSet = new HashSet<>();
+        Arrays.stream(ServerQueries.getServers(jedis))
+                .forEach(serverData -> serverInfoSet.add(new ServerInfo(serverData._name, new InetSocketAddress(serverData._address, serverData._port))));
+
+        _server.getAllServers().stream().map(RegisteredServer::getServerInfo).forEach(_server::unregisterServer);
+        serverInfoSet.forEach(_server::registerServer);
+    }
+
+    private void updatePlayerCounts() {
         //noinspection ReassignedVariable
         int playerCount = 0;
         //noinspection ReassignedVariable
@@ -95,12 +106,32 @@ public class Proxy {
                 final ServerPing.Players players = optionalPlayers.get();
                 playerCount += players.getOnline();
                 maxPlayerCount += players.getMax();
-            } catch (final InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+            } catch (final InterruptedException | ExecutionException | RuntimeException ex) {
+                _logger.info("Could not ping server '" + registeredServer.getServerInfo().getName() + "': " + ex.getMessage());
             }
         }
-        builder.currentPlayers(playerCount);
-        builder.maxPlayers(maxPlayerCount);
+
+        _playerCount = playerCount;
+        _maxPlayerCount = maxPlayerCount;
+    }
+
+    @Subscribe
+    private void onProxyQuery(final ProxyQueryEvent event) {
+        final QueryResponse.Builder builder = QueryResponse.builder();
+        builder.players(
+                "§r",
+                "    §6§lHexuscraft§r §f§lNetwork§r    ",
+                "§r",
+                "  §f§l▶§r  Mini Games",
+                "  §f§l▶§r  Private Servers",
+                "  §f§l▶§r  Tournaments",
+                "§r"
+        );
+        builder.clearPlugins();
+        builder.proxyVersion("Minecraft 1.8");
+        builder.gameVersion("Minecraft 1.8");
+        builder.currentPlayers(_playerCount);
+        builder.maxPlayers(_maxPlayerCount);
         event.setResponse(builder.build());
     }
 
@@ -108,29 +139,9 @@ public class Proxy {
     private void onProxyPing(final ProxyPingEvent event) {
         final ServerPing.Builder builder = ServerPing.builder();
 
-        //noinspection ReassignedVariable
-        int playerCount = 0;
-        //noinspection ReassignedVariable
-        int maxPlayerCount = 0;
+        builder.onlinePlayers(_playerCount);
+        builder.maximumPlayers(_maxPlayerCount);
 
-        for (RegisteredServer registeredServer : _server.getAllServers()) {
-            try {
-                final Optional<ServerPing.Players> optionalPlayers = registeredServer.ping().get().getPlayers();
-                if (optionalPlayers.isEmpty()) continue;
-
-                final ServerPing.Players players = optionalPlayers.get();
-                playerCount += players.getOnline();
-                maxPlayerCount += players.getMax();
-            } catch (final InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        builder.onlinePlayers(playerCount);
-        builder.maximumPlayers(maxPlayerCount);
-
-//        int playerCount = _server.getPlayerCount();
-//        builder.onlinePlayers(playerCount);
-//        builder.maximumPlayers(playerCount + 1);
         builder.description(Component.text(_motd));
         builder.samplePlayers(
                 new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)),
