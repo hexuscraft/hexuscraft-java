@@ -29,73 +29,61 @@ public class F {
     private static final String PREFIX_MAIN = C.cBlue;
     private static final String PREFIX_SUB = C.cDGray;
 
-    private static final String PREFIX_ANNOUNCE = C.cYellow;
-
     private static final String ITEM_COLOR = C.cYellow;
 
-    public static String fMain(final String prefix) {
-        return PREFIX_MAIN + prefix + ">" + SPACER_GRAY;
+
+
+    public static String fMain(final String prefix, final String... text) {
+        return PREFIX_MAIN + prefix + ">" + SPACER_GRAY + String.join("", text);
     }
 
-    public static String fMain() {
-        return fMain("");
+    public static String fMain(final MiniPlugin miniPlugin, final String... text) {
+        return fMain(miniPlugin._name, text);
     }
 
-    public static String fMain(final MiniPlugin miniPlugin) {
-        return fMain(miniPlugin._name);
+    public static String fMain(final BaseCommand baseCommand, final String... text) {
+        return fMain(baseCommand._miniPlugin, text);
     }
 
-    public static String fMain(final BaseCommand baseCommand) {
-        return fMain(baseCommand._miniPlugin);
+    public static String fMain(final Player player, final String... text) {
+        return fMain(player.getDisplayName(), text);
     }
 
-    public static String fMain(final Player player) {
-        return fMain(player.getDisplayName());
+    public static String fMain(final Object object, final String... text) {
+        return fMain(object.toString(), text);
     }
 
-    public static String fMain(final Object object) {
-        return fMain(object.toString());
+    public static String fMain(final JavaPlugin plugin, final String... text) {
+        return fMain(plugin.getName(), text);
     }
 
-    public static String fMain(final JavaPlugin plugin) {
-        return fMain(plugin.getName());
+
+
+    public static String fSub(final String prefix, final String... text) {
+        return fMain(PREFIX_SUB + prefix, text);
     }
 
-    public static String fSub(final String prefix) {
-        return PREFIX_SUB + prefix + ">" + SPACER_GRAY;
+    public static String fSub(final MiniPlugin miniPlugin, final String... text) {
+        return fSub(miniPlugin._name, text);
     }
 
-    public static String fSub() {
-        return fSub("");
+    public static String fSub(final BaseCommand baseCommand, final String... text) {
+        return fSub(baseCommand._miniPlugin, text);
     }
 
-    public static String fSub(final MiniPlugin miniPlugin) {
-        return fSub(miniPlugin._name);
+    public static String fSub(final Player player, final String... text) {
+        return fSub(player.getDisplayName(), text);
     }
 
-    public static String fSub(final BaseCommand baseCommand) {
-        return fSub(baseCommand._miniPlugin);
+    public static String fSub(final Object object, final String... text) {
+        return fSub(object.toString(), text);
     }
 
-    public static String fSub(final Player player) {
-        return fSub(player.getDisplayName());
+    public static String fSub(final JavaPlugin plugin, final String... text) {
+        return fSub(plugin.getName(), text);
     }
 
-    public static String fSub(final Object object) {
-        return fSub(object.toString());
-    }
 
-    public static String fSub(final JavaPlugin plugin) {
-        return fSub(plugin.getName());
-    }
-
-    public static String fStaff() {
-        return fSub("[S]");
-    }
-
-    public static String fAnnounce(final String text) {
-        return PREFIX_ANNOUNCE + "Announcement>" + SPACER + text;
-    }
 
     public static String fItem(final String name) {
         return ITEM_COLOR + name + RESET_GRAY;
