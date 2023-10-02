@@ -1,7 +1,7 @@
-package net.hexuscraft.build.team;
+package net.hexuscraft.hub.team;
 
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.build.Hub;
+import net.hexuscraft.hub.Hub;
 
 public class PluginTeam extends MiniPlugin {
 

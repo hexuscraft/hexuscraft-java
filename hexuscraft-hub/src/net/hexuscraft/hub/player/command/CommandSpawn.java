@@ -1,11 +1,11 @@
-package net.hexuscraft.build.player.command;
+package net.hexuscraft.hub.player.command;
 
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.build.Hub;
-import net.hexuscraft.build.player.PluginPlayer;
+import net.hexuscraft.hub.Hub;
+import net.hexuscraft.hub.player.PluginPlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -56,7 +56,7 @@ public class CommandSpawn extends BaseCommand {
             if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {
                 return;
             }
-            staff.sendMessage(F.fStaff() + F.fMain(this) + F.fItem(sender) + " teleported " + F.fItem(target) + " to spawn.");
+            staff.sendMessage(F.fSub(this) + F.fItem(sender) + " teleported " + F.fItem(target) + " to spawn.");
         });
     }
 }

@@ -1,8 +1,8 @@
-package net.hexuscraft.build;
+package net.hexuscraft.hub;
 
 import net.hexuscraft.core.HexusPlugin;
-import net.hexuscraft.build.player.PluginPlayer;
-import net.hexuscraft.build.team.PluginTeam;
+import net.hexuscraft.hub.player.PluginPlayer;
+import net.hexuscraft.hub.team.PluginTeam;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;

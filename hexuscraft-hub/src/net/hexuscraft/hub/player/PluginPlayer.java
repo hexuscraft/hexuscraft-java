@@ -1,4 +1,4 @@
-package net.hexuscraft.build.player;
+package net.hexuscraft.hub.player;
 
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
@@ -15,8 +15,8 @@ import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import net.hexuscraft.database.serverdata.ServerGroupData;
-import net.hexuscraft.build.Hub;
-import net.hexuscraft.build.player.command.CommandSpawn;
+import net.hexuscraft.hub.Hub;
+import net.hexuscraft.hub.player.command.CommandSpawn;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
