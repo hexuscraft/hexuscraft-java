@@ -43,8 +43,7 @@ public class PluginEntity extends MiniPlugin {
         ));
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_ENTITY_REFRESH);
-
-        PermissionGroup.DEVELOPER._permissions.add(PERM.COMMAND_ENTITY_PURGE);
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_ENTITY_PURGE);
     }
 
     @Override
