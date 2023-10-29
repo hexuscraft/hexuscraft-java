@@ -63,13 +63,13 @@ public class ServerMonitor implements Runnable {
 
             // Kill dead servers
             if ((System.currentTimeMillis() - serverData._updated) > MAX_SERVER_IDLE_MS) {
-                killServer(jedis, serverData, "Unresponsive");
+                killServer(jedis, serverData._name, "Unresponsive");
                 return;
             }
 
             // Kill pending death servers
             if (serverData._name.endsWith("-DEAD")) {
-                killServer(jedis, serverData, "Pending Death");
+                killServer(jedis, serverData._name.replace("-DEAD", ""), "Pending Death");
                 return;
             }
 
@@ -109,44 +109,6 @@ public class ServerMonitor implements Runnable {
             }
 
         });
-    }
-
-    private void killServer(final JedisPooled jedis, final String serverName, final String reason) {
-        log("=== KILL SERVER ===");
-        log("Reason: " + reason);
-        log("Name: " + serverName);
-
-        try {
-            new ProcessBuilder(
-                    "cmd.exe",
-                    "/c",
-                    "start",
-                    "C:/minecraft/scripts/killServer.cmd",
-                    "127.0.0.1",
-                    "193.110.160.24",
-                    serverName
-            ).start();
-
-            jedis.del(ServerQueries.SERVER(serverName));
-        } catch (IOException e) {
-            log("!!! Exception while running kill process:");
-            log(e.getMessage(), e);
-        }
-
-        log("====================");
-    }
-
-    private void killServer(final JedisPooled jedis, final ServerData serverData, final String reason) {
-        killServer(jedis, serverData._name, reason);
-    }
-
-    private ServerData getBestServerToKill(final JedisPooled jedis, final ServerGroupData serverGroupData) {
-        for (ServerData serverData : ServerQueries.getServers(jedis, serverGroupData)) {
-            if (serverData._motd.startsWith("LIVE")) continue;
-            if (serverData._players > (serverData._capacity / 3)) continue;
-            return serverData;
-        }
-        return null;
     }
 
     private void startServer(final JedisPooled jedis, final ServerGroupData serverGroupData, final String reason) {
@@ -200,18 +162,17 @@ public class ServerMonitor implements Runnable {
             ).start();
             log("Waiting for server to startup...");
 
-            long startMs = System.currentTimeMillis();
+            final long startMs = System.currentTimeMillis();
             while (true) {
-                if ((System.currentTimeMillis() - startMs) > 20000L) {
+                if ((System.currentTimeMillis() - startMs) > 30000L) {
                     killServer(jedis, serverName, "Slow Start-up");
                     break;
                 }
-                if (ServerQueries.getServer(jedis, serverName) == null) {
-                    //noinspection BusyWait
-                    Thread.sleep(100L);
-                    continue;
+                if (ServerQueries.getServer(jedis, serverName) != null) {
+                    break;
                 }
-                break;
+                //noinspection BusyWait
+                Thread.sleep(100L);
             }
         } catch (IOException e) {
             log("!!! Exception while running start process:");
@@ -223,6 +184,43 @@ public class ServerMonitor implements Runnable {
         log("====================");
     }
 
+    private void killServer(final JedisPooled jedis, final String serverName, final String reason) {
+        log("=== KILL SERVER ===");
+        log("Reason: " + reason);
+        log("Name: " + serverName);
+
+        try {
+            new ProcessBuilder(
+                    "cmd.exe",
+                    "/c",
+                    "start",
+                    "C:/minecraft/scripts/killServer.cmd",
+                    "127.0.0.1",
+                    "193.110.160.24",
+                    serverName
+            ).start();
+            jedis.del(ServerQueries.SERVER(serverName));
+            log("Waiting for server to die...");
+
+            Thread.sleep(3000L);
+        } catch (final IOException ex) {
+            log("!!! Exception while running kill process:");
+            log(ex.getMessage(), ex);
+        } catch (final InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        log("====================");
+    }
+
+    private ServerData getBestServerToKill(final JedisPooled jedis, final ServerGroupData serverGroupData) {
+        for (ServerData serverData : ServerQueries.getServers(jedis, serverGroupData)) {
+            if (serverData._motd.startsWith("LIVE")) continue;
+            if (serverData._players > (serverData._capacity / 3)) continue;
+            return serverData;
+        }
+        return null;
+    }
 
     @Override
     public final void run() {
