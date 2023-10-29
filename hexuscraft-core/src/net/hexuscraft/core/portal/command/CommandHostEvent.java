@@ -61,7 +61,7 @@ public class CommandHostEvent extends BaseCommand {
                 return;
             }
 
-            ServerGroupData serverGroupData = new ServerGroupData("EVENT", "EVENT", null, 20000, 20001, 1, 0, "Arcade.jar", "Lobby_Arcade.zip", 512, 100);
+            final ServerGroupData serverGroupData = new ServerGroupData("EVENT", "EVENT", null, 20000, 20001, 1, 0, "Arcade.jar", "Lobby_Arcade.zip", 512, 100);
             serverGroupData.update(jedis);
 
             scheduler.runTask(_miniPlugin._javaPlugin, () -> {
