@@ -3,6 +3,8 @@ package net.hexuscraft.database.serverdata;
 import net.hexuscraft.database.queries.ServerQueries;
 import redis.clients.jedis.JedisPooled;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ServerGroupData {
@@ -53,7 +55,7 @@ public class ServerGroupData {
     }
 
     public final Map<String, String> toMap() {
-        return Map.of(
+        return new HashMap<>(Map.of(
                 "prefix", _prefix,
                 "requiredPermission", _requiredPermission,
                 "minPort", Integer.toString(_minPort),
@@ -64,7 +66,7 @@ public class ServerGroupData {
                 "worldZip", _worldZip,
                 "ram", Integer.toString(_ram),
                 "capacity", Integer.toString(_capacity)
-        );
+        ));
     }
 
     public final void update(final JedisPooled jedis) {
