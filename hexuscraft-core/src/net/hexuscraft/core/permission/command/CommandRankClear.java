@@ -79,8 +79,6 @@ public class CommandRankClear extends BaseCommand {
             if (sender instanceof Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }
-
-            names.addAll(List.of("*", "**"));
             names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
         }
         return names;

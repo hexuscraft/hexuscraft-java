@@ -82,8 +82,6 @@ public class CommandRankAdd extends BaseCommand {
                 if (sender instanceof Player player) {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
                 }
-
-                names.addAll(List.of("*", "**"));
                 names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
             }
             case 2 -> names.addAll(Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(s -> !s.startsWith("_")).toList());
