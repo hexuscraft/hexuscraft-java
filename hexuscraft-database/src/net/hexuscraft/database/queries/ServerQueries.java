@@ -13,7 +13,7 @@ import java.util.Set;
 @SuppressWarnings("unused")
 public class ServerQueries {
 
-    public static String SERVER(String name) {
+    public static String SERVER(final String name) {
         return Database.buildQuery("server", name);
     }
 
@@ -25,19 +25,19 @@ public class ServerQueries {
         return Database.buildQuery("motd");
     }
 
-    public static ServerData getServer(JedisPooled jedis, String name) {
+    public static ServerData getServer(final JedisPooled jedis, final String name) {
         final Map<String, String> dataMap = jedis.hgetAll(SERVER(name));
         if (dataMap.isEmpty()) return null;
         return new ServerData(name, dataMap);
     }
 
-    public static ServerData[] getServers(JedisPooled jedis) {
+    public static ServerData[] getServers(final JedisPooled jedis) {
         final Set<ServerData> serverDataSet = new HashSet<>();
         jedis.keys("server.*").forEach(key -> serverDataSet.add(getServer(jedis, key.split("\\.", 2)[1])));
         return serverDataSet.toArray(ServerData[]::new);
     }
 
-    public static ServerData[] getServers(JedisPooled jedis, ServerGroupData serverGroupData) {
+    public static ServerData[] getServers(final JedisPooled jedis, final ServerGroupData serverGroupData) {
         final Set<ServerData> serverDataSet = new HashSet<>();
         for (ServerData serverData : getServers(jedis)) {
             if (serverData._group.equals(serverGroupData._name)) {
@@ -47,7 +47,7 @@ public class ServerQueries {
         return serverDataSet.toArray(ServerData[]::new);
     }
 
-    public static Map<String, ServerData> getServersAsMap(JedisPooled jedis) {
+    public static Map<String, ServerData> getServersAsMap(final JedisPooled jedis) {
         final Map<String, ServerData> serverDataMap = new HashMap<>();
         for (ServerData serverData : getServers(jedis)) {
             serverDataMap.put(serverData._name, serverData);
