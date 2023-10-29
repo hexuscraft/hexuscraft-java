@@ -21,9 +21,9 @@ public class CommandHelp extends BaseCommand {
             return;
         }
         sender.sendMessage(F.fMain(this) + "Hey there! Need some help?");
-        sender.sendMessage(F.fMain("") + "Visit our website: " + C.cGreen + "www.hexuscraft.net");
-        sender.sendMessage(F.fMain("") + "Join our Discord: " + C.cPurple + "discord.hexuscraft.net");
-        sender.sendMessage(F.fMain("") + "Still stuck? Request help from staff with " + F.fItem("/support") + ".");
+        sender.sendMessage(F.fMain("", "Visit our website: " + C.cGreen + "www.hexuscraft.net"));
+        sender.sendMessage(F.fMain("", "Join our Discord: " + C.cPurple + "discord.hexuscraft.net"));
+        sender.sendMessage(F.fMain("", "Still stuck? Request help from staff with " + F.fItem("/support") + "."));
     }
 
 }
