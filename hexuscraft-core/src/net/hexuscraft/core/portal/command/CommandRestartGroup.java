@@ -29,7 +29,7 @@ public class CommandRestartGroup extends BaseCommand {
             return;
         }
 
-        sender.sendMessage(F.fMain(this) + "Sending restart command to servers of group " + F.fItem(args[0]) + ".");
+        sender.sendMessage(F.fMain(this, "Sending restart command to servers of group ", F.fItem(args[0]), "."));
         _portal.restartGroup(args[0]);
     }
 
