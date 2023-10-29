@@ -164,26 +164,19 @@ public class F {
     }
 
     public static String fChat(final int level, final PermissionGroup permissionGroup) {
-        return C.cGray + level + SPACER + fPermissionGroup(permissionGroup, true).toUpperCase() + SPACER + C.cYellow + "%s" + SPACER + "%s";
+        return C.cGray + level + SPACER + fPermissionGroup(permissionGroup, true, true) + SPACER + C.cYellow + "%s" + SPACER + "%s";
     }
 
-    public static String fPermissionGroup(final String prefix, final String color) {
-        return RESET + color + prefix + RESET_GRAY;
+    public static String fPermissionGroup(final PermissionGroup group, final boolean uppercase, final boolean bold) {
+        return RESET + group._color + (bold ? C.fBold : "") + (uppercase ? group._prefix.toUpperCase() : group._prefix) + RESET_GRAY;
     }
 
-    public static String fPermissionGroup(final PermissionGroup permissionGroup) {
-        if (permissionGroup == null) {
-            return fPermissionGroup("null", C.cWhite);
-        }
-        return fPermissionGroup(permissionGroup._prefix, permissionGroup._color);
+    public static String fPermissionGroup(final PermissionGroup group, final boolean uppercase) {
+        return fPermissionGroup(group, uppercase, false);
     }
 
-    public static String fPermissionGroup(final PermissionGroup permissionGroup, final boolean bold) {
-        final StringBuilder builder = new StringBuilder(permissionGroup._color);
-        if (bold) {
-            builder.append(C.fBold);
-        }
-        return fPermissionGroup(permissionGroup._prefix, builder.toString());
+    public static String fPermissionGroup(final PermissionGroup group) {
+        return fPermissionGroup(group, false, false);
     }
 
     public static String fInsufficientPermissions() {
