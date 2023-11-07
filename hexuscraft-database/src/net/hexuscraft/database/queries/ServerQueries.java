@@ -37,14 +37,18 @@ public class ServerQueries {
         return serverDataSet.toArray(ServerData[]::new);
     }
 
-    public static ServerData[] getServers(final JedisPooled jedis, final ServerGroupData serverGroupData) {
+    public static ServerData[] getServers(final JedisPooled jedis, final String name) {
         final Set<ServerData> serverDataSet = new HashSet<>();
         for (ServerData serverData : getServers(jedis)) {
-            if (serverData._group.equals(serverGroupData._name)) {
+            if (serverData._group.equals(name)) {
                 serverDataSet.add(serverData);
             }
         }
         return serverDataSet.toArray(ServerData[]::new);
+    }
+
+    public static ServerData[] getServers(final JedisPooled jedis, final ServerGroupData serverGroupData) {
+        return getServers(jedis, serverGroupData._name);
     }
 
     public static Map<String, ServerData> getServersAsMap(final JedisPooled jedis) {
@@ -83,10 +87,4 @@ public class ServerQueries {
         jedis.set(MOTD(), value);
     }
 
-    public static void markServerAsDead(JedisPooled jedis, String serverName) {
-        ServerData serverData = getServer(jedis, serverName);
-        if (serverData == null) return;
-
-        new ServerData(serverData._name + "-DEAD", serverData.toMap()).update(jedis);
-    }
 }

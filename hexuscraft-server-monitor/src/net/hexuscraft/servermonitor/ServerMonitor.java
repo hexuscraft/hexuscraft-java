@@ -67,12 +67,6 @@ public class ServerMonitor implements Runnable {
                 return;
             }
 
-            // Kill pending death servers
-            if (serverData._name.endsWith("-DEAD")) {
-                killServer(jedis, serverData._name.replace("-DEAD", ""), "Pending Death");
-                return;
-            }
-
             // Count total and joinable servers
             final ServerGroupData serverGroupData = _serverGroupDataMap.get(serverData._group);
             totalServersMap.get(serverGroupData).add(serverData);
@@ -143,6 +137,7 @@ public class ServerMonitor implements Runnable {
         log("Ram: " + serverGroupData._ram);
         log("Name: " + serverName);
 
+        killServer(jedis, serverName, "Destroy Old Server");
         try {
             new ProcessBuilder(
                     "cmd.exe",

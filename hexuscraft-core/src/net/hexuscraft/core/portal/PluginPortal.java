@@ -208,8 +208,6 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
         _updateTask.cancel();
         _updateTask = null;
-
-        ServerQueries.markServerAsDead(_pluginDatabase.getJedisPooled(), _serverName);
     }
 
     @Override
