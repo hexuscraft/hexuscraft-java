@@ -99,7 +99,7 @@ public class PluginPlayer extends MiniPlugin {
         refreshInventory(player);
         player.teleport(spawn);
 
-        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), F.fTabFooter("WWW.HEXUSCRAFT.NET"));
+        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), "");
 
         PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
         event.setJoinMessage(F.fSub("Join", F.fPermissionGroup(primaryGroup, true).toUpperCase(), " ", F.fItem(player.getName())));
