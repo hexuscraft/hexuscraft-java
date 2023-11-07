@@ -15,7 +15,7 @@ public abstract class BaseCommand extends Command {
     public final MiniPlugin _miniPlugin;
     public final IPermission _permission;
 
-    protected BaseCommand(MiniPlugin miniPlugin, String name, String usage, String description, Set<String> aliases, IPermission permission) {
+    protected BaseCommand(final MiniPlugin miniPlugin, final String name, final String usage, final String description, final Set<String> aliases, final IPermission permission) {
         super(name.toLowerCase(), description, usage, aliases.stream().map(String::toLowerCase).toList());
         setPermission(permission.toString());
         setPermissionMessage(F.fInsufficientPermissions());
@@ -24,23 +24,23 @@ public abstract class BaseCommand extends Command {
         _permission = permission;
     }
 
-    public String help(String alias) {
+    public String help(final String alias) {
         return F.fMain(_miniPlugin._name) + "Command Usage:\n" + F.fCommand(this, alias);
     }
 
-    public final boolean isAlias(String alias) {
+    public final boolean isAlias(final String alias) {
         return getName().equalsIgnoreCase(alias) || getAliases().contains(alias.toLowerCase());
     }
 
-    public void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
     }
 
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         return List.of();
     }
 
     @Override
-    public final boolean execute(CommandSender sender, String alias, String[] args) {
+    public final boolean execute(final CommandSender sender, final String alias, final String[] args) {
         if (!testPermission(sender)) {
             return true;
         }
@@ -49,7 +49,7 @@ public abstract class BaseCommand extends Command {
     }
 
     @Override
-    public final List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+    public final List<String> tabComplete(final CommandSender sender, final String alias, final String[] args) {
         if (!testPermission(sender)) {
             return List.of();
         }
