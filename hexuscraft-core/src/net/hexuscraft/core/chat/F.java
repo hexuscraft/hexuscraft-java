@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings("unused")
 public class F {
 
     private static final String RESET = C.fReset;
@@ -30,7 +29,6 @@ public class F {
     private static final String PREFIX_SUB = C.cDGray;
 
     private static final String ITEM_COLOR = C.cYellow;
-
 
 
     public static String fMain(final String prefix, final String... text) {
@@ -53,11 +51,6 @@ public class F {
         return fMain(object.toString(), text);
     }
 
-    public static String fMain(final JavaPlugin plugin, final String... text) {
-        return fMain(plugin.getName(), text);
-    }
-
-
 
     public static String fSub(final String prefix, final String... text) {
         return fMain(PREFIX_SUB + prefix, text);
@@ -71,18 +64,9 @@ public class F {
         return fSub(baseCommand._miniPlugin, text);
     }
 
-    public static String fSub(final Player player, final String... text) {
-        return fSub(player.getDisplayName(), text);
-    }
-
     public static String fSub(final Object object, final String... text) {
         return fSub(object.toString(), text);
     }
-
-    public static String fSub(final JavaPlugin plugin, final String... text) {
-        return fSub(plugin.getName(), text);
-    }
-
 
 
     public static String fItem(final String name) {
@@ -113,6 +97,7 @@ public class F {
         return fItem(stack.getType().name(), stack.getAmount());
     }
 
+
     public static String fList(final String[] args) {
         return RESET_GRAY + "[" + ITEM_COLOR + String.join(RESET_GRAY + ", " + ITEM_COLOR, args) + RESET_GRAY + "]";
     }
@@ -129,13 +114,11 @@ public class F {
         return fList(Integer.toString(index));
     }
 
+
     public static String fCurrency(final String color, final String nameSingular, final String namePlural, final int amount) {
         return color + amount + " " + (amount == 1 ? nameSingular : namePlural) + RESET_GRAY;
     }
 
-    public static String fCurrency(final CurrencyType currencyType, final int amount) {
-        return fCurrency(currencyType.getColor(), currencyType.getNameSingular(), currencyType.getNamePlural(), amount);
-    }
 
     public static String fCommand(final String alias, final String usage, final String description, final String prefix) {
         final StringBuilder builder = new StringBuilder();
@@ -151,13 +134,10 @@ public class F {
         return fCommand(alias, usage, description, C.cWhite);
     }
 
-    public static String fCommand(final BaseCommand command, final String alias, final String prefix) {
-        return fCommand(alias, command.getUsage(), command.getDescription(), prefix);
-    }
-
     public static String fCommand(final BaseCommand command, final String alias) {
         return fCommand(alias, command.getUsage(), command.getDescription());
     }
+
 
     public static String fChat(final int level) {
         return C.cGray + level + SPACER + C.cYellow + "%s" + SPACER + "%s";
@@ -282,10 +262,6 @@ public class F {
 
     public static String fTabHeader(final String server) {
         return "\n     " + C.fBold + "Hexuscraft Network" + RESET + "     \n     " + C.cGreen + server + RESET + "     \n";
-    }
-
-    public static String fTabFooter(final String website) {
-        return RESET;
     }
 
 }
