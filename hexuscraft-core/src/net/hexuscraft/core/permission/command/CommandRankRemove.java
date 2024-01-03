@@ -60,7 +60,7 @@ public class CommandRankRemove extends BaseCommand {
         pluginDatabase.getJedisPooled().srem(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.toString());
         sender.sendMessage(F.fMain(this) + "Removed sub-group " + F.fPermissionGroup(targetGroup) + " from " + F.fItem(profile.name) + ".");
 
-        Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
+        final Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
         if (player == null) return;
 
         player.sendMessage(F.fMain(this) + "You no longer have sub-group " + F.fPermissionGroup(targetGroup) + ".");
@@ -69,12 +69,12 @@ public class CommandRankRemove extends BaseCommand {
 
     @Override
     public List<String> tab(CommandSender sender, String alias, String[] args) {
-        List<String> names = new ArrayList<>();
+        final List<String> names = new ArrayList<>();
         switch (args.length) {
             case 1 -> {
                 //noinspection ReassignedVariable
                 Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
-                if (sender instanceof Player player) {
+                if (sender instanceof final Player player) {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
                 }
                 names.addAll(streamedOnlinePlayers.map(Player::getName).toList());

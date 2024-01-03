@@ -16,25 +16,23 @@ public class CommandSend extends BaseCommand {
 
     private final PluginPortal _portal;
 
-    public CommandSend(PluginPortal pluginPortal) {
+    public CommandSend(final PluginPortal pluginPortal) {
         super(pluginPortal, "send", "<Player> <Name>", "Teleport a player to a server.", Set.of(), PluginPortal.PERM.COMMAND_SEND);
 
         _portal = pluginPortal;
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public final void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length != 2) {
             sender.sendMessage(help(alias));
             return;
         }
 
-        String targetName = args[0];
-        String serverName = args[1];
+        final String targetName = args[0];
+        final String serverName = args[1];
 
-        if (PlayerSearch.fetchMojangProfile(targetName, sender) == null) {
-            return;
-        }
+        if (PlayerSearch.fetchMojangProfile(targetName, sender) == null) return;
 
         if (!_portal.doesServerExist(serverName)) {
             sender.sendMessage(F.fMain(this) + F.fError("Could not locate a server with name ", F.fItem(serverName), "."));
@@ -46,12 +44,12 @@ public class CommandSend extends BaseCommand {
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
-        List<String> names = new ArrayList<>();
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
+        final List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
-            if (sender instanceof Player player) {
+            if (sender instanceof final Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }
 
