@@ -9,6 +9,7 @@ import net.hexuscraft.database.serverdata.ServerGroupData;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.JedisPooled;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -157,4 +158,10 @@ public class CommandNetStatGroupCreate extends BaseCommand {
         ))));
     }
 
+    @Override
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
+        if (args.length == 2)
+            return Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).toList();
+        return List.of();
+    }
 }

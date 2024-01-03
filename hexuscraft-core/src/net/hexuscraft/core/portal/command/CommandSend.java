@@ -53,7 +53,6 @@ public class CommandSend extends BaseCommand {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }
 
-            names.addAll(List.of("*", "**"));
             names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
         }
         return names;

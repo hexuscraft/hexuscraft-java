@@ -62,18 +62,13 @@ public class CommandSupportResponse extends BaseCommand {
             return List.of();
         }
 
-        List<String> names = new ArrayList<>();
-
         //noinspection ReassignedVariable
         Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
         if (sender instanceof Player player) {
             streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
         }
 
-        names.addAll(List.of("*", "**"));
-        names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
-
-        return names;
+        return new ArrayList<>(streamedOnlinePlayers.map(Player::getName).toList());
     }
 
 }

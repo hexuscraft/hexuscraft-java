@@ -40,8 +40,6 @@ public class CommandTestBan extends BaseCommand {
             return List.of();
         }
 
-        final List<String> names = new ArrayList<>();
-
         final Stream<? extends Player> streamedOnlinePlayers;
         if (sender instanceof Player player) {
             streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer()
@@ -54,10 +52,7 @@ public class CommandTestBan extends BaseCommand {
                     .stream();
         }
 
-        names.addAll(List.of("*", "**"));
-        names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
-
-        return names;
+        return streamedOnlinePlayers.map(Player::getName).toList();
     }
 
 }

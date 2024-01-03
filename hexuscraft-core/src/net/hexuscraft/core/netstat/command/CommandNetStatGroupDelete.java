@@ -36,6 +36,6 @@ public class CommandNetStatGroupDelete extends BaseCommand {
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        return Arrays.stream(ServerQueries.getServers(_pluginDatabase.getJedisPooled())).map(serverData -> serverData._name).toList();
+        return Arrays.stream(ServerQueries.getServerGroups(_pluginDatabase.getJedisPooled())).map(serverGroupData -> serverGroupData._name).toList();
     }
 }
