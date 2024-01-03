@@ -11,7 +11,6 @@ public class ServerGroupData {
 
     public final String _name;
 
-    public final String _prefix;
     public final String _requiredPermission;
     public final int _minPort;
     public final int _maxPort;
@@ -25,7 +24,6 @@ public class ServerGroupData {
     public ServerGroupData(final String name, final Map<String, String> serverGroupData) {
         _name = name;
 
-        _prefix = serverGroupData.getOrDefault("prefix", name);
         _requiredPermission = serverGroupData.getOrDefault("requiredPermission", "MEMBER");
         _minPort = Integer.parseInt(serverGroupData.getOrDefault("minPort", "0"));
         _maxPort = Integer.parseInt(serverGroupData.getOrDefault("maxPort", "0"));
@@ -37,12 +35,11 @@ public class ServerGroupData {
         _capacity = Integer.parseInt(serverGroupData.getOrDefault("capacity", "20"));
     }
 
-    public ServerGroupData(final String name, final String prefix, final String requiredPermission,
+    public ServerGroupData(final String name, final String requiredPermission,
                            final int minPort, final int maxPort, final int totalServers, final int joinableServers,
                            final String plugin, final String worldZip, final int ram, final int capacity) {
         _name = name;
 
-        _prefix = prefix;
         _requiredPermission = requiredPermission;
         _minPort = minPort;
         _maxPort = maxPort;
@@ -56,7 +53,6 @@ public class ServerGroupData {
 
     public final Map<String, String> toMap() {
         return new HashMap<>(Map.of(
-                "prefix", _prefix,
                 "requiredPermission", _requiredPermission,
                 "minPort", Integer.toString(_minPort),
                 "maxPort", Integer.toString(_maxPort),
