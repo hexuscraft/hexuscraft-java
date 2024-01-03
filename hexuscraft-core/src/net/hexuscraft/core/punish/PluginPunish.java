@@ -96,9 +96,7 @@ public class PluginPunish extends MiniPlugin {
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 1);
                     }
                     _javaPlugin.getServer().getOnlinePlayers().forEach(staff -> {
-                        if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {
-                            return;
-                        }
+                        if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
                         staff.sendMessage(F.fMain(this) + F.fItem(staffSession.name) + " warned " + F.fItem(targetSession.name) + ".");
                         staff.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
                     });
@@ -170,9 +168,9 @@ public class PluginPunish extends MiniPlugin {
                         "active", "false",
                         "removeOrigin", Long.toString(System.currentTimeMillis()),
                         "removeReason", "EXPIRED",
-                        "removeServerId", DEFAULT_UUID.toString(),
+                        "removeServer", _pluginPortal._serverName,
                         "removeStaffId", DEFAULT_UUID.toString(),
-                        "removeStaffServerId", DEFAULT_UUID.toString()
+                        "removeStaffServer", _pluginPortal._serverName
                 ));
                 continue;
             }
@@ -209,10 +207,9 @@ public class PluginPunish extends MiniPlugin {
                 "origin", Long.toString(System.currentTimeMillis()),
                 "length", Long.toString(length),
                 "reason", reason,
-                "serverId", DEFAULT_UUID.toString(),
+                "server", _pluginPortal._serverName,
                 "staffId", staffUuid.toString(),
-                "staffServerId", DEFAULT_UUID.toString()
-
+                "staffServer", _pluginPortal._serverName
         ));
 
         _pluginDatabase.getJedisPooled().hset(PunishQueries.PUNISHMENT(punishData.id.toString()), punishData.toMap());
