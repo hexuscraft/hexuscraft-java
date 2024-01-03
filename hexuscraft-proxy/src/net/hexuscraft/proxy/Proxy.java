@@ -39,6 +39,8 @@ public class Proxy {
 
     private final ProxyServer _server;
     private final Logger _logger;
+
+    @SuppressWarnings("FieldCanBeLocal")
     private final Path _dataDirectory;
 
     private final String MOTD_PREFIX = String.join("\n", new String[]{
