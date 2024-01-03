@@ -3,6 +3,7 @@ package net.hexuscraft.core.portal.command;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
+import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
@@ -11,24 +12,25 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.JedisPooled;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 public class CommandHostEvent extends BaseCommand {
 
     private final PluginDatabase _pluginDatabase;
-    private final PluginPortal _pluginPortal;
 
-    private final Set<Player> _pending;
+    private final Set<CommandSender> _pending;
 
     public CommandHostEvent(PluginPortal pluginPortal, PluginDatabase pluginDatabase) {
         super(pluginPortal, "hostevent", "", "Start a new private server.", Set.of("hes"), PluginPortal.PERM.COMMAND_HOSTEVENT);
 
-        _pending = new HashSet<>();
         _pluginDatabase = pluginDatabase;
-        _pluginPortal = pluginPortal;
+        _pending = new HashSet<>();
     }
 
     @Override
@@ -38,50 +40,67 @@ public class CommandHostEvent extends BaseCommand {
             return;
         }
 
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage("Only players can create private servers.");
+        if (_pending.contains(sender)) {
+            sender.sendMessage(F.fMain(this, F.fError("You already have a pending request! Please wait until your previous request has completed...")));
             return;
         }
-
-        if (_pending.contains(player)) {
-            player.sendMessage(F.fMain(this) + F.fError("Please wait around 30 seconds before using this command again."));
-            return;
-        }
-
-        _pending.add(player);
+        _pending.add(sender);
 
         final BukkitScheduler scheduler = _miniPlugin._javaPlugin.getServer().getScheduler();
-        scheduler.runTaskLater(_miniPlugin._javaPlugin, () -> _pending.remove(player), 600L);
+        sender.sendMessage(F.fMain(this, "Searching for existing servers..."));
+
         scheduler.runTaskAsynchronously(_miniPlugin._javaPlugin, () -> {
             final JedisPooled jedis = _pluginDatabase.getJedisPooled();
 
-            if (ServerQueries.getServerGroup(jedis, "EVENT") != null) {
-                player.sendMessage(F.fMain(this) + F.fError("An event server group already exists."));
-                _pending.remove(player);
+            final String serverName;
+            try {
+                serverName = ((Callable<String>) () -> {
+                    for (ServerData serverData : ServerQueries.getServers(jedis))
+                        if (serverData._group.split("-", 2)[0].equals("EVENT"))
+                            return serverData._name;
+                    return null;
+                }).call();
+            } catch (Exception e) {
+                _pending.remove(sender);
+                sender.sendMessage(F.fMain(this, F.fError("There was an error fetching existing server data. Maybe try again later?")));
                 return;
             }
 
-            final ServerGroupData serverGroupData = new ServerGroupData("EVENT", "EVENT", null, 20000, 20001, 1, 0, "Arcade.jar", "Lobby_Arcade.zip", 512, 100);
-            serverGroupData.update(jedis);
+            if (serverName != null) {
+                sender.sendMessage(F.fMain(this, F.fError("There is already an event server!\n"), F.fMain("", "Connect to it with ", F.fItem("/server " + serverName + "."))));
+                return;
+            }
 
-            scheduler.runTask(_miniPlugin._javaPlugin, () -> {
-                player.sendMessage(F.fMain(this) + F.fItem(serverGroupData._prefix + "-1") + " is being created...\n" + F.fMain("") + "You will be teleported in around " + F.fItem("20 Seconds") + ".");
-                _pending.remove(player);
-            });
+            try {
+                sender.sendMessage(F.fMain(this, "Creating server group..."));
+                final ServerGroupData groupData = new ServerGroupData("EVENT", PermissionGroup.MEMBER.name(),
+                        30050, 30051, 1, 0,
+                        "Arcade.jar", "Lobby_Arcade.zip", 512, 40);
+                groupData.update(jedis);
+                sender.sendMessage(F.fMain(this, "Waiting for your server to start..."));
+            } catch (Exception e) {
+                _pending.remove(sender);
+                sender.sendMessage(F.fMain(this, F.fError("There was an error performing your request. Maybe try again later?")));
+                return;
+            }
 
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    final ServerData[] eventServers = ServerQueries.getServers(jedis, serverGroupData);
-                    if (eventServers.length == 0) {
-                        return;
-                    }
-
-                    final String serverName = eventServers[0]._name;
-                    _pluginPortal.teleport(player.getName(), serverName, serverName);
-                    cancel();
+            final BukkitTask[] tasks = new BukkitTask[1]; // a bit of a dodgy workaround - but it works
+            final long start = System.currentTimeMillis();
+            tasks[0] = scheduler.runTaskTimerAsynchronously(_miniPlugin._javaPlugin, () -> {
+                if (System.currentTimeMillis() - start > 30000) {
+                    sender.sendMessage(F.fMain(this, F.fError("Could not locate your server within 30 seconds. There might not be enough resources available to start your server. Maybe try again later?")));
+                    _pending.remove(sender);
+                    tasks[0].cancel();
+                    return;
                 }
-            }.runTaskTimerAsynchronously(_miniPlugin._javaPlugin, 0L, 20L);
+
+                for (ServerData serverData : ServerQueries.getServers(jedis, new ServerGroupData("EVENT", Map.of()))) {
+                    scheduler.runTaskLaterAsynchronously(_miniPlugin._javaPlugin, () -> ((PluginPortal) _miniPlugin).teleport(sender.getName(), serverData._name), 20L);
+                    _pending.remove(sender);
+                    tasks[0].cancel();
+                    return;
+                }
+            }, 100L, 20L);
         });
     }
 

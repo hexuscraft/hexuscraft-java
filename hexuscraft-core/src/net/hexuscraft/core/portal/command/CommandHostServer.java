@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CommandHostServer extends BaseCommand {
 
@@ -71,8 +72,9 @@ public class CommandHostServer extends BaseCommand {
 
             try {
                 sender.sendMessage(F.fMain(this, "Creating server group..."));
-                final ServerGroupData groupData = new ServerGroupData(sender.getName(), sender.getName(), PermissionGroup.MEMBER.name(),
-                        30050, 30051, 1, 0,
+                final int port = ThreadLocalRandom.current().nextInt(50000, 51000);
+                final ServerGroupData groupData = new ServerGroupData(sender.getName(), PermissionGroup.MEMBER.name(),
+                        port - 1, port, 1, 0,
                         "Arcade.jar", "Lobby_Arcade.zip", 512, 40);
                 groupData.update(jedis);
                 sender.sendMessage(F.fMain(this, "Waiting for your server to start..."));
