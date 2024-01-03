@@ -34,7 +34,7 @@ public class CommandSend extends BaseCommand {
 
         if (PlayerSearch.fetchMojangProfile(targetName, sender) == null) return;
 
-        if (!_portal.doesServerExist(serverName)) {
+        if (!_portal.doesServerExistWithName(serverName)) {
             sender.sendMessage(F.fMain(this) + F.fError("Could not locate a server with name ", F.fItem(serverName), "."));
             return;
         }

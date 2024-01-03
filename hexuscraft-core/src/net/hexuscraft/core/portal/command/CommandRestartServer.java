@@ -23,7 +23,7 @@ public class CommandRestartServer extends BaseCommand {
             return;
         }
 
-        if (!_portal.doesServerExist(args[0])) {
+        if (!_portal.doesServerExistWithName(args[0])) {
             sender.sendMessage(F.fMain(this) + F.fError("Could not locate server with name " + F.fItem(args[0]) + "."));
             return;
         }

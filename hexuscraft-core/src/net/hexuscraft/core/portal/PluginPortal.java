@@ -229,7 +229,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         teleport(player, server, null);
     }
 
-    public final boolean doesServerExist(String name) {
+    public final boolean doesServerExistWithName(String name) {
         return ServerQueries.getServer(_pluginDatabase.getJedisPooled(), name) != null;
     }
 
