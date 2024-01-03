@@ -229,6 +229,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         teleport(player, server, null);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public final boolean doesServerExistWithName(String name) {
         return ServerQueries.getServer(_pluginDatabase.getJedisPooled(), name) != null;
     }
