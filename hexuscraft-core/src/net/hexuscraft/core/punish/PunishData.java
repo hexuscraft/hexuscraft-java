@@ -12,16 +12,16 @@ public class PunishData {
     public final Long origin;
     public final Long length;
     public final String reason;
-    public final UUID serverId;
+    public final String server;
     public final UUID staffId;
-    public final UUID staffServerId;
+    public final String staffServer;
 
     // these cannot be guaranteed to exist unless 'active' is false. ye be warned!
     public final Long removeOrigin;
     public final String removeReason;
-    public final UUID removeServerId;
+    public final String removeServer;
     public final UUID removeStaffId;
-    public final UUID removeStaffServerId;
+    public final String removeStaffServer;
 
     public PunishData(Map<String, String> rawData) {
         id = UUID.fromString(rawData.get("id"));
@@ -30,24 +30,24 @@ public class PunishData {
         origin = Long.parseLong(rawData.get("origin"));
         length = Long.parseLong(rawData.get("length"));
         reason = rawData.get("reason");
-        serverId = UUID.fromString(rawData.get("serverId"));
+        server = rawData.get("server");
         staffId = UUID.fromString(rawData.get("staffId"));
-        staffServerId = UUID.fromString(rawData.get("staffServerId"));
+        staffServer = rawData.get("staffServer");
 
         if (!active) { // we cannot guarantee these should exist unless 'active' is false
             removeOrigin = Long.parseLong(rawData.get("removeOrigin"));
             removeReason = rawData.get("removeReason");
-            removeServerId = UUID.fromString(rawData.get("removeServerId"));
+            removeServer = rawData.get("removeServer");
             removeStaffId = UUID.fromString(rawData.get("removeStaffId"));
-            removeStaffServerId = UUID.fromString(rawData.get("removeStaffServerId"));
+            removeStaffServer = rawData.get("removeStaffServer");
             return;
         }
 
         removeOrigin = null;
         removeReason = null;
-        removeServerId = null;
+        removeServer = null;
         removeStaffId = null;
-        removeStaffServerId = null;
+        removeStaffServer = null;
     }
 
     public Map<String, String> toMap() {
@@ -57,16 +57,16 @@ public class PunishData {
         map.put("origin", origin.toString());
         map.put("length", length.toString());
         map.put("reason", reason);
-        map.put("serverId", serverId.toString());
+        map.put("server", server);
         map.put("staffId", staffId.toString());
-        map.put("staffServerId", staffServerId.toString());
+        map.put("staffServer", staffServer);
 
         if (!active) {
             map.put("removeOrigin", removeOrigin.toString());
             map.put("removeReason", removeReason);
-            map.put("removeServerId", removeServerId.toString());
+            map.put("removeServer", removeServer);
             map.put("removeStaffId", removeStaffId.toString());
-            map.put("removeStaffServerId", removeStaffServerId.toString());
+            map.put("removeStaffServer", removeStaffServer);
         }
 
         return map;
@@ -81,11 +81,11 @@ public class PunishData {
                 + "\n- length: " + length
                 + "\n- reason: " + reason
                 + "\n- staffId: " + staffId.toString()
-                + "\n- serverId: " + serverId.toString()
+                + "\n- server: " + server
                 + "\n- removeOrigin: " + removeOrigin
                 + "\n- removeReason: " + removeReason
                 + "\n- removeStaffId: " + removeStaffId.toString()
-                + "\n- removeServerId: " + removeServerId.toString();
+                + "\n- removeServer: " + removeServer;
     }
 
     public final Long getRemaining(Long now) {
