@@ -7,23 +7,19 @@ import net.hexuscraft.servermonitor.database.PluginDatabase;
 import redis.clients.jedis.JedisPooled;
 
 import java.io.Console;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
 
 public class ServerMonitor implements Runnable {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         new ServerMonitor();
     }
 
-    private final long NATURAL_TIMEOUT_MS = 100L;
-    private final long MAX_SERVER_IDLE_MS = 10000L;
-
     private final Console _console;
     private final PluginDatabase _database;
+    private final ServerManager _manager;
 
     private final Map<String, ServerData> _serverDataMap;
     private final Map<String, ServerGroupData> _serverGroupDataMap;
@@ -32,13 +28,24 @@ public class ServerMonitor implements Runnable {
         _console = System.console();
         _database = new PluginDatabase();
 
+        final String path;
+        try {
+            File pathFile = new File("_path.dat");
+            Scanner pathScanner = new Scanner(pathFile);
+            path = pathScanner.nextLine();
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        _manager = new ServerManager(this, path);
+
         _serverDataMap = new HashMap<>();
         _serverGroupDataMap = new HashMap<>();
 
         new Thread(this).start();
     }
 
-    private void log(final String message, final Object... args) {
+    public final void log(final String message, final Object... args) {
         _console.printf("[" + System.currentTimeMillis() + "] " + message + "\n", args);
     }
 
@@ -62,17 +69,24 @@ public class ServerMonitor implements Runnable {
         _serverDataMap.forEach((serverName, serverData) -> {
 
             // Kill dead servers
-            if ((System.currentTimeMillis() - serverData._updated) > MAX_SERVER_IDLE_MS) {
-                killServer(jedis, serverData._name, "Unresponsive");
+            if ((System.currentTimeMillis() - serverData._updated) > 10000L) {
+                _manager.killServer(jedis, serverData._name, "Unresponsive");
+                return;
+            }
+
+            final ServerGroupData serverGroupData = _serverGroupDataMap.get(serverData._group);
+
+            // Kill servers without a valid server group
+            if (serverGroupData == null) {
+                _manager.killServer(jedis, serverData._name, "Unknown Server Group");
                 return;
             }
 
             // Count total and joinable servers
-            final ServerGroupData serverGroupData = _serverGroupDataMap.get(serverData._group);
             totalServersMap.get(serverGroupData).add(serverData);
 
             if (serverData._motd.startsWith("LIVE")) return;
-            if (serverData._players < serverData._capacity) return;
+            if (serverData._players >= serverData._capacity) return;
 
             joinableServersMap.get(serverGroupData).add(serverData);
         });
@@ -92,120 +106,17 @@ public class ServerMonitor implements Runnable {
 
             // Start minimum servers
             if (!isEnoughTotalServers || !isEnoughJoinableServers) {
-                startServer(jedis, serverGroupData, "Insufficient Servers");
+                _manager.startServer(jedis, serverGroupData, "Insufficient Servers");
             }
 
             // Kill excess servers
             if (isOverflowTotalServers && isOverflowJoinableServers) {
                 final ServerData bestServerToKill = getBestServerToKill(jedis, serverGroupData);
                 if (bestServerToKill != null)
-                    killServer(jedis, bestServerToKill._name, "Excess Servers");
+                    _manager.killServer(jedis, bestServerToKill._name, "Excess Servers");
             }
 
         });
-    }
-
-    private void startServer(final JedisPooled jedis, final ServerGroupData serverGroupData, final String reason) {
-        log("=== START SERVER ===");
-        log("Reason: " + reason);
-        log("Group: " + serverGroupData._name);
-
-        final ServerData[] existingServers = ServerQueries.getServers(jedis, serverGroupData);
-
-        final Map<Integer, ServerData> serverDataIdMap = new HashMap<>();
-        for (ServerData existingServer : existingServers) {
-            serverDataIdMap.put(Integer.parseInt(existingServer._name.split("-")[1]), existingServer);
-        }
-
-        //noinspection ReassignedVariable
-        int lowestId = 0;
-        // we +1 as the normal server port is _minPort + id, and there cannot be a server with id 0.
-        for (int i = 1; i < (serverGroupData._maxPort - serverGroupData._minPort + 1); i++) {
-            if (serverDataIdMap.containsKey(i)) continue;
-            lowestId = i;
-            break;
-        }
-
-        if (lowestId == 0) {
-            log("!!! There are no server spaces available within this group's port range. Cancelling.");
-            log("====================");
-            return;
-        }
-
-        final String serverName = serverGroupData._prefix + "-" + lowestId;
-
-        log("Ram: " + serverGroupData._ram);
-        log("Name: " + serverName);
-
-        killServer(jedis, serverName, "Destroy Old Server");
-        try {
-            new ProcessBuilder(
-                    "cmd.exe",
-                    "/c",
-                    "start",
-                    "C:/minecraft/scripts/startServer.cmd",
-                    "127.0.0.1",
-                    "193.110.160.24",
-                    Integer.toString(serverGroupData._minPort + lowestId),
-                    Integer.toString(serverGroupData._ram),
-                    serverGroupData._worldZip,
-                    serverGroupData._plugin,
-                    serverGroupData._name,
-                    serverGroupData._prefix + "-" + lowestId,
-                    "false",
-                    Integer.toString(serverGroupData._capacity)
-            ).start();
-            log("Waiting for server to startup...");
-
-            final long startMs = System.currentTimeMillis();
-            while (true) {
-                if ((System.currentTimeMillis() - startMs) > 30000L) {
-                    killServer(jedis, serverName, "Slow Start-up");
-                    break;
-                }
-                if (ServerQueries.getServer(jedis, serverName) != null) {
-                    break;
-                }
-                //noinspection BusyWait
-                Thread.sleep(100L);
-            }
-        } catch (IOException e) {
-            log("!!! Exception while running start process:");
-            log(e.getMessage(), e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        log("====================");
-    }
-
-    private void killServer(final JedisPooled jedis, final String serverName, final String reason) {
-        log("=== KILL SERVER ===");
-        log("Reason: " + reason);
-        log("Name: " + serverName);
-
-        try {
-            new ProcessBuilder(
-                    "cmd.exe",
-                    "/c",
-                    "start",
-                    "C:/minecraft/scripts/killServer.cmd",
-                    "127.0.0.1",
-                    "193.110.160.24",
-                    serverName
-            ).start();
-            jedis.del(ServerQueries.SERVER(serverName));
-            log("Waiting for server to die...");
-
-            Thread.sleep(3000L);
-        } catch (final IOException ex) {
-            log("!!! Exception while running kill process:");
-            log(ex.getMessage(), ex);
-        } catch (final InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
-
-        log("====================");
     }
 
     private ServerData getBestServerToKill(final JedisPooled jedis, final ServerGroupData serverGroupData) {
@@ -230,7 +141,7 @@ public class ServerMonitor implements Runnable {
 
             try {
                 //noinspection BusyWait
-                Thread.sleep(NATURAL_TIMEOUT_MS);
+                Thread.sleep(1000L);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
