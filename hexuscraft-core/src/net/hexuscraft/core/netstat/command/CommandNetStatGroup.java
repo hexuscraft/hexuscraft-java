@@ -10,7 +10,9 @@ public class CommandNetStatGroup extends BaseMultiCommand {
 
     CommandNetStatGroup(final PluginNetStat pluginNetStat, final PluginDatabase pluginDatabase) {
         super(pluginNetStat, "group", "Manage server groups.", Set.of("g"), PluginNetStat.PERM.COMMAND_NETSTAT_GROUP, Set.of(
-                new CommandNetStatGroupDelete(pluginNetStat, pluginDatabase)
+                new CommandNetStatGroupCreate(pluginNetStat, pluginDatabase),
+                new CommandNetStatGroupDelete(pluginNetStat, pluginDatabase),
+                new CommandNetStatGroupList(pluginNetStat, pluginDatabase)
         ));
     }
 
