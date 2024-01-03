@@ -63,10 +63,8 @@ public class CommandRankAdd extends BaseCommand {
         _pluginDatabase.getJedisPooled().sadd(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.toString());
         sender.sendMessage(F.fMain(this) + "Added sub-group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
 
-        Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
-        if (player == null) {
-            return;
-        }
+        final Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
+        if (player == null) return;
 
         player.sendMessage(F.fMain(this) + "You now have sub-group " + F.fPermissionGroup(targetGroup) + ".");
         _pluginPermission.refreshPermissions(player);

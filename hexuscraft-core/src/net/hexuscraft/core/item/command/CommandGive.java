@@ -28,9 +28,7 @@ public class CommandGive extends BaseCommand {
         }
 
         final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0], sender);
-        if (targets.length == 0) {
-            return;
-        }
+        if (targets.length == 0) return;
 
         final int amount = args.length > 2 ? Integer.parseInt(args[2]) % 64 : 1;
 

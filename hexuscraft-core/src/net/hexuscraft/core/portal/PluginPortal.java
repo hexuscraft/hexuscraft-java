@@ -110,24 +110,20 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
             @Override
             public void run() {
-                String[] args = getMessage().split(",");
-                String playerName = args[0];
-                String serverName = args[1];
-                String senderName = args.length > 2 ? args[2] : null;
+                final String[] args = getMessage().split(",");
+                final String playerName = args[0];
+                final String serverName = args[1];
+                final String senderName = args.length > 2 ? args[2] : null;
 
                 if (senderName != null) {
                     _javaPlugin.getServer().getOnlinePlayers().forEach(player1 -> {
-                        if (!player1.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
-                            return;
-                        }
+                        if (!player1.hasPermission(PermissionGroup.ADMINISTRATOR.name())) return;
                         player1.sendMessage(F.fSub(this) + F.fItem(senderName) + " sent " + F.fItem(playerName) + " to " + F.fItem(serverName));
                     });
                 }
 
-                Player player = _javaPlugin.getServer().getPlayer(playerName);
-                if (player == null) {
-                    return;
-                }
+                final Player player = _javaPlugin.getServer().getPlayer(playerName);
+                if (player == null) return;
 
                 if (args.length > 2) {
                     player.sendMessage(F.fMain(this) + F.fItem(senderName) + " sent you from " + F.fItem(_serverName) + " to " + F.fItem(serverName) + ".");
@@ -136,7 +132,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
                 }
 
                 //noinspection UnstableApiUsage
-                ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                final ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF("Connect");
                 out.writeUTF(serverName);
                 player.sendPluginMessage(_javaPlugin, PROXY_CHANNEL, out.toByteArray());
@@ -152,13 +148,9 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
                 final String restartType = args[0];
 
                 if (restartType.equals("server")) {
-                    if (!_serverName.equals(args[1])) {
-                        return;
-                    }
+                    if (!_serverName.equals(args[1])) return;
                 } else if (restartType.equals("group")) {
-                    if (!_serverGroup.equals(args[1])) {
-                        return;
-                    }
+                    if (!_serverGroup.equals(args[1])) return;
                 } else {
                     log("Received unknown restart type: " + restartType);
                     return;
@@ -217,9 +209,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
         if (channel.equals(PROXY_CHANNEL)) {
             String subChannel = in.readUTF();
-            if (!_callbacks.containsKey(subChannel)) {
-                return;
-            }
+            if (!_callbacks.containsKey(subChannel)) return;
             _callbacks.get(subChannel).forEach((uuid, callback) -> {
                 callback.setIn(in);
                 callback.run();
@@ -283,9 +273,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
     @SuppressWarnings("unused")
     public final void unregisterCallback(UUID id) {
         _callbacks.forEach((s, uuidRunnableMap) -> {
-            if (!uuidRunnableMap.containsKey(id)) {
-                return;
-            }
+            if (!uuidRunnableMap.containsKey(id)) return;
             uuidRunnableMap.remove(id);
         });
     }

@@ -152,9 +152,7 @@ public class PluginEntity extends MiniPlugin {
 
     public final void removeNPCs(final World world) {
         world.getEntities().forEach(entity -> {
-            if (entity.getMetadata("NPC").isEmpty()) {
-                return;
-            }
+            if (entity.getMetadata("NPC").isEmpty()) return;
             entity.remove();
         });
     }

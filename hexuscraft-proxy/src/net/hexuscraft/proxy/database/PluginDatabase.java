@@ -87,15 +87,11 @@ public class PluginDatabase {
     @SuppressWarnings("unused")
     public void unregisterCallback(UUID id) {
         _callbacks.forEach((s, uuidRunnableMap) -> {
-            if (!uuidRunnableMap.containsKey(id)) {
-                return;
-            }
+            if (!uuidRunnableMap.containsKey(id)) return;
             uuidRunnableMap.remove(id);
 
             // remove the map if there are no more callbacks
-            if (!uuidRunnableMap.values().isEmpty()) {
-                return;
-            }
+            if (!uuidRunnableMap.values().isEmpty()) return;
             _callbacks.remove(s);
         });
     }

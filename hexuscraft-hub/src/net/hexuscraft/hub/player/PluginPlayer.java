@@ -148,14 +148,10 @@ public class PluginPlayer extends MiniPlugin {
     private void onItemInteract(final Player player, final ItemStack itemStack) {
         final Material itemType = itemStack.getType();
 
-        if (!itemStack.hasItemMeta()) {
-            return;
-        }
+        if (!itemStack.hasItemMeta()) return;
         final ItemMeta currentItemMeta = itemStack.getItemMeta();
 
-        if (!currentItemMeta.hasDisplayName()) {
-            return;
-        }
+        if (!currentItemMeta.hasDisplayName()) return;
         final String displayName = currentItemMeta.getDisplayName();
 
         if (itemType.equals(Material.COMPASS) && displayName.contains("Game Menu")) {
@@ -233,7 +229,7 @@ public class PluginPlayer extends MiniPlugin {
         final BukkitScheduler scheduler = _javaPlugin.getServer().getScheduler();
         scheduler.runTaskAsynchronously(_javaPlugin, () -> {
             final JedisPooled jedis = _pluginDatabase.getJedisPooled();
-            final ServerGroupData lobbyGroupData = ServerQueries.getServerGroup(jedis, "lobby-main");
+            final ServerGroupData lobbyGroupData = ServerQueries.getServerGroup(jedis, "Lobby");
             final ServerData[] serverDataArray = ServerQueries.getServers(jedis, lobbyGroupData);
             scheduler.runTask(_javaPlugin, () -> {
                 for (ServerData serverData : serverDataArray) {

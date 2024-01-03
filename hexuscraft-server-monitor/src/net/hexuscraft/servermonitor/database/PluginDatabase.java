@@ -46,9 +46,7 @@ public class PluginDatabase {
 
                         @Override
                         public void onPMessage(String pattern, String channel, String message) {
-                            if (!_callbacks.containsKey(channel)) {
-                                return;
-                            }
+                            if (!_callbacks.containsKey(channel)) return;
                             _callbacks.get(channel).forEach((uuid, callback) -> {
                                 callback.setMessage(message);
                                 callback.run();
@@ -86,15 +84,11 @@ public class PluginDatabase {
     @SuppressWarnings("unused")
     public void unregisterCallback(UUID id) {
         _callbacks.forEach((s, uuidRunnableMap) -> {
-            if (!uuidRunnableMap.containsKey(id)) {
-                return;
-            }
+            if (!uuidRunnableMap.containsKey(id)) return;
             uuidRunnableMap.remove(id);
 
             // remove the map if there are no more callbacks
-            if (!uuidRunnableMap.values().isEmpty()) {
-                return;
-            }
+            if (!uuidRunnableMap.values().isEmpty()) return;
             _callbacks.remove(s);
         });
     }

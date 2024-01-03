@@ -29,9 +29,7 @@ public class CommandGameMode extends BaseCommand {
 
         if (args.length == 1) {
             final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0], sender);
-            if (targets.length != 1) {
-                return;
-            }
+            if (targets.length != 1) return;
             target = targets[0];
         } else if (sender instanceof Player) {
             target = (Player) sender;
@@ -50,10 +48,7 @@ public class CommandGameMode extends BaseCommand {
 
         sender.sendMessage(F.fMain(this) + F.fItem(target) + " Creative Mode: " + F.fBoolean(toggleCreativeMode));
 
-        if (target == sender) {
-            return;
-        }
-
+        if (target == sender) return;
         target.sendMessage(F.fMain(this) + F.fItem(sender) + " set your Creative Mode: " + F.fBoolean(toggleCreativeMode));
     }
 

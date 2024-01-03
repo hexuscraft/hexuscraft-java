@@ -119,9 +119,7 @@ public class PluginPermission extends MiniPlugin {
             grantPermissions(permissionAttachment, group);
         }
 
-        if (!player.hasPermission(PERM.OPERATOR.name())) {
-            return;
-        }
+        if (!player.hasPermission(PERM.OPERATOR.name())) return;
         player.setOp(true);
         setBukkitPermissions(permissionAttachment, true);
     }

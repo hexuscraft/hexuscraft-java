@@ -88,9 +88,7 @@ public class PluginChat extends MiniPlugin {
                         player.sendMessage(F.fSub("Staff", F.fItem(senderName), " broadcast to ", F.fPermissionGroup(permissionGroup), "."));
                     }
 
-                    if (!player.hasPermission(permissionGroup.name())) {
-                        return;
-                    }
+                    if (!player.hasPermission(permissionGroup.name())) return;
 
                     //noinspection deprecation
                     player.sendTitle(C.cYellow + "Announcement", announcementMessage);
@@ -126,9 +124,7 @@ public class PluginChat extends MiniPlugin {
             event.setFormat(F.fChat(0));
         }
 
-        if (!_chatMuted) {
-            return;
-        }
+        if (!_chatMuted) return;
         event.setCancelled(true);
         player.sendMessage(F.fMain(this) + "The global chat is currently muted.");
     }

@@ -26,9 +26,7 @@ public class CommandClear extends BaseCommand {
         }
 
         final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0], sender);
-        if (targets.length == 0) {
-            return;
-        }
+        if (targets.length == 0) return;
 
         for (Player target : targets) {
             target.getInventory().clear();

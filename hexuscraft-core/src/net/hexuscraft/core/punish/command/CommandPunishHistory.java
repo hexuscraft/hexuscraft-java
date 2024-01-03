@@ -33,9 +33,7 @@ public class CommandPunishHistory extends BaseCommand {
 
         if (args.length == 1) {
             MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
-            if (profile == null) {
-                return;
-            }
+            if (profile == null) return;
             targetUUID = profile.uuid;
             targetName = profile.name;
         } else if (sender instanceof Player player) {
