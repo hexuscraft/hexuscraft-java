@@ -229,7 +229,10 @@ public class PluginPlayer extends MiniPlugin {
         final BukkitScheduler scheduler = _javaPlugin.getServer().getScheduler();
         scheduler.runTaskAsynchronously(_javaPlugin, () -> {
             final JedisPooled jedis = _pluginDatabase.getJedisPooled();
+
             final ServerGroupData lobbyGroupData = ServerQueries.getServerGroup(jedis, "Lobby");
+            if (lobbyGroupData == null) return;
+
             final ServerData[] serverDataArray = ServerQueries.getServers(jedis, lobbyGroupData);
             scheduler.runTask(_javaPlugin, () -> {
                 for (ServerData serverData : serverDataArray) {
