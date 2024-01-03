@@ -5,12 +5,10 @@ import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.netstat.PluginNetStat;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerGroupData;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.JedisPooled;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 

@@ -1,7 +1,6 @@
 package net.hexuscraft.core.netstat;
 
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.netstat.command.CommandNetStat;

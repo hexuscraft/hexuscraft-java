@@ -3,7 +3,6 @@ package net.hexuscraft.database.serverdata;
 import net.hexuscraft.database.queries.ServerQueries;
 import redis.clients.jedis.JedisPooled;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
