@@ -1,6 +1,7 @@
 package net.hexuscraft.core.netstat;
 
 import net.hexuscraft.core.MiniPlugin;
+import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.netstat.command.CommandNetStat;
@@ -15,7 +16,9 @@ public class PluginNetStat extends MiniPlugin {
     public enum PERM implements IPermission {
         COMMAND_NETSTAT,
         COMMAND_NETSTAT_GROUP,
+        COMMAND_NETSTAT_GROUP_CREATE,
         COMMAND_NETSTAT_GROUP_DELETE,
+        COMMAND_NETSTAT_GROUP_LIST,
         COMMAND_NETSTAT_SERVER
     }
 
@@ -24,7 +27,9 @@ public class PluginNetStat extends MiniPlugin {
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT_GROUP);
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT_GROUP_CREATE);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT_GROUP_DELETE);
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT_GROUP_LIST);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT_SERVER);
     }
 
