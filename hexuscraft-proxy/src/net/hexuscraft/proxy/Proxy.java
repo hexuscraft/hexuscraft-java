@@ -11,6 +11,7 @@ import com.velocitypowered.api.event.query.ProxyQueryEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.QueryResponse;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -20,7 +21,6 @@ import com.velocitypowered.api.util.Favicon;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.proxy.database.PluginDatabase;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import redis.clients.jedis.JedisPooled;
 
@@ -164,29 +164,35 @@ public class Proxy {
     @Subscribe
     private void onKickedFromServer(final KickedFromServerEvent event) {
         final Optional<Component> kickReason = event.getServerKickReason();
-        if (kickReason.isEmpty()) {
-            return; // let velocity handle this
-        }
+        if (kickReason.isEmpty()) return; // let velocity handle this
         event.getPlayer().disconnect(kickReason.get());
     }
 
     @Subscribe
     private void onPlayerChooseInitialServer(final PlayerChooseInitialServerEvent event) {
-        if (event.getPlayer().getProtocolVersion().getProtocol() < ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
+        final Player player = event.getPlayer();
+
+        if (player.getProtocolVersion().getProtocol() < ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
             event.setInitialServer(null);
-            final TextComponent kickComponent = Component.text()
+            player.disconnect(Component.text()
                     .color(NamedTextColor.RED)
                     .append(Component.text("You must be playing Minecraft 1.8 or newer to play on "))
                     .append(Component.text("Hexuscraft", NamedTextColor.YELLOW))
                     .append(Component.text(".\n\n"))
                     .append(Component.text("www.hexuscraft.net", NamedTextColor.YELLOW))
-                    .build();
-            event.getPlayer().disconnect(kickComponent);
+                    .build());
         }
 
         final RegisteredServer[] lobbyServers = _server.getAllServers().stream().filter(registeredServer -> registeredServer.getServerInfo().getName().split("-")[0].equals("Lobby")).toArray(RegisteredServer[]::new);
         if (lobbyServers.length == 0) {
-            return; // let velocity handle this. (how are there no lobbies available??)
+            player.disconnect(Component.text()
+                    .color(NamedTextColor.RED)
+                    .append(Component.text("There are currently no lobby servers available.\n"))
+                    .append(Component.text("Please try again later.", NamedTextColor.GRAY))
+                    .append(Component.text(".\n\n"))
+                    .append(Component.text("www.hexuscraft.net", NamedTextColor.YELLOW))
+                    .build());
+            return;
         }
 
         event.setInitialServer(lobbyServers[new Random().nextInt(lobbyServers.length)]);
