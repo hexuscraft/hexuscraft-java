@@ -11,7 +11,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 import java.util.UUID;
@@ -117,6 +116,11 @@ public class F {
 
     public static String fCurrency(final String color, final String nameSingular, final String namePlural, final int amount) {
         return color + amount + " " + (amount == 1 ? nameSingular : namePlural) + RESET_GRAY;
+    }
+
+    @SuppressWarnings("unused")
+    public static String fCurrency(final CurrencyType currencyType, final int amount) {
+        return fCurrency(currencyType._color, currencyType._nameSingular, currencyType._namePlural, amount);
     }
 
 
