@@ -2,33 +2,20 @@ package net.hexuscraft.core.currency;
 
 import net.hexuscraft.core.chat.C;
 
+@SuppressWarnings("unused")
 public enum CurrencyType {
 
-    @SuppressWarnings("unused")
-    COIN("Coin", "Coins", C.cGold);
+    COIN("Coin", "Coins", C.cGold),
+    XP("XP", "XP", C.cGold);
 
-    private final String _nameSingular;
-    private final String _namePlural;
-    private final String _color;
+    public final String _nameSingular;
+    public final String _namePlural;
+    public final String _color;
 
-    @SuppressWarnings("SameParameterValue")
-    CurrencyType(String nameSingular, String namePlural, String color) {
+    CurrencyType(final String nameSingular, final String namePlural, final String color) {
         _nameSingular = nameSingular;
         _namePlural = namePlural;
         _color = color;
     }
-
-    public String getColor() {
-        return _color;
-    }
-
-    public String getNameSingular() {
-        return _nameSingular;
-    }
-
-    public String getNamePlural() {
-        return _namePlural;
-    }
-
 
 }
