@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class CommandNetStatServer extends BaseMultiCommand {
 
-    public CommandNetStatServer(PluginNetStat pluginNetStat, final PluginDatabase pluginDatabase) {
+    public CommandNetStatServer(PluginNetStat pluginNetStat, @SuppressWarnings("unused") final PluginDatabase pluginDatabase) {
         super(pluginNetStat, "server", "Manage servers.", Set.of("s"), PluginNetStat.PERM.COMMAND_NETSTAT_SERVER, Set.of());
     }
 
