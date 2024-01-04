@@ -42,7 +42,7 @@ public class BaseMultiCommand extends BaseCommand {
             if (!command.testPermissionSilent(sender)) {
                 continue;
             }
-            builder.append("\n").append(F.fCommand(command, alias + " " + command.getName()));
+            builder.append("\n").append(F.fCommand(alias + " " + command.getName(), command));
         }
         sender.sendMessage(builder.toString());
     }

@@ -25,7 +25,7 @@ public abstract class BaseCommand extends Command {
     }
 
     public String help(final String alias) {
-        return F.fMain(_miniPlugin._name) + "Command Usage:\n" + F.fCommand(this, alias);
+        return F.fMain(_miniPlugin._name) + "Command Usage:\n" + F.fCommand(alias, this);
     }
 
     public final boolean isAlias(final String alias) {

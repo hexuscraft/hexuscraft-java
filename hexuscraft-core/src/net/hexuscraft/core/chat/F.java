@@ -134,10 +134,9 @@ public class F {
         return fCommand(alias, usage, description, C.cWhite);
     }
 
-    public static String fCommand(final BaseCommand command, final String alias) {
+    public static String fCommand(final String alias, final BaseCommand command) {
         return fCommand(alias, command.getUsage(), command.getDescription());
     }
-
 
     public static String fChat(final int level) {
         return C.cGray + level + SPACER + C.cYellow + "%s" + SPACER + "%s";
