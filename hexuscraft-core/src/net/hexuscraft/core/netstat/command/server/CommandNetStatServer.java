@@ -1,4 +1,4 @@
-package net.hexuscraft.core.netstat.command;
+package net.hexuscraft.core.netstat.command.server;
 
 import net.hexuscraft.core.command.BaseMultiCommand;
 import net.hexuscraft.core.database.PluginDatabase;
@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class CommandNetStatServer extends BaseMultiCommand {
 
-    CommandNetStatServer(PluginNetStat pluginNetStat, final PluginDatabase pluginDatabase) {
+    public CommandNetStatServer(PluginNetStat pluginNetStat, final PluginDatabase pluginDatabase) {
         super(pluginNetStat, "server", "Manage servers.", Set.of("s"), PluginNetStat.PERM.COMMAND_NETSTAT_SERVER, Set.of());
     }
 

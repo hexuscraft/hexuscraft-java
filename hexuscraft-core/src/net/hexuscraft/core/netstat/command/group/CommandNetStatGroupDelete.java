@@ -1,4 +1,4 @@
-package net.hexuscraft.core.netstat.command;
+package net.hexuscraft.core.netstat.command.group;
 
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
