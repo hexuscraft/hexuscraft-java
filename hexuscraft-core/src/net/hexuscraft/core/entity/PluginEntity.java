@@ -8,6 +8,7 @@ import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -32,9 +33,9 @@ public class PluginEntity extends MiniPlugin {
         COMMAND_ENTITY_REFRESH
     }
 
-    PluginCommand _pluginCommand;
+    private PluginCommand _pluginCommand;
 
-    public PluginEntity(JavaPlugin javaPlugin) {
+    public PluginEntity(final JavaPlugin javaPlugin) {
         super(javaPlugin, "Entity");
 
         PermissionGroup.BUILDER._permissions.addAll(List.of(
@@ -47,8 +48,27 @@ public class PluginEntity extends MiniPlugin {
     }
 
     @Override
-    public final void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public final void onLoad(final Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
+
+        final Map<Entity, Location> entityLocationMap = new HashMap<>();
+
+        final Server server = _javaPlugin.getServer();
+        server.getScheduler().runTaskTimer(this._javaPlugin, () -> server.getWorlds().forEach(world -> world.getEntities().forEach(entity -> {
+            final Location from = entityLocationMap.get(entity);
+            final Location to = entity.getLocation();
+
+            if (!to.equals(from)) {
+                final EntityMoveEvent event = new EntityMoveEvent(entity, from, to);
+                _javaPlugin.getServer().getPluginManager().callEvent(event);
+                if (event.isCancelled()) {
+                    entity.teleport(event._from);
+                    return;
+                }
+            }
+
+            entityLocationMap.put(entity, to);
+        })), 0, 1L);
     }
 
     @Override
@@ -63,7 +83,8 @@ public class PluginEntity extends MiniPlugin {
         _javaPlugin.getServer().getWorlds().forEach(this::removeNPCs);
     }
 
-    public final void createEntity(World world, double x, double y, double z, float yaw, float pitch, String[] data) {
+    public final void createEntity(final World world, final double x, final double y, final double z,
+                                   final float yaw, final float pitch, final String[] data) {
         log(String.join(", ", new String[]{world.toString(), Double.toString(x), Double.toString(y), Double.toString(z), Float.toString(yaw), Float.toString(pitch), String.join(":", data)}));
         final Location location = new Location(world, x, y, z, yaw, pitch);
 
@@ -80,6 +101,23 @@ public class PluginEntity extends MiniPlugin {
             }
             case "GAME" -> {
                 switch (data[1]) {
+                    case "CLANS" -> {
+                        final Skeleton skeleton = (Skeleton) world.spawnEntity(location, EntityType.SKELETON);
+                        skeleton.setCustomName(C.cGreen + C.fBold + "Clans");
+                        skeleton.setCustomNameVisible(true);
+
+                        final PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 200, true, false);
+                        slow.apply(skeleton);
+
+                        final EntityEquipment equipment = skeleton.getEquipment();
+                        equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
+                        equipment.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+                        equipment.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+                        equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
+                        equipment.setItemInHand(new ItemStack(Material.BOW));
+
+                        entity = skeleton;
+                    }
                     case "SURVIVAL_GAMES" -> {
                         final Zombie zombie = (Zombie) world.spawnEntity(location, EntityType.ZOMBIE);
                         zombie.setBaby(false);
@@ -157,7 +195,7 @@ public class PluginEntity extends MiniPlugin {
         });
     }
 
-    public final void refreshNPCs(World world) {
+    public final void refreshNPCs(final World world) {
         removeNPCs(world);
 
         final List<String> npcStrings = new ArrayList<>();
