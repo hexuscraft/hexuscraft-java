@@ -3,7 +3,6 @@ package net.hexuscraft.core.database;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.database.Database;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.JedisPubSub;
@@ -15,9 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.RunnableFuture;
 
 public class PluginDatabase extends MiniPlugin {
 
@@ -36,8 +32,7 @@ public class PluginDatabase extends MiniPlugin {
         final int port;
 
         try {
-            File redisFile = new File("_redis.dat");
-            Scanner redisScanner = new Scanner(redisFile);
+            final Scanner redisScanner = new Scanner(new File("_redis.dat"));
             host = redisScanner.nextLine();
             port = redisScanner.nextInt();
         } catch (FileNotFoundException ex) {
