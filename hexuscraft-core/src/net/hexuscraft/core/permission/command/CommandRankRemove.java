@@ -7,7 +7,6 @@ import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.permission.PluginPermission;
 import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.scoreboard.PluginScoreboard;
 import net.hexuscraft.database.queries.PermissionQueries;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

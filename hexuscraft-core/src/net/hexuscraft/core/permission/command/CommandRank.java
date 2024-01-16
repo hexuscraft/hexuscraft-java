@@ -3,7 +3,6 @@ package net.hexuscraft.core.permission.command;
 import net.hexuscraft.core.command.BaseMultiCommand;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.permission.PluginPermission;
-import net.hexuscraft.core.scoreboard.PluginScoreboard;
 
 import java.util.Set;
 

@@ -1,6 +1,5 @@
 package net.hexuscraft.hub.doublejump;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.hub.Hub;
 import org.bukkit.GameMode;
@@ -10,8 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
-
-import java.util.Map;
 
 public class PluginDoubleJump extends MiniPlugin<Hub> {
 
