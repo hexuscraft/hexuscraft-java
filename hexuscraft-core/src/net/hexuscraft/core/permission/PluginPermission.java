@@ -1,5 +1,6 @@
 package net.hexuscraft.core.permission;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.database.PluginDatabase;
@@ -12,7 +13,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.plugin.java.JavaPlugin;
 import redis.clients.jedis.JedisPooled;
 
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class PluginPermission extends MiniPlugin {
+public class PluginPermission extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_RANK,
@@ -43,8 +43,8 @@ public class PluginPermission extends MiniPlugin {
 
     private final HashMap<Player, PermissionAttachment> _permissionAttachmentMap;
 
-    public PluginPermission(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Permissions");
+    public PluginPermission(final HexusPlugin plugin) {
+        super(plugin, "Permissions");
 
         _primaryGroupMap = new HashMap<>();
         _secondaryGroupsMap = new HashMap<>();
@@ -61,7 +61,7 @@ public class PluginPermission extends MiniPlugin {
     }
 
     @Override
-    public final void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
         _pluginScoreboard = (PluginScoreboard) dependencies.get(PluginScoreboard.class);
@@ -69,7 +69,7 @@ public class PluginPermission extends MiniPlugin {
 
     @Override
     public final void onEnable() {
-        for (Player player : _javaPlugin.getServer().getOnlinePlayers()) {
+        for (final Player player : _plugin.getServer().getOnlinePlayers()) {
             onPlayerJoin(player);
         }
 
@@ -88,18 +88,18 @@ public class PluginPermission extends MiniPlugin {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    private void onPlayerJoin(PlayerJoinEvent event) {
+    private void onPlayerJoin(final PlayerJoinEvent event) {
         onPlayerJoin(event.getPlayer());
     }
 
-    private void onPlayerJoin(Player player) {
+    private void onPlayerJoin(final Player player) {
         _primaryGroupMap.put(player, PermissionGroup.MEMBER);
         _secondaryGroupsMap.put(player, Set.of());
 
-        JedisPooled jedis = _pluginDatabase.getJedisPooled();
-        String uuidStr = player.getUniqueId().toString();
+        final JedisPooled jedis = _pluginDatabase.getJedisPooled();
+        final String uuidStr = player.getUniqueId().toString();
 
-        String primaryGroupStr = jedis.get(PermissionQueries.PRIMARY(uuidStr));
+        final String primaryGroupStr = jedis.get(PermissionQueries.PRIMARY(uuidStr));
         if (primaryGroupStr == null) {
             jedis.set(PermissionQueries.PRIMARY(uuidStr), _primaryGroupMap.get(player).name());
         } else {
@@ -108,7 +108,7 @@ public class PluginPermission extends MiniPlugin {
 
         _secondaryGroupsMap.put(player, jedis.smembers(PermissionQueries.GROUPS(uuidStr)).stream().map(PermissionGroup::valueOf).collect(Collectors.toSet()));
 
-        PermissionAttachment permissionAttachment = player.addAttachment(_javaPlugin);
+        final PermissionAttachment permissionAttachment = player.addAttachment(_plugin);
         _permissionAttachmentMap.put(player, permissionAttachment);
 
         player.setOp(false);
@@ -125,11 +125,11 @@ public class PluginPermission extends MiniPlugin {
     }
 
     @EventHandler
-    private void onPlayerQuit(PlayerQuitEvent event) {
+    private void onPlayerQuit(final PlayerQuitEvent event) {
         onPlayerQuit(event.getPlayer());
     }
 
-    private void onPlayerQuit(Player player) {
+    private void onPlayerQuit(final Player player) {
         player.setOp(false);
         player.removeAttachment(_permissionAttachmentMap.get(player));
 
@@ -138,7 +138,7 @@ public class PluginPermission extends MiniPlugin {
         _permissionAttachmentMap.remove(player);
     }
 
-    private void setBukkitPermissions(PermissionAttachment attachment, boolean toggle) {
+    private void setBukkitPermissions(final PermissionAttachment attachment, final boolean toggle) {
         attachment.setPermission("minecraft.command.me", toggle);
         attachment.setPermission("minecraft.command.tell", toggle);
         attachment.setPermission("bukkit.command.help", toggle);
@@ -146,7 +146,7 @@ public class PluginPermission extends MiniPlugin {
         attachment.setPermission("bukkit.command.version", toggle);
     }
 
-    private void grantPermissions(PermissionAttachment attachment, PermissionGroup group) {
+    private void grantPermissions(final PermissionAttachment attachment, final PermissionGroup group) {
         attachment.setPermission(group.name(), true);
         group._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(), true));
 
