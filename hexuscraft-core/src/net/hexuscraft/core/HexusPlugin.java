@@ -26,7 +26,7 @@ import java.util.Map;
 
 public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
 
-    private final Map<Class<? extends MiniPlugin>, MiniPlugin> _miniPluginClassMap;
+    private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPluginClassMap;
 
     public HexusPlugin() {
         _miniPluginClassMap = new HashMap<>();
@@ -55,6 +55,8 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
         require(new PluginPunish(this));
         require(new PluginReport(this));
         require(new PluginScoreboard(this));
+
+        log("Core finished loading.");
 
         load();
         _miniPluginClassMap.values().forEach(miniPlugin -> miniPlugin.load(_miniPluginClassMap));
@@ -85,7 +87,9 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
         log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void require(MiniPlugin miniPlugin) {
+    public final void require(MiniPlugin<? extends HexusPlugin> miniPlugin) {
+        // Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap
+
         _miniPluginClassMap.put(miniPlugin.getClass(), miniPlugin);
     }
 

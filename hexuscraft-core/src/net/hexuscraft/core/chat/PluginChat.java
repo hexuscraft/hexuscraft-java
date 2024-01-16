@@ -1,5 +1,6 @@
 package net.hexuscraft.core.chat;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.command.*;
 import net.hexuscraft.core.command.PluginCommand;
@@ -12,11 +13,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 
-public class PluginChat extends MiniPlugin {
+public class PluginChat extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_ANNOUNCEMENT,
@@ -38,8 +38,8 @@ public class PluginChat extends MiniPlugin {
 
     private boolean _chatMuted = false;
 
-    public PluginChat(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Chat");
+    public PluginChat(final HexusPlugin plugin) {
+        super(plugin, "Chat");
 
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_HELP);
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SUPPORT);
@@ -56,7 +56,7 @@ public class PluginChat extends MiniPlugin {
     }
 
     @Override
-    public final void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginPermission = (PluginPermission) dependencies.get(PluginPermission.class);
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
@@ -83,7 +83,7 @@ public class PluginChat extends MiniPlugin {
 
                 PermissionGroup permissionGroup = PermissionGroup.valueOf(groupName);
 
-                _plugin._javaPlugin.getServer().getOnlinePlayers().forEach(player -> {
+                _plugin._plugin.getServer().getOnlinePlayers().forEach(player -> {
                     if (player.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
                         player.sendMessage(F.fSub("Staff", F.fItem(senderName), " broadcast to ", F.fPermissionGroup(permissionGroup), "."));
                     }
@@ -107,9 +107,9 @@ public class PluginChat extends MiniPlugin {
         _chatMuted = toggle;
         if (sendDefaultMessage.length > 0 && sendDefaultMessage[0]) {
             if (_chatMuted) {
-                _javaPlugin.getServer().broadcastMessage(F.fMain(this) + "The global chat is now muted.");
+                _plugin.getServer().broadcastMessage(F.fMain(this) + "The global chat is now muted.");
             } else {
-                _javaPlugin.getServer().broadcastMessage(F.fMain(this) + "The global chat is no longer muted.");
+                _plugin.getServer().broadcastMessage(F.fMain(this) + "The global chat is no longer muted.");
             }
         }
     }

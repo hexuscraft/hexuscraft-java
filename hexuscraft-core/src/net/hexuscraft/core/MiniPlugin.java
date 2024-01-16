@@ -2,27 +2,26 @@ package net.hexuscraft.core;
 
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 
-public abstract class MiniPlugin implements Listener {
+public abstract class MiniPlugin<T extends HexusPlugin> implements Listener {
 
-    public final JavaPlugin _javaPlugin;
+    public final T _plugin;
     public final String _name;
 
-    protected MiniPlugin(JavaPlugin javaPlugin, String name) {
-        _javaPlugin = javaPlugin;
+    protected MiniPlugin(T plugin, String name) {
+        _plugin = plugin;
         _name = name;
 
         log("Instantiated.");
     }
 
     public void log(String message) {
-        _javaPlugin.getLogger().info("[" + _name + "] " + message);
+        _plugin.getLogger().info("[" + _name + "] " + message);
     }
 
-    public final void load(Map<Class<? extends MiniPlugin>, MiniPlugin> miniPluginClassMap) {
+    public final void load(Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> miniPluginClassMap) {
         log("Initializing...");
         long start = System.currentTimeMillis();
 
@@ -35,7 +34,7 @@ public abstract class MiniPlugin implements Listener {
         log("Enabling...");
         long start = System.currentTimeMillis();
 
-        _javaPlugin.getServer().getPluginManager().registerEvents(this, _javaPlugin);
+        _plugin.getServer().getPluginManager().registerEvents(this, _plugin);
         onEnable();
 
         log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
@@ -51,7 +50,7 @@ public abstract class MiniPlugin implements Listener {
         log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
     }
 
     public void onEnable() {

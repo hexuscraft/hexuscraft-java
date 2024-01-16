@@ -5,13 +5,12 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.buildversion.command.CommandBuildVersion;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.permission.IPermission;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
-public class PluginBuildVersion extends MiniPlugin {
+public class PluginBuildVersion extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_BUILDVERSION
@@ -19,12 +18,12 @@ public class PluginBuildVersion extends MiniPlugin {
 
     private PluginCommand _pluginCommand;
 
-    public PluginBuildVersion(JavaPlugin plugin) {
+    public PluginBuildVersion(final HexusPlugin plugin) {
         super(plugin, "Build Version");
     }
 
     @Override
-    public final void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
     }
 
@@ -34,12 +33,12 @@ public class PluginBuildVersion extends MiniPlugin {
     }
 
     public final long getLastModifiedMillis() {
-        return ((HexusPlugin) _javaPlugin).getFile().lastModified();
+        return _plugin.getFile().lastModified();
     }
 
     public final long getSizeBytes() {
         try {
-            return Files.size(((HexusPlugin) _javaPlugin).getFile().toPath());
+            return Files.size(_plugin.getFile().toPath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

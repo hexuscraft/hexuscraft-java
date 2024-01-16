@@ -1,5 +1,6 @@
 package net.hexuscraft.hub.player;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
@@ -19,8 +20,8 @@ import net.hexuscraft.hub.Hub;
 import net.hexuscraft.hub.player.command.CommandSpawn;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Server;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -42,7 +43,7 @@ import redis.clients.jedis.JedisPooled;
 import java.util.List;
 import java.util.Map;
 
-public class PluginPlayer extends MiniPlugin {
+public class PluginPlayer extends MiniPlugin<Hub> {
 
     public enum PERM implements IPermission {
         COMMAND_SPAWN
@@ -55,7 +56,7 @@ public class PluginPlayer extends MiniPlugin {
 
     private final BukkitRunnable _actionTextTask;
 
-    public PluginPlayer(Hub hub) {
+    public PluginPlayer(final Hub hub) {
         super(hub, "Player");
 
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SPAWN);
@@ -63,7 +64,7 @@ public class PluginPlayer extends MiniPlugin {
         _actionTextTask = new BukkitRunnable() {
             @Override
             public void run() {
-                _javaPlugin.getServer()
+                _plugin.getServer()
                         .getOnlinePlayers()
                         .forEach(player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET"));
             }
@@ -71,7 +72,7 @@ public class PluginPlayer extends MiniPlugin {
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginPermission = (PluginPermission) dependencies.get(PluginPermission.class);
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
@@ -81,7 +82,7 @@ public class PluginPlayer extends MiniPlugin {
     @Override
     public void onEnable() {
         _pluginCommand.register(new CommandSpawn(this));
-        _actionTextTask.runTaskTimer(_javaPlugin, 0, 20);
+        _actionTextTask.runTaskTimer(_plugin, 0, 20);
     }
 
     @Override
@@ -90,23 +91,20 @@ public class PluginPlayer extends MiniPlugin {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Hub hub = (Hub) _javaPlugin;
-        Location spawn = hub.getSpawn();
-
-        Player player = getPlayer(event, hub);
+    public void onPlayerJoin(final PlayerJoinEvent event) {
+        final Player player = getPlayer(event, _plugin);
         player.getInventory().setHeldItemSlot(0);
         refreshInventory(player);
-        player.teleport(spawn);
+        player.teleport(_plugin._spawn);
 
         PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), "");
 
-        PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
+        final PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
         event.setJoinMessage(F.fSub("Join", F.fPermissionGroup(primaryGroup, true).toUpperCase(), " ", F.fItem(player.getName())));
     }
 
-    private static Player getPlayer(PlayerJoinEvent event, Hub hub) {
-        Player player = event.getPlayer();
+    private static Player getPlayer(final PlayerJoinEvent event, final Hub hub) {
+        final Player player = event.getPlayer();
         player.setFallDistance(0);
         player.setFlying(false);
         player.setSneaking(false);
@@ -124,13 +122,13 @@ public class PluginPlayer extends MiniPlugin {
     }
 
     void refreshInventory(Player player) {
-        PlayerInventory inventory = player.getInventory();
+        final PlayerInventory inventory = player.getInventory();
 
-        ItemStack gameCompass = UtilItem.createItem(Material.COMPASS, C.cGreen + C.fBold + "Game Menu", "Click to open the Game Menu");
-        ItemStack profileSkull = UtilItem.createItemSkull(player.getName(), C.cGreen + C.fBold + player.getName(), "Click to open the Profile Menu");
-        ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST, C.cGreen + C.fBold + "Cosmetics Menu", "Click to open the Cosmetics Menu");
-        ItemStack shopEmerald = UtilItem.createItem(Material.EMERALD, C.cGreen + C.fBold + "Shop Menu", "Click to open the Shop Menu");
-        ItemStack lobbyClock = UtilItem.createItem(Material.WATCH, C.cGreen + C.fBold + "Lobby Menu", "Click to open the Lobby Menu");
+        final ItemStack gameCompass = UtilItem.createItem(Material.COMPASS, C.cGreen + C.fBold + "Game Menu", "Click to open the Game Menu");
+        final ItemStack profileSkull = UtilItem.createItemSkull(player.getName(), C.cGreen + C.fBold + player.getName(), "Click to open the Profile Menu");
+        final ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST, C.cGreen + C.fBold + "Cosmetics Menu", "Click to open the Cosmetics Menu");
+        final ItemStack shopEmerald = UtilItem.createItem(Material.EMERALD, C.cGreen + C.fBold + "Shop Menu", "Click to open the Shop Menu");
+        final ItemStack lobbyClock = UtilItem.createItem(Material.WATCH, C.cGreen + C.fBold + "Lobby Menu", "Click to open the Lobby Menu");
 
         inventory.clear();
         inventory.setItem(0, gameCompass);
@@ -141,7 +139,7 @@ public class PluginPlayer extends MiniPlugin {
     }
 
     @EventHandler
-    void onDisguise(DisguiseEvent event) {
+    void onDisguise(final DisguiseEvent event) {
         refreshInventory(event._player);
     }
 
@@ -224,17 +222,19 @@ public class PluginPlayer extends MiniPlugin {
     }
 
     void openLobbyMenu(final Player player) {
-        final Inventory lobbyMenu = _javaPlugin.getServer().createInventory(player, 54, "Lobby Menu");
+        final Server server = _plugin.getServer();
 
-        final BukkitScheduler scheduler = _javaPlugin.getServer().getScheduler();
-        scheduler.runTaskAsynchronously(_javaPlugin, () -> {
+        final Inventory lobbyMenu = server.createInventory(player, 54, "Lobby Menu");
+
+        final BukkitScheduler scheduler = server.getScheduler();
+        scheduler.runTaskAsynchronously(_plugin, () -> {
             final JedisPooled jedis = _pluginDatabase.getJedisPooled();
 
             final ServerGroupData lobbyGroupData = ServerQueries.getServerGroup(jedis, "Lobby");
             if (lobbyGroupData == null) return;
 
             final ServerData[] serverDataArray = ServerQueries.getServers(jedis, lobbyGroupData);
-            scheduler.runTask(_javaPlugin, () -> {
+            scheduler.runTask(_plugin, () -> {
                 for (ServerData serverData : serverDataArray) {
                     final int lobbyId = Integer.parseInt(serverData._name.split("-")[1]);
                     final boolean isCurrentServer = serverData._name.equals(_pluginPortal._serverName);
@@ -259,85 +259,66 @@ public class PluginPlayer extends MiniPlugin {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
+    void onPlayerQuit(final PlayerQuitEvent event) {
+        final Player player = event.getPlayer();
         PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
         event.setQuitMessage(F.fSub("Quit", F.fPermissionGroup(primaryGroup, true).toUpperCase(), " ", F.fItem(player.getName())));
     }
 
     @EventHandler
-    void onEntityDamage(EntityDamageEvent event) {
-        Hub hub = (Hub) _javaPlugin;
+    void onEntityDamage(final EntityDamageEvent event) {
         Entity entity = event.getEntity();
-        if (!(entity instanceof Player player)) {
-            return;
-        }
+        if (!(entity instanceof final Player player)) return;
 
-        if (event.getCause() == EntityDamageEvent.DamageCause.CUSTOM) {
-            return;
-        }
+        if (event.getCause() == EntityDamageEvent.DamageCause.CUSTOM) return;
         if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
             player.setVelocity(new Vector());
-            player.teleport(hub.getSpawn());
+            player.teleport(_plugin._spawn);
         }
 
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onFoodLevelChange(FoodLevelChangeEvent event) {
-        Entity entity = event.getEntity();
-        if (!(entity instanceof Player player)) {
-            return;
-        }
+    public void onFoodLevelChange(final FoodLevelChangeEvent event) {
+        final Entity entity = event.getEntity();
+        if (!(entity instanceof final Player player)) return;
 
         event.setCancelled(true);
         player.setFoodLevel(20);
     }
 
     @EventHandler
-    public void onPlayerDropItem(PlayerDropItemEvent event) {
-        Player player = event.getPlayer();
+    public void onPlayerDropItem(final PlayerDropItemEvent event) {
+        final Player player = event.getPlayer();
 
-        if (player.getGameMode().equals(GameMode.CREATIVE)) {
-            return;
-        }
+        if (player.getGameMode().equals(GameMode.CREATIVE)) return;
         event.setCancelled(true);
 
-        Item droppedItem = event.getItemDrop();
-        if (droppedItem == null) {
-            return;
-        }
+        final Item droppedItem = event.getItemDrop();
+        if (droppedItem == null) return;
 
-        ItemStack itemStack = droppedItem.getItemStack();
-        if (itemStack == null) {
-            return;
-        }
+        final ItemStack itemStack = droppedItem.getItemStack();
+        if (itemStack == null) return;
 
         onItemInteract(player, itemStack);
     }
 
     @EventHandler
-    public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-        if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
-            return;
-        }
+    public void onPlayerPickupItem(final PlayerPickupItemEvent event) {
+        if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
+    public void onPlayerInteract(final PlayerInteractEvent event) {
+        final Player player = event.getPlayer();
 
-        if (player.getGameMode().equals(GameMode.CREATIVE)) {
-            return;
-        }
+        if (player.getGameMode().equals(GameMode.CREATIVE)) return;
         event.setCancelled(true);
 
-        ItemStack currentItem = player.getItemInHand();
-        if (currentItem == null) {
-            return;
-        }
+        final ItemStack currentItem = player.getItemInHand();
+        if (currentItem == null) return;
 
         onItemInteract(player, currentItem);
     }

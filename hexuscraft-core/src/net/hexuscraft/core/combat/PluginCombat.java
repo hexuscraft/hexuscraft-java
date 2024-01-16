@@ -1,21 +1,21 @@
 package net.hexuscraft.core.combat;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PluginCombat extends MiniPlugin {
+public class PluginCombat extends MiniPlugin<HexusPlugin> {
 
     Map<Player, BukkitRunnable> _pendingRespawns;
 
-    public PluginCombat(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Combat");
+    public PluginCombat(final HexusPlugin plugin) {
+        super(plugin, "Combat");
 
         _pendingRespawns = new HashMap<>();
     }
@@ -27,7 +27,7 @@ public class PluginCombat extends MiniPlugin {
     }
 
     @EventHandler
-    void onPlayerDeath(PlayerDeathEvent event) {
+    void onPlayerDeath(final PlayerDeathEvent event) {
         Player player = event.getEntity();
 
         BukkitRunnable runnable = new BukkitRunnable() {
@@ -37,7 +37,7 @@ public class PluginCombat extends MiniPlugin {
                 player.spigot().respawn();
             }
         };
-        runnable.runTaskLater(_javaPlugin, 15);
+        runnable.runTaskLater(_plugin, 15);
 
         _pendingRespawns.put(player, runnable);
     }

@@ -1,5 +1,6 @@
 package net.hexuscraft.core.anticheat;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.anticheat.command.CommandTestBan;
 import net.hexuscraft.core.chat.C;
@@ -23,14 +24,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
-public class PluginAntiCheat extends MiniPlugin {
+@SuppressWarnings("unused")
+public class PluginAntiCheat extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_TESTBAN
@@ -44,8 +44,8 @@ public class PluginAntiCheat extends MiniPlugin {
     private final Map<Player, Set<Guardian>> _guardians;
     private final Set<Player> _inAnimation;
 
-    public PluginAntiCheat(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Anti Cheat");
+    public PluginAntiCheat(final HexusPlugin plugin) {
+        super(plugin, "Anti Cheat");
 
         _violations = new HashMap<>();
         _guardians = new HashMap<>();
@@ -55,14 +55,14 @@ public class PluginAntiCheat extends MiniPlugin {
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
     }
 
     @Override
     public final void onEnable() {
-        for (Player player : _javaPlugin.getServer().getOnlinePlayers()) {
+        for (Player player : _plugin.getServer().getOnlinePlayers()) {
             onPlayerJoin(new PlayerJoinEvent(player, null));
         }
 
@@ -141,12 +141,12 @@ public class PluginAntiCheat extends MiniPlugin {
         Guardian guardian = (Guardian) location.getWorld().spawnEntity(location, EntityType.GUARDIAN);
         guardian.setCustomName(C.cRed + C.fBold + "HAC");
         guardian.setCustomNameVisible(true);
-        guardian.setMetadata("Invulnerable", new FixedMetadataValue(_javaPlugin, 1));
-        guardian.setMetadata("PersistenceRequired", new FixedMetadataValue(_javaPlugin, 1));
-        guardian.setMetadata("Silent", new FixedMetadataValue(_javaPlugin, 1));
-        guardian.setMetadata("NoAI", new FixedMetadataValue(_javaPlugin, 1));
-        guardian.setMetadata("CustomName", new FixedMetadataValue(_javaPlugin, guardian.getCustomName()));
-        guardian.setMetadata("0Gravity", new FixedMetadataValue(_javaPlugin, 0));
+        guardian.setMetadata("Invulnerable", new FixedMetadataValue(_plugin, 1));
+        guardian.setMetadata("PersistenceRequired", new FixedMetadataValue(_plugin, 1));
+        guardian.setMetadata("Silent", new FixedMetadataValue(_plugin, 1));
+        guardian.setMetadata("NoAI", new FixedMetadataValue(_plugin, 1));
+        guardian.setMetadata("CustomName", new FixedMetadataValue(_plugin, guardian.getCustomName()));
+        guardian.setMetadata("0Gravity", new FixedMetadataValue(_plugin, 0));
         guardian.teleport(location);
 
         NBTEditor.set(guardian, 1, "NoAI");
@@ -192,7 +192,7 @@ public class PluginAntiCheat extends MiniPlugin {
         _guardians.get(player).addAll(List.of(north, east, south, west));
         _guardians.get(player).forEach(guardian -> guardian.setTarget(player));
 
-        _javaPlugin.getServer().getScheduler().runTaskTimer(_javaPlugin, () -> {
+        _plugin.getServer().getScheduler().runTaskTimer(_plugin, () -> {
             Location northBeforeLook = player.getLocation().add(0, heightAdj, -radius);
             north.teleport(northBeforeLook.setDirection(northBeforeLook.subtract(player.getLocation()).toVector()));
 
@@ -223,7 +223,7 @@ public class PluginAntiCheat extends MiniPlugin {
     public final void on(EntityDamageEvent event) {
         final Entity entity = event.getEntity();
         for (Set<Guardian> guardians : _guardians.values()) {
-            if (!guardians.contains(entity)) continue;
+            if (!guardians.contains((Guardian) entity)) continue;
             event.setCancelled(true);
             break;
         }
@@ -231,13 +231,13 @@ public class PluginAntiCheat extends MiniPlugin {
 
     @SuppressWarnings("unused")
     public final void kick(Player player, String reason, CheatSeverity severity, int count) {
-        _javaPlugin.getServer().broadcastMessage(F.fMain(this) + F.fItem(player) + " kicked for " + severity.getColor() + reason);
+        _plugin.getServer().broadcastMessage(F.fMain(this) + F.fItem(player) + " kicked for " + severity.getColor() + reason);
         player.kickPlayer(C.cRed + C.fBold + "You were kicked by Anti-Cheat" + C.fReset + C.cWhite + "\n" + reason);
     }
 
     public final void alert(Player player, String reason, CheatSeverity severity, int count) {
 //        _javaPlugin.getServer().broadcastMessage(F.fMain(this, F.fPlayer(player) + " suspected of " + severity.getColor() + reason));
-        _javaPlugin.getServer().broadcastMessage(F.fCheat(player, severity, reason, count, _pluginPortal._serverName));
+        _plugin.getServer().broadcastMessage(F.fCheat(player, severity, reason, count, _pluginPortal._serverName));
     }
 
     public final void flag(final Player player, final String reason, final CheatSeverity severity) {

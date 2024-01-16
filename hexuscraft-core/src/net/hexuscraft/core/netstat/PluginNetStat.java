@@ -1,16 +1,16 @@
 package net.hexuscraft.core.netstat;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.netstat.command.CommandNetStat;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 
-public class PluginNetStat extends MiniPlugin {
+public class PluginNetStat extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_NETSTAT,
@@ -21,8 +21,11 @@ public class PluginNetStat extends MiniPlugin {
         COMMAND_NETSTAT_SERVER
     }
 
-    public PluginNetStat(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Network Statistics");
+    private PluginCommand _pluginCommand;
+    private PluginDatabase _pluginDatabase;
+
+    public PluginNetStat(final HexusPlugin plugin) {
+        super(plugin, "Network Statistics");
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT_GROUP);
@@ -32,11 +35,8 @@ public class PluginNetStat extends MiniPlugin {
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT_SERVER);
     }
 
-    private PluginCommand _pluginCommand;
-    private PluginDatabase _pluginDatabase;
-
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
     }
