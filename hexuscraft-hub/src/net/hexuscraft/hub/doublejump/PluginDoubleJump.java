@@ -1,26 +1,29 @@
 package net.hexuscraft.hub.doublejump;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.entity.EntityMoveEvent;
 import net.hexuscraft.hub.Hub;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
-import org.bukkit.util.Vector;
 
-public class PluginDoubleJump extends MiniPlugin {
+import java.util.Map;
 
-    PluginDoubleJump(final Hub hub) {
+public class PluginDoubleJump extends MiniPlugin<Hub> {
+
+    public PluginDoubleJump(final Hub hub) {
         super(hub, "Double Jump");
     }
 
     @EventHandler
-    public void onMove(final EntityMoveEvent event) {
-        if (!(event._entity instanceof final Player player)) return;
-        if (!event._entity.isOnGround()) return;
+    public void onMove(final PlayerMoveEvent event) {
+        final Player player = event.getPlayer();
+
+        if (!((Entity) player).isOnGround()) return;
         player.setAllowFlight(true);
     }
 
@@ -32,13 +35,12 @@ public class PluginDoubleJump extends MiniPlugin {
         event.setCancelled(true);
 
         final Player player = event.getPlayer();
-        final Location location = player.getLocation();
 
         player.setFlying(false);
         player.setAllowFlight(false);
 
-        player.setVelocity(location.toVector().add(new Vector(0, 1, 3)));
-        player.playSound(location, Sound.GHAST_FIREBALL, 1000000, 1);
+        player.setVelocity(player.getEyeLocation().toVector().normalize().multiply(0.5).setY(0.5));
+        player.playSound(player.getLocation(), Sound.GHAST_FIREBALL, 1000000, 1);
     }
 
 }
