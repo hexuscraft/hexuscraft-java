@@ -30,6 +30,7 @@ public class PluginParse extends MiniPlugin<Build> {
         _command = (PluginCommand) dependencies.get(PluginCommand.class);
     }
 
+    @SuppressWarnings("unused")
     public final void parse(final World world, final int radius) {
         _command.register(new CommandParse(this));
     }
