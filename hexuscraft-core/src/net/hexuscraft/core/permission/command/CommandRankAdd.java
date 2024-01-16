@@ -7,7 +7,6 @@ import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.permission.PluginPermission;
 import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.scoreboard.PluginScoreboard;
 import net.hexuscraft.database.queries.PermissionQueries;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -22,24 +21,22 @@ public class CommandRankAdd extends BaseCommand {
 
     final PluginPermission _pluginPermission;
     final PluginDatabase _pluginDatabase;
-    final PluginScoreboard _pluginScoreboard;
 
-    CommandRankAdd(PluginPermission pluginPermission, PluginDatabase pluginDatabase, PluginScoreboard pluginScoreboard) {
+    CommandRankAdd(final PluginPermission pluginPermission, final PluginDatabase pluginDatabase) {
         super(pluginPermission, "add", "<Player> <Permission Group>", "Add a group to a player.", Set.of("a"), PluginPermission.PERM.COMMAND_RANK_ADD);
 
         _pluginPermission = pluginPermission;
         _pluginDatabase = pluginDatabase;
-        _pluginScoreboard = pluginScoreboard;
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public final void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length != 2) {
             sender.sendMessage(help(alias));
             return;
         }
 
-        PermissionGroup targetGroup;
+        final PermissionGroup targetGroup;
         try {
             targetGroup = PermissionGroup.valueOf(args[1]);
         } catch (IllegalArgumentException ex) {
@@ -63,7 +60,7 @@ public class CommandRankAdd extends BaseCommand {
         _pluginDatabase.getJedisPooled().sadd(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.toString());
         sender.sendMessage(F.fMain(this) + "Added sub-group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
 
-        final Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
+        final Player player = _miniPlugin._plugin.getServer().getPlayer(profile.name);
         if (player == null) return;
 
         player.sendMessage(F.fMain(this) + "You now have sub-group " + F.fPermissionGroup(targetGroup) + ".");
@@ -71,18 +68,19 @@ public class CommandRankAdd extends BaseCommand {
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
-        List<String> names = new ArrayList<>();
+    public List<String> tab(final CommandSender sender, final String alias, String[] args) {
+        final List<String> names = new ArrayList<>();
         switch (args.length) {
             case 1 -> {
                 //noinspection ReassignedVariable
-                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
                 if (sender instanceof Player player) {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
                 }
                 names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
             }
-            case 2 -> names.addAll(Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(s -> !s.startsWith("_")).toList());
+            case 2 ->
+                    names.addAll(Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(s -> !s.startsWith("_")).toList());
         }
         return names;
     }

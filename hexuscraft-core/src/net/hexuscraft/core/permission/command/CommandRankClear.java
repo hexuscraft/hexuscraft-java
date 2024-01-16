@@ -20,13 +20,11 @@ public class CommandRankClear extends BaseCommand {
 
     private final PluginPermission _permission;
     private final PluginDatabase _database;
-    private final PluginScoreboard _scoreboard;
 
-    public CommandRankClear(final PluginPermission permission, final PluginDatabase database, final PluginScoreboard scoreboard) {
+    public CommandRankClear(final PluginPermission permission, final PluginDatabase database) {
         super(permission, "clear", "<Player>", "Clears a player's additional groups.", Set.of(), PluginPermission.PERM.COMMAND_RANK_CLEAR);
         _permission = permission;
         _database = database;
-        _scoreboard = scoreboard;
     }
 
     @Override

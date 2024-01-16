@@ -5,7 +5,6 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.permission.command.CommandRank;
-import net.hexuscraft.core.scoreboard.PluginScoreboard;
 import net.hexuscraft.database.queries.PermissionQueries;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,7 +35,6 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
 
     private PluginCommand _pluginCommand;
     private PluginDatabase _pluginDatabase;
-    private PluginScoreboard _pluginScoreboard;
 
     public final HashMap<Player, PermissionGroup> _primaryGroupMap;
     public final HashMap<Player, Set<PermissionGroup>> _secondaryGroupsMap;
@@ -64,7 +62,6 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
     public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
-        _pluginScoreboard = (PluginScoreboard) dependencies.get(PluginScoreboard.class);
     }
 
     @Override
@@ -73,7 +70,7 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
             onPlayerJoin(player);
         }
 
-        _pluginCommand.register(new CommandRank(this, _pluginDatabase, _pluginScoreboard));
+        _pluginCommand.register(new CommandRank(this, _pluginDatabase));
     }
 
     @Override

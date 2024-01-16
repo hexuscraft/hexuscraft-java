@@ -21,12 +21,10 @@ import java.util.stream.Stream;
 public class CommandRankRemove extends BaseCommand {
 
     final PluginDatabase pluginDatabase;
-    final PluginScoreboard pluginScoreboard;
 
-    CommandRankRemove(PluginPermission pluginPermission, PluginDatabase pluginDatabase, PluginScoreboard pluginScoreboard) {
+    CommandRankRemove(final PluginPermission pluginPermission, final PluginDatabase pluginDatabase) {
         super(pluginPermission, "remove", "<Player> <Permission Group>", "Take a group from a player.", Set.of("r"), PluginPermission.PERM.COMMAND_RANK_REMOVE);
         this.pluginDatabase = pluginDatabase;
-        this.pluginScoreboard = pluginScoreboard;
     }
 
     @Override
@@ -36,7 +34,7 @@ public class CommandRankRemove extends BaseCommand {
             return;
         }
 
-        PermissionGroup targetGroup;
+        final PermissionGroup targetGroup;
         try {
             targetGroup = PermissionGroup.valueOf(args[1]);
         } catch (IllegalArgumentException ex) {
@@ -60,7 +58,7 @@ public class CommandRankRemove extends BaseCommand {
         pluginDatabase.getJedisPooled().srem(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.toString());
         sender.sendMessage(F.fMain(this) + "Removed sub-group " + F.fPermissionGroup(targetGroup) + " from " + F.fItem(profile.name) + ".");
 
-        final Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
+        final Player player = _miniPlugin._plugin.getServer().getPlayer(profile.name);
         if (player == null) return;
 
         player.sendMessage(F.fMain(this) + "You no longer have sub-group " + F.fPermissionGroup(targetGroup) + ".");
@@ -68,12 +66,12 @@ public class CommandRankRemove extends BaseCommand {
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         final List<String> names = new ArrayList<>();
         switch (args.length) {
             case 1 -> {
                 //noinspection ReassignedVariable
-                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
                 if (sender instanceof final Player player) {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
                 }
