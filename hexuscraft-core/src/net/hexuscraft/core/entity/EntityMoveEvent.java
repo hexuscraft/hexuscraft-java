@@ -13,17 +13,21 @@ public class EntityMoveEvent extends Event implements Cancellable {
     public final Location _from;
     public final Location _to;
 
+    private static final HandlerList _handlers = new HandlerList();
+    private boolean _cancelled = false;
+
     public EntityMoveEvent(final Entity entity, final Location from, final Location to) {
         _entity = entity;
         _from = from;
         _to = to;
     }
 
-    private static final HandlerList _handlers = new HandlerList();
-    private boolean _cancelled = false;
-
     @Override
     public HandlerList getHandlers() {
+        return _handlers;
+    }
+
+    public HandlerList getHandlerList() {
         return _handlers;
     }
 
