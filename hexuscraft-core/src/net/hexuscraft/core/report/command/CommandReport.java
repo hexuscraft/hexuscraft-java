@@ -39,7 +39,7 @@ public class CommandReport extends BaseCommand {
         }
 
         List<String> reasonArgs = new java.util.ArrayList<>(Arrays.stream(args).toList());
-        reasonArgs.remove(0);
+        reasonArgs.removeFirst();
         String reason = String.join(" ", reasonArgs);
 
         _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(onlinePlayer -> {
