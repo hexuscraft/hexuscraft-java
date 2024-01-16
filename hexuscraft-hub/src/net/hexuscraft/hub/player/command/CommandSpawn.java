@@ -32,7 +32,7 @@ public class CommandSpawn extends BaseCommand {
                 return;
             }
 
-            Player[] players = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0], sender);
+            Player[] players = PlayerSearch.onlinePlayerSearch(_miniPlugin._plugin.getServer().getOnlinePlayers(), args[0], sender);
             if (players.length != 1) {
                 return;
             }
@@ -44,7 +44,7 @@ public class CommandSpawn extends BaseCommand {
             target = (Player) sender;
         }
 
-        target.teleport(((Hub) _miniPlugin._javaPlugin).getSpawn());
+        target.teleport(((Hub) _miniPlugin._plugin)._spawn);
         if (target.getName().equals(sender.getName())) {
             target.sendMessage(F.fMain(this) + "You teleported to spawn.");
             return;
@@ -52,7 +52,7 @@ public class CommandSpawn extends BaseCommand {
 
         target.sendMessage(F.fMain(this) + "You were teleported to spawn by " + F.fItem(sender) + ".");
         sender.sendMessage(F.fMain(this) + "Teleported " + F.fItem(target) + " to spawn.");
-        _miniPlugin._javaPlugin.getServer().getOnlinePlayers().forEach(staff -> {
+        _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
             if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {
                 return;
             }

@@ -3,7 +3,6 @@ package net.hexuscraft.core.permission.command;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.permission.PluginPermission;
 import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
@@ -32,26 +31,8 @@ public class CommandRankClear extends BaseCommand {
 
     @Override
     public final void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length != 2) {
+        if (args.length != 1) {
             sender.sendMessage(help(alias));
-            return;
-        }
-
-        final PermissionGroup targetGroup;
-        try {
-            targetGroup = PermissionGroup.valueOf(args[1]);
-        } catch (IllegalArgumentException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Invalid group. Groups: ") + F.fList(PermissionGroup.getColoredNames()) + ".");
-            return;
-        }
-
-        if (targetGroup.toString().startsWith("_")) {
-            sender.sendMessage(F.fMain(this) + F.fError("This group cannot be manually granted to players."));
-            return;
-        }
-
-        if (!sender.hasPermission(targetGroup.toString())) {
-            sender.sendMessage(F.fInsufficientPermissions());
             return;
         }
 
@@ -61,12 +42,12 @@ public class CommandRankClear extends BaseCommand {
         _database.getJedisPooled().del(PermissionQueries.GROUPS(profile.uuid.toString()));
         sender.sendMessage(F.fMain(this) + "Cleared sub-groups of " + F.fItem(profile.name) + ".");
 
-        final Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
+        final Player player = _miniPlugin._plugin.getServer().getPlayer(profile.name);
         if (player == null) {
             return;
         }
 
-        player.sendMessage(F.fMain(this) + "You now have sub-group " + F.fPermissionGroup(targetGroup) + ".");
+        player.sendMessage(F.fMain(this) + "Your sub-groups were cleared.");
         _permission.refreshPermissions(player);
     }
 
@@ -75,7 +56,7 @@ public class CommandRankClear extends BaseCommand {
         List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
             if (sender instanceof Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }

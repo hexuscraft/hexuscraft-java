@@ -60,7 +60,7 @@ public class CommandRankSet extends BaseCommand {
         pluginDatabase.getJedisPooled().set(PermissionQueries.PRIMARY(profile.uuid.toString()), targetGroup.toString());
         sender.sendMessage(F.fMain(this) + "Assigned primary group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
 
-        Player player = _miniPlugin._javaPlugin.getServer().getPlayer(profile.name);
+        Player player = _miniPlugin._plugin.getServer().getPlayer(profile.name);
         if (player == null) {
             return;
         }
@@ -75,7 +75,7 @@ public class CommandRankSet extends BaseCommand {
         switch (args.length) {
             case 1 -> {
                 //noinspection ReassignedVariable
-                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
                 if (sender instanceof Player player) {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
                 }
