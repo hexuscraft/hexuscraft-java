@@ -1,15 +1,15 @@
 package net.hexuscraft.core.gamemode;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.gamemode.command.CommandGameMode;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 
-public class PluginGameMode extends MiniPlugin {
+public class PluginGameMode extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_GAMEMODE,
@@ -18,8 +18,8 @@ public class PluginGameMode extends MiniPlugin {
 
     PluginCommand _pluginCommand;
 
-    public PluginGameMode(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Game Mode");
+    public PluginGameMode(final HexusPlugin plugin) {
+        super(plugin, "Game Mode");
 
         PermissionGroup.BUILDER._permissions.add(PERM.COMMAND_GAMEMODE);
 
@@ -27,7 +27,7 @@ public class PluginGameMode extends MiniPlugin {
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
     }
 

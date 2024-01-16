@@ -1,5 +1,6 @@
 package net.hexuscraft.core.punish;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
@@ -25,12 +26,11 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.util.*;
 
-public class PluginPunish extends MiniPlugin {
+public class PluginPunish extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_PUNISH,
@@ -44,12 +44,12 @@ public class PluginPunish extends MiniPlugin {
 
     private final UUID DEFAULT_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-    public PluginPunish(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Punish");
+    public PluginPunish(final HexusPlugin plugin) {
+        super(plugin, "Punish");
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
@@ -87,7 +87,7 @@ public class PluginPunish extends MiniPlugin {
                     throw new RuntimeException(ex);
                 }
 
-                Player target = _javaPlugin.getServer().getPlayer(targetSession.name);
+                Player target = _plugin._plugin.getServer().getPlayer(targetSession.name);
 
                 if (punishData.type.equals(PunishType.WARNING)) {
                     if (target != null) {
@@ -95,7 +95,7 @@ public class PluginPunish extends MiniPlugin {
                         target.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 1);
                     }
-                    _javaPlugin.getServer().getOnlinePlayers().forEach(staff -> {
+                    _plugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
                         staff.sendMessage(F.fMain(this) + F.fItem(staffSession.name) + " warned " + F.fItem(targetSession.name) + ".");
                         staff.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
@@ -108,7 +108,7 @@ public class PluginPunish extends MiniPlugin {
                         target.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 0.6F);
                     }
-                    _javaPlugin.getServer().getOnlinePlayers().forEach(staff -> {
+                    _plugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {
                             return;
                         }
@@ -119,9 +119,9 @@ public class PluginPunish extends MiniPlugin {
                 }
                 if (punishData.type.equals(PunishType.BAN)) {
                     if (target != null) {
-                        _javaPlugin.getServer().getScheduler().runTask(_javaPlugin, () -> target.kickPlayer(F.fPunishBan(UUID.fromString(punishmentId), punishData.reason, punishData.length)));
+                        _plugin._plugin.getServer().getScheduler().runTask(_plugin._plugin, () -> target.kickPlayer(F.fPunishBan(UUID.fromString(punishmentId), punishData.reason, punishData.length)));
                     }
-                    _javaPlugin.getServer().getOnlinePlayers().forEach(staff -> {
+                    _plugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {
                             return;
                         }
@@ -355,7 +355,7 @@ public class PluginPunish extends MiniPlugin {
         ItemStack skull = inventory.getItem(4);
         MojangSession targetSession;
         try {
-            targetSession = PlayerSearch.fetchMojangSession(UUID.fromString(ChatColor.stripColor(skull.getItemMeta().getLore().get(0))));
+            targetSession = PlayerSearch.fetchMojangSession(UUID.fromString(ChatColor.stripColor(skull.getItemMeta().getLore().getFirst())));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

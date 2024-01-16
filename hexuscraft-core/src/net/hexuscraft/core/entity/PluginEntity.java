@@ -48,7 +48,7 @@ public class PluginEntity extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
     }
 

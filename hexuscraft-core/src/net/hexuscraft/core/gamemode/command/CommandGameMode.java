@@ -28,7 +28,7 @@ public class CommandGameMode extends BaseCommand {
         Player target;
 
         if (args.length == 1) {
-            final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0], sender);
+            final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._plugin.getServer().getOnlinePlayers(), args[0], sender);
             if (targets.length != 1) return;
             target = targets[0];
         } else if (sender instanceof Player) {
@@ -44,7 +44,7 @@ public class CommandGameMode extends BaseCommand {
         }
 
         boolean toggleCreativeMode = target.getGameMode() != GameMode.CREATIVE;
-        target.setGameMode(toggleCreativeMode ? GameMode.CREATIVE : _miniPlugin._javaPlugin.getServer().getDefaultGameMode());
+        target.setGameMode(toggleCreativeMode ? GameMode.CREATIVE : _miniPlugin._plugin.getServer().getDefaultGameMode());
 
         sender.sendMessage(F.fMain(this) + F.fItem(target) + " Creative Mode: " + F.fBoolean(toggleCreativeMode));
 
@@ -55,7 +55,7 @@ public class CommandGameMode extends BaseCommand {
     @Override
     public List<String> tab(CommandSender sender, String alias, String[] args) {
         //noinspection ReassignedVariable
-        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
         if (sender instanceof Player player) {
             streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
         }

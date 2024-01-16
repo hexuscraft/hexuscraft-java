@@ -52,7 +52,7 @@ public class CommandPunish extends BaseCommand {
         List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
             if (sender instanceof Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }
@@ -63,7 +63,7 @@ public class CommandPunish extends BaseCommand {
     }
 
     public final void openGui(Player player, MojangProfile targetProfile, String reasonMessage) {
-        Inventory gui = _miniPlugin._javaPlugin.getServer().createInventory(player, 6*9, "Punish " + targetProfile.name);
+        Inventory gui = _miniPlugin._plugin.getServer().createInventory(player, 6*9, "Punish " + targetProfile.name);
 
         ItemStack devNotice = UtilItem.createDyeItem(DyeColor.YELLOW, C.cYellow + C.fBold + "Developer Notice", "Developers are advised against","using the punishment system","without consulting an " + F.fPermissionGroup(PermissionGroup.ADMINISTRATOR) + ".","","Exceptions allowed in emergency.");
         devNotice.addUnsafeEnchantment(Enchantment.DURABILITY, 1);

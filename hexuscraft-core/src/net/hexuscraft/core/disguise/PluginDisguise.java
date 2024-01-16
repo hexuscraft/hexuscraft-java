@@ -1,6 +1,7 @@
 package net.hexuscraft.core.disguise;
 
 import com.mojang.authlib.GameProfile;
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.disguise.command.CommandDisguise;
@@ -12,12 +13,11 @@ import org.bukkit.Server;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class PluginDisguise extends MiniPlugin {
+public class PluginDisguise extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_DISGUISE
@@ -25,12 +25,12 @@ public class PluginDisguise extends MiniPlugin {
 
     PluginCommand _pluginCommand;
 
-    public PluginDisguise(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Disguise");
+    public PluginDisguise(final HexusPlugin plugin) {
+        super(plugin, "Disguise");
     }
 
     @Override
-    public final void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
 
         PermissionGroup.MEDIA._permissions.add(PERM.COMMAND_DISGUISE);
@@ -42,7 +42,7 @@ public class PluginDisguise extends MiniPlugin {
     }
 
     public final boolean disguise(Player player, EntityType entityType, String disguiseName) throws NoSuchFieldException, IllegalAccessException, DisguiseUnsupportedEntityException {
-        Server server = _javaPlugin.getServer();
+        Server server = _plugin.getServer();
 
         if (entityType == EntityType.PLAYER) {
             CraftPlayer craftPlayer = (CraftPlayer) player;
@@ -71,7 +71,7 @@ public class PluginDisguise extends MiniPlugin {
                 player1.showPlayer(player);
             });
 
-            _javaPlugin.getServer().getPluginManager().callEvent(new DisguiseEvent(player, playerProfile, targetProfile));
+            _plugin.getServer().getPluginManager().callEvent(new DisguiseEvent(player, playerProfile, targetProfile));
 
             return true;
         }

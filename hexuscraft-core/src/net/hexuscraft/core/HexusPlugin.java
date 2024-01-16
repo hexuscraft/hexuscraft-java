@@ -90,7 +90,8 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
     public final void require(MiniPlugin<? extends HexusPlugin> miniPlugin) {
         // Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap
 
-        _miniPluginClassMap.put(miniPlugin.getClass(), miniPlugin);
+        //noinspection unchecked
+        _miniPluginClassMap.put((Class<? extends MiniPlugin<? extends HexusPlugin>>) miniPlugin.getClass(), miniPlugin);
     }
 
     public final void log(String message) {

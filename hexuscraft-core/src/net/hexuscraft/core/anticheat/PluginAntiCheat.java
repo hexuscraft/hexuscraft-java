@@ -55,7 +55,7 @@ public class PluginAntiCheat extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
     }
@@ -236,7 +236,7 @@ public class PluginAntiCheat extends MiniPlugin<HexusPlugin> {
     }
 
     public final void alert(Player player, String reason, CheatSeverity severity, int count) {
-//        _javaPlugin.getServer().broadcastMessage(F.fMain(this, F.fPlayer(player) + " suspected of " + severity.getColor() + reason));
+//        _plugin.getServer().broadcastMessage(F.fMain(this, F.fPlayer(player) + " suspected of " + severity.getColor() + reason));
         _plugin.getServer().broadcastMessage(F.fCheat(player, severity, reason, count, _pluginPortal._serverName));
     }
 

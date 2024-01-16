@@ -23,7 +23,7 @@ public class CommandBuildVersion extends BaseCommand {
         }
 
         final PluginBuildVersion plugin = (PluginBuildVersion) _miniPlugin;
-        final PluginDescriptionFile description = plugin._javaPlugin.getDescription();
+        final PluginDescriptionFile description = plugin._plugin.getDescription();
         final long lastModified = plugin.getLastModifiedMillis();
 
         final StringBuilder builder = new StringBuilder(F.fMain(this, "Plugin Information:\n"));

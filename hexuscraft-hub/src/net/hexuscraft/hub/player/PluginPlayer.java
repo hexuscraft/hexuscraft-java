@@ -72,7 +72,7 @@ public class PluginPlayer extends MiniPlugin<Hub> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginPermission = (PluginPermission) dependencies.get(PluginPermission.class);
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);

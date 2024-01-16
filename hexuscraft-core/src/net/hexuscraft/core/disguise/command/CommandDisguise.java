@@ -50,7 +50,7 @@ public class CommandDisguise extends BaseCommand {
         }
 
         //noinspection ReassignedVariable
-        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
         if (sender instanceof Player player) {
             streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
         }

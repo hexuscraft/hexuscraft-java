@@ -3,6 +3,7 @@ package net.hexuscraft.core.portal;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.PluginCommand;
@@ -17,7 +18,6 @@ import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.server.ServerListPingEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -29,7 +29,7 @@ import java.io.FileNotFoundException;
 import java.net.InetSocketAddress;
 import java.util.*;
 
-public class PluginPortal extends MiniPlugin implements PluginMessageListener {
+public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessageListener {
 
     public enum PERM implements IPermission {
         COMMAND_RESTART,
@@ -59,8 +59,8 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
     private final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
     private BukkitTask _updateTask;
 
-    public PluginPortal(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Portal");
+    public PluginPortal(final HexusPlugin plugin) {
+        super(plugin, "Portal");
 
         _created = System.currentTimeMillis();
         _callbacks = new HashMap<>();
@@ -72,13 +72,13 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
             throw new RuntimeException(ex);
         }
 
-        _messenger = _javaPlugin.getServer().getMessenger();
-        _messenger.registerOutgoingPluginChannel(_javaPlugin, PROXY_CHANNEL);
-        _messenger.registerIncomingPluginChannel(_javaPlugin, PROXY_CHANNEL, this);
+        _messenger = _plugin.getServer().getMessenger();
+        _messenger.registerOutgoingPluginChannel(_plugin, PROXY_CHANNEL);
+        _messenger.registerIncomingPluginChannel(_plugin, PROXY_CHANNEL, this);
     }
 
     @Override
-    public final void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
 
@@ -116,13 +116,13 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
                 final String senderName = args.length > 2 ? args[2] : null;
 
                 if (senderName != null) {
-                    _javaPlugin.getServer().getOnlinePlayers().forEach(player1 -> {
+                    _plugin._plugin.getServer().getOnlinePlayers().forEach(player1 -> {
                         if (!player1.hasPermission(PermissionGroup.ADMINISTRATOR.name())) return;
                         player1.sendMessage(F.fSub(this) + F.fItem(senderName) + " sent " + F.fItem(playerName) + " to " + F.fItem(serverName));
                     });
                 }
 
-                final Player player = _javaPlugin.getServer().getPlayer(playerName);
+                final Player player = _plugin._plugin.getServer().getPlayer(playerName);
                 if (player == null) return;
 
                 if (args.length > 2) {
@@ -135,7 +135,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
                 final ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF("Connect");
                 out.writeUTF(serverName);
-                player.sendPluginMessage(_javaPlugin, PROXY_CHANNEL, out.toByteArray());
+                player.sendPluginMessage(_plugin._plugin, PROXY_CHANNEL, out.toByteArray());
             }
 
         });
@@ -156,17 +156,17 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
                     return;
                 }
 
-                final Server server = _javaPlugin.getServer();
+                final Server server = _plugin._plugin.getServer();
                 final BukkitScheduler scheduler = server.getScheduler();
                 server.broadcastMessage(F.fMain(this) + "The server you are currently connected to is restarting. Sending you to a lobby.");
-                scheduler.runTaskLater(_javaPlugin, () -> server.getOnlinePlayers().forEach(player -> teleport(player.getName(), "Lobby")), 80);
-                scheduler.runTaskLater(_javaPlugin, server.spigot()::restart, 160);
+                scheduler.runTaskLater(_plugin._plugin, () -> server.getOnlinePlayers().forEach(player -> teleport(player.getName(), "Lobby")), 80);
+                scheduler.runTaskLater(_plugin._plugin, server.spigot()::restart, 160);
             }
 
         });
 
         final JedisPooled jedis = _pluginDatabase.getJedisPooled();
-        final Server server = _javaPlugin.getServer();
+        final Server server = _plugin.getServer();
         final BukkitScheduler scheduler = server.getScheduler();
 
         final double[] recentTps = MinecraftServer.getServer().recentTps;
@@ -177,7 +177,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress("127.0.0.1", 0).getAddress(), "", 0, 0);
         server.getPluginManager().callEvent(ping);
 
-        _updateTask = scheduler.runTaskTimerAsynchronously(_javaPlugin, () -> new ServerData(
+        _updateTask = scheduler.runTaskTimerAsynchronously(_plugin, () -> new ServerData(
                 _serverName,
                 _serverGroup,
                 _created,
@@ -193,8 +193,8 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
 
     @Override
     public final void onDisable() {
-        _messenger.unregisterOutgoingPluginChannel(_javaPlugin, PROXY_CHANNEL);
-        _messenger.unregisterIncomingPluginChannel(_javaPlugin, PROXY_CHANNEL);
+        _messenger.unregisterOutgoingPluginChannel(_plugin, PROXY_CHANNEL);
+        _messenger.unregisterIncomingPluginChannel(_plugin, PROXY_CHANNEL);
 
         _callbacks.clear();
 
@@ -256,7 +256,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         ByteArrayDataOutput outServer = ByteStreams.newDataOutput();
         outServer.writeUTF("PlayerCount");
         outServer.writeUTF(name);
-        _javaPlugin.getServer().sendPluginMessage(_javaPlugin, PROXY_CHANNEL, outServer.toByteArray());
+        _plugin.getServer().sendPluginMessage(_plugin, PROXY_CHANNEL, outServer.toByteArray());
 
         return 0;
     }
@@ -286,7 +286,7 @@ public class PluginPortal extends MiniPlugin implements PluginMessageListener {
         for (String s : data) {
             outServer.writeUTF(s);
         }
-        _javaPlugin.getServer().sendPluginMessage(_javaPlugin, PROXY_CHANNEL, outServer.toByteArray());
+        _plugin.getServer().sendPluginMessage(_plugin, PROXY_CHANNEL, outServer.toByteArray());
     }
 
 }

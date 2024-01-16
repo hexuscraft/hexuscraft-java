@@ -34,7 +34,7 @@ public class CommandSupport extends BaseCommand {
                 sender.sendMessage(F.fMain(this) + "You should receive a reply shortly if a staff member is in your server. You can also report rule-breakers with " + F.fItem("/report") + ".");
             }
 
-            for (final Player player : _miniPlugin._javaPlugin.getServer().getOnlinePlayers()) {
+            for (final Player player : _miniPlugin._plugin.getServer().getOnlinePlayers()) {
                 if (player.equals(sender) || player.hasPermission(PermissionGroup.TRAINEE.toString())) {
                     player.sendMessage(F.fPermissionGroup(permissionGroup) + " " + permissionGroup._color + sender.getName() + C.fReset + " " + C.cPurple + String.join(" ", args));
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, Integer.MAX_VALUE, 2);

@@ -25,7 +25,7 @@ public class CommandClear extends BaseCommand {
             return;
         }
 
-        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0], sender);
+        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._plugin.getServer().getOnlinePlayers(), args[0], sender);
         if (targets.length == 0) return;
 
         for (Player target : targets) {
@@ -38,7 +38,7 @@ public class CommandClear extends BaseCommand {
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         final List<String> completions = new ArrayList<>(List.of("*", "**", "."));
-        completions.addAll(_miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
+        completions.addAll(_miniPlugin._plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
         return completions;
     }
 }

@@ -27,7 +27,7 @@ public class CommandGive extends BaseCommand {
             return;
         }
 
-        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0], sender);
+        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._plugin.getServer().getOnlinePlayers(), args[0], sender);
         if (targets.length == 0) return;
 
         final int amount = args.length > 2 ? Integer.parseInt(args[2]) % 64 : 1;
@@ -82,7 +82,7 @@ public class CommandGive extends BaseCommand {
         switch (args.length) {
             case 1 -> {
                 //noinspection ReassignedVariable
-                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
                 if (sender instanceof Player player) {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
                 }

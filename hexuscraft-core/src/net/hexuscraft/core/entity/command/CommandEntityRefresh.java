@@ -26,7 +26,7 @@ public class CommandEntityRefresh extends BaseCommand {
         long start = System.currentTimeMillis();
 
         sender.sendMessage(F.fMain(this) + "Processing NPC refresh...");
-        _miniPlugin._javaPlugin.getServer().getWorlds().forEach(world -> {
+        _miniPlugin._plugin.getServer().getWorlds().forEach(world -> {
             sender.sendMessage(F.fMain(this) + "Refreshing NPCs in world " + F.fItem(world.getName()) + ".");
             pluginEntity.refreshNPCs(world);
         });

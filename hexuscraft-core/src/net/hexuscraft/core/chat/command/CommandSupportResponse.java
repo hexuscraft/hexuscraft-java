@@ -28,7 +28,7 @@ public class CommandSupportResponse extends BaseCommand {
     @Override
     public final void run(CommandSender sender, String alias, String[] args) {
         if (args.length > 1) {
-            Player target = _miniPlugin._javaPlugin.getServer().getPlayer(args[0]);
+            Player target = _miniPlugin._plugin.getServer().getPlayer(args[0]);
             if (target == null) {
                 sender.sendMessage(F.fMain(this) + "Could not find a player with specified name.");
                 return;
@@ -36,7 +36,7 @@ public class CommandSupportResponse extends BaseCommand {
 
             final PermissionGroup permissionGroup = sender instanceof Player ? pluginPermission._primaryGroupMap.get((Player) sender) : null;
 
-            for (Player player : _miniPlugin._javaPlugin.getServer().getOnlinePlayers()) {
+            for (Player player : _miniPlugin._plugin.getServer().getOnlinePlayers()) {
                 if (player.equals(sender) || player.equals(target) || player.hasPermission(PermissionGroup.TRAINEE.toString())) {
                     final PermissionGroup targetGroup = pluginPermission._primaryGroupMap.get(player);
 
@@ -63,7 +63,7 @@ public class CommandSupportResponse extends BaseCommand {
         }
 
         //noinspection ReassignedVariable
-        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
         if (sender instanceof Player player) {
             streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
         }

@@ -21,7 +21,7 @@ public class PluginCommand extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _commands = new HashSet<>();
         _commandMap = ((CraftServer) _plugin.getServer()).getCommandMap();
     }

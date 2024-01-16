@@ -2,6 +2,7 @@ package net.hexuscraft.build.parse;
 
 import net.hexuscraft.build.Build;
 import net.hexuscraft.build.parse.command.CommandParse;
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.permission.IPermission;
@@ -10,7 +11,7 @@ import org.bukkit.World;
 
 import java.util.Map;
 
-public class PluginParse extends MiniPlugin {
+public class PluginParse extends MiniPlugin<Build> {
 
     public enum PERM implements IPermission {
         COMMAND_PARSE
@@ -25,7 +26,7 @@ public class PluginParse extends MiniPlugin {
     }
 
     @Override
-    public final void onLoad(Map<Class<? extends MiniPlugin>, MiniPlugin> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _command = (PluginCommand) dependencies.get(PluginCommand.class);
     }
 

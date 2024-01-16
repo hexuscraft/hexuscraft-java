@@ -18,7 +18,7 @@ public class CommandBroadcast extends BaseCommand {
     @Override
     public final void run(CommandSender sender, String alias, String[] args) {
         if (args.length > 0) {
-            _miniPlugin._javaPlugin.getServer().broadcastMessage(F.fMain(this) + F.fItem(sender) + ": " + C.cWhite + ChatColor.translateAlternateColorCodes('&', String.join(" ", args)));
+            _miniPlugin._plugin.getServer().broadcastMessage(F.fMain(this) + F.fItem(sender) + ": " + C.cWhite + ChatColor.translateAlternateColorCodes('&', String.join(" ", args)));
             return;
         }
         sender.sendMessage(help(alias));

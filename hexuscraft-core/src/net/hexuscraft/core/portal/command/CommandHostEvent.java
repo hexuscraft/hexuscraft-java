@@ -44,10 +44,10 @@ public class CommandHostEvent extends BaseCommand {
         }
         _pending.add(sender);
 
-        final BukkitScheduler scheduler = _miniPlugin._javaPlugin.getServer().getScheduler();
+        final BukkitScheduler scheduler = _miniPlugin._plugin.getServer().getScheduler();
         sender.sendMessage(F.fMain(this, "Searching for existing servers..."));
 
-        scheduler.runTaskAsynchronously(_miniPlugin._javaPlugin, () -> {
+        scheduler.runTaskAsynchronously(_miniPlugin._plugin, () -> {
             final JedisPooled jedis = _pluginDatabase.getJedisPooled();
 
             final String serverName;
@@ -84,7 +84,7 @@ public class CommandHostEvent extends BaseCommand {
 
             final BukkitTask[] tasks = new BukkitTask[1]; // a bit of a dodgy workaround - but it works
             final long start = System.currentTimeMillis();
-            tasks[0] = scheduler.runTaskTimerAsynchronously(_miniPlugin._javaPlugin, () -> {
+            tasks[0] = scheduler.runTaskTimerAsynchronously(_miniPlugin._plugin, () -> {
                 if (System.currentTimeMillis() - start > 30000) {
                     sender.sendMessage(F.fMain(this, F.fError("Could not locate your server within 30 seconds. There might not be enough resources available to start your server. Maybe try again later?")));
                     _pending.remove(sender);
@@ -93,7 +93,7 @@ public class CommandHostEvent extends BaseCommand {
                 }
 
                 for (ServerData serverData : ServerQueries.getServers(jedis, new ServerGroupData("EVENT", Map.of()))) {
-                    scheduler.runTaskLaterAsynchronously(_miniPlugin._javaPlugin, () -> ((PluginPortal) _miniPlugin).teleport(sender.getName(), serverData._name), 20L);
+                    scheduler.runTaskLaterAsynchronously(_miniPlugin._plugin, () -> ((PluginPortal) _miniPlugin).teleport(sender.getName(), serverData._name), 20L);
                     _pending.remove(sender);
                     tasks[0].cancel();
                     return;

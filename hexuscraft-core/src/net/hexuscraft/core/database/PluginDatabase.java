@@ -1,8 +1,8 @@
 package net.hexuscraft.core.database;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.database.Database;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.JedisPubSub;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class PluginDatabase extends MiniPlugin {
+public class PluginDatabase extends MiniPlugin<HexusPlugin> {
 
     private final Database _database;
 
@@ -23,8 +23,8 @@ public class PluginDatabase extends MiniPlugin {
 
     private BukkitTask _asyncMessageTask;
 
-    public PluginDatabase(JavaPlugin javaPlugin) {
-        super(javaPlugin, "Database");
+    public PluginDatabase(final HexusPlugin plugin) {
+        super(plugin, "Database");
 
         _callbacks = new HashMap<>();
 
@@ -48,7 +48,7 @@ public class PluginDatabase extends MiniPlugin {
 
     @Override
     public void onEnable() {
-        _asyncMessageTask = _javaPlugin.getServer().getScheduler().runTaskAsynchronously(_javaPlugin, () -> {
+        _asyncMessageTask = _plugin.getServer().getScheduler().runTaskAsynchronously(_plugin, () -> {
             while (true) {
                 try {
                     getJedisPooled().psubscribe(new JedisPubSub() {

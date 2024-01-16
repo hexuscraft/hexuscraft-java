@@ -48,7 +48,7 @@ public class CommandSend extends BaseCommand {
         final List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer().getOnlinePlayers().stream();
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
             if (sender instanceof final Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }

@@ -25,7 +25,7 @@ public class CommandTestBan extends BaseCommand {
 
     @Override
     public final void run(final CommandSender sender, final String alias, final String[] args) {
-        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._javaPlugin.getServer().getOnlinePlayers(), args[0], sender);
+        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._plugin.getServer().getOnlinePlayers(), args[0], sender);
         if (targets.length != 1) return;
 
         final Player target = targets[0];
@@ -41,12 +41,12 @@ public class CommandTestBan extends BaseCommand {
 
         final Stream<? extends Player> streamedOnlinePlayers;
         if (sender instanceof Player player) {
-            streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer()
+            streamedOnlinePlayers = _miniPlugin._plugin.getServer()
                     .getOnlinePlayers()
                     .stream()
                     .filter(p -> p.canSee(player));
         } else {
-            streamedOnlinePlayers = _miniPlugin._javaPlugin.getServer()
+            streamedOnlinePlayers = _miniPlugin._plugin.getServer()
                     .getOnlinePlayers()
                     .stream();
         }

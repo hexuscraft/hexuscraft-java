@@ -21,7 +21,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener {
         _plugin.getLogger().info("[" + _name + "] " + message);
     }
 
-    public final void load(Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> miniPluginClassMap) {
+    public final void load(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap) {
         log("Initializing...");
         long start = System.currentTimeMillis();
 
@@ -50,7 +50,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener {
         log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public void onLoad(Map<Class<? extends MiniPlugin<HexusPlugin>>, MiniPlugin<HexusPlugin>> dependencies) {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
     }
 
     public void onEnable() {
