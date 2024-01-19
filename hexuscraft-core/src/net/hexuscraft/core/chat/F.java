@@ -3,6 +3,7 @@ package net.hexuscraft.core.chat;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.anticheat.CheatSeverity;
 import net.hexuscraft.core.command.BaseCommand;
+import net.hexuscraft.core.common.UtilMath;
 import net.hexuscraft.core.currency.CurrencyType;
 import net.hexuscraft.core.permission.PermissionGroup;
 import org.apache.commons.lang.StringUtils;
@@ -34,7 +35,7 @@ public class F {
         return PREFIX_MAIN + prefix + ">" + SPACER_GRAY + String.join("", text);
     }
 
-    public static String fMain(final MiniPlugin miniPlugin, final String... text) {
+    public static String fMain(final MiniPlugin<?> miniPlugin, final String... text) {
         return fMain(miniPlugin._name, text);
     }
 
@@ -55,7 +56,7 @@ public class F {
         return fMain(PREFIX_SUB + prefix, text);
     }
 
-    public static String fSub(final MiniPlugin miniPlugin, final String... text) {
+    public static String fSub(final MiniPlugin<?> miniPlugin, final String... text) {
         return fSub(miniPlugin._name, text);
     }
 
