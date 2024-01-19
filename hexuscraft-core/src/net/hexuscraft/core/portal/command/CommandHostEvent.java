@@ -65,6 +65,7 @@ public class CommandHostEvent extends BaseCommand {
             }
 
             if (serverName != null) {
+                _pending.remove(sender);
                 sender.sendMessage(F.fMain(this, F.fError("There is already an event server!\n"), F.fMain("", "Connect to it with ", F.fItem("/server " + serverName + "."))));
                 return;
             }

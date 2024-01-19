@@ -66,6 +66,7 @@ public class CommandHostServer extends BaseCommand {
             }
 
             if (serverName != null) {
+                _pending.remove(sender);
                 sender.sendMessage(F.fMain(this, F.fError("You are already the host of a private server!\n"), F.fMain("", "Connect to it with ", F.fItem("/server " + serverName + "."))));
                 return;
             }
