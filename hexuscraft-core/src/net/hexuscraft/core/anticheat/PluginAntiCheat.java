@@ -223,7 +223,8 @@ public class PluginAntiCheat extends MiniPlugin<HexusPlugin> {
     public final void on(EntityDamageEvent event) {
         final Entity entity = event.getEntity();
         for (Set<Guardian> guardians : _guardians.values()) {
-            if (!guardians.contains((Guardian) entity)) continue;
+            if (!(entity instanceof Guardian)) continue;
+            if (!guardians.contains(entity)) continue;
             event.setCancelled(true);
             break;
         }
