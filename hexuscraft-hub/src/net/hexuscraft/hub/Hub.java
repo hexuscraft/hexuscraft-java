@@ -19,10 +19,15 @@ public class Hub extends HexusPlugin {
     public Location _spawn = new Location(null, 0, 100, 0, 0, 0);
 
     @Override
-    public void load() {
+    public final void load() {
         require(new PluginDoubleJump(this));
         require(new PluginPlayer(this));
         require(new PluginTeam(this));
+    }
+
+    @Override
+    public final void enable() {
+        getServer().setDefaultGameMode(GameMode.ADVENTURE);
     }
 
     @EventHandler
@@ -30,16 +35,11 @@ public class Hub extends HexusPlugin {
         final World world = event.getWorld();
         if (!world.getName().equals("world")) return;
 
-        getServer().setDefaultGameMode(GameMode.ADVENTURE);
-        _spawn.setWorld(world);
+        _spawn = new Location(world, 0, 0, 0, 0, 0);
 
         try {
             final Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_spawn.dat").toFile());
-            _spawn.setX(scanner.nextDouble());
-            _spawn.setY(scanner.nextDouble());
-            _spawn.setZ(scanner.nextDouble());
-            _spawn.setYaw(scanner.nextFloat());
-            _spawn.setPitch(scanner.nextFloat());
+            _spawn = new Location(event.getWorld(), scanner.nextDouble(), scanner.nextDouble(), scanner.nextDouble(), scanner.nextFloat(), scanner.nextFloat());
         } catch (FileNotFoundException ex) {
             log("Could not locate _spawn.dat in world '" + world.getName() + "'");
         }
