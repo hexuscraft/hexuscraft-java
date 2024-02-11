@@ -64,7 +64,7 @@ public class PluginDatabase extends MiniPlugin<HexusPlugin> {
 
                         @Override
                         public void onPSubscribe(String pattern, int subscribedChannels) {
-                            log("[JEDIS] Subscribed to '" + pattern + "' (" + subscribedChannels + ")");
+//                            log("[JEDIS] Subscribed to '" + pattern + "' (" + subscribedChannels + ")");
                         }
 
                     }, "*");

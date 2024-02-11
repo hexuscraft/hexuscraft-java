@@ -84,7 +84,7 @@ public class PluginEntity extends MiniPlugin<HexusPlugin> {
 
     public final void createEntity(final World world, final double x, final double y, final double z,
                                    final float yaw, final float pitch, final String[] data) {
-        log(String.join(", ", new String[]{world.toString(), Double.toString(x), Double.toString(y), Double.toString(z), Float.toString(yaw), Float.toString(pitch), String.join(":", data)}));
+//        log(String.join(", ", new String[]{world.toString(), Double.toString(x), Double.toString(y), Double.toString(z), Float.toString(yaw), Float.toString(pitch), String.join(":", data)}));
         final Location location = new Location(world, x, y, z, yaw, pitch);
 
         //noinspection ReassignedVariable

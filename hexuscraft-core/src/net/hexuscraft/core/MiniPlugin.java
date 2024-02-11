@@ -32,7 +32,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener {
 
     public final void enable() {
 //        log("Enabling...");
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
 
         _plugin.getServer().getPluginManager().registerEvents(this, _plugin);
         onEnable();
