@@ -25,14 +25,10 @@ public class F {
     private static final String SPACER = RESET + " ";
     private static final String SPACER_GRAY = RESET_GRAY + " ";
 
-    private static final String PREFIX_MAIN = C.cBlue;
-    private static final String PREFIX_SUB = C.cDGray;
-
     private static final String ITEM_COLOR = C.cYellow;
 
-
     public static String fMain(final String prefix, final String... text) {
-        return PREFIX_MAIN + prefix + ">" + SPACER_GRAY + String.join("", text);
+        return C.cBlue + prefix + ">" + SPACER_GRAY + String.join("", text);
     }
 
     public static String fMain(final MiniPlugin<?> miniPlugin, final String... text) {
@@ -53,7 +49,7 @@ public class F {
 
 
     public static String fSub(final String prefix, final String... text) {
-        return fMain(PREFIX_SUB + prefix, text);
+        return fMain(C.cDGray + prefix, text);
     }
 
     public static String fSub(final MiniPlugin<?> miniPlugin, final String... text) {
@@ -74,7 +70,7 @@ public class F {
     }
 
     public static String fItem(final String name, final int count) {
-        return ITEM_COLOR + count + " " + name + RESET_GRAY;
+        return fItem(count + " " + name);
     }
 
     public static String fItem(final CommandSender commandSender) {
@@ -99,7 +95,7 @@ public class F {
 
 
     public static String fList(final String[] args) {
-        return RESET_GRAY + "[" + ITEM_COLOR + String.join(RESET_GRAY + ", " + ITEM_COLOR, args) + RESET_GRAY + "]";
+        return RESET_GRAY + "[" + fItem(String.join(RESET_GRAY + ", " + ITEM_COLOR, args)) + "]";
     }
 
     public static String fList(final List<String> args) {
