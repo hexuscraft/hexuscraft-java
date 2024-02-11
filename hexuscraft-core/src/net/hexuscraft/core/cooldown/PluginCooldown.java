@@ -5,39 +5,57 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PluginCooldown extends MiniPlugin<HexusPlugin> {
 
-    private Map<Object, Cooldown> _cooldownMap;
+    private final Map<Object, List<Cooldown>> _cooldownMap;
 
     public PluginCooldown(final HexusPlugin plugin) {
         super(plugin, "Cooldown");
         _cooldownMap = new HashMap<>();
     }
 
-    public boolean use(final Object parent, final String name, final Long delayMs) {
-        final long now = System.currentTimeMillis();
-
-        final long remaining = now - _cooldownMap.getOrDefault(name, 0L);
-        if (remaining < delayMs) {
-            return false;
+    private Cooldown getCooldown(final Object parent, final String name) {
+        if (!_cooldownMap.containsKey(parent)) return null;
+        for (final Cooldown cooldown : _cooldownMap.get(parent)) {
+            if (!cooldown._name.equals(name)) continue;
+            return cooldown;
         }
+        return null;
+    }
 
-        _cooldownMap.put(name, new Cooldown(name, now, delayMs));
-        _plugin.getServer().getScheduler().runTaskLater(_plugin, () -> {
-            if (!_cooldownMap.get(name).equals(now)) return;
-            _cooldownMap.remove(name);
-        }, delayMs);
+    private void addCooldown(final Object parent, final Cooldown cooldown) {
+        if (!_cooldownMap.containsKey(parent)) _cooldownMap.put(parent, new ArrayList<>());
+        _cooldownMap.get(parent).add(cooldown);
+    }
+
+    private Long calculateRemaining(final Long now, final Long start, final Long delay) {
+        return delay - (now - start);
+    }
+
+    public final boolean use(final Object parent, final String name, final Long delayMs) {
+        final Cooldown cooldown = getCooldown(parent, name);
+        if (cooldown != null)
+            return calculateRemaining(System.currentTimeMillis(), cooldown._started, cooldown._delayMs) <= 0;
+
+        addCooldown(parent, new Cooldown(name, System.currentTimeMillis(), delayMs));
         return true;
     }
 
-    public void use(final Object parent, final String name, final Long delayMs, final CommandSender sender) {
-        if (!use(parent, name, delayMs)) {
-            sender.sendMessage(F.fMain(this, "You cannot use ", object.toString(), " for another ", F.fTime()));
+    public final void use(final Object parent, final String name, final Long delayMs, final CommandSender sender) {
+        if (use(parent, name, delayMs)) return;
+
+        final Cooldown cooldown = getCooldown(parent, name);
+        if (cooldown == null) {
+            sender.sendMessage(F.fMain(this, "Please wait before trying to use ", F.fItem(name), "again."));
+            return;
         }
-        return;
+
+        sender.sendMessage(F.fMain(this, "You cannot use ", F.fItem(name), " for another ", F.fTime(calculateRemaining(System.currentTimeMillis(), cooldown._started, cooldown._delayMs))));
     }
 
 }
