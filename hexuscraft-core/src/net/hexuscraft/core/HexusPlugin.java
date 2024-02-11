@@ -35,8 +35,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
 
     @Override
     public final void onLoad() {
-        log("Loading...");
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
 
         require(new PluginAntiCheat(this));
         require(new PluginAuthentication(this));
@@ -58,35 +57,36 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
         require(new PluginReport(this));
         require(new PluginScoreboard(this));
 
-        log("Core finished loading.");
+//        log("Core plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
 
         load();
+
+//        log("Local plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
+
         _miniPluginClassMap.values().forEach(miniPlugin -> miniPlugin.load(_miniPluginClassMap));
 
-        log("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
+//        log("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
     public final void onEnable() {
-        log("Enabling...");
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
 
         enable();
         _miniPluginClassMap.values().forEach(MiniPlugin::enable);
 
-        log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
+//        log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
     public final void onDisable() {
-        log("Disabling...");
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
 
         disable();
         _miniPluginClassMap.values().forEach(MiniPlugin::disable);
         _miniPluginClassMap.clear();
 
-        log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
+//        log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public final void require(MiniPlugin<? extends HexusPlugin> miniPlugin) {

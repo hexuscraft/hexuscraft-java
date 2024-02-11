@@ -14,7 +14,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener {
         _plugin = plugin;
         _name = name;
 
-        log("Instantiated.");
+//        log("Instantiated.");
     }
 
     public void log(String message) {
@@ -22,32 +22,32 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener {
     }
 
     public final void load(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap) {
-        log("Initializing...");
-        long start = System.currentTimeMillis();
+//        log("Initializing...");
+//        long start = System.currentTimeMillis();
 
         onLoad(miniPluginClassMap);
 
-        log("Initialized in " + (System.currentTimeMillis() - start) + "ms.");
+//        log("Initialized in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public final void enable() {
-        log("Enabling...");
+//        log("Enabling...");
         long start = System.currentTimeMillis();
 
         _plugin.getServer().getPluginManager().registerEvents(this, _plugin);
         onEnable();
 
-        log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
+//        log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public final void disable() {
-        log("Disabling...");
-        long start = System.currentTimeMillis();
+//        log("Disabling...");
+//        long start = System.currentTimeMillis();
 
         HandlerList.unregisterAll(this);
         onDisable();
 
-        log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
+//        log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
