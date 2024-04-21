@@ -21,11 +21,6 @@ public class ServerManager {
     }
 
     public final void startServer(final JedisPooled jedis, final ServerGroupData serverGroupData, final String reason) {
-        _monitor.log("=== START SERVER ===");
-        _monitor.log("Reason: " + reason);
-        _monitor.log("Group: " + serverGroupData._name);
-        _monitor.log("Ram: " + serverGroupData._ram);
-
         final ServerData[] existingServers = ServerQueries.getServers(jedis, serverGroupData);
 
         final Map<Integer, ServerData> serverDataIdMap = new HashMap<>();
@@ -42,19 +37,18 @@ public class ServerManager {
         }
 
         if (lowestId == 0) {
-            _monitor.log("FATAL: Maximum port reached. Cancelling.");
-            _monitor.log("====================");
+            _monitor.log("FATAL: Could not start a server in group " + serverGroupData._name + ": Max Port Reached");
             return;
         }
 
         final String serverName = serverGroupData._name + "-" + lowestId;
-        _monitor.log("Name: " + serverName);
+        _monitor.log("Starting " + serverName + " (" + serverGroupData._ram + " MB): " + reason);
 
         try {
             new ProcessBuilder(
-                    "cmd.exe",
-                    "/c",
-                    "start",
+//                    "cmd.exe",
+//                    "/c",
+//                    "start",
                     _path + "/scripts/startServer.cmd",
                     "127.0.0.1",
                     "193.110.160.24",
@@ -66,8 +60,8 @@ public class ServerManager {
                     serverGroupData._name + "-" + lowestId,
                     "false",
                     Integer.toString(serverGroupData._capacity)
-            ).start();
-            _monitor.log("Waiting for server to startup...");
+            ).start().waitFor();
+            _monitor.log("- Files generated. Waiting for startup...");
 
             final long startMs = System.currentTimeMillis();
             while (true) {
@@ -81,43 +75,40 @@ public class ServerManager {
                 Thread.sleep(1000L);
             }
         } catch (final IOException e) {
-            _monitor.log("!!! Exception while running start process:");
+            _monitor.log("- Exception while running start process:");
             _monitor.log(e.getMessage(), e);
         } catch (final InterruptedException e) {
-            _monitor.log("!!! Exception while busy-waiting:");
+            _monitor.log("- Exception while busy-waiting:");
             _monitor.log(e.getMessage(), e);
         } finally {
-            _monitor.log("====================");
+            _monitor.log("- Done.");
         }
     }
 
     public final void killServer(final JedisPooled jedis, final String serverName, final String reason) {
-        _monitor.log("=== KILL SERVER ===");
-        _monitor.log("Reason: " + reason);
-        _monitor.log("Name: " + serverName);
+        _monitor.log("Killing " + serverName + ": " + reason);
 
         try {
             new ProcessBuilder(
-                    "cmd.exe",
-                    "/c",
-                    "start",
+//                    "cmd.exe",
+//                    "/c",
+//                    "start",
                     _path + "/scripts/killServer.cmd",
                     "127.0.0.1",
                     "193.110.160.24",
                     serverName
-            ).start();
-            jedis.del(ServerQueries.SERVER(serverName));
-            _monitor.log("Waiting for server to die...");
+            ).start().waitFor();
+            _monitor.log("- Files destroyed.");
 
-            Thread.sleep(3000L);
+            jedis.del(ServerQueries.SERVER(serverName));
         } catch (final IOException ex) {
-            _monitor.log("!!! Exception while running kill process:");
+            _monitor.log("- Exception while running kill process:");
             _monitor.log(ex.getMessage(), ex);
         } catch (final InterruptedException ex) {
-            _monitor.log("!!! Exception while busy-waiting:");
+            _monitor.log("- Exception while busy-waiting:");
             _monitor.log(ex.getMessage(), ex);
         } finally {
-            _monitor.log("====================");
+            _monitor.log("- Done.");
         }
     }
 
