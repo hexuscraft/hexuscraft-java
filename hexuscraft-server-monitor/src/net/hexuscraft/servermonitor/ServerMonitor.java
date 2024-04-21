@@ -23,6 +23,7 @@ public class ServerMonitor implements Runnable {
 
     private final Map<String, ServerData> _serverDataMap;
     private final Map<String, ServerGroupData> _serverGroupDataMap;
+    private final Set<String> _deadServersSet;
 
     private ServerMonitor() {
         _console = System.console();
@@ -41,6 +42,7 @@ public class ServerMonitor implements Runnable {
 
         _serverDataMap = new HashMap<>();
         _serverGroupDataMap = new HashMap<>();
+        _deadServersSet = new HashSet<>();
 
         new Thread(this).start();
     }
@@ -51,6 +53,13 @@ public class ServerMonitor implements Runnable {
 
     private void tick() {
         final JedisPooled jedis = _database.getJedisPooled();
+
+        _deadServersSet.clear();
+        _deadServersSet.addAll(ServerQueries.getDeadServers(jedis));
+
+        for (String name : _deadServersSet) {
+            _manager.killServer(jedis, name, "Dead");
+        }
 
         _serverDataMap.clear();
         _serverDataMap.putAll(ServerQueries.getServersAsMap(jedis));
@@ -68,7 +77,7 @@ public class ServerMonitor implements Runnable {
 
         _serverDataMap.forEach((serverName, serverData) -> {
 
-            // Kill dead servers
+            // Kill unresponsive servers
             if ((System.currentTimeMillis() - serverData._updated) > 10000L) {
                 _manager.killServer(jedis, serverData._name, "Unresponsive");
                 return;
@@ -78,7 +87,7 @@ public class ServerMonitor implements Runnable {
 
             // Kill servers without a valid server group
             if (serverGroupData == null) {
-                _manager.killServer(jedis, serverData._name, "Unknown Server Group");
+                _manager.killServer(jedis, serverData._name, "Invalid Server Group");
                 return;
             }
 
@@ -134,7 +143,7 @@ public class ServerMonitor implements Runnable {
         while (true) {
             try {
                 tick();
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 //noinspection CallToPrintStackTrace
                 ex.printStackTrace();
             }
@@ -142,7 +151,7 @@ public class ServerMonitor implements Runnable {
             try {
                 //noinspection BusyWait
                 Thread.sleep(1000L);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }

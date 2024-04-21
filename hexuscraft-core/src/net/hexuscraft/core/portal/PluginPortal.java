@@ -201,6 +201,10 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
 
         _updateTask.cancel();
         _updateTask = null;
+
+        try {
+            _pluginDatabase.getJedisPooled().sadd("deadservers", _serverName);
+        } catch(Exception ignored) {}
     }
     
     @Override
