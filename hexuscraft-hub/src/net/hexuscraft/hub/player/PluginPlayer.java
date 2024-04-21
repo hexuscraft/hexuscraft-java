@@ -91,25 +91,13 @@ public class PluginPlayer extends MiniPlugin<Hub> {
     }
 
     @EventHandler
-    public void onPlayerJoin(final PlayerJoinEvent event) {
-        final Player player = getPlayer(event, _plugin);
-        player.getInventory().setHeldItemSlot(0);
-        refreshInventory(player);
-        player.teleport(_plugin._spawn);
-
-        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), "");
-
-        final PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
-        event.setJoinMessage(F.fSub("Join", F.fPermissionGroup(primaryGroup, true).toUpperCase(), " ", F.fItem(player.getName())));
-    }
-
-    private static Player getPlayer(final PlayerJoinEvent event, final Hub hub) {
+    private void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         player.setFallDistance(0);
         player.setFlying(false);
         player.setSneaking(false);
         player.setAllowFlight(false);
-        player.setGameMode(hub.getServer().getDefaultGameMode());
+        player.setGameMode(_plugin.getServer().getDefaultGameMode());
         player.setWalkSpeed(0.2f);
         player.setFlySpeed(0.1f);
         player.setVelocity(new Vector());
@@ -118,10 +106,17 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         player.setFoodLevel(20);
         player.setExhaustion(0);
         player.setExp(0);
-        return player;
+        player.teleport(_plugin._spawn);
+
+        refreshInventory(player);
+
+        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), "");
+
+        final PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
+        event.setJoinMessage(F.fSub("Join", F.fPermissionGroup(primaryGroup, true).toUpperCase(), " ", F.fItem(player.getName())));
     }
 
-    void refreshInventory(Player player) {
+    private void refreshInventory(Player player) {
         final PlayerInventory inventory = player.getInventory();
 
         final ItemStack gameCompass = UtilItem.createItem(Material.COMPASS, C.cGreen + C.fBold + "Game Menu", "Click to open the Game Menu");
@@ -136,10 +131,11 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         inventory.setItem(4, cosmeticsChest);
         inventory.setItem(7, shopEmerald);
         inventory.setItem(8, lobbyClock);
+        inventory.setHeldItemSlot(0);
     }
 
     @EventHandler
-    void onDisguise(final DisguiseEvent event) {
+    private void onDisguise(final DisguiseEvent event) {
         refreshInventory(event._player);
     }
 
