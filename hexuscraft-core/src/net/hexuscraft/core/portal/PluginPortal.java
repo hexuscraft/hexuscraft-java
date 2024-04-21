@@ -179,15 +179,16 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
 
         _updateTask = scheduler.runTaskTimerAsynchronously(_plugin, () -> new ServerData(
                 _serverName,
-                _serverGroup,
-                _created,
-                System.currentTimeMillis(),
+
                 server.getIp(),
-                server.getPort(),
-                server.getOnlinePlayers().size(),
                 server.getMaxPlayers(),
+                _created,
+                _serverGroup,
                 ping.getMotd(),
-                averageTps.orElse(20D)
+                ping.getNumPlayers(),
+                server.getPort(),
+                averageTps.orElse(2D),
+                System.currentTimeMillis()
         ).update(jedis), 0, 20);
     }
 
@@ -201,7 +202,7 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
         _updateTask.cancel();
         _updateTask = null;
     }
-
+    
     @Override
     public final void onPluginMessageReceived(String channel, Player player, byte[] message) {
         //noinspection UnstableApiUsage

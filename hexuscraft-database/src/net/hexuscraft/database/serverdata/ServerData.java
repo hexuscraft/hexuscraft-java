@@ -9,57 +9,57 @@ public class ServerData {
 
     public final String _name;
 
-    public final String _group;
-    public final long _created;
-    public final long _updated;
     public final String _address;
-    public final int _port;
-    public final int _players;
     public final int _capacity;
+    public final long _created;
+    public final String _group;
     public final String _motd;
+    public final int _players;
+    public final int _port;
     public final double _tps;
+    public final long _updated;
 
     public ServerData(final String name, final Map<String, String> serverData) {
         _name = name;
 
-        _group = serverData.get("group");
-        _created = Long.parseLong(serverData.getOrDefault("created", "0"));
-        _updated = Long.parseLong(serverData.getOrDefault("updated", "0"));
         _address = serverData.getOrDefault("address", "127.0.0.1");
-        _port = Integer.parseInt(serverData.getOrDefault("port", "0"));
-        _players = Integer.parseInt(serverData.getOrDefault("players", "0"));
         _capacity = Integer.parseInt(serverData.getOrDefault("capacity", "0"));
+        _created = Long.parseLong(serverData.getOrDefault("created", "0"));
+        _group = serverData.get("group");
         _motd = serverData.getOrDefault("motd", "");
+        _players = Integer.parseInt(serverData.getOrDefault("players", "0"));
+        _port = Integer.parseInt(serverData.getOrDefault("port", "0"));
         _tps = Double.parseDouble(serverData.getOrDefault("tps", "20"));
+        _updated = Long.parseLong(serverData.getOrDefault("updated", "0"));
     }
 
-    public ServerData(final String name, final String group, final long created, final long updated,
-                      final String address, final int port, final int players, final int capacity, final String motd,
-                      final double tps) {
+    public ServerData(final String name, final String address, final int capacity, final long created,
+                      final String group, final String motd, final int players, final int port,
+                      final double tps, final long updated) {
         _name = name;
 
-        _group = group;
-        _created = created;
-        _updated = updated;
         _address = address;
-        _port = port;
-        _players = players;
         _capacity = capacity;
+        _created = created;
+        _group = group;
         _motd = motd;
+        _players = players;
+        _port = port;
         _tps = tps;
+        _updated = updated;
     }
 
     public final Map<String, String> toMap() {
         return Map.of(
-                "group", _group,
-                "created", Long.toString(_created),
-                "updated", Long.toString(_updated),
                 "address", _address,
-                "port", Integer.toString(_port),
-                "players", Integer.toString(_players),
                 "capacity", Integer.toString(_capacity),
+                "created", Long.toString(_created),
+                "group", _group,
                 "motd", _motd,
-                "tps", Double.toString(_tps)
+                "players", Integer.toString(_players),
+                "port", Integer.toString(_port),
+                "tps", Double.toString(_tps),
+                "updated", Long.toString(_updated)
         );
     }
 
