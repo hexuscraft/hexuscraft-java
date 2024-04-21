@@ -4,6 +4,8 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 ## Redis Data
 
+**WARNING:** These might be oudated. Check source code for up-to-date redis keys and fields
+
 ### HASH punishment.(UUID)
 
 | Field         | Type        |
