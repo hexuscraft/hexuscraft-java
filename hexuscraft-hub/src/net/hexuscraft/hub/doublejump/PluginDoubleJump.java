@@ -36,7 +36,7 @@ public class PluginDoubleJump extends MiniPlugin<Hub> {
         player.setFlying(false);
         player.setAllowFlight(false);
 
-        player.setVelocity(player.getEyeLocation().toVector().normalize().multiply(0.5).setY(0.5));
+        player.setVelocity(player.getLocation().getDirection().setY(1));
         player.playSound(player.getLocation(), Sound.GHAST_FIREBALL, 1000000, 1);
     }
 
