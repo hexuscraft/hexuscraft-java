@@ -6,7 +6,6 @@ import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.disguise.DisguiseEvent;
 import net.hexuscraft.core.item.UtilItem;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
@@ -51,7 +50,6 @@ public class PluginPlayer extends MiniPlugin<Hub> {
     }
 
     private PluginCommand _pluginCommand;
-    private PluginPermission _pluginPermission;
     private PluginPortal _pluginPortal;
     private PluginDatabase _pluginDatabase;
 
@@ -75,7 +73,6 @@ public class PluginPlayer extends MiniPlugin<Hub> {
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
-        _pluginPermission = (PluginPermission) dependencies.get(PluginPermission.class);
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
     }
