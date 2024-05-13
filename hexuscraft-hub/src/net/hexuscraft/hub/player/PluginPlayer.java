@@ -9,7 +9,6 @@ import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.item.UtilItem;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.permission.PluginPermission;
 import net.hexuscraft.core.player.PlayerTabInfo;
 import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
@@ -136,11 +135,6 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         inventory.setItem(7, shopEmerald);
         inventory.setItem(8, lobbyClock);
         inventory.setHeldItemSlot(0);
-    }
-
-    @EventHandler
-    private void onDisguise(final DisguiseEvent event) {
-        refreshInventory(event._player);
     }
 
     private void onItemInteract(final Player player, final ItemStack itemStack) {
