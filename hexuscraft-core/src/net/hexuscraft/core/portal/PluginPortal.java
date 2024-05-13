@@ -167,17 +167,12 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
 
         final JedisPooled jedis = _pluginDatabase.getJedisPooled();
         final Server server = _plugin.getServer();
-        final BukkitScheduler scheduler = server.getScheduler();
+        final OptionalDouble averageTps = Arrays.stream(MinecraftServer.getServer().recentTps).average();
 
-        final double[] recentTps = MinecraftServer.getServer().recentTps;
-        final OptionalDouble averageTps = Arrays.stream(recentTps).average();
-
-        // Server ping event here so other mini-plugins can handle this data, such as not showing vanished players.
-        // Also its not possible to change some of these without nms. And that's scary. And breaks.
         final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress("127.0.0.1", 0).getAddress(), "", 0, 0);
         server.getPluginManager().callEvent(ping);
 
-        _updateTask = scheduler.runTaskTimerAsynchronously(_plugin, () -> new ServerData(
+        _updateTask = server.getScheduler().runTaskTimerAsynchronously(_plugin, () -> new ServerData(
                 _serverName,
 
                 server.getIp(),
@@ -202,9 +197,25 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
         _updateTask.cancel();
         _updateTask = null;
 
-        try {
-            _pluginDatabase.getJedisPooled().sadd("deadservers", _serverName);
-        } catch(Exception ignored) {}
+        final JedisPooled jedis = _pluginDatabase.getJedisPooled();
+        final Server server = _plugin.getServer();
+
+        final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress("127.0.0.1", 0).getAddress(), "", 0, 0);
+        server.getPluginManager().callEvent(ping);
+
+        new ServerData(
+                _serverName,
+
+                server.getIp(),
+                server.getMaxPlayers(),
+                _created,
+                _serverGroup,
+                ping.getMotd(),
+                ping.getNumPlayers(),
+                server.getPort(),
+                0,
+                System.currentTimeMillis()
+        ).update(jedis);
     }
     
     @Override
