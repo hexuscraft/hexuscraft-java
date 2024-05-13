@@ -86,7 +86,7 @@ public class CommandPunish extends BaseCommand {
         ItemStack client3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "30 Days Ban", "Severity 3","Heavy client offense","","Refer to guidelines for details.");
 
         ItemStack miscHeader = UtilItem.createItem(Material.LEVER, C.cBlue + C.fBold + "Miscellaneous");
-        ItemStack miscWarn = UtilItem.createItem(Material.PAPER, C.cYellow + C.fBold + "Warning", "Severity 1","A friendly waring","","Refer to guidelines for details.");
+        ItemStack miscWarn = UtilItem.createItem(Material.PAPER, C.cGreen + C.fBold + "Warning", "Severity 1","A friendly waring","","Refer to guidelines for details.");
         ItemStack miscMute = UtilItem.createItem(Material.BOOK, C.cRed + C.fBold + "Permanent Mute", "Severity 4","Severe chat offense","","Refer to guidelines for details.");
         ItemStack miscBan = UtilItem.createItem(Material.REDSTONE_BLOCK, C.cRed + C.fBold + "Permanent Ban", "Severity 4","Severe gameplay/client offense","","Refer to guidelines for details.");
 
