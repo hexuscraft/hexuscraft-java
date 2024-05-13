@@ -2,6 +2,8 @@
 
 Plugins for the Hexuscraft server on Minecraft Java Edition
 
+Start and kill scripts: https://github.com/hexuscraft/hexuscraft-scripts
+
 ## Redis Data
 
 **WARNING:** These might be oudated. Check source code for up-to-date redis keys and fields
