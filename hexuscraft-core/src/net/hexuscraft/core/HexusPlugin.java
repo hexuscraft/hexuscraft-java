@@ -29,13 +29,16 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
 
     private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPluginClassMap;
 
+    private final boolean _isDebug;
+
     public HexusPlugin() {
         _miniPluginClassMap = new HashMap<>();
+        _isDebug = new File("_debug.dat").isFile();
     }
 
     @Override
     public final void onLoad() {
-//        long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
         require(new PluginAntiCheat(this));
         require(new PluginAuthentication(this));
@@ -57,41 +60,44 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
         require(new PluginReport(this));
         require(new PluginScoreboard(this));
 
-//        log("Core plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
+        if (_isDebug)
+            log("Core plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
 
         load();
 
-//        log("Local plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
+        if (_isDebug)
+           log("Local plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
 
         _miniPluginClassMap.values().forEach(miniPlugin -> miniPlugin.load(_miniPluginClassMap));
 
-//        log("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
+        if (_isDebug)
+          log("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
     public final void onEnable() {
-//        long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
         enable();
         _miniPluginClassMap.values().forEach(MiniPlugin::enable);
 
-//        log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
+        if (_isDebug)
+            log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
     public final void onDisable() {
-//        long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
         disable();
         _miniPluginClassMap.values().forEach(MiniPlugin::disable);
         _miniPluginClassMap.clear();
 
-//        log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
+        if (_isDebug)
+          log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public final void require(MiniPlugin<? extends HexusPlugin> miniPlugin) {
-        // Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap
-
         //noinspection unchecked
         _miniPluginClassMap.put((Class<? extends MiniPlugin<? extends HexusPlugin>>) miniPlugin.getClass(), miniPlugin);
     }
