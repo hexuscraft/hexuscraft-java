@@ -18,7 +18,7 @@ public class CommandNetStatGroupCreate extends BaseCommand {
     private final PluginDatabase _pluginDatabase;
 
     CommandNetStatGroupCreate(final PluginNetStat pluginNetStat, final PluginDatabase pluginDatabase) {
-        super(pluginNetStat, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE>", "Create a server group.", Set.of("c", "add", "a"), PluginNetStat.PERM.COMMAND_NETSTAT_GROUP_CREATE);
+        super(pluginNetStat, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE>, [Games]", "Create a server group.", Set.of("c", "add", "a"), PluginNetStat.PERM.COMMAND_NETSTAT_GROUP_CREATE);
         _pluginDatabase = pluginDatabase;
     }
 
@@ -42,7 +42,7 @@ public class CommandNetStatGroupCreate extends BaseCommand {
 
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length != 11) {
+        if (args.length < 11 || args.length > 12) {
             sender.sendMessage(help(alias));
             return;
         }
@@ -58,6 +58,7 @@ public class CommandNetStatGroupCreate extends BaseCommand {
         final int ram;
         final int capacity;
         final boolean worldEdit;
+        final String[] games;
 
         try {
             name = args[0];
@@ -142,13 +143,18 @@ public class CommandNetStatGroupCreate extends BaseCommand {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "World Edit", "Must be TRUE or FALSE");
             }
 
+            if (args.length == 11)
+                games = new String[0];
+            else
+                games = args[11].split(",");
+
         } catch (InvalidNetStatGroupCreateArgumentException ex) {
             sender.sendMessage(ex.constructMessage());
             return;
         }
 
         final JedisPooled jedis = _pluginDatabase.getJedisPooled();
-        final ServerGroupData groupData = new ServerGroupData(name, requiredPermission.name(), minPort, maxPort, totalServers, joinableServers, plugin, worldZip, ram, capacity, worldEdit);
+        final ServerGroupData groupData = new ServerGroupData(name, requiredPermission.name(), minPort, maxPort, totalServers, joinableServers, plugin, worldZip, ram, capacity, worldEdit, games);
         groupData.update(jedis);
 
         sender.sendMessage(F.fMain(this, "Created server group '", F.fItem(name), "':\n", F.fList(List.of(
@@ -162,7 +168,8 @@ public class CommandNetStatGroupCreate extends BaseCommand {
                 "World Zip: " + F.fItem(worldZip),
                 "Ram: " + F.fItem(Integer.toString(ram)),
                 "Capacity: " + F.fItem(Integer.toString(capacity)),
-                "World Edit: " + F.fItem(Boolean.toString(worldEdit))
+                "World Edit: " + F.fItem(Boolean.toString(worldEdit)),
+                "Games: " + F.fList(games)
         ))));
     }
 
