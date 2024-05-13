@@ -19,6 +19,7 @@ public class ServerGroupData {
     public final String _worldZip;
     public final int _ram;
     public final int _capacity;
+    public final boolean _worldEdit;
 
     public ServerGroupData(final String name, final Map<String, String> serverGroupData) {
         _name = name;
@@ -32,11 +33,12 @@ public class ServerGroupData {
         _worldZip = serverGroupData.getOrDefault("worldZip", "");
         _ram = Integer.parseInt(serverGroupData.getOrDefault("ram", "512"));
         _capacity = Integer.parseInt(serverGroupData.getOrDefault("capacity", "20"));
+        _worldEdit = Boolean.parseBoolean(serverGroupData.getOrDefault("worldEdit", "FALSE"));
     }
 
     public ServerGroupData(final String name, final String requiredPermission,
                            final int minPort, final int maxPort, final int totalServers, final int joinableServers,
-                           final String plugin, final String worldZip, final int ram, final int capacity) {
+                           final String plugin, final String worldZip, final int ram, final int capacity, final boolean worldEdit) {
         _name = name;
 
         _requiredPermission = requiredPermission;
@@ -48,6 +50,7 @@ public class ServerGroupData {
         _worldZip = worldZip;
         _ram = ram;
         _capacity = capacity;
+        _worldEdit = worldEdit;
     }
 
     public final Map<String, String> toMap() {
@@ -60,7 +63,8 @@ public class ServerGroupData {
                 "plugin", _plugin,
                 "worldZip", _worldZip,
                 "ram", Integer.toString(_ram),
-                "capacity", Integer.toString(_capacity)
+                "capacity", Integer.toString(_capacity),
+                "worldEdit", Boolean.toString(_worldEdit)
         ));
     }
 

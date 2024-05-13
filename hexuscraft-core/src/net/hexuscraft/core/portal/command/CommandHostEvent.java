@@ -74,7 +74,7 @@ public class CommandHostEvent extends BaseCommand {
                 sender.sendMessage(F.fMain(this, "Creating server group..."));
                 final ServerGroupData groupData = new ServerGroupData("EVENT", PermissionGroup.MEMBER.name(),
                         30050, 30051, 1, 0,
-                        "Arcade.jar", "Lobby_Arcade.zip", 512, 40);
+                        "Arcade.jar", "Lobby_Arcade.zip", 512, 40, false);
                 groupData.update(jedis);
                 sender.sendMessage(F.fMain(this, "Waiting for your server to start..."));
             } catch (Exception e) {

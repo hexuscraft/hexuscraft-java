@@ -76,7 +76,7 @@ public class CommandHostServer extends BaseCommand {
                 final int port = ThreadLocalRandom.current().nextInt(50000, 51000);
                 final ServerGroupData groupData = new ServerGroupData(sender.getName(), PermissionGroup.MEMBER.name(),
                         port - 1, port, 1, 0,
-                        "Arcade.jar", "Lobby_Arcade.zip", 512, 40);
+                        "Arcade.jar", "Lobby_Arcade.zip", 512, 40, false);
                 groupData.update(jedis);
                 sender.sendMessage(F.fMain(this, "Waiting for your server to start..."));
             } catch (Exception e) {

@@ -25,10 +25,6 @@ public class ServerQueries {
         return Database.buildQuery("motd");
     }
 
-    public static String DEADSERVERS() {
-        return Database.buildQuery("deadservers");
-    }
-
     public static ServerData getServer(final JedisPooled jedis, final String name) {
         final Map<String, String> dataMap = jedis.hgetAll(SERVER(name));
         if (dataMap.isEmpty()) return null;
@@ -53,10 +49,6 @@ public class ServerQueries {
 
     public static ServerData[] getServers(final JedisPooled jedis, final ServerGroupData serverGroupData) {
         return getServers(jedis, serverGroupData._name);
-    }
-
-    public static Set<String> getDeadServers(final JedisPooled jedis) {
-        return jedis.smembers(DEADSERVERS());
     }
 
     public static Map<String, ServerData> getServersAsMap(final JedisPooled jedis) {

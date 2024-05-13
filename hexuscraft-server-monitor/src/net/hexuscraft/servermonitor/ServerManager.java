@@ -8,6 +8,7 @@ import redis.clients.jedis.JedisPooled;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class ServerManager {
 
@@ -37,7 +38,7 @@ public class ServerManager {
         }
 
         if (lowestId == 0) {
-            _monitor.log("FATAL: Could not start a server in group " + serverGroupData._name + ": Max Port Reached");
+            _monitor.log("Could not start a server in group " + serverGroupData._name + ": Max Port Reached");
             return;
         }
 
@@ -45,35 +46,39 @@ public class ServerManager {
         _monitor.log("Starting " + serverName + " (" + serverGroupData._ram + " MB): " + reason);
 
         try {
-            new ProcessBuilder(
-//                    "cmd.exe",
-//                    "/c",
-//                    "start",
-                    _path + "/scripts/startServer.cmd",
-                    "127.0.0.1",
-                    "193.110.160.24",
+            final Process process = new ProcessBuilder(
+                    _path + "/Scripts/StartServer.cmd",
+                    serverGroupData._name + "-" + lowestId,
+                    serverGroupData._name,
                     Integer.toString(serverGroupData._minPort + lowestId),
                     Integer.toString(serverGroupData._ram),
-                    serverGroupData._worldZip,
+                    Integer.toString(serverGroupData._capacity),
                     serverGroupData._plugin,
-                    serverGroupData._name,
-                    serverGroupData._name + "-" + lowestId,
-                    "false",
-                    Integer.toString(serverGroupData._capacity)
-            ).start().waitFor();
-            _monitor.log("- Files generated. Waiting for startup...");
+                    serverGroupData._worldZip,
+                    Boolean.toString(serverGroupData._worldEdit)
+            ).start();
+            final boolean finished = process.waitFor(10, TimeUnit.SECONDS);
 
-            final long startMs = System.currentTimeMillis();
-            while (true) {
-                if ((System.currentTimeMillis() - startMs) > 30000L) {
-                    killServer(jedis, serverName, "Slow Start-up");
-                    break;
+            if (!finished) {
+                process.destroy();
+                killServer(jedis, serverName, "Script did not finish");
+                throw new IOException("Aborting as process did not finish in 10 seconds");
+            } else {
+                _monitor.log("- Files generated. Waiting for startup...");
+
+                final long startMs = System.currentTimeMillis();
+                while (true) {
+                    if ((System.currentTimeMillis() - startMs) > 30000L) {
+                        killServer(jedis, serverName, "Slow Start-up");
+                        break;
+                    }
+                    if (ServerQueries.getServer(jedis, serverName) != null) break;
+
+                    //noinspection BusyWait
+                    Thread.sleep(1000L);
                 }
-                if (ServerQueries.getServer(jedis, serverName) != null) break;
-
-                //noinspection BusyWait
-                Thread.sleep(1000L);
             }
+
         } catch (final IOException e) {
             _monitor.log("- Exception while running start process:");
             _monitor.log(e.getMessage(), e);
@@ -81,7 +86,7 @@ public class ServerManager {
             _monitor.log("- Exception while busy-waiting:");
             _monitor.log(e.getMessage(), e);
         } finally {
-            _monitor.log("- Done.");
+            _monitor.log("- Done");
         }
     }
 
@@ -89,16 +94,16 @@ public class ServerManager {
         _monitor.log("Killing " + serverName + ": " + reason);
 
         try {
-            new ProcessBuilder(
-//                    "cmd.exe",
-//                    "/c",
-//                    "start",
+            final Process process = new ProcessBuilder(
                     _path + "/scripts/killServer.cmd",
-                    "127.0.0.1",
-                    "193.110.160.24",
                     serverName
-            ).start().waitFor();
-            _monitor.log("- Files destroyed.");
+            ).start();
+            final boolean finished = process.waitFor(10, TimeUnit.SECONDS);
+
+            if (!finished) {
+                process.destroy();
+                throw new IOException("Aborting as process did not finish in 10 seconds");
+            }
 
             jedis.del(ServerQueries.SERVER(serverName));
         } catch (final IOException ex) {
@@ -108,7 +113,7 @@ public class ServerManager {
             _monitor.log("- Exception while busy-waiting:");
             _monitor.log(ex.getMessage(), ex);
         } finally {
-            _monitor.log("- Done.");
+            _monitor.log("- Done");
         }
     }
 

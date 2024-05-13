@@ -23,7 +23,6 @@ public class ServerMonitor implements Runnable {
 
     private final Map<String, ServerData> _serverDataMap;
     private final Map<String, ServerGroupData> _serverGroupDataMap;
-    private final Set<String> _deadServersSet;
 
     private ServerMonitor() {
         _console = System.console();
@@ -42,7 +41,6 @@ public class ServerMonitor implements Runnable {
 
         _serverDataMap = new HashMap<>();
         _serverGroupDataMap = new HashMap<>();
-        _deadServersSet = new HashSet<>();
 
         new Thread(this).start();
     }
@@ -53,13 +51,6 @@ public class ServerMonitor implements Runnable {
 
     private void tick() {
         final JedisPooled jedis = _database.getJedisPooled();
-
-        _deadServersSet.clear();
-        _deadServersSet.addAll(ServerQueries.getDeadServers(jedis));
-
-        for (String name : _deadServersSet) {
-            _manager.killServer(jedis, name, "Dead");
-        }
 
         _serverDataMap.clear();
         _serverDataMap.putAll(ServerQueries.getServersAsMap(jedis));
