@@ -48,23 +48,21 @@ public enum PermissionGroup {
 
     public final String _prefix;
     public final String _color;
-    public final List<IPermission> _permissions;
     public final PermissionGroup[] _parents;
+    public final List<IPermission> _permissions;
 
-    PermissionGroup(String prefix, String color, PermissionGroup... parents) {
+    PermissionGroup(final String prefix, final String color, final PermissionGroup... parents) {
         _prefix = prefix;
         _color = color;
-        _permissions = new ArrayList<>();
         _parents = parents;
+        _permissions = new ArrayList<>();
     }
 
     public static String[] getColoredNames(boolean skipServerGroups) {
-        List<String> names = new ArrayList<>();
-        for (PermissionGroup group : PermissionGroup.values()) {
-            String groupName = group.name();
-            if (skipServerGroups && groupName.startsWith("_")) {
-                continue;
-            }
+        final List<String> names = new ArrayList<>();
+        for (final PermissionGroup group : PermissionGroup.values()) {
+            final String groupName = group.name();
+            if (skipServerGroups && groupName.startsWith("_")) continue;
             names.add(group._color + groupName);
         }
         return names.toArray(new String[0]);
