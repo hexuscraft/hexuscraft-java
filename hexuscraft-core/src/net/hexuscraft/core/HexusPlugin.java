@@ -8,7 +8,6 @@ import net.hexuscraft.core.combat.PluginCombat;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.cooldown.PluginCooldown;
 import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.disguise.PluginDisguise;
 import net.hexuscraft.core.entity.PluginEntity;
 import net.hexuscraft.core.gamemode.PluginGameMode;
 import net.hexuscraft.core.item.PluginItem;
@@ -48,7 +47,6 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
         require(new PluginCommand(this));
         require(new PluginCooldown(this));
         require(new PluginDatabase(this));
-        require(new PluginDisguise(this));
         require(new PluginEntity(this));
         require(new PluginGameMode(this));
         require(new PluginItem(this));
