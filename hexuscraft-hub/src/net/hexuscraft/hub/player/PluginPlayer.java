@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
@@ -82,7 +83,7 @@ public class PluginPlayer extends MiniPlugin<Hub> {
     @Override
     public void onEnable() {
         _pluginCommand.register(new CommandSpawn(this));
-        _actionTextTask.runTaskTimer(_plugin, 0, 20);
+        _actionTextTask.runTaskTimer(_plugin, 0, 40);
     }
 
     @Override
@@ -92,6 +93,8 @@ public class PluginPlayer extends MiniPlugin<Hub> {
 
     @EventHandler
     private void onPlayerJoin(final PlayerJoinEvent event) {
+        event.setJoinMessage(null);
+
         final Player player = event.getPlayer();
         player.setFallDistance(0);
         player.setFlying(false);
@@ -106,14 +109,18 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         player.setFoodLevel(20);
         player.setExhaustion(0);
         player.setExp(0);
-        player.teleport(_plugin._spawn);
+
+        if (_plugin._spawn != null)
+            player.teleport(_plugin._spawn);
 
         refreshInventory(player);
 
-        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), "");
+        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), " ");
+    }
 
-        final PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
-        event.setJoinMessage(F.fSub("Join", F.fPermissionGroup(primaryGroup, true).toUpperCase(), " ", F.fItem(player.getName())));
+    @EventHandler(priority = EventPriority.LOWEST)
+    void onPlayerQuit(final PlayerQuitEvent event) {
+        event.setQuitMessage(null);
     }
 
     private void refreshInventory(Player player) {
@@ -254,13 +261,6 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         });
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    void onPlayerQuit(final PlayerQuitEvent event) {
-        final Player player = event.getPlayer();
-        PermissionGroup primaryGroup = _pluginPermission._primaryGroupMap.get(player);
-        event.setQuitMessage(F.fSub("Quit", F.fPermissionGroup(primaryGroup, true).toUpperCase(), " ", F.fItem(player.getName())));
-    }
-
     @EventHandler
     void onEntityDamage(final EntityDamageEvent event) {
         Entity entity = event.getEntity();
@@ -317,6 +317,12 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         if (currentItem == null) return;
 
         onItemInteract(player, currentItem);
+    }
+
+    @EventHandler
+    public void onEntityTargetLivingEntity(final EntityTargetLivingEntityEvent event) {
+        if (!(event.getTarget() instanceof Player)) return;
+        event.setCancelled(true);
     }
 
 }

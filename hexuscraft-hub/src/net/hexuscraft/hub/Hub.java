@@ -16,7 +16,7 @@ import java.util.Scanner;
 
 public class Hub extends HexusPlugin {
 
-    public Location _spawn = new Location(null, 0, 100, 0, 0, 0);
+    public Location _spawn = null;
 
     @Override
     public final void load() {
@@ -33,9 +33,10 @@ public class Hub extends HexusPlugin {
     @EventHandler
     public final void onWorldLoad(final WorldLoadEvent event) {
         final World world = event.getWorld();
+        log("WORLD NAME: '" + world.getName() + "'");
         if (!world.getName().equals("world")) return;
 
-        _spawn = new Location(world, 0, 0, 0, 0, 0);
+        _spawn = new Location(world, 0, 100, 0, 0, 0);
 
         try {
             final Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_spawn.dat").toFile());
