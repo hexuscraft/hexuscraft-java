@@ -132,10 +132,10 @@ public class CommandNetStatGroupCreate extends BaseCommand {
             try {
                 capacity = Integer.parseInt(args[9]);
             } catch (NumberFormatException ex) {
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Ram", "Invalid or unrecognised integer");
+                throw new InvalidNetStatGroupCreateArgumentException(this, "Capacity", "Invalid or unrecognised integer");
             }
-            if (capacity < 1)
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Ram", "Number too small (must be greater than 0)");
+            if (capacity < 0)
+                throw new InvalidNetStatGroupCreateArgumentException(this, "Capacity", "Number too small (must be greater than or equal to 0)");
 
             try {
                 worldEdit = Boolean.parseBoolean(args[10]);
