@@ -189,10 +189,9 @@ public class Proxy {
         if (lobbyServers.length == 0) {
             player.disconnect(Component.text()
                     .color(NamedTextColor.RED)
-                    .append(Component.text("There are currently no lobby servers available.\n"))
-                    .append(Component.text("Please try again later.", NamedTextColor.GRAY))
-                    .append(Component.text(".\n\n"))
-                    .append(Component.text("www.hexuscraft.net", NamedTextColor.YELLOW))
+                    .append(Component.text("There are currently no lobby servers available."))
+                    .append(Component.text("\nPlease try again later.", NamedTextColor.GRAY))
+                    .append(Component.text("\n\nwww.hexuscraft.net", NamedTextColor.YELLOW))
                     .build());
             return;
         }
