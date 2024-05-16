@@ -2,58 +2,77 @@
 
 Plugins for the Hexuscraft server on Minecraft Java Edition
 
-Start and kill scripts: https://github.com/hexuscraft/hexuscraft-scripts
+> **hexuscraft-server-monitor** scripts: https://github.com/hexuscraft/hexuscraft-scripts
 
-## Redis Data
+## Redis Keys
 
-**WARNING:** These might be oudated. Check source code for up-to-date redis keys and fields
+### Server Groups
 
-### HASH punishment.(UUID)
+> **HASH** `servergroup.(String)`
+> 
+> | Field              | Type                                    |
+> |--------------------|-----------------------------------------|
+> | requiredPermission | **String** (PermissionGroup Enum)       |
+> | maxPort            | **Integer**                             |
+> | minPort            | **Integer**                             |
+> | totalServers       | **Integer**                             |
+> | joinableServers    | **Integer**                             |
+> | plugin             | **String**                              |
+> | worldZip           | **String**                              |
+> | capacity           | **Integer**                             |
+> | worldEdit          | **Boolean**                             |
+> | games              | **String** (Game Enums split by commas) |
 
-| Field         | Type        |
-|---------------|-------------|
-| reason        | **String**  |
-| origin        | **Long**    |
-| active        | **Boolean** |
-| staffServer   | **String**  |
-| staffUuid     | **UUID**    |
-| server        | **String**  |
-| removeOrigin  | **Long**    |
-| removeStaff   | **UUID**    | 
-| removeReason  | **String**  | 
+### Servers
 
-### HASH servergroup.(String)
+> **HASH** `server.(String)`
+>
+> | Field    | Type              |
+> |----------|-------------------|
+> | address  | **String** (IPv4) |
+> | capacity | **Integer**       |
+> | created  | **Long**          |
+> | group    | **String**        |
+> | motd     | **String**        |
+> | players  | **Integer**       |
+> | port     | **Integer**       |
+> | tps      | **Double**        |
+> | updated  | **Long**          |
 
-| Field           | Type                          |
-|-----------------|-------------------------------|
-| joinableServers | **Integer**                   |
-| maxPort         | **Integer**                   |
-| minPort         | **Integer**                   |
-| totalServers    | **Integer**                   |
-| type            | **String** (DEDICATED, PROXY) |
+### Permissions
 
-### HASH server.(String)
+> **STRING** `user.(UUID).permission.primary`
+>
+> - PermissionGroup Enum
 
-| Field    | Type                         |
-|----------|------------------------------|
-| address  | **String**                   |
-| capacity | **Integer**                  |
-| group    | **String** (servergroup.###) |
-| players  | **Integer**                  |
-| port     | **Integer**                  |
-| updated  | **Long**                     |
+> **SET** `user.(UUID).permission.groups`
+>
+> - PermissionGroup Enum 
 
-### SET user.(UUID).punishments
+### Punishments
 
-- UUID
+> **HASH** `punishment.(UUID)`
+> 
+> | Field             | Type                         |
+> |-------------------|------------------------------|
+> | type              | **String** (PunishType Enum) |
+> | active            | **Boolean**                  |
+> | origin            | **Long**                     |
+> | length            | **Long**                     |
+> | reason            | **String**                   |
+> | server            | **String**                   |
+> | staffId           | **String** (UUID)            |
+> | staffServer       | **String**                   |
+> | removeOrigin      | **Long**                     |
+> | removeReason      | **String**                   |
+> | removeServer      | **String**                   |
+> | removeStaffId     | **String** (UUID)            |
+> | removeStaffServer | **String**                   | 
 
-### STRING user.(UUID).permission.primary
+>  **SET** `user.(UUID).punishments`
+> - `(UUID)` of redis keys `punishment.(UUID)`
 
-- Rank Enum
+### Motd
 
-### SET user.(UUID).permission.additional
+> **STRING** `motd`
 
-- Rank Enum
-
-### STRING motd
-- *Anything*
