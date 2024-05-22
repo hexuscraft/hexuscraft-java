@@ -94,4 +94,5 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 ### Motd
 
 > **STRING** `motd`
-
+> - Changes the **bottom** line of the proxy's MOTD.
+> - The top line is set by `MOTD_PREFIX` located in `hexuscraft-proxy/src/net/hexuscraft/proxy/Proxy.java`
