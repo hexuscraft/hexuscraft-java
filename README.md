@@ -4,6 +4,25 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 > **hexuscraft-server-monitor** scripts: https://github.com/hexuscraft/hexuscraft-scripts
 
+## Enums
+
+### PermissionGroup
+
+- QUALITY_ASSURANCE
+- EVENT_MOD
+- EVENT_LEAD
+- MEMBER
+- VIP
+- MVP
+- MEDIA
+- BUILDER
+- SENIOR_BUILDER
+- TRAINEE
+- MODERATOR
+- SENIOR_MODERATOR
+- ADMINISTRATOR
+- DEVELOPER
+
 ## Redis Keys
 
 ### Server Groups
