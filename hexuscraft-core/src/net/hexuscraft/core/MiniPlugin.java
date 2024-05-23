@@ -10,47 +10,56 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener {
     public final T _plugin;
     public final String _name;
 
-    protected MiniPlugin(T plugin, String name) {
+    protected MiniPlugin(final T plugin, final String name) {
         _plugin = plugin;
         _name = name;
 
-//        log("Instantiated.");
+        if (plugin._isDebug) log("Instantiated.");
     }
 
-    public void log(String message) {
+    public void log(final String message) {
         _plugin.getLogger().info("[" + _name + "] " + message);
     }
 
-    public final void load(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap) {
-//        log("Initializing...");
-//        long start = System.currentTimeMillis();
+    public final void load(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap) {
+        long start = System.currentTimeMillis();
+        if (_plugin._isDebug) log("Initializing...");
 
         onLoad(miniPluginClassMap);
 
-//        log("Initialized in " + (System.currentTimeMillis() - start) + "ms.");
+        long finish = System.currentTimeMillis();
+        if (finish - start > 2000L)
+            log("WARNING: Took " + (System.currentTimeMillis() - start) + "ms to enable. (>2s)");
+        if (_plugin._isDebug) log("Initialized in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public final void enable() {
-//        log("Enabling...");
-//        long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
+        if (_plugin._isDebug) log("Enabling...");
 
         _plugin.getServer().getPluginManager().registerEvents(this, _plugin);
         onEnable();
 
-//        log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
+        long finish = System.currentTimeMillis();
+        if (finish - start > 2000L)
+            log("WARNING: Took " + (System.currentTimeMillis() - start) + "ms to enable. (>2s)");
+        if (_plugin._isDebug) log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public final void disable() {
-//        log("Disabling...");
-//        long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
+        if (_plugin._isDebug) log("Disabling...");
 
         HandlerList.unregisterAll(this);
         onDisable();
 
-//        log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
+        long finish = System.currentTimeMillis();
+        if (finish - start > 2000L)
+            log("WARNING: Took " + (System.currentTimeMillis() - start) + "ms to disable. (>2s)");
+        if (_plugin._isDebug) log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
     }
 
     public void onEnable() {

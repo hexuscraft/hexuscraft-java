@@ -21,6 +21,7 @@ import net.hexuscraft.core.scoreboard.PluginScoreboard;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,11 +29,11 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
 
     private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPluginClassMap;
 
-    private final boolean _isDebug;
+    public final boolean _isDebug;
 
     public HexusPlugin() {
         _miniPluginClassMap = new HashMap<>();
-        _isDebug = new File("_debug.dat").isFile();
+        _isDebug = new File("_debug.dat").isFile() || new File("../_debug.dat").isFile();
     }
 
     @Override
@@ -95,12 +96,15 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
           log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void require(MiniPlugin<? extends HexusPlugin> miniPlugin) {
+    public final void require(final MiniPlugin<? extends HexusPlugin> miniPlugin) {
+        if (_isDebug)
+            log("Instantiating " + miniPlugin._name + "...");
+
         //noinspection unchecked
         _miniPluginClassMap.put((Class<? extends MiniPlugin<? extends HexusPlugin>>) miniPlugin.getClass(), miniPlugin);
     }
 
-    public final void log(String message) {
+    public final void log(final String message) {
         getLogger().info(message);
     }
 
