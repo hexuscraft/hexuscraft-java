@@ -80,7 +80,7 @@ public class PluginDatabase extends MiniPlugin<HexusPlugin> {
     @Override
     public void onDisable() {
         _callbacks.clear();
-        _asyncMessageTask.cancel();
+        if (_asyncMessageTask != null) _asyncMessageTask.cancel();
     }
 
     public JedisPooled getJedisPooled() {
