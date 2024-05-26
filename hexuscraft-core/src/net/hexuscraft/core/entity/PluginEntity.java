@@ -68,7 +68,7 @@ public class PluginEntity extends MiniPlugin<HexusPlugin> {
                 final EntityMoveEvent event = new EntityMoveEvent(entity, from, to);
                 _plugin.getServer().getPluginManager().callEvent(event);
                 if (event.isCancelled()) {
-                    entity.teleport(event._from);
+                    entity.teleport(event.getFrom());
                     return;
                 }
             }
@@ -235,6 +235,13 @@ public class PluginEntity extends MiniPlugin<HexusPlugin> {
     public final int purge() {
         // TODO
         return 0;
+    }
+
+    @EventHandler
+    public void onEntityMove(final EntityMoveEvent event) {
+        if (!event.getEntity().hasMetadata("NPC")) return;
+        if (!event.isHorizontal(false)) return;
+        event.setCancelled(true);
     }
 
 }
