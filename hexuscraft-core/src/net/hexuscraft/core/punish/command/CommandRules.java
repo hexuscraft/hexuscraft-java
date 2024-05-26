@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class CommandRules extends BaseCommand<HexusPlugin> {
 
-    public CommandRules(MiniPlugin plugin) {
+    public CommandRules(MiniPlugin<HexusPlugin> plugin) {
         super(plugin, "rules", "", "View our server rules.", Set.of(), PluginPunish.PERM.COMMAND_RULES);
     }
 
