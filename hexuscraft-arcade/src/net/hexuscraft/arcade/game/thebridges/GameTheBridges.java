@@ -1,4 +1,4 @@
-package net.hexuscraft.arcade.game.bridge;
+package net.hexuscraft.arcade.game.thebridges;
 
 import net.hexuscraft.arcade.game.Game;
 import net.hexuscraft.arcade.game.GameTeam;
