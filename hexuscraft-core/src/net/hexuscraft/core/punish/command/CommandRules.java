@@ -11,12 +11,12 @@ import java.util.Set;
 
 public class CommandRules extends BaseCommand<HexusPlugin> {
 
-    public CommandRules(MiniPlugin<HexusPlugin> plugin) {
+    public CommandRules(final MiniPlugin<HexusPlugin> plugin) {
         super(plugin, "rules", "", "View our server rules.", Set.of(), PluginPunish.PERM.COMMAND_RULES);
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public final void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 0) {
             sender.sendMessage(help(alias));
             return;
