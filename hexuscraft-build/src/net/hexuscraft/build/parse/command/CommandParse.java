@@ -12,6 +12,7 @@ import java.util.Set;
 
 public final class CommandParse extends BaseCommand<Build> {
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final Integer MINIMUM_RADIUS = 1;
 
     private static final class ExInvalidSender extends Exception {
