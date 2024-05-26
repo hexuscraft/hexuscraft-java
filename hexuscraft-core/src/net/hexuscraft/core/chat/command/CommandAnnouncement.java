@@ -38,7 +38,7 @@ public class CommandAnnouncement extends BaseCommand<HexusPlugin> {
         }
 
         List<String> messageList = new ArrayList<>(Arrays.stream(args).toList());
-        messageList.remove(0);
+        messageList.removeFirst();
         _pluginDatabase.getJedisPooled().publish(((PluginChat) _miniPlugin).CHANNEL_ANNOUNCEMENT, sender.getName() + "," + permissionGroup.name() + "," + String.join(" ", messageList));
         sender.sendMessage(F.fMain(this) + "Message has been broadcast.");
     }
