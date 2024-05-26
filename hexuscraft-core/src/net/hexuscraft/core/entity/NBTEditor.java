@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
  * @author BananaPuncher714
  * @version 7.18.5
  */
+@SuppressWarnings("ALL")
 public final class NBTEditor {
     private static final Map<String, Class<?>> classCache;
     private static final Map<String, Method> methodCache;
