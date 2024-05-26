@@ -34,8 +34,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import redis.clients.jedis.JedisPooled;
 
@@ -52,21 +52,12 @@ public class PluginPlayer extends MiniPlugin<Hub> {
     private PluginPortal _pluginPortal;
     private PluginDatabase _pluginDatabase;
 
-    private final BukkitRunnable _actionTextTask;
+    private BukkitTask _actionTextTask;
 
     public PluginPlayer(final Hub hub) {
         super(hub, "Player");
 
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SPAWN);
-
-        _actionTextTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                _plugin.getServer()
-                        .getOnlinePlayers()
-                        .forEach(player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET"));
-            }
-        };
     }
 
     @Override
@@ -79,12 +70,16 @@ public class PluginPlayer extends MiniPlugin<Hub> {
     @Override
     public void onEnable() {
         _pluginCommand.register(new CommandSpawn(this));
-        _actionTextTask.runTaskTimer(_plugin, 0, 40);
+        _actionTextTask = _plugin.getServer().getScheduler().runTaskTimer(_plugin, () -> {
+            _plugin.getServer()
+                    .getOnlinePlayers()
+                    .forEach(player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET"));
+        }, 0, 40);
     }
 
     @Override
     public void onDisable() {
-        _actionTextTask.cancel();
+        if (_actionTextTask != null) _actionTextTask.cancel();
     }
 
     @EventHandler
