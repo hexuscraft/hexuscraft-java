@@ -44,7 +44,7 @@ public final class CommandParse extends BaseCommand<Build> {
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
         try {
-            runLogic(sender, alias, args);
+            runLogic(sender, args);
         } catch (final ExInvalidSender ex) {
             sender.sendMessage(F.fMain(this, F.fError("Only players can execute this command.")));
         } catch (final ExInvalidRadius ex) {
@@ -57,7 +57,7 @@ public final class CommandParse extends BaseCommand<Build> {
         }
     }
 
-    private void runLogic(final CommandSender sender, final String alias, final String[] args)
+    private void runLogic(final CommandSender sender, final String[] args)
             throws ExInvalidRadius, ExInvalidSender, ExInvalidWorld, ExRadiusTooSmall {
         if (!(sender instanceof Player player)) {
             throw new ExInvalidSender();
