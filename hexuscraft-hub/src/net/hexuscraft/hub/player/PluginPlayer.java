@@ -70,11 +70,9 @@ public class PluginPlayer extends MiniPlugin<Hub> {
     @Override
     public void onEnable() {
         _pluginCommand.register(new CommandSpawn(this));
-        _actionTextTask = _plugin.getServer().getScheduler().runTaskTimer(_plugin, () -> {
-            _plugin.getServer()
-                    .getOnlinePlayers()
-                    .forEach(player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET"));
-        }, 0, 40);
+        _actionTextTask = _plugin.getServer().getScheduler().runTaskTimer(_plugin, () -> _plugin.getServer()
+                .getOnlinePlayers()
+                .forEach(player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET")), 0, 40);
     }
 
     @Override
