@@ -194,8 +194,7 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
 
         _callbacks.clear();
 
-        _updateTask.cancel();
-        _updateTask = null;
+        if (_updateTask != null) _updateTask.cancel();
 
         final JedisPooled jedis = _pluginDatabase.getJedisPooled();
         final Server server = _plugin.getServer();
