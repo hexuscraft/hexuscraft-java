@@ -1,5 +1,6 @@
 package net.hexuscraft.core.permission.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.permission.PermissionGroup;
@@ -9,7 +10,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.Set;
 
-public class CommandRankList extends BaseCommand {
+public class CommandRankList extends BaseCommand<HexusPlugin> {
 
     CommandRankList(PluginPermission pluginPermission) {
         super(pluginPermission, "list", "", "List all permission groups.", Set.of("l"), PluginPermission.PERM.COMMAND_RANK_LIST);

@@ -1,5 +1,6 @@
 package net.hexuscraft.core.buildversion.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.buildversion.PluginBuildVersion;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
@@ -9,7 +10,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import java.util.Map;
 import java.util.Set;
 
-public class CommandBuildVersion extends BaseCommand {
+public class CommandBuildVersion extends BaseCommand<HexusPlugin> {
 
     public CommandBuildVersion(final PluginBuildVersion plugin) {
         super(plugin, "buildversion", "", "View information about the current plugin.", Set.of("bv"), PluginBuildVersion.PERM.COMMAND_BUILDVERSION);

@@ -1,5 +1,6 @@
 package net.hexuscraft.core.portal.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
@@ -19,7 +20,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CommandHostServer extends BaseCommand {
+public class CommandHostServer extends BaseCommand<HexusPlugin> {
 
     private final PluginDatabase _pluginDatabase;
 

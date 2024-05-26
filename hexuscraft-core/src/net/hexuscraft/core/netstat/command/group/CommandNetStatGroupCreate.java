@@ -1,5 +1,6 @@
 package net.hexuscraft.core.netstat.command.group;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandNetStatGroupCreate extends BaseCommand {
+public class CommandNetStatGroupCreate extends BaseCommand<HexusPlugin> {
 
     private final PluginDatabase _pluginDatabase;
 

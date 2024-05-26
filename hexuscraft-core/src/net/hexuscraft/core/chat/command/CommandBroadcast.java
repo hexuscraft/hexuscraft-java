@@ -1,5 +1,6 @@
 package net.hexuscraft.core.chat.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.chat.PluginChat;
@@ -9,7 +10,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandBroadcast extends BaseCommand {
+public class CommandBroadcast extends BaseCommand<HexusPlugin> {
 
     public CommandBroadcast(PluginChat pluginChat) {
         super(pluginChat, "s", "<Message>", "Broadcast a server message.", Set.of("broadcast", "bc"), PluginChat.PERM.COMMAND_BROADCAST);

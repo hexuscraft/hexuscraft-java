@@ -1,5 +1,6 @@
 package net.hexuscraft.core.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.permission.IPermission;
@@ -10,18 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public abstract class BaseCommand extends Command {
+public abstract class BaseCommand<T extends HexusPlugin> extends Command {
 
-    public final MiniPlugin _miniPlugin;
-    public final IPermission _permission;
+    public final MiniPlugin<T> _miniPlugin;
 
-    protected BaseCommand(final MiniPlugin miniPlugin, final String name, final String usage, final String description, final Set<String> aliases, final IPermission permission) {
+    protected BaseCommand(final MiniPlugin<T> miniPlugin, final String name, final String usage, final String description, final Set<String> aliases, final IPermission permission) {
         super(name.toLowerCase(), description, usage, aliases.stream().map(String::toLowerCase).toList());
         setPermission(permission.toString());
         setPermissionMessage(F.fInsufficientPermissions());
 
         _miniPlugin = miniPlugin;
-        _permission = permission;
     }
 
     public String help(final String alias) {

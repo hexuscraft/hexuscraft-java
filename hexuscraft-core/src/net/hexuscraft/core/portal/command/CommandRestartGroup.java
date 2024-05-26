@@ -1,5 +1,6 @@
 package net.hexuscraft.core.portal.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.portal.PluginPortal;
@@ -8,7 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandRestartGroup extends BaseCommand {
+public class CommandRestartGroup extends BaseCommand<HexusPlugin> {
 
     PluginPortal _portal;
 

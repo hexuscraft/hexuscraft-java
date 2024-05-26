@@ -1,5 +1,6 @@
 package net.hexuscraft.core.item.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.item.PluginItem;
@@ -12,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandClear extends BaseCommand {
+public class CommandClear extends BaseCommand<HexusPlugin> {
 
     public CommandClear(PluginItem pluginItem) {
         super(pluginItem, "clear", "[Players]", "Clear the inventory of targets.", Set.of("clearinventory"), PluginItem.PERM.COMMAND_CLEAR);

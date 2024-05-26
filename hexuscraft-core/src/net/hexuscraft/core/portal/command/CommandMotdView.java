@@ -1,5 +1,6 @@
 package net.hexuscraft.core.portal.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
@@ -11,7 +12,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandMotdView extends BaseCommand {
+public class CommandMotdView extends BaseCommand<HexusPlugin> {
 
     private final PluginDatabase _pluginDatabase;
 

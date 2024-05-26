@@ -1,5 +1,6 @@
 package net.hexuscraft.core.chat.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.chat.PluginChat;
@@ -13,7 +14,7 @@ import org.bukkit.entity.Player;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CommandSupport extends BaseCommand {
+public class CommandSupport extends BaseCommand<HexusPlugin> {
 
     private final Set<CommandSender> receivedTipSet;
     private final PluginPermission pluginPermission;

@@ -1,5 +1,6 @@
 package net.hexuscraft.core.punish.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandPunish extends BaseCommand {
+public class CommandPunish extends BaseCommand<HexusPlugin> {
 
     public CommandPunish(PluginPunish pluginPunish) {
         super(pluginPunish, "punishment", "<Player> <Reason>", "Open the punishment panel.", Set.of("punish", "x"), PluginPunish.PERM.COMMAND_PUNISH);

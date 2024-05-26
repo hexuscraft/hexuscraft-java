@@ -1,5 +1,6 @@
 package net.hexuscraft.core.punish.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.MojangProfile;
@@ -14,7 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class CommandPunishHistory extends BaseCommand {
+public class CommandPunishHistory extends BaseCommand<HexusPlugin> {
 
     public CommandPunishHistory(PluginPunish pluginPunish) {
         super(pluginPunish, "punishmenthistory", "[Player]", "View the history of punishments.", Set.of("punishhistory", "xh"), PluginPunish.PERM.COMMAND_PUNISH_HISTORY);

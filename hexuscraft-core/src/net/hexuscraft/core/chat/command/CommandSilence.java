@@ -1,5 +1,6 @@
 package net.hexuscraft.core.chat.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.chat.PluginChat;
 import net.hexuscraft.core.command.BaseCommand;
@@ -7,7 +8,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandSilence extends BaseCommand {
+public class CommandSilence extends BaseCommand<HexusPlugin> {
 
     private final PluginChat _pluginChat;
 

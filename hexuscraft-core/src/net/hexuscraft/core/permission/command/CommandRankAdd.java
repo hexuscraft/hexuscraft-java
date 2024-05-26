@@ -1,5 +1,6 @@
 package net.hexuscraft.core.permission.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandRankAdd extends BaseCommand {
+public class CommandRankAdd extends BaseCommand<HexusPlugin> {
 
     final PluginPermission _pluginPermission;
     final PluginDatabase _pluginDatabase;

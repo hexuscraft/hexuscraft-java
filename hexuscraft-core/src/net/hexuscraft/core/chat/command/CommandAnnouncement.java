@@ -1,5 +1,6 @@
 package net.hexuscraft.core.chat.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.chat.PluginChat;
 import net.hexuscraft.core.command.BaseCommand;
@@ -12,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandAnnouncement extends BaseCommand {
+public class CommandAnnouncement extends BaseCommand<HexusPlugin> {
 
     final PluginDatabase _pluginDatabase;
 

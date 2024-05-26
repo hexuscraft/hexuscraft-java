@@ -1,5 +1,6 @@
 package net.hexuscraft.core.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.permission.IPermission;
@@ -10,11 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class BaseMultiCommand extends BaseCommand {
+public class BaseMultiCommand<T extends HexusPlugin> extends BaseCommand<T> {
 
-    private final Set<BaseCommand> _commands;
+    private final Set<BaseCommand<T>> _commands;
 
-    public BaseMultiCommand(MiniPlugin miniPlugin, String name, String description, Set<String> aliases, IPermission permission, Set<BaseCommand> commands) {
+    public BaseMultiCommand(MiniPlugin<T> miniPlugin, String name, String description, Set<String> aliases, IPermission permission, Set<BaseCommand<T>> commands) {
         super(miniPlugin, name, "", description, aliases, permission);
         _commands = commands;
     }
@@ -22,7 +23,7 @@ public class BaseMultiCommand extends BaseCommand {
     @Override
     public final void run(CommandSender sender, String alias, String[] args) {
         if (args.length > 0) {
-            for (BaseCommand command : _commands) {
+            for (BaseCommand<? extends HexusPlugin> command : _commands) {
                 if (!command.isAlias(args[0])) continue;
                 if (!command.testPermission(sender)) return;
                 command.run(sender, alias + " " + args[0], Arrays.copyOfRange(args, 1, args.length));
@@ -32,7 +33,7 @@ public class BaseMultiCommand extends BaseCommand {
 
         StringBuilder builder = new StringBuilder();
         builder.append(help(alias));
-        for (BaseCommand command : _commands) {
+        for (BaseCommand<? extends HexusPlugin> command : _commands) {
             if (!command.testPermissionSilent(sender)) continue;
             builder.append("\n").append(F.fCommand(alias + " " + command.getName(), command));
         }
@@ -42,7 +43,7 @@ public class BaseMultiCommand extends BaseCommand {
     @Override
     public final List<String> tab(CommandSender sender, String alias, String[] args) {
         if (args.length > 1) {
-            for (BaseCommand command : _commands) {
+            for (BaseCommand<? extends HexusPlugin> command : _commands) {
                 if (!command.getName().equals(args[0]) && !command.getAliases().contains(args[0])) continue;
                 if (!command.testPermissionSilent(sender)) break;
 

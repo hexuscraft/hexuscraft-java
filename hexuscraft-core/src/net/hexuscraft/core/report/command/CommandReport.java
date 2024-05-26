@@ -1,5 +1,6 @@
 package net.hexuscraft.core.report.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.permission.PermissionGroup;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandReport extends BaseCommand {
+public class CommandReport extends BaseCommand<HexusPlugin> {
 
     public CommandReport(PluginReport pluginReport) {
         super(pluginReport, "report", "<Player> <Reason>", "Report a player breaking rules.", Set.of(), PluginReport.PERM.COMMAND_REPORT);

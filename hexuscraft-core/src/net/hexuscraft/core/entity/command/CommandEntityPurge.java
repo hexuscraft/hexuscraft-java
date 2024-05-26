@@ -1,5 +1,6 @@
 package net.hexuscraft.core.entity.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.entity.PluginEntity;
@@ -7,7 +8,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandEntityPurge extends BaseCommand {
+public class CommandEntityPurge extends BaseCommand<HexusPlugin> {
 
     final PluginEntity pluginEntity;
 

@@ -1,5 +1,6 @@
 package net.hexuscraft.core.permission.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandRankRemove extends BaseCommand {
+public class CommandRankRemove extends BaseCommand<HexusPlugin> {
 
     final PluginDatabase pluginDatabase;
 
@@ -76,7 +77,8 @@ public class CommandRankRemove extends BaseCommand {
                 }
                 names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
             }
-            case 2 -> names.addAll(Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(s -> !s.startsWith("_")).toList());
+            case 2 ->
+                    names.addAll(Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(s -> !s.startsWith("_")).toList());
         }
         return names;
     }

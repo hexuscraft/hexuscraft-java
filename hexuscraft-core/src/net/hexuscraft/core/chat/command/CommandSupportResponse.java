@@ -1,5 +1,6 @@
 package net.hexuscraft.core.chat.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.chat.PluginChat;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandSupportResponse extends BaseCommand {
+public class CommandSupportResponse extends BaseCommand<HexusPlugin> {
 
     final PluginPermission pluginPermission;
 

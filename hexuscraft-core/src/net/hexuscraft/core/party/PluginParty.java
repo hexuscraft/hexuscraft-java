@@ -3,7 +3,7 @@ package net.hexuscraft.core.party;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
-import net.hexuscraft.core.party.command.PartyCommand;
+import net.hexuscraft.core.party.command.CommandParty;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 
@@ -30,6 +30,6 @@ public class PluginParty extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onEnable() {
-        _pluginCommand.register(new PartyCommand(this));
+        _pluginCommand.register(new CommandParty(this));
     }
 }

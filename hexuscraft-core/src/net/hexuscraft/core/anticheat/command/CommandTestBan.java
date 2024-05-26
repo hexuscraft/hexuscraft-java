@@ -1,5 +1,6 @@
 package net.hexuscraft.core.anticheat.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.anticheat.PluginAntiCheat;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandTestBan extends BaseCommand {
+public class CommandTestBan extends BaseCommand<HexusPlugin> {
 
     private final PluginAntiCheat _antiCheat;
 

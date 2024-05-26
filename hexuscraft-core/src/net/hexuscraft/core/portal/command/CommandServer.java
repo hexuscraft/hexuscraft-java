@@ -1,5 +1,6 @@
 package net.hexuscraft.core.portal.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
@@ -13,7 +14,7 @@ import redis.clients.jedis.JedisPooled;
 
 import java.util.Set;
 
-public class CommandServer extends BaseCommand {
+public class CommandServer extends BaseCommand<HexusPlugin> {
 
     private final PluginPortal _portal;
     private final PluginDatabase _database;

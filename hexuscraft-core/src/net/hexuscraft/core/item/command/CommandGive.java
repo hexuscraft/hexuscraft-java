@@ -1,5 +1,6 @@
 package net.hexuscraft.core.item.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.item.MaterialSearch;
@@ -14,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class CommandGive extends BaseCommand {
+public class CommandGive extends BaseCommand<HexusPlugin> {
 
     public CommandGive(PluginItem itemCenter) {
         super(itemCenter, "give", "<Players> <Item> [Amount] [Enchantment:Level ...]", "Give items to players.", Set.of("g", "item", "i"), PluginItem.PERM.COMMAND_GIVE);

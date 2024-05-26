@@ -1,5 +1,6 @@
 package net.hexuscraft.core.punish.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
@@ -8,7 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandRules extends BaseCommand {
+public class CommandRules extends BaseCommand<HexusPlugin> {
 
     public CommandRules(MiniPlugin plugin) {
         super(plugin, "rules", "", "View our server rules.", Set.of(), PluginPunish.PERM.COMMAND_RULES);

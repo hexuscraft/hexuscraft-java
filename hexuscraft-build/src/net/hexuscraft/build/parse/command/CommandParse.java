@@ -1,15 +1,16 @@
 package net.hexuscraft.build.parse.command;
 
+import net.hexuscraft.build.Build;
+import net.hexuscraft.build.parse.PluginParse;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.build.parse.PluginParse;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandParse extends BaseCommand {
+public final class CommandParse extends BaseCommand<Build> {
 
     private final Integer MINIMUM_RADIUS = 1;
 

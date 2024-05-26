@@ -1,5 +1,6 @@
 package net.hexuscraft.core.gamemode.command;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.gamemode.PluginGameMode;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandGameMode extends BaseCommand {
+public class CommandGameMode extends BaseCommand<HexusPlugin> {
 
     public CommandGameMode(PluginGameMode pluginGameMode) {
         super(pluginGameMode, "gamemode", "[Player]", "Toggle creative mode.", Set.of("gm"), PluginGameMode.PERM.COMMAND_GAMEMODE);
