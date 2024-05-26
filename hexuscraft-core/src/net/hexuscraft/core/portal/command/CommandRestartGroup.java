@@ -4,7 +4,6 @@ import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.portal.PluginPortal;
-import net.hexuscraft.database.queries.ServerQueries;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
