@@ -35,7 +35,7 @@ public class F {
         return fMain(miniPlugin._name, text);
     }
 
-    public static String fMain(final BaseCommand baseCommand, final String... text) {
+    public static String fMain(final BaseCommand<?> baseCommand, final String... text) {
         return fMain(baseCommand._miniPlugin, text);
     }
 
@@ -56,7 +56,7 @@ public class F {
         return fSub(miniPlugin._name, text);
     }
 
-    public static String fSub(final BaseCommand baseCommand, final String... text) {
+    public static String fSub(final BaseCommand<?> baseCommand, final String... text) {
         return fSub(baseCommand._miniPlugin, text);
     }
 
@@ -135,7 +135,7 @@ public class F {
         return fCommand(alias, usage, description, C.cWhite);
     }
 
-    public static String fCommand(final String alias, final BaseCommand command) {
+    public static String fCommand(final String alias, final BaseCommand<?> command) {
         return fCommand(alias, command.getUsage(), command.getDescription());
     }
 
@@ -151,6 +151,7 @@ public class F {
         return RESET + group._color + (bold ? C.fBold : "") + (uppercase ? group._prefix.toUpperCase() : group._prefix) + RESET_GRAY;
     }
 
+    @SuppressWarnings("unused")
     public static String fPermissionGroup(final PermissionGroup group, final boolean uppercase) {
         return fPermissionGroup(group, uppercase, false);
     }
