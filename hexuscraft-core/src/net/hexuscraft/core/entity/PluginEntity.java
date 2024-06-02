@@ -237,11 +237,12 @@ public class PluginEntity extends MiniPlugin<HexusPlugin> {
         return 0;
     }
 
-    @EventHandler
-    public void onEntityMove(final EntityMoveEvent event) {
-        if (!event.getEntity().hasMetadata("NPC")) return;
-        if (!event.isHorizontal(false)) return;
-        event.setCancelled(true);
-    }
+    // TODO: Fix this - it keeps crashing :(
+//    @EventHandler
+//    public void onEntityMove(final EntityMoveEvent event) {
+//        if (!event.getEntity().hasMetadata("NPC")) return;
+//        if (!event.isHorizontal(false)) return;
+//        event.setCancelled(true);
+//    }
 
 }
