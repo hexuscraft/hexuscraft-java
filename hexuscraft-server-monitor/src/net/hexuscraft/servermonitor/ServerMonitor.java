@@ -66,7 +66,7 @@ public class ServerMonitor implements Runnable {
             joinableServersMap.put(serverGroupData, new HashSet<>());
         });
 
-        _serverDataMap.forEach((serverName, serverData) -> {
+        _serverDataMap.values().forEach(serverData -> {
 
             // Kill unresponsive servers
             if ((System.currentTimeMillis() - serverData._updated) > 10000L) {
