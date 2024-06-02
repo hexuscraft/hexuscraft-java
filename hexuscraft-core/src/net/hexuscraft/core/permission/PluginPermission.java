@@ -2,6 +2,7 @@ package net.hexuscraft.core.permission;
 
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
+import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.permission.command.CommandRank;
@@ -100,10 +101,20 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
         if (primaryGroupStr == null) {
             jedis.set(PermissionQueries.PRIMARY(uuidStr), _primaryGroupMap.get(player).name());
         } else {
-            _primaryGroupMap.put(player, PermissionGroup.valueOf(primaryGroupStr));
+            try {
+                _primaryGroupMap.put(player, PermissionGroup.valueOf(primaryGroupStr));
+            } catch(final Exception ex) {
+                player.sendMessage(F.fMain(this, F.fError("Sorry, there was an error parsing your primary permission group. Please contact an administrator if this issue persists.")));
+                log(ex.getMessage());
+            }
         }
 
-        _secondaryGroupsMap.put(player, jedis.smembers(PermissionQueries.GROUPS(uuidStr)).stream().map(PermissionGroup::valueOf).collect(Collectors.toSet()));
+        try {
+            _secondaryGroupsMap.put(player, jedis.smembers(PermissionQueries.GROUPS(uuidStr)).stream().map(PermissionGroup::valueOf).collect(Collectors.toSet()));
+        } catch(final Exception ex) {
+            player.sendMessage(F.fMain(this, F.fError("Sorry, there was an error parsing one or more of your secondary permission groups. Please contact an administrator if this issue persists.")));
+            log(ex.getMessage());
+        }
 
         final PermissionAttachment permissionAttachment = player.addAttachment(_plugin);
         _permissionAttachmentMap.put(player, permissionAttachment);
@@ -128,11 +139,13 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
 
     private void onPlayerQuit(final Player player) {
         player.setOp(false);
-        player.removeAttachment(_permissionAttachmentMap.get(player));
 
+        if (_permissionAttachmentMap.containsKey(player))
+            player.removeAttachment(_permissionAttachmentMap.get(player));
+
+        _permissionAttachmentMap.remove(player);
         _primaryGroupMap.remove(player);
         _secondaryGroupsMap.remove(player);
-        _permissionAttachmentMap.remove(player);
     }
 
     private void setBukkitPermissions(final PermissionAttachment attachment, final boolean toggle) {
