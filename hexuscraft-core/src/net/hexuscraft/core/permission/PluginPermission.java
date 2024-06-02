@@ -105,7 +105,7 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
                 _primaryGroupMap.put(player, PermissionGroup.valueOf(primaryGroupStr));
             } catch(final Exception ex) {
                 player.sendMessage(F.fMain(this, F.fError("Sorry, there was an error parsing your primary permission group. Please contact an administrator if this issue persists.")));
-                log(ex.getMessage());
+                warning(ex.getMessage());
             }
         }
 
@@ -113,7 +113,7 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
             _secondaryGroupsMap.put(player, jedis.smembers(PermissionQueries.GROUPS(uuidStr)).stream().map(PermissionGroup::valueOf).collect(Collectors.toSet()));
         } catch(final Exception ex) {
             player.sendMessage(F.fMain(this, F.fError("Sorry, there was an error parsing one or more of your secondary permission groups. Please contact an administrator if this issue persists.")));
-            log(ex.getMessage());
+            warning(ex.getMessage());
         }
 
         final PermissionAttachment permissionAttachment = player.addAttachment(_plugin);

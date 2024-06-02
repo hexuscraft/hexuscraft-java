@@ -21,6 +21,10 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener {
         _plugin.getLogger().info("[" + _name + "] " + message);
     }
 
+    public void warning(final String message) {
+        _plugin.getLogger().warning("[" + _name + "] " + message);
+    }
+
     public final void load(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap) {
         long start = System.currentTimeMillis();
         if (_plugin._isDebug) log("Initializing...");
