@@ -213,10 +213,10 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
                 ping.getNumPlayers(),
                 server.getPort(),
                 0,
-                System.currentTimeMillis()
+                Integer.MAX_VALUE
         ).update(jedis);
     }
-    
+
     @Override
     public final void onPluginMessageReceived(String channel, Player player, byte[] message) {
         //noinspection UnstableApiUsage
