@@ -49,7 +49,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public final void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
@@ -61,7 +61,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onEnable() {
+    public final void onEnable() {
         _pluginCommand.register(new CommandRules(this));
         _pluginCommand.register(new CommandPunish(this));
         _pluginCommand.register(new CommandPunishHistory(this));
@@ -70,16 +70,17 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
 
             @Override
             public void run() {
-                String[] data = getMessage().split(",");
-                String targetId = data[0];
-                String punishmentId = data[1];
+                final String[] data = getMessage().split(",");
+                final String targetId = data[0];
+                final String punishmentId = data[1];
 
-                Map<String, String> rawData = new HashMap<>(_pluginDatabase.getJedisPooled().hgetAll(PunishQueries.PUNISHMENT(punishmentId)));
+                final Map<String, String> rawData = new HashMap<>(_pluginDatabase.getJedisPooled().hgetAll(PunishQueries.PUNISHMENT(punishmentId)));
                 rawData.put("id", punishmentId);
-                PunishData punishData = new PunishData(rawData);
 
-                MojangSession targetSession;
-                MojangSession staffSession;
+                final PunishData punishData = new PunishData(rawData);
+
+                final MojangSession targetSession;
+                final MojangSession staffSession;
                 try {
                     targetSession = PlayerSearch.fetchMojangSession(UUID.fromString(targetId));
                     staffSession = PlayerSearch.fetchMojangSession(punishData.staffId);
@@ -87,33 +88,31 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
                     throw new RuntimeException(ex);
                 }
 
-                Player target = _plugin._plugin.getServer().getPlayer(targetSession.name);
+                final Player target = _plugin._plugin.getServer().getPlayer(targetSession.name);
 
                 if (punishData.type.equals(PunishType.WARNING)) {
                     if (target != null) {
-                        target.sendMessage(F.fMain(this) + "You received a warning.");
-                        target.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
+                        target.sendMessage(F.fMain(this, "You received a warning."));
+                        target.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 1);
                     }
                     _plugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
-                        staff.sendMessage(F.fMain(this) + F.fItem(staffSession.name) + " warned " + F.fItem(targetSession.name) + ".");
-                        staff.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
+                        staff.sendMessage(F.fMain(this, F.fItem(staffSession.name), " warned ", F.fItem(targetSession.name), "."));
+                        staff.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
                     });
                     return;
                 }
                 if (punishData.type.equals(PunishType.MUTE)) {
                     if (target != null) {
-                        target.sendMessage(F.fMain(this) + "You were muted for " + F.fItem(F.fTime(punishData.length) + "."));
-                        target.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
+                        target.sendMessage(F.fMain(this, "You were muted for ", F.fItem(F.fTime(punishData.length)), "."));
+                        target.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 0.6F);
                     }
                     _plugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
-                        if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {
-                            return;
-                        }
-                        staff.sendMessage(F.fMain(this) + F.fItem(staffSession.name) + " muted " + F.fItem(targetSession.name) + " for " + F.fItem(F.fTime(punishData.length) + "."));
-                        staff.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
+                        if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
+                        staff.sendMessage(F.fMain(this, F.fItem(staffSession.name), " muted ", F.fItem(targetSession.name), " for ", F.fItem(F.fTime(punishData.length)), "."));
+                        staff.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
                     });
                     return;
                 }
@@ -122,11 +121,9 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
                         _plugin._plugin.getServer().getScheduler().runTask(_plugin._plugin, () -> target.kickPlayer(F.fPunishBan(UUID.fromString(punishmentId), punishData.reason, punishData.length)));
                     }
                     _plugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
-                        if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {
-                            return;
-                        }
-                        staff.sendMessage(F.fMain(this) + F.fItem(staffSession.name) + " banned " + F.fItem(targetSession.name) + " for " + F.fItem(F.fTime(punishData.length) + "."));
-                        staff.sendMessage(F.fMain("") + "Reason: " + C.cWhite + punishData.reason);
+                        if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
+                        staff.sendMessage(F.fMain(this, F.fItem(staffSession.name), " banned ", F.fItem(targetSession.name), " for ", F.fItem(F.fTime(punishData.length)), "."));
+                        staff.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
                     });
                     return;
                 }
@@ -136,20 +133,20 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
     }
 
     @EventHandler
-    void onConnect(AsyncPlayerPreLoginEvent event) {
-        Set<String> punishmentIds = _pluginDatabase.getJedisPooled().smembers(PunishQueries.LIST(event.getUniqueId().toString()));
+    final void onConnect(final AsyncPlayerPreLoginEvent event) {
+        final Set<String> punishmentIds = _pluginDatabase.getJedisPooled().smembers(PunishQueries.LIST(event.getUniqueId().toString()));
 
         // We want to display the longest ban remaining.
         // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most recent ban.
-        // If there are multiple bans matching this and were also applied at the same time, fate decides the displayed message.
+        // If there are multiple bans matching this and were also applied at the EXACT same time (??), fate decides the displayed message.
 
-        Set<PunishData> activePunishments = new HashSet<>();
+        final Set<PunishData> activePunishments = new HashSet<>();
 
-        for (String id : punishmentIds) {
-            Map<String, String> rawData = new HashMap<>(_pluginDatabase.getJedisPooled().hgetAll(PunishQueries.PUNISHMENT(id)));
+        for (final String id : punishmentIds) {
+            final Map<String, String> rawData = new HashMap<>(_pluginDatabase.getJedisPooled().hgetAll(PunishQueries.PUNISHMENT(id)));
             rawData.put("id", id);
 
-            PunishData punishData = new PunishData(rawData);
+            final PunishData punishData = new PunishData(rawData);
             if (!punishData.active) {
                 continue;
             }
@@ -162,7 +159,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
                 continue;
             }
 
-            long remaining = punishData.getRemaining();
+            final long remaining = punishData.getRemaining();
             if (remaining <= 0) {
                 _pluginDatabase.getJedisPooled().hset(PunishQueries.PUNISHMENT(id), Map.of(
                         "active", "false",
@@ -199,7 +196,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
         event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, F.fPunishBan(punishData.id, punishData.reason, punishData.length == -1 ? -1 : punishData.getRemaining()));
     }
 
-    void punish(UUID targetUuid, UUID staffUuid, PunishType punishType, long length, String reason) {
+    final void punish(final UUID targetUuid, final UUID staffUuid, final PunishType punishType, final long length, final String reason) {
         PunishData punishData = new PunishData(Map.of(
                 "id", UUID.randomUUID().toString(),
                 "type", punishType.name(),
@@ -218,39 +215,28 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
     }
 
     @EventHandler
-    void onInventoryClick(InventoryClickEvent event) {
-        Inventory inventory = event.getInventory();
-        if (!inventory.getName().contains("Punish ")) {
-            return;
-        }
+    final void onInventoryClick(InventoryClickEvent event) {
+        final Inventory inventory = event.getInventory();
+        if (!inventory.getName().contains("Punish ")) return;
 
         event.setCancelled(true);
 
-        HumanEntity clicker = event.getWhoClicked();
-        if (!(clicker instanceof Player)) {
-            return;
-        }
+        if (!event.getClick().isLeftClick()) return;
 
-        if (!event.getClick().isLeftClick()) {
-            return;
-        }
+        final HumanEntity clicker = event.getWhoClicked();
+        if (!(clicker instanceof Player)) return;
 
-        ItemStack currentItem = event.getCurrentItem();
-        if (currentItem == null) {
-            return;
-        }
-        if (!currentItem.hasItemMeta()) {
-            return;
-        }
+        final ItemStack currentItem = event.getCurrentItem();
+        if (currentItem == null) return;
+        if (!currentItem.hasItemMeta()) return;
 
-        ItemMeta itemMeta = currentItem.getItemMeta();
-        if (!itemMeta.hasDisplayName()) {
-            return;
-        }
-        String displayName = itemMeta.getDisplayName();
+        final ItemMeta itemMeta = currentItem.getItemMeta();
+        if (!itemMeta.hasDisplayName()) return;
 
-        PunishType punishType;
-        long punishLengthMillis;
+        final String displayName = itemMeta.getDisplayName();
+
+        final PunishType punishType;
+        final long punishLengthMillis;
 
         if (displayName.contains("Warning")) {
             if (!clicker.hasPermission(PermissionGroup.TRAINEE.name())) {
@@ -348,20 +334,17 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
             punishType = PunishType.BAN;
             punishLengthMillis = -1;
 
-        } else {
-            return;
-        }
+        } else return;
 
-        ItemStack skull = inventory.getItem(4);
-        MojangSession targetSession;
+        final ItemStack skull = inventory.getItem(4);
+        final MojangSession targetSession;
         try {
             targetSession = PlayerSearch.fetchMojangSession(UUID.fromString(ChatColor.stripColor(skull.getItemMeta().getLore().getFirst())));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
 
         punish(targetSession.uuid, clicker.getUniqueId(), punishType, punishLengthMillis, ChatColor.stripColor(skull.getItemMeta().getLore().get(2)));
-
         clicker.closeInventory();
     }
 
