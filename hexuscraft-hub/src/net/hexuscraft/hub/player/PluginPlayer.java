@@ -16,10 +16,7 @@ import net.hexuscraft.database.serverdata.ServerData;
 import net.hexuscraft.database.serverdata.ServerGroupData;
 import net.hexuscraft.hub.Hub;
 import net.hexuscraft.hub.player.command.CommandSpawn;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Server;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -154,42 +151,33 @@ public class PluginPlayer extends MiniPlugin<Hub> {
 
     @EventHandler
     private void onInventoryClick(final InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof final Player player)) {
-            return;
-        }
+        if (!(event.getWhoClicked() instanceof final Player player)) return;
+        if (player.getGameMode().equals(GameMode.CREATIVE)) return;
 
-        if (player.getGameMode().equals(GameMode.CREATIVE)) {
-            return;
-        }
+        final Inventory clickedInventory = event.getClickedInventory();
 
-        if (event.getClickedInventory().equals(player.getInventory())) {
+        if (clickedInventory.equals(player.getInventory())) {
             event.setCancelled(true);
 
-            ItemStack currentItem = event.getCurrentItem();
-            if (currentItem == null) {
-                return;
-            }
+            final ItemStack currentItem = event.getCurrentItem();
+            if (currentItem == null) return;
 
             onItemInteract(player, currentItem);
             return;
         }
 
-        if (event.getClickedInventory().getName().equals("Lobby Menu")) {
+        if (clickedInventory.getName().equals("Lobby Menu")) {
             event.setCancelled(true);
 
             final ItemStack currentItem = event.getCurrentItem();
-            if (!currentItem.hasItemMeta()) {
-                return;
-            }
+            if (!currentItem.hasItemMeta()) return;
 
             final ItemMeta currentItemMeta = currentItem.getItemMeta();
-            if (!currentItemMeta.hasDisplayName()) {
-                return;
-            }
+            if (!currentItemMeta.hasDisplayName()) return;
 
             _pluginPortal.teleport(player.getName(), ChatColor.stripColor(currentItemMeta.getDisplayName()));
+            player.playSound(player.getLocation(), Sound.NOTE_PLING, 100, 2);
         }
-
     }
 
     void openGameMenu(final Player player) {
