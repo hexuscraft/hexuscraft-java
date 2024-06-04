@@ -41,7 +41,7 @@ public class PluginCommand extends MiniPlugin<HexusPlugin> {
     }
 
     public void register(Command command) {
-        _commandMap.register("_", command);
+        _commandMap.register("", command);
     }
 
 }
