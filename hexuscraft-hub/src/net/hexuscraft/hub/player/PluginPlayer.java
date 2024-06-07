@@ -155,6 +155,10 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         if (player.getGameMode().equals(GameMode.CREATIVE)) return;
 
         final Inventory clickedInventory = event.getClickedInventory();
+        if (clickedInventory == null) {
+            event.setCancelled(true);
+            return;
+        }
 
         if (clickedInventory.equals(player.getInventory())) {
             event.setCancelled(true);
