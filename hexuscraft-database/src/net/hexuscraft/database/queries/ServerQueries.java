@@ -33,7 +33,7 @@ public class ServerQueries {
 
     public static ServerData[] getServers(final JedisPooled jedis) {
         final Set<ServerData> serverDataSet = new HashSet<>();
-        jedis.keys(Database.buildQuery("server", "*")).forEach(key -> serverDataSet.add(getServer(jedis, key.split("\\.", 2)[1])));
+        jedis.keys(Database.buildQuery("server", "*")).forEach(key -> serverDataSet.add(getServer(jedis, key.split(Database.KEY_DELIMITER, 2)[1])));
         return serverDataSet.toArray(ServerData[]::new);
     }
 
