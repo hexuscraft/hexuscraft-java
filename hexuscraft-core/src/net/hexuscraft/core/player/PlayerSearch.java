@@ -38,6 +38,8 @@ public class PlayerSearch {
     }
 
     public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers, final String searchName, final CommandSender sender) {
+        if (searchName.equals(".") && sender instanceof Player player) return new Player[] { player };
+
         List<? extends Player> onlinePlayersList = new ArrayList<>(onlinePlayers);
 
         if (searchName.equals("**") && sender instanceof Player player) {
