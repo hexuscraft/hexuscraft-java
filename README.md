@@ -27,7 +27,7 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 ### Server Groups
 
-> **HASH** `servergroup.(String)`
+> **HASH** `servergroup:(String)`
 > 
 > | Field              | Type                                    |
 > |--------------------|-----------------------------------------|
@@ -38,13 +38,14 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > | joinableServers    | **Integer**                             |
 > | plugin             | **String**                              |
 > | worldZip           | **String**                              |
+> | ram                | **Integer**                             |
 > | capacity           | **Integer**                             |
 > | worldEdit          | **Boolean**                             |
 > | games              | **String** (Game Enums split by commas) |
 
 ### Servers
 
-> **HASH** `server.(String)`
+> **HASH** `server:(String)`
 >
 > | Field    | Type              |
 > |----------|-------------------|
@@ -60,17 +61,17 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 ### Permissions
 
-> **STRING** `user.(UUID).permission.primary`
+> **STRING** `user:(UUID):permission:primary`
 >
 > - PermissionGroup Enum
 
-> **SET** `user.(UUID).permission.groups`
+> **SET** `user:(UUID):permission:groups`
 >
 > - PermissionGroup Enum 
 
 ### Punishments
 
-> **HASH** `punishment.(UUID)`
+> **HASH** `punishment:(UUID)`
 > 
 > | Field             | Type                         |
 > |-------------------|------------------------------|
@@ -88,7 +89,7 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > | removeStaffId     | **String** (UUID)            |
 > | removeStaffServer | **String**                   | 
 
->  **SET** `user.(UUID).punishments`
+>  **SET** `user:(UUID):punishments`
 > - `(UUID)` of redis keys `punishment.(UUID)`
 
 ### Motd
