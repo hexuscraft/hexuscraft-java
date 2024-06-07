@@ -49,9 +49,10 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
         _secondaryGroupsMap = new HashMap<>();
         _permissionAttachmentMap = new HashMap<>();
 
-        PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_RANK);
+        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_RANK);
+        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_RANK_LIST);
+
         PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_RANK_INFO);
-        PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_RANK_LIST);
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.OPERATOR);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RANK_ADD);
