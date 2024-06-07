@@ -6,7 +6,7 @@ import redis.clients.jedis.util.Pool;
 
 public class Database {
 
-    public static final String KEY_DELIMITER = ".";
+    public static final String KEY_DELIMITER = ":";
 
     public final JedisPooled _jedisPooled;
 
