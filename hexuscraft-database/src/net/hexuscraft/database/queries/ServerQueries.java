@@ -33,7 +33,7 @@ public class ServerQueries {
 
     public static ServerData[] getServers(final JedisPooled jedis) {
         final Set<ServerData> serverDataSet = new HashSet<>();
-        jedis.keys("server.*").forEach(key -> serverDataSet.add(getServer(jedis, key.split("\\.", 2)[1])));
+        jedis.keys(Database.buildQuery("server", "*")).forEach(key -> serverDataSet.add(getServer(jedis, key.split("\\.", 2)[1])));
         return serverDataSet.toArray(ServerData[]::new);
     }
 
@@ -67,7 +67,7 @@ public class ServerQueries {
 
     public static ServerGroupData[] getServerGroups(JedisPooled jedis) {
         final Set<ServerGroupData> serverGroupDataSet = new HashSet<>();
-        jedis.keys("servergroup.*").forEach(key -> serverGroupDataSet.add(getServerGroup(jedis, key.split("\\.", 2)[1])));
+        jedis.keys(Database.buildQuery("servergroup", "*")).forEach(key -> serverGroupDataSet.add(getServerGroup(jedis, key.split("\\.", 2)[1])));
         return serverGroupDataSet.toArray(ServerGroupData[]::new);
     }
 
