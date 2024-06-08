@@ -1,0 +1,5 @@
+#file: noinspection YAMLSchemaValidation
+name: ${project.name}
+main: ${project.groupId}.clans.Clans
+version: ${project.version}
+load: STARTUP
