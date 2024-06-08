@@ -3,6 +3,7 @@ package net.hexuscraft.database.serverdata;
 import net.hexuscraft.database.queries.ServerQueries;
 import redis.clients.jedis.JedisPooled;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ServerData {
@@ -50,17 +51,17 @@ public class ServerData {
     }
 
     public final Map<String, String> toMap() {
-        return Map.of(
-                "address", _address,
-                "capacity", Integer.toString(_capacity),
-                "created", Long.toString(_created),
-                "group", _group,
-                "motd", _motd,
-                "players", Integer.toString(_players),
-                "port", Integer.toString(_port),
-                "tps", Double.toString(_tps),
-                "updated", Long.toString(_updated)
-        );
+        final Map<String, String> map = new HashMap<>();
+        map.put("address", _address);
+        map.put("capacity", Integer.toString(_capacity));
+        map.put("created", Long.toString(_created));
+        map.put("group", _group);
+        map.put("motd", _motd);
+        map.put("players", Integer.toString(_players));
+        map.put("port", Integer.toString(_port));
+        map.put("tps", Double.toString(_tps));
+        map.put("updated", Long.toString(_updated));
+        return map;
     }
 
     public final void update(final JedisPooled jedis) {
