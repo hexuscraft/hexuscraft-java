@@ -18,6 +18,7 @@ import net.hexuscraft.core.portal.PluginPortal;
 import net.hexuscraft.core.punish.PluginPunish;
 import net.hexuscraft.core.report.PluginReport;
 import net.hexuscraft.core.scoreboard.PluginScoreboard;
+import net.hexuscraft.core.teleport.PluginTeleport;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -57,6 +58,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
         require(new PluginPunish(this));
         require(new PluginReport(this));
         require(new PluginScoreboard(this));
+        require(new PluginTeleport(this));
 
         if (_isDebug)
             log("Core plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
