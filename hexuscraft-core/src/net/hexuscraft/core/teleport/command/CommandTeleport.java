@@ -18,7 +18,7 @@ public class CommandTeleport extends BaseCommand<HexusPlugin> {
 
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
-
+        sender.sendMessage("Work in progress");
     }
 
     @Override
