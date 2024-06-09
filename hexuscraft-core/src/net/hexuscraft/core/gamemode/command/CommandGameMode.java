@@ -44,13 +44,13 @@ public class CommandGameMode extends BaseCommand<HexusPlugin> {
             return;
         }
 
-        boolean toggleCreativeMode = target.getGameMode() != GameMode.CREATIVE;
-        target.setGameMode(toggleCreativeMode ? GameMode.CREATIVE : _miniPlugin._plugin.getServer().getDefaultGameMode());
+        final GameMode newGameMode = target.getGameMode() != GameMode.CREATIVE ? GameMode.CREATIVE : _miniPlugin._plugin.getServer().getDefaultGameMode();
+        target.setGameMode(newGameMode);
 
-        sender.sendMessage(F.fMain(this) + F.fItem(target) + " Creative Mode: " + F.fBoolean(toggleCreativeMode));
+        sender.sendMessage(F.fMain(this) + F.fItem(target) + " Creative Mode: " + F.fBoolean(newGameMode.equals(GameMode.CREATIVE)));
 
         if (target == sender) return;
-        target.sendMessage(F.fMain(this) + F.fItem(sender) + " set your Creative Mode: " + F.fBoolean(toggleCreativeMode));
+        target.sendMessage(F.fMain(this) + F.fItem(sender) + " set your Creative Mode: " + F.fBoolean(newGameMode.equals(GameMode.CREATIVE)));
     }
 
     @Override
