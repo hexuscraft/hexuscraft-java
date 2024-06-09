@@ -22,6 +22,7 @@
     <modules>
         <module>hexuscraft-arcade</module>
         <module>hexuscraft-build</module>
+        <module>hexuscraft-clans</module>
         <module>hexuscraft-core</module>
         <module>hexuscraft-database</module>
         <module>hexuscraft-hub</module>
