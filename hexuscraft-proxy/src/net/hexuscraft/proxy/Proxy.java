@@ -44,7 +44,7 @@ public class Proxy {
     private final Path _dataDirectory;
 
     private final String MOTD_PREFIX = String.join("\n", new String[]{
-            "         §9§m     §8§m[  §r  §6§lHexuscraft§r §f§lNetwork§r  §8§m  ]§9§m     §r",
+            "       §9§m     §8§m[  §r  §6§lHexuscraft§r §f§lNetwork§r  §9[1.8-1.20]§r  §8§m  ]§9§m     §r",
             "§f§l ▶ §r"
     });
 
