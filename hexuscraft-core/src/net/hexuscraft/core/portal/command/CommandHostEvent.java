@@ -26,7 +26,7 @@ public class CommandHostEvent extends BaseCommand<HexusPlugin> {
     private final Set<CommandSender> _pending;
 
     public CommandHostEvent(PluginPortal pluginPortal, PluginDatabase pluginDatabase) {
-        super(pluginPortal, "hostevent", "", "Start a new private server.", Set.of("hes"), PluginPortal.PERM.COMMAND_HOSTEVENT);
+        super(pluginPortal, "hostevent", "", "Start a new private server with prefix 'EVENT'.", Set.of("hes"), PluginPortal.PERM.COMMAND_HOSTEVENT);
 
         _pluginDatabase = pluginDatabase;
         _pending = new HashSet<>();
