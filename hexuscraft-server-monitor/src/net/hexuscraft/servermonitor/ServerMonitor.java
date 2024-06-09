@@ -9,24 +9,28 @@ import redis.clients.jedis.JedisPooled;
 import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 public class ServerMonitor implements Runnable {
 
-    public static void main(final String[] args) {
-        new ServerMonitor();
+    public static void main(final String[] args) throws UnknownHostException {
+        new ServerMonitor(InetAddress.getByName(args[0]));
     }
 
     private final Console _console;
     private final PluginDatabase _database;
     private final ServerManager _manager;
+    private final InetAddress _inetAddress;
 
     private final Map<String, ServerData> _serverDataMap;
     private final Map<String, ServerGroupData> _serverGroupDataMap;
 
-    private ServerMonitor() {
+    private ServerMonitor(final InetAddress inetAddress) {
         _console = System.console();
         _database = new PluginDatabase();
+        _inetAddress = inetAddress;
 
         final String path;
         try {
@@ -61,22 +65,27 @@ public class ServerMonitor implements Runnable {
         final Map<ServerGroupData, Set<ServerData>> totalServersMap = new HashMap<>();
         final Map<ServerGroupData, Set<ServerData>> joinableServersMap = new HashMap<>();
 
-        _serverGroupDataMap.forEach((serverGroupName, serverGroupData) -> {
+        _serverGroupDataMap.values().forEach(serverGroupData -> {
             totalServersMap.put(serverGroupData, new HashSet<>());
             joinableServersMap.put(serverGroupData, new HashSet<>());
         });
 
-        _serverDataMap.values().forEach(serverData -> {
-
+        for (final ServerData serverData : _serverDataMap.values()) {
             // Kill unresponsive servers
             if ((System.currentTimeMillis() - serverData._updated) > 10000L) {
                 _manager.killServer(jedis, serverData._name, "Unresponsive");
                 return;
             }
 
-            final ServerGroupData serverGroupData = _serverGroupDataMap.get(serverData._group);
+            // Kill servers marked as dead
+            final List<String> motdStrings = Arrays.stream(serverData._motd.split(",")).toList();
+            if (motdStrings.contains("DEAD")) {
+                _manager.killServer(jedis, serverData._name, "Dead");
+                return;
+            }
 
             // Kill servers without a valid server group
+            final ServerGroupData serverGroupData = _serverGroupDataMap.get(serverData._group);
             if (serverGroupData == null) {
                 _manager.killServer(jedis, serverData._name, "Invalid Server Group");
                 return;
@@ -84,14 +93,12 @@ public class ServerMonitor implements Runnable {
 
             // Count total and joinable servers
             totalServersMap.get(serverGroupData).add(serverData);
-
-            if (serverData._motd.startsWith("LIVE")) return;
-            if (serverData._players >= serverData._capacity) return;
-
+            if (motdStrings.contains("LIVE_GAME")) continue;
+            if (serverData._players >= serverData._capacity) continue;
             joinableServersMap.get(serverGroupData).add(serverData);
-        });
+        }
 
-        _serverGroupDataMap.forEach((serverGroupName, serverGroupData) -> {
+        for (final ServerGroupData serverGroupData : _serverGroupDataMap.values()) {
             final Set<ServerData> totalServers = totalServersMap.get(serverGroupData);
             final int totalServersAmount = totalServers.size();
 
@@ -104,19 +111,22 @@ public class ServerMonitor implements Runnable {
             final boolean isEnoughJoinableServers = joinableServersAmount >= serverGroupData._joinableServers;
             final boolean isOverflowJoinableServers = joinableServersAmount > serverGroupData._joinableServers;
 
-            // Start minimum servers
-            if (!isEnoughTotalServers || !isEnoughJoinableServers) {
-                _manager.startServer(jedis, serverGroupData, "Insufficient Servers");
-            }
-
             // Kill excess servers
             if (isOverflowTotalServers && isOverflowJoinableServers) {
                 final ServerData bestServerToKill = getBestServerToKill(jedis, serverGroupData);
-                if (bestServerToKill != null)
+                if (bestServerToKill != null) {
                     _manager.killServer(jedis, bestServerToKill._name, "Excess Servers");
+                    return;
+                }
             }
 
-        });
+            // Start minimum servers
+            if (!isEnoughTotalServers || !isEnoughJoinableServers) {
+                _manager.startServer(jedis, serverGroupData, "Insufficient Servers");
+                return;
+            }
+        }
+
     }
 
     private ServerData getBestServerToKill(final JedisPooled jedis, final ServerGroupData serverGroupData) {
