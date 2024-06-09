@@ -54,6 +54,14 @@ public class PlayerSearch {
         return matches;
     }
 
+    public static List<String> onlinePlayerCompletions(final Collection<? extends Player> onlinePlayers) {
+        return List.of();
+    }
+
+    public static List<String> onlinePlayerCompletions(final Collection<? extends Player> onlinePlayers, final Player sender, final Player[] exclusions, final boolean includeMultiple) {
+        return List.of();
+    }
+
     public static MojangProfile fetchMojangProfile(final String name) throws IOException, URISyntaxException {
         final URL url = new URI("https://api.mojang.com/users/profiles/minecraft/" + name).toURL();
 
