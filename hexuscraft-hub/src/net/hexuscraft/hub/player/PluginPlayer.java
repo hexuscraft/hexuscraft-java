@@ -79,7 +79,7 @@ public class PluginPlayer extends MiniPlugin<Hub> {
 
     @EventHandler
     private void onPlayerJoin(final PlayerJoinEvent event) {
-        event.setJoinMessage(null);
+        event.setJoinMessage(F.fSub("Join", event.getPlayer().getDisplayName()));
 
         final Player player = event.getPlayer();
         player.setFallDistance(0);
@@ -104,9 +104,9 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), " ");
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     void onPlayerQuit(final PlayerQuitEvent event) {
-        event.setQuitMessage(null);
+        event.setQuitMessage(F.fSub("Quit", event.getPlayer().getDisplayName()));
     }
 
     private void refreshInventory(Player player) {
