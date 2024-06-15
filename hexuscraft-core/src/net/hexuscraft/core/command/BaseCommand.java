@@ -43,7 +43,12 @@ public abstract class BaseCommand<T extends HexusPlugin> extends Command {
         if (!testPermission(sender)) {
             return true;
         }
-        run(sender, alias, args);
+        try {
+            run(sender, alias, args);
+        } catch(final Exception ex) {
+            _miniPlugin.log("An exception occurred while CommandSender '" + sender.getName() + "' executing BaseCommand '" + alias + " " + String.join(" ", args) + "':" + ex.getMessage());
+            sender.sendMessage(F.fMain(this, F.fError("An unknown error occurred while executing this command. Please try again later.")));
+        }
         return true;
     }
 
@@ -53,7 +58,7 @@ public abstract class BaseCommand<T extends HexusPlugin> extends Command {
             return List.of();
         }
 
-        List<String> completes = new ArrayList<>();
+        final List<String> completes = new ArrayList<>();
         tab(sender, alias, args).forEach(s -> {
             if (s == null) {
                 return;
