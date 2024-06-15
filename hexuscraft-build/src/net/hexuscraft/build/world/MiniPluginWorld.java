@@ -7,6 +7,7 @@ import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.permission.IPermission;
+import net.hexuscraft.core.permission.PermissionGroup;
 
 import java.util.Map;
 
@@ -22,6 +23,10 @@ public final class MiniPluginWorld extends MiniPlugin<Build> {
 
     public MiniPluginWorld(final Build plugin) {
         super(plugin, "World");
+
+        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SPAWN);
+        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_WORLD);
+        PermissionGroup.BUILDER._permissions.add(PERM.COMMAND_WORLD_CREATE);
     }
 
     @Override
