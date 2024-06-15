@@ -1,6 +1,7 @@
 package net.hexuscraft.build.world;
 
 import net.hexuscraft.build.Build;
+import net.hexuscraft.build.world.command.CommandSpawn;
 import net.hexuscraft.build.world.command.CommandWorld;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
@@ -12,6 +13,7 @@ import java.util.Map;
 public final class MiniPluginWorld extends MiniPlugin<Build> {
 
     public enum PERM implements IPermission {
+        COMMAND_SPAWN,
         COMMAND_WORLD,
         COMMAND_WORLD_CREATE
     }
@@ -29,6 +31,7 @@ public final class MiniPluginWorld extends MiniPlugin<Build> {
 
     @Override
     public void onEnable() {
+        _miniPluginCommand.register(new CommandSpawn(this));
         _miniPluginCommand.register(new CommandWorld(this));
     }
 
