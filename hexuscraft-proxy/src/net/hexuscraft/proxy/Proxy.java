@@ -10,7 +10,6 @@ import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.event.query.ProxyQueryEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.QueryResponse;
@@ -33,15 +32,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 @Plugin(id = "hexuscraft-proxy", name = "Proxy", version = "1.0.0")
-public class Proxy {
+public final class Proxy {
 
     private final PluginDatabase _pluginDatabase;
 
     private final ProxyServer _server;
     private final Logger _logger;
-
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
-    private final Path _dataDirectory;
 
     private final String MOTD_PREFIX = String.join("\n", new String[]{
             "       §9§m     §8§m[  §r  §6§lHexuscraft§r §f§lNetwork§r  §9[1.8-1.20]§r  §8§m  ]§9§m     §r",
@@ -54,10 +50,9 @@ public class Proxy {
     private String _motd = MOTD_PREFIX;
 
     @Inject
-    public Proxy(final ProxyServer server, final Logger logger, final @DataDirectory Path dataDirectory) {
+    public Proxy(final ProxyServer server, final Logger logger) {
         _server = server;
         _logger = logger;
-        _dataDirectory = dataDirectory;
 
         _pluginDatabase = new PluginDatabase();
     }
@@ -65,8 +60,7 @@ public class Proxy {
     @Subscribe
     public void onProxyInitialize(final ProxyInitializeEvent event) {
         final CommandManager commandManager = _server.getCommandManager();
-        commandManager.unregister("server");
-        commandManager.unregister("velocity");
+        commandManager.getAliases().forEach(commandManager::unregister);
 
         _server.getScheduler()
                 .buildTask(this, this::updateRegisteredServers)
