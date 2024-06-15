@@ -16,41 +16,34 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
-public class PlayerSearch {
+public final class PlayerSearch {
 
     public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers, final String searchName) {
         if (searchName.equals("*") || searchName.equals("**")) {
             return onlinePlayers.toArray(Player[]::new);
         }
 
-        List<Player> matches = new ArrayList<>();
+        final List<Player> matches = new ArrayList<>();
         for (Player target : onlinePlayers) {
-            String targetName = target.getName();
-            if (targetName.equals(searchName)) {
-                return new Player[]{target};
-            }
-            if (!targetName.contains(searchName)) {
-                continue;
-            }
+            final String targetName = target.getName();
+            if (targetName.equals(searchName)) return new Player[]{target};
+            if (!targetName.contains(searchName)) continue;
             matches.add(target);
         }
         return matches.toArray(Player[]::new);
     }
 
     public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers, final String searchName, final CommandSender sender) {
-        if (searchName.equals(".") && sender instanceof Player player) return new Player[] { player };
+        if (searchName.equals(".") && sender instanceof Player player) return new Player[]{player};
 
-        List<? extends Player> onlinePlayersList = new ArrayList<>(onlinePlayers);
-
+        final List<? extends Player> onlinePlayersList = new ArrayList<>(onlinePlayers);
         if (searchName.equals("**") && sender instanceof Player player) {
             onlinePlayersList.remove(player);
         }
 
         final Player[] matches = onlinePlayerSearch(onlinePlayersList, searchName);
-
         sender.sendMessage(F.fMain("Player Search") + F.fItem(matches.length + (matches.length == 1 ? " Match" : " Matches")) + " for " + F.fItem(searchName) + (matches.length == 0 ? "." : ":\n" +
                 F.fMain("") + F.fList(Arrays.stream(matches).map(Player::getName).toArray(String[]::new))));
-
         return matches;
     }
 
@@ -96,29 +89,19 @@ public class PlayerSearch {
         }
     }
 
-    public static MojangProfile fetchMojangProfile(String name, CommandSender sender) {
-        sender.sendMessage(F.fMain("Profile Fetcher") + "Fetching profile of " + F.fItem(name) + "...");
+    public static MojangProfile fetchMojangProfile(final String name, final CommandSender sender) {
         try {
             return fetchMojangProfile(name);
-        } catch (IOException | URISyntaxException ex) {
-            sender.sendMessage(F.fMain("Profile Fetcher") + F.fError("Error while fetching profile of ") + F.fItem(name) + F.fError(":") + "\n"
-                    + F.fMain("") + ex.getMessage());
+        } catch (final IOException | URISyntaxException ex) {
+            //noinspection CallToPrintStackTrace
+            ex.printStackTrace();
+            sender.sendMessage(F.fMain("Player Search", F.fError("Sorry, there was an error while trying to fetch the information of ", F.fItem(name), ". Please try again later.")));
             return null;
         }
     }
 
     public static MojangSession fetchMojangSession(UUID uuid) throws IOException {
-        final URL url;
-        try {
-            url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replaceAll("-", "")).toURL();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-
-        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setInstanceFollowRedirects(false);
+        final HttpURLConnection connection = getMojangSessionUrlConnection(uuid);
 
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
@@ -147,6 +130,21 @@ public class PlayerSearch {
 
         // TODO: Caching
         return new MojangSession(mojangId, mojangName, properties);
+    }
+
+    private static HttpURLConnection getMojangSessionUrlConnection(UUID uuid) throws IOException {
+        final URL url;
+        try {
+            url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replaceAll("-", "")).toURL();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setInstanceFollowRedirects(false);
+        return connection;
     }
 
     @SuppressWarnings("unused")
