@@ -19,13 +19,14 @@ import net.hexuscraft.core.punish.PluginPunish;
 import net.hexuscraft.core.report.PluginReport;
 import net.hexuscraft.core.scoreboard.PluginScoreboard;
 import net.hexuscraft.core.teleport.PluginTeleport;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
+public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Listener {
 
     private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPluginClassMap;
 
@@ -78,6 +79,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin {
     public final void onEnable() {
         long start = System.currentTimeMillis();
 
+        getServer().getPluginManager().registerEvents(this, this);
         enable();
         _miniPluginClassMap.values().forEach(MiniPlugin::enable);
 
