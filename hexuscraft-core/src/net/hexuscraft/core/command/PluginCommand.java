@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class PluginCommand extends MiniPlugin<HexusPlugin> {
+public final class PluginCommand extends MiniPlugin<HexusPlugin> {
 
     private Set<Command> _commands;
     private SimpleCommandMap _commandMap;
