@@ -6,7 +6,6 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.command.CommandSender;
 
-import java.util.List;
 import java.util.Set;
 
 public final class CommandWorldCreate extends BaseCommand<Build> {
@@ -17,7 +16,7 @@ public final class CommandWorldCreate extends BaseCommand<Build> {
 
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
-
+        sender.sendMessage("wip");
     }
 
 }
