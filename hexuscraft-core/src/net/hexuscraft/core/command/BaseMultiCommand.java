@@ -4,14 +4,12 @@ import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.permission.IPermission;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-public class BaseMultiCommand<T extends HexusPlugin> extends BaseCommand<T> {
+public abstract class BaseMultiCommand<T extends HexusPlugin> extends BaseCommand<T> {
 
     private final Set<BaseCommand<T>> _commands;
 
@@ -33,10 +31,12 @@ public class BaseMultiCommand<T extends HexusPlugin> extends BaseCommand<T> {
 
         StringBuilder builder = new StringBuilder();
         builder.append(help(alias));
-        for (BaseCommand<? extends HexusPlugin> command : _commands) {
-            if (!command.testPermissionSilent(sender)) continue;
+
+        _commands.stream().sorted(Comparator.comparing(Command::getName)).forEach(command -> {
+            if (!command.testPermissionSilent(sender)) return;
             builder.append("\n").append(F.fCommand(alias + " " + command.getName(), command));
-        }
+        });
+
         sender.sendMessage(builder.toString());
     }
 
