@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class PluginCombat extends MiniPlugin<HexusPlugin> {
 
-    Map<Player, BukkitRunnable> _pendingRespawns;
+    final Map<Player, BukkitRunnable> _pendingRespawns;
 
     public PluginCombat(final HexusPlugin plugin) {
         super(plugin, "Combat");

@@ -30,7 +30,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.IOException;
 import java.util.*;
 
-public class PluginPunish extends MiniPlugin<HexusPlugin> {
+public final class PluginPunish extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_PUNISH,
@@ -49,7 +49,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public final void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
         _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
         _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
@@ -61,7 +61,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public final void onEnable() {
+    public void onEnable() {
         _pluginCommand.register(new CommandRules(this));
         _pluginCommand.register(new CommandPunish(this));
         _pluginCommand.register(new CommandPunishHistory(this));
@@ -133,7 +133,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
     }
 
     @EventHandler
-    final void onConnect(final AsyncPlayerPreLoginEvent event) {
+    private void onConnect(final AsyncPlayerPreLoginEvent event) {
         final Set<String> punishmentIds = _pluginDatabase.getJedisPooled().smembers(PunishQueries.LIST(event.getUniqueId().toString()));
 
         // We want to display the longest ban remaining.
@@ -196,8 +196,8 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
         event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, F.fPunishBan(punishData.id, punishData.reason, punishData.length == -1 ? -1 : punishData.getRemaining()));
     }
 
-    final void punish(final UUID targetUuid, final UUID staffUuid, final PunishType punishType, final long length, final String reason) {
-        PunishData punishData = new PunishData(Map.of(
+    public void punish(final UUID targetUuid, final UUID staffUuid, final PunishType punishType, final long length, final String reason) {
+        final PunishData punishData = new PunishData(Map.of(
                 "id", UUID.randomUUID().toString(),
                 "type", punishType.name(),
                 "active", "true",
@@ -205,7 +205,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
                 "length", Long.toString(length),
                 "reason", reason,
                 "server", _pluginPortal._serverName,
-                "staffId", staffUuid.toString(),
+                "staffId", (staffUuid == null ? DEFAULT_UUID : staffUuid).toString(),
                 "staffServer", _pluginPortal._serverName
         ));
 
@@ -215,7 +215,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
     }
 
     @EventHandler
-    final void onInventoryClick(InventoryClickEvent event) {
+    private void onInventoryClick(InventoryClickEvent event) {
         final Inventory inventory = event.getInventory();
         if (!inventory.getName().contains("Punish ")) return;
 

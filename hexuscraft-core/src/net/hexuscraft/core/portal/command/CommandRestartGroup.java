@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class CommandRestartGroup extends BaseCommand<HexusPlugin> {
 
-    PluginPortal _portal;
+    final PluginPortal _portal;
 
     public CommandRestartGroup(PluginPortal pluginPortal) {
         super(pluginPortal, "group", "<Server Group>", "Restart all servers of a group.", Set.of("g"), PluginPortal.PERM.COMMAND_RESTART_GROUP);
