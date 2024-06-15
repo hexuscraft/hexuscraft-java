@@ -185,6 +185,12 @@ public class F {
         return RESET + C.cRed + String.join(RESET + C.cRed, actions) + RESET_GRAY;
     }
 
+    public static String fPunishKick(final String reason) {
+        return C.cRed + C.fBold + "You were kicked from the server" + RESET + "\n"
+                + reason + RESET + "\n"
+                + C.cDGreen + "Unfairly removed? Let us know at " + C.cGreen + "www.hexuscraft.net" + RESET;
+    }
+
     public static String fPunishBan(final UUID id, final String reason, final long length) {
         final String formattedLength = length == 0 ? "Permanent" : fTime(length);
         return C.cRed + C.fBold + "You are banned for " + formattedLength + RESET + "\n"
