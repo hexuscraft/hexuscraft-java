@@ -15,7 +15,7 @@ public abstract class BaseCommand<T extends HexusPlugin> extends Command {
 
     public final MiniPlugin<T> _miniPlugin;
 
-    protected BaseCommand(final MiniPlugin<T> miniPlugin, final String name, final String usage, final String description, final Set<String> aliases, final IPermission permission) {
+    public BaseCommand(final MiniPlugin<T> miniPlugin, final String name, final String usage, final String description, final Set<String> aliases, final IPermission permission) {
         super(name.toLowerCase(), description, usage, aliases.stream().map(String::toLowerCase).toList());
         setPermission(permission.toString());
         setPermissionMessage(F.fInsufficientPermissions());
@@ -45,7 +45,7 @@ public abstract class BaseCommand<T extends HexusPlugin> extends Command {
         }
         try {
             run(sender, alias, args);
-        } catch(final Exception ex) {
+        } catch (final Exception ex) {
             _miniPlugin.log("An exception occurred while CommandSender '" + sender.getName() + "' executing BaseCommand '" + alias + " " + String.join(" ", args) + "':" + ex.getMessage());
             sender.sendMessage(F.fMain(this, F.fError("An unknown error occurred while executing this command. Please try again later.")));
         }
