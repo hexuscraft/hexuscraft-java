@@ -88,7 +88,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
                     throw new RuntimeException(ex);
                 }
 
-                final Player target = _plugin._plugin.getServer().getPlayer(targetSession.name);
+                final Player target = _miniPlugin._plugin.getServer().getPlayer(targetSession.name);
 
                 if (punishData.type.equals(PunishType.WARNING)) {
                     if (target != null) {
@@ -96,7 +96,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
                         target.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 1);
                     }
-                    _plugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
+                    _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
                         staff.sendMessage(F.fMain(this, F.fItem(staffSession.name), " warned ", F.fItem(targetSession.name), "."));
                         staff.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
@@ -109,7 +109,7 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
                         target.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 0.6F);
                     }
-                    _plugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
+                    _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
                         staff.sendMessage(F.fMain(this, F.fItem(staffSession.name), " muted ", F.fItem(targetSession.name), " for ", F.fItem(F.fTime(punishData.length)), "."));
                         staff.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
@@ -118,9 +118,9 @@ public class PluginPunish extends MiniPlugin<HexusPlugin> {
                 }
                 if (punishData.type.equals(PunishType.BAN)) {
                     if (target != null) {
-                        _plugin._plugin.getServer().getScheduler().runTask(_plugin._plugin, () -> target.kickPlayer(F.fPunishBan(UUID.fromString(punishmentId), punishData.reason, punishData.length)));
+                        _miniPlugin._plugin.getServer().getScheduler().runTask(_miniPlugin._plugin, () -> target.kickPlayer(F.fPunishBan(UUID.fromString(punishmentId), punishData.reason, punishData.length)));
                     }
-                    _plugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
+                    _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
                         staff.sendMessage(F.fMain(this, F.fItem(staffSession.name), " banned ", F.fItem(targetSession.name), " for ", F.fItem(F.fTime(punishData.length)), "."));
                         staff.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));

@@ -1,15 +1,16 @@
 package net.hexuscraft.core.database;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 
 public class MessagedRunnable implements Runnable {
 
-    public final MiniPlugin _plugin;
+    public final MiniPlugin<? extends HexusPlugin> _miniPlugin;
 
     private String _message;
 
-    protected MessagedRunnable(MiniPlugin plugin) {
-        _plugin = plugin;
+    protected MessagedRunnable(MiniPlugin<? extends HexusPlugin> plugin) {
+        _miniPlugin = plugin;
     }
 
     public final void setMessage(String message) {
@@ -26,7 +27,7 @@ public class MessagedRunnable implements Runnable {
 
     @Override
     public String toString() {
-        return _plugin._name;
+        return _miniPlugin._name;
     }
 
 }

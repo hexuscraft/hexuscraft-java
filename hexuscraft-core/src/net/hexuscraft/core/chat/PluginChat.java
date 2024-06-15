@@ -83,7 +83,7 @@ public class PluginChat extends MiniPlugin<HexusPlugin> {
 
                 PermissionGroup permissionGroup = PermissionGroup.valueOf(groupName);
 
-                _plugin._plugin.getServer().getOnlinePlayers().forEach(player -> {
+                _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(player -> {
                     if (player.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
                         player.sendMessage(F.fSub("Staff", F.fItem(senderName), " broadcast to ", F.fPermissionGroup(permissionGroup), "."));
                     }

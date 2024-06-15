@@ -116,13 +116,13 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
                 final String senderName = args.length > 2 ? args[2] : null;
 
                 if (senderName != null) {
-                    _plugin._plugin.getServer().getOnlinePlayers().forEach(player1 -> {
+                    _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(player1 -> {
                         if (!player1.hasPermission(PermissionGroup.ADMINISTRATOR.name())) return;
                         player1.sendMessage(F.fSub(this) + F.fItem(senderName) + " sent " + F.fItem(playerName) + " to " + F.fItem(serverName));
                     });
                 }
 
-                final Player player = _plugin._plugin.getServer().getPlayer(playerName);
+                final Player player = _miniPlugin._plugin.getServer().getPlayer(playerName);
                 if (player == null) return;
 
                 if (args.length > 2) {
@@ -135,7 +135,7 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
                 final ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF("Connect");
                 out.writeUTF(serverName);
-                player.sendPluginMessage(_plugin._plugin, PROXY_CHANNEL, out.toByteArray());
+                player.sendPluginMessage(_miniPlugin._plugin, PROXY_CHANNEL, out.toByteArray());
             }
 
         });
@@ -156,11 +156,11 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
                     return;
                 }
 
-                final Server server = _plugin._plugin.getServer();
+                final Server server = _miniPlugin._plugin.getServer();
                 final BukkitScheduler scheduler = server.getScheduler();
                 server.broadcastMessage(F.fMain(this) + "The server you are currently connected to is restarting. Sending you to a lobby.");
-                scheduler.runTaskLater(_plugin._plugin, () -> server.getOnlinePlayers().forEach(player -> teleport(player.getName(), "Lobby")), 80);
-                scheduler.runTaskLater(_plugin._plugin, server.spigot()::restart, 160);
+                scheduler.runTaskLater(_miniPlugin._plugin, () -> server.getOnlinePlayers().forEach(player -> teleport(player.getName(), "Lobby")), 80);
+                scheduler.runTaskLater(_miniPlugin._plugin, server.spigot()::restart, 160);
             }
 
         });
