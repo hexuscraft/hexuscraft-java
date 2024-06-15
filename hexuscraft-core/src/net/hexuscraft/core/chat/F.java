@@ -7,6 +7,7 @@ import net.hexuscraft.core.common.UtilMath;
 import net.hexuscraft.core.currency.CurrencyType;
 import net.hexuscraft.core.permission.PermissionGroup;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -93,6 +94,10 @@ public class F {
         return fItem(stack.getType().name(), stack.getAmount());
     }
 
+    public static String fItem(final Location location) {
+        return fList(new String[]{"" + location.getX(), "" + location.getY(), "" + location.getZ(), fList(new String[]{"" + location.getYaw(), "" + location.getPitch()})});
+    }
+
 
     public static String fList(final String[] args) {
         return RESET_GRAY + "[" + fItem(String.join(RESET_GRAY + ", " + ITEM_COLOR, args)) + "]";
@@ -161,7 +166,7 @@ public class F {
     }
 
     public static String fInsufficientPermissions() {
-        return fMain("Permissions") + "You have insufficient permissions to do this.";
+        return fMain("Permissions", "You have insufficient permissions to do this.");
     }
 
     public static String fBoolean(final boolean toggle) {
