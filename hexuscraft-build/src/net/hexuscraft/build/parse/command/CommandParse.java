@@ -1,7 +1,7 @@
 package net.hexuscraft.build.parse.command;
 
 import net.hexuscraft.build.Build;
-import net.hexuscraft.build.parse.PluginParse;
+import net.hexuscraft.build.parse.MiniPluginParse;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.World;
@@ -15,14 +15,11 @@ public final class CommandParse extends BaseCommand<Build> {
     @SuppressWarnings("FieldCanBeLocal")
     private final Integer MINIMUM_RADIUS = 1;
 
-    private static final class ExInvalidSender extends Exception {
-    }
+    private static final class ExInvalidSender extends Exception {}
 
-    private static final class ExInvalidRadius extends Exception {
-    }
+    private static final class ExInvalidRadius extends Exception {}
 
-    private static final class ExInvalidWorld extends Exception {
-    }
+    private static final class ExInvalidWorld extends Exception {}
 
     private static final class ExRadiusTooSmall extends Exception {
         public final Integer _minimumRadius;
@@ -32,12 +29,12 @@ public final class CommandParse extends BaseCommand<Build> {
         }
     }
 
-    private final PluginParse _parse;
+    private final MiniPluginParse _parse;
 
-    public CommandParse(final PluginParse parse) {
+    public CommandParse(final MiniPluginParse parse) {
         super(parse, "parse", "<Radius>",
                 "Parse your current world. The parse centers around chunk (0,0). The radius is the amount of chunks in each direction parsed.",
-                Set.of(), PluginParse.PERM.COMMAND_PARSE);
+                Set.of(), MiniPluginParse.PERM.COMMAND_PARSE);
 
         _parse = parse;
     }
@@ -50,11 +47,11 @@ public final class CommandParse extends BaseCommand<Build> {
             sender.sendMessage(F.fMain(this, F.fError("Only players can execute this command.")));
         } catch (final ExInvalidRadius ex) {
             sender.sendMessage(F.fMain(this, F.fError("Invalid radius.")));
-        } catch (final ExInvalidWorld ex) {
-            sender.sendMessage(F.fMain(this, F.fError("You cannot parse the default world.")));
         } catch (final ExRadiusTooSmall ex) {
             sender.sendMessage(F.fMain(this, F.fError("Radius too small."), "Minimum radius: ",
                     F.fItem(Integer.toString(ex._minimumRadius))));
+        } catch (final ExInvalidWorld ex) {
+            sender.sendMessage(F.fMain(this, F.fError("You cannot parse the default world.")));
         }
     }
 

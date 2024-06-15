@@ -11,7 +11,7 @@ import org.bukkit.World;
 
 import java.util.Map;
 
-public class PluginParse extends MiniPlugin<Build> {
+public final class MiniPluginParse extends MiniPlugin<Build> {
 
     public enum PERM implements IPermission {
         COMMAND_PARSE
@@ -19,7 +19,7 @@ public class PluginParse extends MiniPlugin<Build> {
 
     private PluginCommand _command;
 
-    public PluginParse(final Build build) {
+    public MiniPluginParse(final Build build) {
         super(build, "Parse");
 
         PermissionGroup.BUILDER._permissions.add(PERM.COMMAND_PARSE);
@@ -30,9 +30,13 @@ public class PluginParse extends MiniPlugin<Build> {
         _command = (PluginCommand) dependencies.get(PluginCommand.class);
     }
 
-    @SuppressWarnings("unused")
-    public final void parse(final World world, final int radius) {
+    @Override
+    public void onEnable() {
         _command.register(new CommandParse(this));
+    }
+
+    @SuppressWarnings("unused")
+    public void parse(final World world, final int radius) {
     }
 
 }
