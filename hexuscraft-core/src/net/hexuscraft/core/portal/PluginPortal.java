@@ -159,7 +159,18 @@ public class PluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessa
                 final Server server = _miniPlugin._plugin.getServer();
                 final BukkitScheduler scheduler = server.getScheduler();
                 server.broadcastMessage(F.fMain(this) + "The server you are currently connected to is restarting. Sending you to a lobby.");
-                scheduler.runTaskLater(_miniPlugin._plugin, () -> server.getOnlinePlayers().forEach(player -> teleport(player.getName(), "Lobby")), 80);
+                scheduler.runTaskLaterAsynchronously(_miniPlugin._plugin, () -> {
+                    final ServerData[] lobbyServers = ServerQueries.getServers(_pluginDatabase.getJedisPooled(), "Lobby");
+
+                    //noinspection ReassignedVariable
+                    ServerData selectedServer = null;
+                    while (selectedServer == null || selectedServer._name.equals(_serverName)) {
+                        selectedServer = lobbyServers[new Random().nextInt(lobbyServers.length)];
+                    }
+
+                    final ServerData finalSelectedServer = selectedServer;
+                    scheduler.runTask(_miniPlugin._plugin, () -> server.getOnlinePlayers().forEach(player -> teleport(player.getName(), finalSelectedServer._name)));
+                }, 80);
                 scheduler.runTaskLater(_miniPlugin._plugin, server.spigot()::restart, 160);
             }
 
