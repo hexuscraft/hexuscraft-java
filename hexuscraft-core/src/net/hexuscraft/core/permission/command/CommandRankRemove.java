@@ -47,7 +47,7 @@ public class CommandRankRemove extends BaseCommand<HexusPlugin> {
             return;
         }
 
-        if (!sender.hasPermission(targetGroup.toString())) {
+        if (!sender.hasPermission(targetGroup.name())) {
             sender.sendMessage(F.fInsufficientPermissions());
             return;
         }
@@ -55,7 +55,7 @@ public class CommandRankRemove extends BaseCommand<HexusPlugin> {
         final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
         if (profile == null) return;
 
-        pluginDatabase.getJedisPooled().srem(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.toString());
+        pluginDatabase.getJedisPooled().srem(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.name());
         sender.sendMessage(F.fMain(this) + "Removed sub-group " + F.fPermissionGroup(targetGroup) + " from " + F.fItem(profile.name) + ".");
 
         final Player player = _miniPlugin._plugin.getServer().getPlayer(profile.name);

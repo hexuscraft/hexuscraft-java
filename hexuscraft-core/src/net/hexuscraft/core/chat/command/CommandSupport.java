@@ -36,7 +36,7 @@ public class CommandSupport extends BaseCommand<HexusPlugin> {
             }
 
             for (final Player player : _miniPlugin._plugin.getServer().getOnlinePlayers()) {
-                if (player.equals(sender) || player.hasPermission(PermissionGroup.TRAINEE.toString())) {
+                if (player.equals(sender) || player.hasPermission(PermissionGroup.TRAINEE.name())) {
                     player.sendMessage(F.fPermissionGroup(permissionGroup) + " " + permissionGroup._color + sender.getName() + C.fReset + " " + C.cPurple + String.join(" ", args));
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, Integer.MAX_VALUE, 2);
                 }

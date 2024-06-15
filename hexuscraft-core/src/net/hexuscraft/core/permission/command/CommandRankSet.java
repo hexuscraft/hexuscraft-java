@@ -47,7 +47,7 @@ public class CommandRankSet extends BaseCommand<HexusPlugin> {
             return;
         }
 
-        if (!sender.hasPermission(targetGroup.toString())) {
+        if (!sender.hasPermission(targetGroup.name())) {
             sender.sendMessage(F.fInsufficientPermissions());
             return;
         }
@@ -55,7 +55,7 @@ public class CommandRankSet extends BaseCommand<HexusPlugin> {
         final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
         if (profile == null) return;
 
-        pluginDatabase.getJedisPooled().set(PermissionQueries.PRIMARY(profile.uuid.toString()), targetGroup.toString());
+        pluginDatabase.getJedisPooled().set(PermissionQueries.PRIMARY(profile.uuid.toString()), targetGroup.name());
         sender.sendMessage(F.fMain(this) + "Assigned primary group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
 
         final Player player = _miniPlugin._plugin.getServer().getPlayer(profile.name);

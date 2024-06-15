@@ -45,12 +45,12 @@ public class CommandRankAdd extends BaseCommand<HexusPlugin> {
             return;
         }
 
-        if (targetGroup.toString().startsWith("_")) {
+        if (targetGroup.name().startsWith("_")) {
             sender.sendMessage(F.fMain(this) + F.fError("This group cannot be manually granted to players."));
             return;
         }
 
-        if (!sender.hasPermission(targetGroup.toString())) {
+        if (!sender.hasPermission(targetGroup.name())) {
             sender.sendMessage(F.fInsufficientPermissions());
             return;
         }
@@ -58,7 +58,7 @@ public class CommandRankAdd extends BaseCommand<HexusPlugin> {
         final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
         if (profile == null) return;
 
-        _pluginDatabase.getJedisPooled().sadd(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.toString());
+        _pluginDatabase.getJedisPooled().sadd(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.name());
         sender.sendMessage(F.fMain(this) + "Added sub-group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
 
         final Player player = _miniPlugin._plugin.getServer().getPlayer(profile.name);

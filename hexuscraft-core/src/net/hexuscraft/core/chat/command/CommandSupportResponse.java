@@ -38,7 +38,7 @@ public class CommandSupportResponse extends BaseCommand<HexusPlugin> {
             final PermissionGroup permissionGroup = sender instanceof Player ? pluginPermission._primaryGroupMap.get((Player) sender) : null;
 
             for (Player player : _miniPlugin._plugin.getServer().getOnlinePlayers()) {
-                if (player.equals(sender) || player.equals(target) || player.hasPermission(PermissionGroup.TRAINEE.toString())) {
+                if (player.equals(sender) || player.equals(target) || player.hasPermission(PermissionGroup.TRAINEE.name())) {
                     final PermissionGroup targetGroup = pluginPermission._primaryGroupMap.get(player);
 
                     final String sourceStr = F.fPermissionGroup(permissionGroup) + " " + sender.getName();
