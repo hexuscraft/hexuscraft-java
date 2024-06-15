@@ -14,24 +14,24 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.Scanner;
 
-public class Hub extends HexusPlugin {
+public final class Hub extends HexusPlugin {
 
     public Location _spawn = null;
 
     @Override
-    public final void load() {
+    public void load() {
         require(new PluginDoubleJump(this));
         require(new PluginPlayer(this));
         require(new PluginTeam(this));
     }
 
     @Override
-    public final void enable() {
+    public void enable() {
         getServer().setDefaultGameMode(GameMode.ADVENTURE);
     }
 
     @EventHandler
-    public final void onWorldLoad(final WorldLoadEvent event) {
+    public void onWorldLoad(final WorldLoadEvent event) {
         final World world = event.getWorld();
         log("WORLD NAME: '" + world.getName() + "'");
         if (!world.getName().equals("world")) return;
