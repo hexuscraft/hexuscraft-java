@@ -10,13 +10,12 @@ import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 
 public class ServerMonitor implements Runnable {
 
-    public static void main(final String[] args) throws UnknownHostException {
-        new ServerMonitor(InetAddress.getByName(args[0]));
+    public static void main(final String[] args) {
+        new ServerMonitor(args);
     }
 
     private final Console _console;
@@ -27,10 +26,19 @@ public class ServerMonitor implements Runnable {
     private final Map<String, ServerData> _serverDataMap;
     private final Map<String, ServerGroupData> _serverGroupDataMap;
 
-    private ServerMonitor(final InetAddress inetAddress) {
+    private ServerMonitor(final String[] args) {
         _console = System.console();
         _database = new PluginDatabase();
-        _inetAddress = inetAddress;
+
+        //noinspection ReassignedVariable
+        InetAddress inetAddress = null;
+        try {
+            inetAddress = InetAddress.getByName(args[0]);
+        } catch (final Exception ex) {
+            log("Error getting InetAddress: " + ex.getMessage());
+        } finally {
+            _inetAddress = inetAddress;
+        }
 
         final String path;
         try {
