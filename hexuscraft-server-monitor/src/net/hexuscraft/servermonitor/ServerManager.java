@@ -26,12 +26,12 @@ public class ServerManager {
 
         final Map<Integer, ServerData> serverDataIdMap = new HashMap<>();
         for (ServerData existingServer : existingServers) {
-            serverDataIdMap.put(Integer.parseInt(existingServer._name.split("-")[1]), existingServer);
+            serverDataIdMap.put(existingServer._port - serverGroupData._minPort + 1, existingServer);
         }
 
         //noinspection ReassignedVariable
         int lowestId = 0;
-        for (int i = 1; i <= (serverGroupData._maxPort - serverGroupData._minPort); i++) {
+        for (int i = 1; i <= (serverGroupData._maxPort - serverGroupData._minPort + 1); i++) {
             if (serverDataIdMap.containsKey(i)) continue;
             lowestId = i;
             break;
@@ -50,7 +50,7 @@ public class ServerManager {
                     _path + "/Scripts/StartServer.cmd",
                     serverGroupData._name + "-" + lowestId,
                     serverGroupData._name,
-                    Integer.toString(serverGroupData._minPort + lowestId),
+                    Integer.toString(serverGroupData._minPort + lowestId - 1),
                     Integer.toString(serverGroupData._ram),
                     Integer.toString(serverGroupData._capacity),
                     serverGroupData._plugin,
