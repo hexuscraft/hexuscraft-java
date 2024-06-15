@@ -103,9 +103,11 @@ public class PluginAntiCheat extends MiniPlugin<HexusPlugin> {
     }
 
     public final void alert(final Player player, final String reason, final CheatSeverity severity, final int count) {
-        _plugin.getServer().getOnlinePlayers().stream().filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name())).forEach(staff -> {
-            staff.sendMessage(F.fCheat(player, severity, reason, count, _pluginPortal._serverName));
-        });
+        _plugin.getServer()
+                .getOnlinePlayers()
+                .stream()
+                .filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name()))
+                .forEach(staff -> staff.sendMessage(F.fCheat(player, severity, reason, count, _pluginPortal._serverName)));
     }
 
     public final void kick(final Player player, final String reason) {
