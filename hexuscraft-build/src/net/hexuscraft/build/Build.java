@@ -8,12 +8,12 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-public class Build extends HexusPlugin {
+public final class Build extends HexusPlugin {
 
     @Override
     public void load() {
-        new MiniPluginParse(this);
-        new MiniPluginWorld(this);
+        require(new MiniPluginParse(this));
+        require(new MiniPluginWorld(this));
     }
 
     public Location getSpawn() {
