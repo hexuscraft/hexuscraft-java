@@ -1,10 +1,10 @@
-package net.hexuscraft.core.netstat.command.group;
+package net.hexuscraft.core.network.command.group;
 
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.netstat.PluginNetStat;
+import net.hexuscraft.core.network.PluginNetwork;
 import net.hexuscraft.database.queries.ServerQueries;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.JedisPooled;
@@ -13,12 +13,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandNetStatGroupDelete extends BaseCommand<HexusPlugin> {
+public final class CommandNetworkGroupDelete extends BaseCommand<HexusPlugin> {
 
     private final PluginDatabase _pluginDatabase;
 
-    CommandNetStatGroupDelete(final PluginNetStat pluginNetStat, final PluginDatabase pluginDatabase) {
-        super(pluginNetStat, "delete", "<Name>", "Delete a server group.", Set.of("del", "d"), PluginNetStat.PERM.COMMAND_NETSTAT_GROUP_DELETE);
+    CommandNetworkGroupDelete(final PluginNetwork pluginNetwork, final PluginDatabase pluginDatabase) {
+        super(pluginNetwork, "delete", "<Name>", "Delete a server group.", Set.of("del", "d"), PluginNetwork.PERM.COMMAND_NETSTAT_GROUP_DELETE);
         _pluginDatabase = pluginDatabase;
     }
 

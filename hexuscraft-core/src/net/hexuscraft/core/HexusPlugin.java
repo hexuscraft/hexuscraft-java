@@ -11,7 +11,7 @@ import net.hexuscraft.core.database.PluginDatabase;
 import net.hexuscraft.core.entity.PluginEntity;
 import net.hexuscraft.core.gamemode.PluginGameMode;
 import net.hexuscraft.core.item.PluginItem;
-import net.hexuscraft.core.netstat.PluginNetStat;
+import net.hexuscraft.core.network.PluginNetwork;
 import net.hexuscraft.core.party.PluginParty;
 import net.hexuscraft.core.permission.PluginPermission;
 import net.hexuscraft.core.portal.PluginPortal;
@@ -52,7 +52,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         require(new PluginEntity(this));
         require(new PluginGameMode(this));
         require(new PluginItem(this));
-        require(new PluginNetStat(this));
+        require(new PluginNetwork(this));
         require(new PluginParty(this));
         require(new PluginPermission(this));
         require(new PluginPortal(this));

@@ -1,16 +1,16 @@
-package net.hexuscraft.core.netstat;
+package net.hexuscraft.core.network;
 
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.PluginCommand;
 import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.netstat.command.CommandNetStat;
+import net.hexuscraft.core.network.command.CommandNetwork;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 
 import java.util.Map;
 
-public class PluginNetStat extends MiniPlugin<HexusPlugin> {
+public final class PluginNetwork extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_NETSTAT,
@@ -24,8 +24,8 @@ public class PluginNetStat extends MiniPlugin<HexusPlugin> {
     private PluginCommand _pluginCommand;
     private PluginDatabase _pluginDatabase;
 
-    public PluginNetStat(final HexusPlugin plugin) {
-        super(plugin, "Network Statistics");
+    public PluginNetwork(final HexusPlugin plugin) {
+        super(plugin, "Network Management");
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT_GROUP);
@@ -43,7 +43,7 @@ public class PluginNetStat extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onEnable() {
-        _pluginCommand.register(new CommandNetStat(this, _pluginDatabase));
+        _pluginCommand.register(new CommandNetwork(this, _pluginDatabase));
     }
 
 }

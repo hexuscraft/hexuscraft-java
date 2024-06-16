@@ -1,10 +1,10 @@
-package net.hexuscraft.core.netstat.command.group;
+package net.hexuscraft.core.network.command.group;
 
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.netstat.PluginNetStat;
+import net.hexuscraft.core.network.PluginNetwork;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.database.serverdata.ServerGroupData;
 import org.bukkit.command.CommandSender;
@@ -14,22 +14,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandNetStatGroupCreate extends BaseCommand<HexusPlugin> {
+public final class CommandNetworkGroupCreate extends BaseCommand<HexusPlugin> {
 
     private final PluginDatabase _pluginDatabase;
 
-    CommandNetStatGroupCreate(final PluginNetStat pluginNetStat, final PluginDatabase pluginDatabase) {
-        super(pluginNetStat, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE>, [Games]", "Create a server group.", Set.of("c", "add", "a"), PluginNetStat.PERM.COMMAND_NETSTAT_GROUP_CREATE);
+    CommandNetworkGroupCreate(final PluginNetwork pluginNetwork, final PluginDatabase pluginDatabase) {
+        super(pluginNetwork, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE>, [Games]", "Create a server group.", Set.of("c", "add", "a"), PluginNetwork.PERM.COMMAND_NETSTAT_GROUP_CREATE);
         _pluginDatabase = pluginDatabase;
     }
 
     static class InvalidNetStatGroupCreateArgumentException extends Exception {
 
-        private final CommandNetStatGroupCreate _command;
+        private final CommandNetworkGroupCreate _command;
         private final String _argument;
         private final String _reason;
 
-        InvalidNetStatGroupCreateArgumentException(final CommandNetStatGroupCreate command, final String argument, final String reason) {
+        InvalidNetStatGroupCreateArgumentException(final CommandNetworkGroupCreate command, final String argument, final String reason) {
             _command = command;
             _argument = argument;
             _reason = reason;
