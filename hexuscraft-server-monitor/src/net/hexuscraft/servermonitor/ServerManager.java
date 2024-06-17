@@ -46,6 +46,8 @@ public class ServerManager {
         _monitor.log("Starting " + serverName + " (" + serverGroupData._ram + " MB): " + reason);
 
         try {
+            killServer(jedis, serverName, "Removing existing server data before start-up");
+
             final Process process = new ProcessBuilder(
                     _path + "/Scripts/StartServer.cmd",
                     serverGroupData._name + "-" + lowestId,
