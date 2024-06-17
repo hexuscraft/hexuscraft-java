@@ -4,7 +4,7 @@ import net.hexuscraft.build.Build;
 import net.hexuscraft.build.parse.command.CommandParse;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.command.PluginCommand;
+import net.hexuscraft.core.command.MiniPluginCommand;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 import org.bukkit.World;
@@ -17,7 +17,7 @@ public final class MiniPluginParse extends MiniPlugin<Build> {
         COMMAND_PARSE
     }
 
-    private PluginCommand _command;
+    private MiniPluginCommand _command;
 
     public MiniPluginParse(final Build build) {
         super(build, "Parse");
@@ -27,7 +27,7 @@ public final class MiniPluginParse extends MiniPlugin<Build> {
 
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _command = (PluginCommand) dependencies.get(PluginCommand.class);
+        _command = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
     }
 
     @Override

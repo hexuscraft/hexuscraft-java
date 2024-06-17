@@ -5,7 +5,7 @@ import net.hexuscraft.build.world.command.CommandSpawn;
 import net.hexuscraft.build.world.command.CommandWorld;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.command.PluginCommand;
+import net.hexuscraft.core.command.MiniPluginCommand;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 
@@ -19,7 +19,7 @@ public final class MiniPluginWorld extends MiniPlugin<Build> {
         COMMAND_WORLD_CREATE
     }
 
-    private PluginCommand _miniPluginCommand = null;
+    private MiniPluginCommand _miniPluginCommand = null;
 
     public MiniPluginWorld(final Build plugin) {
         super(plugin, "World");
@@ -31,7 +31,7 @@ public final class MiniPluginWorld extends MiniPlugin<Build> {
 
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _miniPluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
+        _miniPluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MaterialSearch {
+public final class MaterialSearch {
 
     public static Material[] materialSearch(final String searchName) {
         if (searchName.equals("*")) {

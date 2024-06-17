@@ -3,8 +3,8 @@ package net.hexuscraft.core.permission;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
-import net.hexuscraft.core.command.PluginCommand;
-import net.hexuscraft.core.database.PluginDatabase;
+import net.hexuscraft.core.command.MiniPluginCommand;
+import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.command.CommandRank;
 import net.hexuscraft.database.queries.PermissionQueries;
 import org.bukkit.entity.Player;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class PluginPermission extends MiniPlugin<HexusPlugin> {
+public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_RANK,
@@ -34,15 +34,15 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
         OPERATOR
     }
 
-    private PluginCommand _pluginCommand;
-    private PluginDatabase _pluginDatabase;
+    private MiniPluginCommand _pluginCommand;
+    private MiniPluginDatabase _miniPluginDatabase;
 
     public final HashMap<Player, PermissionGroup> _primaryGroupMap;
     public final HashMap<Player, Set<PermissionGroup>> _secondaryGroupsMap;
 
     private final HashMap<Player, PermissionAttachment> _permissionAttachmentMap;
 
-    public PluginPermission(final HexusPlugin plugin) {
+    public MiniPluginPermission(final HexusPlugin plugin) {
         super(plugin, "Permissions");
 
         _primaryGroupMap = new HashMap<>();
@@ -62,26 +62,26 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
-        _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
+        _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
+        _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
     }
 
     @Override
-    public final void onEnable() {
-        for (final Player player : _plugin.getServer().getOnlinePlayers()) {
+    public void onEnable() {
+        for (final Player player : _hexusPlugin.getServer().getOnlinePlayers()) {
             onPlayerJoin(player);
         }
 
-        _pluginCommand.register(new CommandRank(this, _pluginDatabase));
+        _pluginCommand.register(new CommandRank(this, _miniPluginDatabase));
     }
 
     @Override
-    public final void onDisable() {
+    public void onDisable() {
         _primaryGroupMap.clear();
         _secondaryGroupsMap.clear();
     }
 
-    public final void refreshPermissions(Player player) {
+    public void refreshPermissions(Player player) {
         onPlayerQuit(player);
         onPlayerJoin(player);
     }
@@ -95,7 +95,7 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
         _primaryGroupMap.put(player, PermissionGroup.MEMBER);
         _secondaryGroupsMap.put(player, Set.of());
 
-        final JedisPooled jedis = _pluginDatabase.getJedisPooled();
+        final JedisPooled jedis = _miniPluginDatabase.getJedisPooled();
         final String uuidStr = player.getUniqueId().toString();
 
         final String primaryGroupStr = jedis.get(PermissionQueries.PRIMARY(uuidStr));
@@ -117,7 +117,7 @@ public class PluginPermission extends MiniPlugin<HexusPlugin> {
             warning(ex.getMessage());
         }
 
-        final PermissionAttachment permissionAttachment = player.addAttachment(_plugin);
+        final PermissionAttachment permissionAttachment = player.addAttachment(_hexusPlugin);
         _permissionAttachmentMap.put(player, permissionAttachment);
 
         player.setOp(false);

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class PunishData {
+public final class PunishData {
 
     public final UUID id; // part of the key name
     public final PunishType type;
@@ -88,11 +88,11 @@ public class PunishData {
                 + "\n- removeServer: " + removeServer;
     }
 
-    public final Long getRemaining(Long now) {
+    public Long getRemaining(Long now) {
         return length - (now - origin);
     }
 
-    public final Long getRemaining() {
+    public Long getRemaining() {
         return getRemaining(System.currentTimeMillis());
     }
 

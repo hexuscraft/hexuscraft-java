@@ -5,9 +5,9 @@ import net.hexuscraft.arcade.game.GameTeam;
 import org.bukkit.Color;
 
 @SuppressWarnings("unused")
-public class GameTheBridges extends Game {
+public final class GameTheBridges extends Game {
 
-    protected GameTheBridges() {
+    private GameTheBridges() {
         super("The Bridges", new GameTeam[]{
                 new GameTeam("Red", Color.RED),
                 new GameTeam("Blue", Color.AQUA),

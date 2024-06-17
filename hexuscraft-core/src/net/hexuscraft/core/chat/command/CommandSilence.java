@@ -1,37 +1,32 @@
 package net.hexuscraft.core.chat.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
-import net.hexuscraft.core.chat.PluginChat;
+import net.hexuscraft.core.chat.MiniPluginChat;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandSilence extends BaseCommand<HexusPlugin> {
+public final class CommandSilence extends BaseCommand<MiniPluginChat> {
 
-    private final PluginChat _pluginChat;
-
-    public CommandSilence(PluginChat pluginChat) {
-        super(pluginChat, "silence", "", "Mute the global chat.", Set.of("mutechat"), PluginChat.PERM.COMMAND_SILENCE);
-
-        _pluginChat = pluginChat;
+    public CommandSilence(final MiniPluginChat miniPluginChat) {
+        super(miniPluginChat, "silence", "", "Mute the global chat.", Set.of("mutechat"), MiniPluginChat.PERM.COMMAND_SILENCE);
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length == 0) {
-            if (_pluginChat.getMuted()) {
-                _pluginChat.setMuted(false, true);
-                _pluginChat._plugin.getServer().getOnlinePlayers().forEach(player -> {
-                    if (!player.hasPermission(PluginChat.PERM.COMMAND_SILENCE_SEE.name())) return;
-                    _pluginChat._plugin.getServer().broadcastMessage(F.fSub("Staff", F.fItem(sender), " ", F.fSuccess("un-muted the global chat"), "."));
+            if (_miniPlugin.getMuted()) {
+                _miniPlugin.setMuted(false, true);
+                _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
+                    if (!player.hasPermission(MiniPluginChat.PERM.COMMAND_SILENCE_SEE.name())) return;
+                    _miniPlugin._hexusPlugin.getServer().broadcastMessage(F.fSub("Staff", F.fItem(sender), " ", F.fSuccess("un-muted the global chat"), "."));
                 });
                 return;
             }
-            _pluginChat.setMuted(true, true);
-            _pluginChat._plugin.getServer().getOnlinePlayers().forEach(player -> {
-                if (!player.hasPermission(PluginChat.PERM.COMMAND_SILENCE_SEE.name())) return;
+            _miniPlugin.setMuted(true, true);
+            _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
+                if (!player.hasPermission(MiniPluginChat.PERM.COMMAND_SILENCE_SEE.name())) return;
                 player.sendMessage(F.fSub("Staff", F.fItem(sender), " ", F.fError("muted the global chat"), "."));
             });
 

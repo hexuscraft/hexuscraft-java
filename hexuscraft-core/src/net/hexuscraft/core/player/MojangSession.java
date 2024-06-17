@@ -3,7 +3,7 @@ package net.hexuscraft.core.player;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class MojangSession {
+public final class MojangSession {
 
     public final UUID uuid;
     public final String name;

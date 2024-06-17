@@ -34,10 +34,10 @@ public final class PlayerSearch {
     }
 
     public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers, final String searchName, final CommandSender sender) {
-        if (searchName.equals(".") && sender instanceof Player player) return new Player[]{player};
+        if (searchName.equals(".") && sender instanceof final Player player) return new Player[]{player};
 
         final List<? extends Player> onlinePlayersList = new ArrayList<>(onlinePlayers);
-        if (searchName.equals("**") && sender instanceof Player player) {
+        if (searchName.equals("**") && sender instanceof final Player player) {
             onlinePlayersList.remove(player);
         }
 

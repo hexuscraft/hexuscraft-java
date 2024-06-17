@@ -5,7 +5,7 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.portal.PluginPortal;
+import net.hexuscraft.core.portal.MiniPluginPortal;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,18 +17,17 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("unused")
-public class PluginAntiCheat extends MiniPlugin<HexusPlugin> {
+public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         CHEAT_ALERTS
     }
 
-    private PluginPortal _pluginPortal;
+    private MiniPluginPortal _miniPluginPortal;
 
     private final Map<Player, Map<String, Integer>> _violations;
 
-    public PluginAntiCheat(final HexusPlugin plugin) {
+    public MiniPluginAntiCheat(final HexusPlugin plugin) {
         super(plugin, "Anti Cheat");
 
         _violations = new HashMap<>();
@@ -38,16 +37,16 @@ public class PluginAntiCheat extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
+        _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
     }
 
     @Override
-    public final void onEnable() {
-        _plugin.getServer().getOnlinePlayers().forEach(player -> onPlayerJoin(new PlayerJoinEvent(player, null)));
+    public void onEnable() {
+        _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> onPlayerJoin(new PlayerJoinEvent(player, null)));
     }
 
     @Override
-    public final void onDisable() {
+    public void onDisable() {
         _violations.clear();
     }
 
@@ -102,19 +101,19 @@ public class PluginAntiCheat extends MiniPlugin<HexusPlugin> {
         }
     }
 
-    public final void alert(final Player player, final String reason, final CheatSeverity severity, final int count) {
-        _plugin.getServer()
+    public void alert(final Player player, final String reason, final CheatSeverity severity, final int count) {
+        _hexusPlugin.getServer()
                 .getOnlinePlayers()
                 .stream()
                 .filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name()))
-                .forEach(staff -> staff.sendMessage(F.fCheat(player, severity, reason, count, _pluginPortal._serverName)));
+                .forEach(staff -> staff.sendMessage(F.fCheat(player, severity, reason, count, _miniPluginPortal._serverName)));
     }
 
-    public final void kick(final Player player, final String reason) {
+    public void kick(final Player player, final String reason) {
         player.kickPlayer(F.fPunishKick("Automatic cheat detection - " + reason));
     }
 
-    public final void flag(final Player player, final String reason, final CheatSeverity severity) {
+    public void flag(final Player player, final String reason, final CheatSeverity severity) {
         final String keyName = reason + ":" + severity.name();
 
         final Map<String, Integer> playerViolations = _violations.get(player);

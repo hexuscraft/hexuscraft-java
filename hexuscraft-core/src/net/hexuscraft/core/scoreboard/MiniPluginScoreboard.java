@@ -13,11 +13,11 @@ import org.bukkit.scoreboard.Team;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PluginScoreboard extends MiniPlugin<HexusPlugin> {
+public final class MiniPluginScoreboard extends MiniPlugin<HexusPlugin> {
 
     private final Map<Player, Scoreboard> _scoreboardMap;
 
-    public PluginScoreboard(final HexusPlugin plugin) {
+    public MiniPluginScoreboard(final HexusPlugin plugin) {
         super(plugin, "Scoreboard");
 
         _scoreboardMap = new HashMap<>();
@@ -25,14 +25,14 @@ public class PluginScoreboard extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onEnable() {
-        for (Player player : _plugin.getServer().getOnlinePlayers()) {
+        for (Player player : _hexusPlugin.getServer().getOnlinePlayers()) {
             onPlayerJoin(new PlayerJoinEvent(player, null));
         }
     }
 
     @Override
     public void onDisable() {
-        for (Player player : _plugin.getServer().getOnlinePlayers()) {
+        for (Player player : _hexusPlugin.getServer().getOnlinePlayers()) {
             onPlayerQuit(new PlayerQuitEvent(player, null));
         }
         _scoreboardMap.clear();
@@ -42,7 +42,7 @@ public class PluginScoreboard extends MiniPlugin<HexusPlugin> {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        Scoreboard scoreboard = _plugin.getServer().getScoreboardManager().getNewScoreboard();
+        Scoreboard scoreboard = _hexusPlugin.getServer().getScoreboardManager().getNewScoreboard();
         player.setScoreboard(scoreboard);
         _scoreboardMap.put(player, scoreboard);
     }
@@ -50,7 +50,7 @@ public class PluginScoreboard extends MiniPlugin<HexusPlugin> {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        player.setScoreboard(_plugin.getServer().getScoreboardManager().getMainScoreboard());
+        player.setScoreboard(_hexusPlugin.getServer().getScoreboardManager().getMainScoreboard());
 
         Scoreboard scoreboard = _scoreboardMap.get(player);
         scoreboard.getTeams().forEach(Team::unregister);

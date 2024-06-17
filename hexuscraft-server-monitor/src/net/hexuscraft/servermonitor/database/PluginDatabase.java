@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class PluginDatabase {
+public final class PluginDatabase {
 
     private final Database _database;
 

@@ -1,11 +1,10 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.PluginDatabase;
+import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.portal.PluginPortal;
+import net.hexuscraft.core.portal.MiniPluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import net.hexuscraft.database.serverdata.ServerGroupData;
@@ -19,21 +18,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-public class CommandHostEvent extends BaseCommand<HexusPlugin> {
+public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
 
-    private final PluginDatabase _pluginDatabase;
+    private final MiniPluginDatabase _miniPluginDatabase;
 
     private final Set<CommandSender> _pending;
 
-    public CommandHostEvent(PluginPortal pluginPortal, PluginDatabase pluginDatabase) {
-        super(pluginPortal, "hostevent", "", "Start a new private server with prefix 'EVENT'.", Set.of("hes"), PluginPortal.PERM.COMMAND_HOSTEVENT);
+    public CommandHostEvent(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
+        super(miniPluginPortal, "hostevent", "", "Start a new private server with prefix 'EVENT'.", Set.of("hes"), MiniPluginPortal.PERM.COMMAND_HOSTEVENT);
 
-        _pluginDatabase = pluginDatabase;
+        _miniPluginDatabase = miniPluginDatabase;
         _pending = new HashSet<>();
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, String[] args) {
         if (args.length > 0) {
             sender.sendMessage(help(alias));
             return;
@@ -45,11 +44,11 @@ public class CommandHostEvent extends BaseCommand<HexusPlugin> {
         }
         _pending.add(sender);
 
-        final BukkitScheduler scheduler = _miniPlugin._plugin.getServer().getScheduler();
+        final BukkitScheduler scheduler = _miniPlugin._hexusPlugin.getServer().getScheduler();
         sender.sendMessage(F.fMain(this, "Searching for existing servers..."));
 
-        scheduler.runTaskAsynchronously(_miniPlugin._plugin, () -> {
-            final JedisPooled jedis = _pluginDatabase.getJedisPooled();
+        scheduler.runTaskAsynchronously(_miniPlugin._hexusPlugin, () -> {
+            final JedisPooled jedis = _miniPluginDatabase.getJedisPooled();
 
             final String serverName;
             try {
@@ -86,7 +85,7 @@ public class CommandHostEvent extends BaseCommand<HexusPlugin> {
 
             final BukkitTask[] tasks = new BukkitTask[1]; // a bit of a dodgy workaround - but it works
             final long start = System.currentTimeMillis();
-            tasks[0] = scheduler.runTaskTimerAsynchronously(_miniPlugin._plugin, () -> {
+            tasks[0] = scheduler.runTaskTimerAsynchronously(_miniPlugin._hexusPlugin, () -> {
                 if (System.currentTimeMillis() - start > 30000) {
                     sender.sendMessage(F.fMain(this, F.fError("Could not locate your server within 30 seconds. There might not be enough resources available to start your server. Maybe try again later?")));
                     _pending.remove(sender);
@@ -95,7 +94,7 @@ public class CommandHostEvent extends BaseCommand<HexusPlugin> {
                 }
 
                 for (ServerData serverData : ServerQueries.getServers(jedis, new ServerGroupData("EVENT", Map.of()))) {
-                    scheduler.runTaskLaterAsynchronously(_miniPlugin._plugin, () -> ((PluginPortal) _miniPlugin).teleport(sender.getName(), serverData._name), 20L);
+                    scheduler.runTaskLaterAsynchronously(_miniPlugin._hexusPlugin, () -> _miniPlugin.teleport(sender.getName(), serverData._name), 20L);
                     _pending.remove(sender);
                     tasks[0].cancel();
                     return;

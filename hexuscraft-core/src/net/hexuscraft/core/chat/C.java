@@ -3,7 +3,7 @@ package net.hexuscraft.core.chat;
 import org.bukkit.ChatColor;
 
 @SuppressWarnings("unused")
-public class C {
+public final class C {
 
     public static final String fBold = ChatColor.BOLD.toString();
     public static final String fItalic = ChatColor.ITALIC.toString();

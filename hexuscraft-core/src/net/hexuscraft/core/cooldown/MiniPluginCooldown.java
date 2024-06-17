@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PluginCooldown extends MiniPlugin<HexusPlugin> {
+public final class MiniPluginCooldown extends MiniPlugin<HexusPlugin> {
 
     private final Map<Object, List<Cooldown>> _cooldownMap;
 
-    public PluginCooldown(final HexusPlugin plugin) {
+    public MiniPluginCooldown(final HexusPlugin plugin) {
         super(plugin, "Cooldown");
         _cooldownMap = new HashMap<>();
     }
@@ -37,7 +37,7 @@ public class PluginCooldown extends MiniPlugin<HexusPlugin> {
         return delay - (now - start);
     }
 
-    public final boolean use(final Object parent, final String name, final Long delayMs) {
+    public boolean use(final Object parent, final String name, final Long delayMs) {
         final Cooldown cooldown = getCooldown(parent, name);
         if (cooldown != null)
             return calculateRemaining(System.currentTimeMillis(), cooldown._started, cooldown._delayMs) <= 0;
@@ -46,7 +46,7 @@ public class PluginCooldown extends MiniPlugin<HexusPlugin> {
         return true;
     }
 
-    public final void use(final Object parent, final String name, final Long delayMs, final CommandSender sender) {
+    public void use(final Object parent, final String name, final Long delayMs, final CommandSender sender) {
         if (use(parent, name, delayMs)) return;
 
         final Cooldown cooldown = getCooldown(parent, name);

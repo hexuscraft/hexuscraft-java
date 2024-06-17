@@ -1,7 +1,6 @@
 package net.hexuscraft.core.buildversion.command;
 
-import net.hexuscraft.core.HexusPlugin;
-import net.hexuscraft.core.buildversion.PluginBuildVersion;
+import net.hexuscraft.core.buildversion.MiniPluginBuildVersion;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.command.CommandSender;
@@ -10,21 +9,21 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import java.util.Map;
 import java.util.Set;
 
-public class CommandBuildVersion extends BaseCommand<HexusPlugin> {
+public final class CommandBuildVersion extends BaseCommand<MiniPluginBuildVersion> {
 
-    public CommandBuildVersion(final PluginBuildVersion plugin) {
-        super(plugin, "buildversion", "", "View information about the current plugin.", Set.of("bv"), PluginBuildVersion.PERM.COMMAND_BUILDVERSION);
+    public CommandBuildVersion(final MiniPluginBuildVersion plugin) {
+        super(plugin, "buildversion", "", "View information about the current plugin.", Set.of("bv"), MiniPluginBuildVersion.PERM.COMMAND_BUILDVERSION);
     }
 
     @Override
-    public final void run(final CommandSender sender, final String alias, final String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 0) {
             sender.sendMessage(help(alias));
             return;
         }
 
-        final PluginBuildVersion plugin = (PluginBuildVersion) _miniPlugin;
-        final PluginDescriptionFile description = plugin._plugin.getDescription();
+        final MiniPluginBuildVersion plugin = _miniPlugin;
+        final PluginDescriptionFile description = plugin._hexusPlugin.getDescription();
         final long lastModified = plugin.getLastModifiedMillis();
 
         final StringBuilder builder = new StringBuilder(F.fMain(this, "Plugin Information:\n"));

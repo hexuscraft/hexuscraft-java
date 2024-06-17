@@ -9,19 +9,19 @@ import org.bukkit.command.CommandSender;
 
 import java.util.*;
 
-public abstract class BaseMultiCommand<T extends HexusPlugin> extends BaseCommand<T> {
+public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugin>> extends BaseCommand<T> {
 
     private final Set<BaseCommand<T>> _commands;
 
-    public BaseMultiCommand(MiniPlugin<T> miniPlugin, String name, String description, Set<String> aliases, IPermission permission, Set<BaseCommand<T>> commands) {
+    public BaseMultiCommand(final T miniPlugin, String name, String description, Set<String> aliases, IPermission permission, Set<BaseCommand<T>> commands) {
         super(miniPlugin, name, "", description, aliases, permission);
         _commands = commands;
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 0) {
-            for (BaseCommand<? extends HexusPlugin> command : _commands) {
+            for (final BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands) {
                 if (!command.isAlias(args[0])) continue;
                 if (!command.testPermission(sender)) return;
                 command.run(sender, alias + " " + args[0], Arrays.copyOfRange(args, 1, args.length));
@@ -43,7 +43,7 @@ public abstract class BaseMultiCommand<T extends HexusPlugin> extends BaseComman
     @Override
     public final List<String> tab(CommandSender sender, String alias, String[] args) {
         if (args.length > 1) {
-            for (BaseCommand<? extends HexusPlugin> command : _commands) {
+            for (final BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands) {
                 if (!command.getName().equals(args[0]) && !command.getAliases().contains(args[0])) continue;
                 if (!command.testPermissionSilent(sender)) break;
 

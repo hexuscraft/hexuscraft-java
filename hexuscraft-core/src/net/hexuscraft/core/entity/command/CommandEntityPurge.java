@@ -1,30 +1,26 @@
 package net.hexuscraft.core.entity.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.entity.PluginEntity;
+import net.hexuscraft.core.entity.MiniPluginEntity;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandEntityPurge extends BaseCommand<HexusPlugin> {
+public final class CommandEntityPurge extends BaseCommand<MiniPluginEntity> {
 
-    final PluginEntity pluginEntity;
-
-    CommandEntityPurge(PluginEntity pluginEntity) {
-        super(pluginEntity, "purge", "", "Temporarily purge all NPCs.", Set.of("kill", "p"), PluginEntity.PERM.COMMAND_ENTITY_PURGE);
-        this.pluginEntity = pluginEntity;
+    CommandEntityPurge(final MiniPluginEntity miniPluginEntity) {
+        super(miniPluginEntity, "purge", "", "Temporarily purge all NPCs.", Set.of("kill", "p"), MiniPluginEntity.PERM.COMMAND_ENTITY_PURGE);
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 0) {
             sender.sendMessage(help(alias));
             return;
         }
 
-        int amount = pluginEntity.purge();
+        int amount = _miniPlugin.purge();
 
         sender.sendMessage(F.fMain(this) + "Temporarily purged " + F.fItem(amount + " NPCs") + ".");
     }

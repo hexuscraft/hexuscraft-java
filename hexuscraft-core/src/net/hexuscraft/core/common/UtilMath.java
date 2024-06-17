@@ -3,7 +3,7 @@ package net.hexuscraft.core.common;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-public class UtilMath {
+public final class UtilMath {
 
     public static double trim(final double n, final int degree, final RoundingMode mode) {
         final DecimalFormat format = new DecimalFormat("#." + "#".repeat(Math.max(0, degree)));

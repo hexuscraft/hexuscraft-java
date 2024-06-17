@@ -1,6 +1,6 @@
 package net.hexuscraft.core.cooldown;
 
-public class Cooldown {
+public final class Cooldown {
 
     public final String _name;
     public final long _started;

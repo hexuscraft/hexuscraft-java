@@ -1,16 +1,15 @@
 package net.hexuscraft.arcade.game.command;
 
-import net.hexuscraft.arcade.Arcade;
-import net.hexuscraft.arcade.game.PluginGame;
+import net.hexuscraft.arcade.game.MiniPluginGame;
 import net.hexuscraft.core.command.BaseMultiCommand;
 
 import java.util.Set;
 
-public class CommandGame extends BaseMultiCommand<Arcade> {
+public final class CommandGame extends BaseMultiCommand<MiniPluginGame> {
 
-    public CommandGame(PluginGame pluginGame) {
-        super(pluginGame, "game", "Manage the active game.", Set.of("arcade"), PluginGame.PERM.COMMAND_GAME, Set.of(
-                new CommandGameSet(pluginGame)
+    public CommandGame(final MiniPluginGame miniPluginGame) {
+        super(miniPluginGame, "game", "Manage the active game.", Set.of("arcade"), MiniPluginGame.PERM.COMMAND_GAME, Set.of(
+                new CommandGameSet(miniPluginGame)
         ));
     }
 

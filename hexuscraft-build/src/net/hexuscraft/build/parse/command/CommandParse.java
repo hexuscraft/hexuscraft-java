@@ -1,6 +1,5 @@
 package net.hexuscraft.build.parse.command;
 
-import net.hexuscraft.build.Build;
 import net.hexuscraft.build.parse.MiniPluginParse;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
@@ -10,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandParse extends BaseCommand<Build> {
+public final class CommandParse extends BaseCommand<MiniPluginParse> {
 
     @SuppressWarnings("FieldCanBeLocal")
     private final Integer MINIMUM_RADIUS = 1;
@@ -29,14 +28,10 @@ public final class CommandParse extends BaseCommand<Build> {
         }
     }
 
-    private final MiniPluginParse _parse;
-
     public CommandParse(final MiniPluginParse parse) {
         super(parse, "parse", "<Radius>",
                 "Parse your current world. The parse centers around chunk (0,0). The radius is the amount of chunks in each direction parsed.",
                 Set.of(), MiniPluginParse.PERM.COMMAND_PARSE);
-
-        _parse = parse;
     }
 
     @Override
@@ -57,7 +52,7 @@ public final class CommandParse extends BaseCommand<Build> {
 
     private void runLogic(final CommandSender sender, final String[] args)
             throws ExInvalidRadius, ExInvalidSender, ExInvalidWorld, ExRadiusTooSmall {
-        if (!(sender instanceof Player player)) {
+        if (!(sender instanceof final Player player)) {
             throw new ExInvalidSender();
         }
 
@@ -77,7 +72,7 @@ public final class CommandParse extends BaseCommand<Build> {
             throw new ExInvalidWorld();
         }
 
-        _parse.parse(world, radius);
+        _miniPlugin.parse(world, radius);
     }
 
 }

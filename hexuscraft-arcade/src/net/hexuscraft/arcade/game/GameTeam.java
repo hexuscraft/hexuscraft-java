@@ -2,7 +2,7 @@ package net.hexuscraft.arcade.game;
 
 import org.bukkit.Color;
 
-public class GameTeam {
+public final class GameTeam {
 
     public final String _name;
     public final Color _color;

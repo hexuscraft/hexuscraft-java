@@ -1,23 +1,22 @@
 package net.hexuscraft.core.permission.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
+import net.hexuscraft.core.permission.MiniPluginPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.permission.PluginPermission;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Set;
 
-public class CommandRankList extends BaseCommand<HexusPlugin> {
+public final class CommandRankList extends BaseCommand<MiniPluginPermission> {
 
-    CommandRankList(PluginPermission pluginPermission) {
-        super(pluginPermission, "list", "", "List all permission groups.", Set.of("l"), PluginPermission.PERM.COMMAND_RANK_LIST);
+    CommandRankList(MiniPluginPermission miniPluginPermission) {
+        super(miniPluginPermission, "list", "", "List all permission groups.", Set.of("l"), MiniPluginPermission.PERM.COMMAND_RANK_LIST);
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length != 0) {
             sender.sendMessage(help(alias));
             return;

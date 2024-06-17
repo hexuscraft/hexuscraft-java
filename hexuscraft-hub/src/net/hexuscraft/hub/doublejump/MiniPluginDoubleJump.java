@@ -10,9 +10,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 
-public class PluginDoubleJump extends MiniPlugin<Hub> {
+public final class MiniPluginDoubleJump extends MiniPlugin<Hub> {
 
-    public PluginDoubleJump(final Hub hub) {
+    public MiniPluginDoubleJump(final Hub hub) {
         super(hub, "Double Jump");
     }
 

@@ -1,24 +1,20 @@
 package net.hexuscraft.core.entity.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.entity.PluginEntity;
+import net.hexuscraft.core.entity.MiniPluginEntity;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandEntityRefresh extends BaseCommand<HexusPlugin> {
+public final class CommandEntityRefresh extends BaseCommand<MiniPluginEntity> {
 
-    final PluginEntity pluginEntity;
-
-    CommandEntityRefresh(PluginEntity pluginEntity) {
-        super(pluginEntity, "refresh", "", "Refresh all NPCs.", Set.of("ref", "r"), PluginEntity.PERM.COMMAND_ENTITY_REFRESH);
-        this.pluginEntity = pluginEntity;
+    CommandEntityRefresh(final MiniPluginEntity miniPluginEntity) {
+        super(miniPluginEntity, "refresh", "", "Refresh all NPCs.", Set.of("ref", "r"), MiniPluginEntity.PERM.COMMAND_ENTITY_REFRESH);
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 0) {
             sender.sendMessage(help(alias));
             return;
@@ -27,9 +23,9 @@ public class CommandEntityRefresh extends BaseCommand<HexusPlugin> {
         long start = System.currentTimeMillis();
 
         sender.sendMessage(F.fMain(this) + "Processing NPC refresh...");
-        _miniPlugin._plugin.getServer().getWorlds().forEach(world -> {
+        _miniPlugin._hexusPlugin.getServer().getWorlds().forEach(world -> {
             sender.sendMessage(F.fMain(this) + "Refreshing NPCs in world " + F.fItem(world.getName()) + ".");
-            pluginEntity.refreshNPCs(world);
+            _miniPlugin.refreshNPCs(world);
         });
 
         sender.sendMessage(F.fMain(this) + "Completed NPC refresh in " + F.fItem(F.fTime(System.currentTimeMillis() - start)) + ".");

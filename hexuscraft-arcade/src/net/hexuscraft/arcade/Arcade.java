@@ -1,13 +1,13 @@
 package net.hexuscraft.arcade;
 
-import net.hexuscraft.arcade.game.PluginGame;
+import net.hexuscraft.arcade.game.MiniPluginGame;
 import net.hexuscraft.core.HexusPlugin;
 
-public class Arcade extends HexusPlugin {
+public final class Arcade extends HexusPlugin {
 
     @Override
-    public final void load() {
-        require(new PluginGame(this));
+    public void load() {
+        require(new MiniPluginGame(this));
     }
 
 }

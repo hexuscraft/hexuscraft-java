@@ -12,7 +12,7 @@ import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.util.*;
 
-public class ServerMonitor implements Runnable {
+public final class ServerMonitor implements Runnable {
 
     public static void main(final String[] args) {
         new ServerMonitor(args);
@@ -57,7 +57,7 @@ public class ServerMonitor implements Runnable {
         new Thread(this).start();
     }
 
-    public final void log(final String message, final Object... args) {
+    public void log(final String message, final Object... args) {
         _console.printf("[" + System.currentTimeMillis() + "] " + message + "\n", args);
     }
 
@@ -147,7 +147,7 @@ public class ServerMonitor implements Runnable {
     }
 
     @Override
-    public final void run() {
+    public void run() {
         //noinspection InfiniteLoopStatement
         while (true) {
             try {

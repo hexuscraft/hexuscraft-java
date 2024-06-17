@@ -1,12 +1,11 @@
 package net.hexuscraft.core.chat.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
-import net.hexuscraft.core.chat.PluginChat;
+import net.hexuscraft.core.chat.MiniPluginChat;
 import net.hexuscraft.core.command.BaseCommand;
+import net.hexuscraft.core.permission.MiniPluginPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.permission.PluginPermission;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -17,29 +16,29 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandSupportResponse extends BaseCommand<HexusPlugin> {
+public final class CommandSupportResponse extends BaseCommand<MiniPluginChat> {
 
-    final PluginPermission pluginPermission;
+    final MiniPluginPermission _miniPluginPermission;
 
-    public CommandSupportResponse(PluginChat pluginChat, PluginPermission pluginPermission) {
-        super(pluginChat, "supportresponse", "<Player> <Message>", "Respond to a help request.", Set.of("ma", "sr"), PluginChat.PERM.COMMAND_SUPPORT_RESPONSE);
-        this.pluginPermission = pluginPermission;
+    public CommandSupportResponse(final MiniPluginChat miniPluginChat, final MiniPluginPermission miniPluginPermission) {
+        super(miniPluginChat, "supportresponse", "<Player> <Message>", "Respond to a help request.", Set.of("ma", "sr"), MiniPluginChat.PERM.COMMAND_SUPPORT_RESPONSE);
+        _miniPluginPermission = miniPluginPermission;
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 1) {
-            Player target = _miniPlugin._plugin.getServer().getPlayer(args[0]);
+            Player target = _miniPlugin._hexusPlugin.getServer().getPlayer(args[0]);
             if (target == null) {
                 sender.sendMessage(F.fMain(this) + "Could not find a player with specified name.");
                 return;
             }
 
-            final PermissionGroup permissionGroup = sender instanceof Player ? pluginPermission._primaryGroupMap.get((Player) sender) : null;
+            final PermissionGroup permissionGroup = sender instanceof Player ? _miniPluginPermission._primaryGroupMap.get((Player) sender) : null;
 
-            for (Player player : _miniPlugin._plugin.getServer().getOnlinePlayers()) {
+            for (Player player : _miniPlugin._hexusPlugin.getServer().getOnlinePlayers()) {
                 if (player.equals(sender) || player.equals(target) || player.hasPermission(PermissionGroup.TRAINEE.name())) {
-                    final PermissionGroup targetGroup = pluginPermission._primaryGroupMap.get(player);
+                    final PermissionGroup targetGroup = _miniPluginPermission._primaryGroupMap.get(player);
 
                     final String sourceStr = F.fPermissionGroup(permissionGroup) + " " + sender.getName();
                     final String targetStr = F.fPermissionGroup(targetGroup) + " " + player.getName();
@@ -64,8 +63,8 @@ public class CommandSupportResponse extends BaseCommand<HexusPlugin> {
         }
 
         //noinspection ReassignedVariable
-        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
-        if (sender instanceof Player player) {
+        Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
+        if (sender instanceof final Player player) {
             streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
         }
 

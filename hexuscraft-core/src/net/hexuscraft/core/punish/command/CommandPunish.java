@@ -1,6 +1,5 @@
 package net.hexuscraft.core.punish.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
@@ -8,7 +7,7 @@ import net.hexuscraft.core.item.UtilItem;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.punish.PluginPunish;
+import net.hexuscraft.core.punish.MiniPluginPunish;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -23,19 +22,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandPunish extends BaseCommand<HexusPlugin> {
+public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
 
-    public CommandPunish(PluginPunish pluginPunish) {
-        super(pluginPunish, "punishment", "<Player> <Reason>", "Open the punishment panel.", Set.of("punish", "x"), PluginPunish.PERM.COMMAND_PUNISH);
+    public CommandPunish(MiniPluginPunish miniPluginPunish) {
+        super(miniPluginPunish, "punishment", "<Player> <Reason>", "Open the punishment panel.", Set.of("punish", "x"), MiniPluginPunish.PERM.COMMAND_PUNISH);
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length < 2) {
             sender.sendMessage(help(alias));
             return;
         }
-        if (!(sender instanceof Player player)) {
+        if (!(sender instanceof final Player player)) {
             sender.sendMessage(F.fMain(this) + "Only players can run this command.");
             return;
         }
@@ -53,8 +52,8 @@ public class CommandPunish extends BaseCommand<HexusPlugin> {
         List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
-            if (sender instanceof Player player) {
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
+            if (sender instanceof final Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }
 
@@ -63,8 +62,8 @@ public class CommandPunish extends BaseCommand<HexusPlugin> {
         return names;
     }
 
-    public final void openGui(Player player, MojangProfile targetProfile, String reasonMessage) {
-        Inventory gui = _miniPlugin._plugin.getServer().createInventory(player, 6*9, "Punish " + targetProfile.name);
+    public void openGui(Player player, MojangProfile targetProfile, String reasonMessage) {
+        Inventory gui = _miniPlugin._hexusPlugin.getServer().createInventory(player, 6*9, "Punish " + targetProfile.name);
 
         ItemStack devNotice = UtilItem.createDyeItem(DyeColor.YELLOW, C.cBlue + C.fBold + "Developer Notice", "Developers are advised against", "using the punishment system", "without consulting an " + F.fPermissionGroup(PermissionGroup.ADMINISTRATOR), "", "Exceptions allowed in emergency");
         devNotice.addUnsafeEnchantment(Enchantment.DURABILITY, 1);

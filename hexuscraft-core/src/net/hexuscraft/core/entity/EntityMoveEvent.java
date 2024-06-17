@@ -8,7 +8,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
 
 @SuppressWarnings("unused")
-public class EntityMoveEvent extends EntityEvent implements Cancellable {
+public final class EntityMoveEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 

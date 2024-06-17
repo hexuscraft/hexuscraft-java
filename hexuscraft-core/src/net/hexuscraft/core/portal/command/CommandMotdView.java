@@ -1,31 +1,30 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.portal.PluginPortal;
+import net.hexuscraft.core.database.MiniPluginDatabase;
+import net.hexuscraft.core.portal.MiniPluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandMotdView extends BaseCommand<HexusPlugin> {
+public final class CommandMotdView extends BaseCommand<MiniPluginPortal> {
 
-    private final PluginDatabase _pluginDatabase;
+    private final MiniPluginDatabase _miniPluginDatabase;
 
-    CommandMotdView(PluginPortal pluginPortal, PluginDatabase pluginDatabase) {
-        super(pluginPortal, "view", "", "View the current MOTD.", Set.of("v"), PluginPortal.PERM.COMMAND_MOTD_VIEW);
+    CommandMotdView(MiniPluginPortal miniPluginPortal, MiniPluginDatabase miniPluginDatabase) {
+        super(miniPluginPortal, "view", "", "View the current MOTD.", Set.of("v"), MiniPluginPortal.PERM.COMMAND_MOTD_VIEW);
 
-        _pluginDatabase = pluginDatabase;
+        _miniPluginDatabase = miniPluginDatabase;
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         sender.sendMessage(F.fMain(this) + "Viewing the current MOTD:\n"
-                + F.fMain(C.cDGray + C.fBold) + C.fReset + ChatColor.translateAlternateColorCodes('&', ServerQueries.getMotd(_pluginDatabase.getJedisPooled()))
+                + F.fMain(C.cDGray + C.fBold) + C.fReset + ChatColor.translateAlternateColorCodes('&', ServerQueries.getMotd(_miniPluginDatabase.getJedisPooled()))
         );
     }
 

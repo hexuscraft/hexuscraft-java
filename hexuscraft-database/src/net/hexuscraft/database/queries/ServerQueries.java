@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings("unused")
-public class ServerQueries {
+public final class ServerQueries {
 
     public static String SERVER(final String name) {
         return Database.buildQuery("server", name);

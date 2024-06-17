@@ -10,18 +10,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class ServerManager {
+public final class ServerManager {
 
     private final ServerMonitor _monitor;
 
     private final String _path;
 
-    protected ServerManager(final ServerMonitor serverMonitor, final String path) {
+    ServerManager(final ServerMonitor serverMonitor, final String path) {
         _monitor = serverMonitor;
         _path = path;
     }
 
-    public final void startServer(final JedisPooled jedis, final ServerGroupData serverGroupData, final String reason) {
+    public void startServer(final JedisPooled jedis, final ServerGroupData serverGroupData, final String reason) {
         final ServerData[] existingServers = ServerQueries.getServers(jedis, serverGroupData);
 
         final Map<Integer, ServerData> serverDataIdMap = new HashMap<>();
@@ -92,7 +92,7 @@ public class ServerManager {
         }
     }
 
-    public final void killServer(final JedisPooled jedis, final String serverName, final String reason) {
+    public void killServer(final JedisPooled jedis, final String serverName, final String reason) {
         _monitor.log("Killing " + serverName + ": " + reason);
 
         try {

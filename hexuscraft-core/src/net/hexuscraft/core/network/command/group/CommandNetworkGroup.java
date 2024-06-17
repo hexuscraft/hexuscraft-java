@@ -1,19 +1,18 @@
 package net.hexuscraft.core.network.command.group;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.command.BaseMultiCommand;
-import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.network.PluginNetwork;
+import net.hexuscraft.core.database.MiniPluginDatabase;
+import net.hexuscraft.core.network.MiniPluginNetwork;
 
 import java.util.Set;
 
-public final class CommandNetworkGroup extends BaseMultiCommand<HexusPlugin> {
+public final class CommandNetworkGroup extends BaseMultiCommand<MiniPluginNetwork> {
 
-    public CommandNetworkGroup(final PluginNetwork pluginNetwork, final PluginDatabase pluginDatabase) {
-        super(pluginNetwork, "group", "Manage server groups.", Set.of("g"), PluginNetwork.PERM.COMMAND_NETSTAT_GROUP, Set.of(
-                new CommandNetworkGroupCreate(pluginNetwork, pluginDatabase),
-                new CommandNetworkGroupDelete(pluginNetwork, pluginDatabase),
-                new CommandNetworkGroupList(pluginNetwork, pluginDatabase)
+    public CommandNetworkGroup(final MiniPluginNetwork miniPluginNetwork, final MiniPluginDatabase miniPluginDatabase) {
+        super(miniPluginNetwork, "group", "Manage server groups.", Set.of("g"), MiniPluginNetwork.PERM.COMMAND_NETSTAT_GROUP, Set.of(
+                new CommandNetworkGroupCreate(miniPluginNetwork, miniPluginDatabase),
+                new CommandNetworkGroupDelete(miniPluginNetwork, miniPluginDatabase),
+                new CommandNetworkGroupList(miniPluginNetwork, miniPluginDatabase)
         ));
     }
 

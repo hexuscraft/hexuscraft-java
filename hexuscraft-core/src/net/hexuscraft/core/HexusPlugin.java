@@ -1,24 +1,24 @@
 package net.hexuscraft.core;
 
-import net.hexuscraft.core.anticheat.PluginAntiCheat;
-import net.hexuscraft.core.authentication.PluginAuthentication;
-import net.hexuscraft.core.buildversion.PluginBuildVersion;
-import net.hexuscraft.core.chat.PluginChat;
-import net.hexuscraft.core.combat.PluginCombat;
-import net.hexuscraft.core.command.PluginCommand;
-import net.hexuscraft.core.cooldown.PluginCooldown;
-import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.entity.PluginEntity;
-import net.hexuscraft.core.gamemode.PluginGameMode;
-import net.hexuscraft.core.item.PluginItem;
-import net.hexuscraft.core.network.PluginNetwork;
-import net.hexuscraft.core.party.PluginParty;
-import net.hexuscraft.core.permission.PluginPermission;
-import net.hexuscraft.core.portal.PluginPortal;
-import net.hexuscraft.core.punish.PluginPunish;
-import net.hexuscraft.core.report.PluginReport;
-import net.hexuscraft.core.scoreboard.PluginScoreboard;
-import net.hexuscraft.core.teleport.PluginTeleport;
+import net.hexuscraft.core.anticheat.MiniPluginAntiCheat;
+import net.hexuscraft.core.authentication.MiniPluginAuthentication;
+import net.hexuscraft.core.buildversion.MiniPluginBuildVersion;
+import net.hexuscraft.core.chat.MiniPluginChat;
+import net.hexuscraft.core.combat.MiniPluginCombat;
+import net.hexuscraft.core.command.MiniPluginCommand;
+import net.hexuscraft.core.cooldown.MiniPluginCooldown;
+import net.hexuscraft.core.database.MiniPluginDatabase;
+import net.hexuscraft.core.entity.MiniPluginEntity;
+import net.hexuscraft.core.gamemode.MiniPluginGameMode;
+import net.hexuscraft.core.item.MiniPluginItem;
+import net.hexuscraft.core.network.MiniPluginNetwork;
+import net.hexuscraft.core.party.MiniPluginParty;
+import net.hexuscraft.core.permission.MiniPluginPermission;
+import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.punish.MiniPluginPunish;
+import net.hexuscraft.core.report.MiniPluginReport;
+import net.hexuscraft.core.scoreboard.MiniPluginScoreboard;
+import net.hexuscraft.core.teleport.MiniPluginTeleport;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -41,25 +41,25 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     public final void onLoad() {
         long start = System.currentTimeMillis();
 
-        require(new PluginAntiCheat(this));
-        require(new PluginAuthentication(this));
-        require(new PluginBuildVersion(this));
-        require(new PluginChat(this));
-        require(new PluginCombat(this));
-        require(new PluginCommand(this));
-        require(new PluginCooldown(this));
-        require(new PluginDatabase(this));
-        require(new PluginEntity(this));
-        require(new PluginGameMode(this));
-        require(new PluginItem(this));
-        require(new PluginNetwork(this));
-        require(new PluginParty(this));
-        require(new PluginPermission(this));
-        require(new PluginPortal(this));
-        require(new PluginPunish(this));
-        require(new PluginReport(this));
-        require(new PluginScoreboard(this));
-        require(new PluginTeleport(this));
+        require(new MiniPluginAntiCheat(this));
+        require(new MiniPluginAuthentication(this));
+        require(new MiniPluginBuildVersion(this));
+        require(new MiniPluginChat(this));
+        require(new MiniPluginCombat(this));
+        require(new MiniPluginCommand(this));
+        require(new MiniPluginCooldown(this));
+        require(new MiniPluginDatabase(this));
+        require(new MiniPluginEntity(this));
+        require(new MiniPluginGameMode(this));
+        require(new MiniPluginItem(this));
+        require(new MiniPluginNetwork(this));
+        require(new MiniPluginParty(this));
+        require(new MiniPluginPermission(this));
+        require(new MiniPluginPortal(this));
+        require(new MiniPluginPunish(this));
+        require(new MiniPluginReport(this));
+        require(new MiniPluginScoreboard(this));
+        require(new MiniPluginTeleport(this));
 
         if (_isDebug)
             log("Core plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");

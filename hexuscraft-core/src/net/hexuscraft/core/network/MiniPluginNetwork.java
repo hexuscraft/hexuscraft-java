@@ -2,15 +2,15 @@ package net.hexuscraft.core.network;
 
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.command.PluginCommand;
-import net.hexuscraft.core.database.PluginDatabase;
+import net.hexuscraft.core.command.MiniPluginCommand;
+import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.network.command.CommandNetwork;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 
 import java.util.Map;
 
-public final class PluginNetwork extends MiniPlugin<HexusPlugin> {
+public final class MiniPluginNetwork extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_NETSTAT,
@@ -21,10 +21,10 @@ public final class PluginNetwork extends MiniPlugin<HexusPlugin> {
         COMMAND_NETSTAT_SERVER
     }
 
-    private PluginCommand _pluginCommand;
-    private PluginDatabase _pluginDatabase;
+    private MiniPluginCommand _pluginCommand;
+    private MiniPluginDatabase _miniPluginDatabase;
 
-    public PluginNetwork(final HexusPlugin plugin) {
+    public MiniPluginNetwork(final HexusPlugin plugin) {
         super(plugin, "Network Management");
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_NETSTAT);
@@ -37,13 +37,13 @@ public final class PluginNetwork extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
-        _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
+        _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
+        _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
     }
 
     @Override
     public void onEnable() {
-        _pluginCommand.register(new CommandNetwork(this, _pluginDatabase));
+        _pluginCommand.register(new CommandNetwork(this, _miniPluginDatabase));
     }
 
 }

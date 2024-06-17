@@ -1,19 +1,19 @@
 package net.hexuscraft.proxy.database;
 
-public class MessagedRunnable implements Runnable {
+public final class MessagedRunnable implements Runnable {
 
     public String _message;
 
-    protected MessagedRunnable(String message) {
+    private MessagedRunnable(String message) {
         _message = message;
     }
 
-    public final void setMessage(String message) {
+    public void setMessage(String message) {
         _message = message;
     }
 
     @SuppressWarnings("unused")
-    public final String getMessage() {
+    public String getMessage() {
         return _message;
     }
 

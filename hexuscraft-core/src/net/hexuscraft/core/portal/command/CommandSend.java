@@ -1,10 +1,9 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.portal.PluginPortal;
+import net.hexuscraft.core.portal.MiniPluginPortal;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -13,18 +12,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandSend extends BaseCommand<HexusPlugin> {
+public final class CommandSend extends BaseCommand<MiniPluginPortal> {
 
-    private final PluginPortal _portal;
-
-    public CommandSend(final PluginPortal pluginPortal) {
-        super(pluginPortal, "send", "<Player> <Name>", "Teleport a player to a server.", Set.of(), PluginPortal.PERM.COMMAND_SEND);
-
-        _portal = pluginPortal;
+    public CommandSend(final MiniPluginPortal miniPluginPortal) {
+        super(miniPluginPortal, "send", "<Player> <Name>", "Teleport a player to a server.", Set.of(), MiniPluginPortal.PERM.COMMAND_SEND);
     }
 
     @Override
-    public final void run(final CommandSender sender, final String alias, final String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length != 2) {
             sender.sendMessage(help(alias));
             return;
@@ -35,13 +30,13 @@ public class CommandSend extends BaseCommand<HexusPlugin> {
 
         if (PlayerSearch.fetchMojangProfile(targetName, sender) == null) return;
 
-        if (!_portal.doesServerExistWithName(serverName)) {
+        if (!_miniPlugin.doesServerExistWithName(serverName)) {
             sender.sendMessage(F.fMain(this) + F.fError("Could not locate a server with name ", F.fItem(serverName), "."));
             return;
         }
 
         sender.sendMessage(F.fMain(this) + "Sending " + F.fItem(targetName) + " to server " + F.fItem(serverName) + ".");
-        _portal.teleport(targetName, serverName, sender.getName());
+        _miniPlugin.teleport(targetName, serverName, sender.getName());
     }
 
     @Override
@@ -49,7 +44,7 @@ public class CommandSend extends BaseCommand<HexusPlugin> {
         final List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
             if (sender instanceof final Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }

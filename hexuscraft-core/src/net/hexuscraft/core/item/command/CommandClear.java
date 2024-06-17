@@ -1,9 +1,8 @@
 package net.hexuscraft.core.item.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.item.PluginItem;
+import net.hexuscraft.core.item.MiniPluginItem;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,10 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandClear extends BaseCommand<HexusPlugin> {
+public final class CommandClear extends BaseCommand<MiniPluginItem> {
 
-    public CommandClear(PluginItem pluginItem) {
-        super(pluginItem, "clear", "[Players]", "Clear the inventory of targets.", Set.of("clearinventory"), PluginItem.PERM.COMMAND_CLEAR);
+    public CommandClear(final MiniPluginItem miniPluginItem) {
+        super(miniPluginItem, "clear", "[Players]", "Clear the inventory of targets.", Set.of("clearinventory"), MiniPluginItem.PERM.COMMAND_CLEAR);
     }
 
     @Override
@@ -26,7 +25,7 @@ public class CommandClear extends BaseCommand<HexusPlugin> {
             return;
         }
 
-        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._plugin.getServer().getOnlinePlayers(), args[0], sender);
+        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
         if (targets.length == 0) return;
 
         for (Player target : targets) {
@@ -39,7 +38,7 @@ public class CommandClear extends BaseCommand<HexusPlugin> {
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         final List<String> completions = new ArrayList<>(List.of("*", "**", "."));
-        completions.addAll(_miniPlugin._plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
+        completions.addAll(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
         return completions;
     }
 }

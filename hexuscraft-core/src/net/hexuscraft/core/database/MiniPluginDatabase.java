@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class PluginDatabase extends MiniPlugin<HexusPlugin> {
+public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
 
     private final Database _database;
 
@@ -23,7 +23,7 @@ public class PluginDatabase extends MiniPlugin<HexusPlugin> {
 
     private BukkitTask _asyncMessageTask;
 
-    public PluginDatabase(final HexusPlugin plugin) {
+    public MiniPluginDatabase(final HexusPlugin plugin) {
         super(plugin, "Database");
 
         _callbacks = new HashMap<>();
@@ -48,7 +48,7 @@ public class PluginDatabase extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onEnable() {
-        _asyncMessageTask = _plugin.getServer().getScheduler().runTaskAsynchronously(_plugin, () -> {
+        _asyncMessageTask = _hexusPlugin.getServer().getScheduler().runTaskAsynchronously(_hexusPlugin, () -> {
             while (true) {
                 try {
                     getJedisPooled().psubscribe(new JedisPubSub() {
@@ -88,7 +88,7 @@ public class PluginDatabase extends MiniPlugin<HexusPlugin> {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public UUID registerCallback(String channelName, MessagedRunnable callback) {
+    public UUID registerCallback(final String channelName, final MessagedRunnable callback) {
         UUID id = UUID.randomUUID();
         if (!_callbacks.containsKey(channelName)) {
             _callbacks.put(channelName, new HashMap<>());
@@ -98,7 +98,7 @@ public class PluginDatabase extends MiniPlugin<HexusPlugin> {
     }
 
     @SuppressWarnings("unused")
-    public void unregisterCallback(UUID id) {
+    public void unregisterCallback(final UUID id) {
         _callbacks.forEach((s, uuidRunnableMap) -> {
             if (!uuidRunnableMap.containsKey(id)) {
                 return;

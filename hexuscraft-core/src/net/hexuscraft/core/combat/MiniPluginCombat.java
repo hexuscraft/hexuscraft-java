@@ -10,11 +10,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PluginCombat extends MiniPlugin<HexusPlugin> {
+public final class MiniPluginCombat extends MiniPlugin<HexusPlugin> {
 
     final Map<Player, BukkitRunnable> _pendingRespawns;
 
-    public PluginCombat(final HexusPlugin plugin) {
+    public MiniPluginCombat(final HexusPlugin plugin) {
         super(plugin, "Combat");
 
         _pendingRespawns = new HashMap<>();
@@ -37,7 +37,7 @@ public class PluginCombat extends MiniPlugin<HexusPlugin> {
                 player.spigot().respawn();
             }
         };
-        runnable.runTaskLater(_plugin, 15);
+        runnable.runTaskLater(_hexusPlugin, 15);
 
         _pendingRespawns.put(player, runnable);
     }

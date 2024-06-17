@@ -58,7 +58,7 @@ public enum PermissionGroup {
         _permissions = new ArrayList<>();
     }
 
-    public static String[] getColoredNames(boolean skipServerGroups) {
+    public static String[] getColoredNames(final boolean skipServerGroups) {
         final List<String> names = new ArrayList<>();
         for (final PermissionGroup group : PermissionGroup.values()) {
             final String groupName = group.name();

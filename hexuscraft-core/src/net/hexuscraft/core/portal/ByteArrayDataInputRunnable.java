@@ -2,7 +2,7 @@ package net.hexuscraft.core.portal;
 
 import com.google.common.io.ByteArrayDataInput;
 
-public class ByteArrayDataInputRunnable implements Runnable {
+public final class ByteArrayDataInputRunnable implements Runnable {
 
     ByteArrayDataInput in;
 

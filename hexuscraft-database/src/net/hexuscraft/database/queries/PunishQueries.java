@@ -2,7 +2,7 @@ package net.hexuscraft.database.queries;
 
 import net.hexuscraft.database.Database;
 
-public class PunishQueries {
+public final class PunishQueries {
 
     public static String LIST(String uuid) {
         return Database.buildQuery("user", uuid, "punishments");

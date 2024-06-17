@@ -13,11 +13,11 @@ public class MessagedRunnable implements Runnable {
         _miniPlugin = plugin;
     }
 
-    public final void setMessage(String message) {
+    public void setMessage(String message) {
         _message = message;
     }
 
-    public final String getMessage() {
+    public String getMessage() {
         return _message;
     }
 

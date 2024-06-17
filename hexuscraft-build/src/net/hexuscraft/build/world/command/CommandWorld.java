@@ -1,17 +1,15 @@
 package net.hexuscraft.build.world.command;
 
-import net.hexuscraft.build.Build;
 import net.hexuscraft.build.world.MiniPluginWorld;
-import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.BaseMultiCommand;
 
 import java.util.Set;
 
-public final class CommandWorld extends BaseMultiCommand<Build> {
+public final class CommandWorld extends BaseMultiCommand<MiniPluginWorld> {
 
-    public CommandWorld(final MiniPlugin<Build> miniPlugin) {
-        super(miniPlugin, "world", "Create, edit and remove worlds.", Set.of("w","wrld"), MiniPluginWorld.PERM.COMMAND_WORLD, Set.of(
-                new CommandWorldCreate(miniPlugin)
+    public CommandWorld(final MiniPluginWorld miniPluginWorld) {
+        super(miniPluginWorld, "world", "Create, edit and remove worlds.", Set.of(), MiniPluginWorld.PERM.COMMAND_WORLD, Set.of(
+                new CommandWorldCreate(miniPluginWorld)
         ));
     }
 

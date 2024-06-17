@@ -3,7 +3,7 @@ package net.hexuscraft.core.entity;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
-import net.hexuscraft.core.command.PluginCommand;
+import net.hexuscraft.core.command.MiniPluginCommand;
 import net.hexuscraft.core.entity.command.CommandEntity;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
@@ -24,7 +24,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.*;
 
-public class PluginEntity extends MiniPlugin<HexusPlugin> {
+public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_ENTITY,
@@ -33,9 +33,9 @@ public class PluginEntity extends MiniPlugin<HexusPlugin> {
         COMMAND_ENTITY_REFRESH
     }
 
-    private PluginCommand _pluginCommand;
+    private MiniPluginCommand _pluginCommand;
 
-    public PluginEntity(final HexusPlugin plugin) {
+    public MiniPluginEntity(final HexusPlugin plugin) {
         super(plugin, "Entity");
 
         PermissionGroup.BUILDER._permissions.addAll(List.of(
@@ -49,24 +49,24 @@ public class PluginEntity extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
+        _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
     }
 
     @Override
-    public final void onEnable() {
+    public void onEnable() {
         _pluginCommand.register(new CommandEntity(this));
 
-        _plugin.getServer().getWorlds().forEach(this::refreshNPCs);
+        _hexusPlugin.getServer().getWorlds().forEach(this::refreshNPCs);
 
         final Map<Entity, Location> entityLocationMap = new HashMap<>();
-        final Server server = _plugin.getServer();
-        server.getScheduler().runTaskTimer(_plugin, () -> server.getWorlds().forEach(world -> world.getEntities().forEach(entity -> {
+        final Server server = _hexusPlugin.getServer();
+        server.getScheduler().runTaskTimer(_hexusPlugin, () -> server.getWorlds().forEach(world -> world.getEntities().forEach(entity -> {
             final Location from = entityLocationMap.get(entity);
             final Location to = entity.getLocation();
 
             if (!to.equals(from)) {
                 final EntityMoveEvent event = new EntityMoveEvent(entity, from, to);
-                _plugin.getServer().getPluginManager().callEvent(event);
+                _hexusPlugin.getServer().getPluginManager().callEvent(event);
                 if (event.isCancelled()) {
                     entity.teleport(event.getFrom());
                     return;
@@ -78,12 +78,12 @@ public class PluginEntity extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public final void onDisable() {
-        _plugin.getServer().getWorlds().forEach(this::removeNPCs);
+    public void onDisable() {
+        _hexusPlugin.getServer().getWorlds().forEach(this::removeNPCs);
     }
 
-    public final void createEntity(final World world, final double x, final double y, final double z,
-                                   final float yaw, final float pitch, final String[] data) {
+    public void createEntity(final World world, final double x, final double y, final double z,
+                             final float yaw, final float pitch, final String[] data) {
 //        log(String.join(", ", new String[]{world.toString(), Double.toString(x), Double.toString(y), Double.toString(z), Float.toString(yaw), Float.toString(pitch), String.join(":", data)}));
         final Location location = new Location(world, x, y, z, yaw, pitch);
 
@@ -179,22 +179,22 @@ public class PluginEntity extends MiniPlugin<HexusPlugin> {
             return;
         }
 
-        entity.setMetadata("NPC", new FixedMetadataValue(_plugin, data[0]));
+        entity.setMetadata("NPC", new FixedMetadataValue(_hexusPlugin, data[0]));
         for (int i = 1; i < data.length; i++) {
-            entity.setMetadata(data[i - 1], new FixedMetadataValue(_plugin, data[i]));
+            entity.setMetadata(data[i - 1], new FixedMetadataValue(_hexusPlugin, data[i]));
         }
 
         entity.teleport(location);
     }
 
-    public final void removeNPCs(final World world) {
+    public void removeNPCs(final World world) {
         world.getEntities().forEach(entity -> {
             if (entity.getMetadata("NPC").isEmpty()) return;
             entity.remove();
         });
     }
 
-    public final void refreshNPCs(final World world) {
+    public void refreshNPCs(final World world) {
         removeNPCs(world);
 
         final List<String> npcStrings = new ArrayList<>();
@@ -222,17 +222,17 @@ public class PluginEntity extends MiniPlugin<HexusPlugin> {
     }
 
     @EventHandler
-    public final void onWorldLoad(final WorldLoadEvent event) {
+    public void onWorldLoad(final WorldLoadEvent event) {
         refreshNPCs(event.getWorld());
     }
 
-    public final Entity[] list() {
+    public Entity[] list() {
         // TODO
         return new Entity[0];
     }
 
     @SuppressWarnings("SameReturnValue")
-    public final int purge() {
+    public int purge() {
         // TODO
         return 0;
     }

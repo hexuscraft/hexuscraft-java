@@ -6,7 +6,7 @@ import redis.clients.jedis.JedisPooled;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServerGroupData {
+public final class ServerGroupData {
 
     public final String _name;
 
@@ -56,7 +56,7 @@ public class ServerGroupData {
         _games = games;
     }
 
-    public final Map<String, String> toMap() {
+    public Map<String, String> toMap() {
         final Map<String, String> map = new HashMap<>();
         map.put("requiredPermission", _requiredPermission);
         map.put("minPort", Integer.toString(_minPort));
@@ -72,7 +72,7 @@ public class ServerGroupData {
         return map;
     }
 
-    public final void update(final JedisPooled jedis) {
+    public void update(final JedisPooled jedis) {
         jedis.hset(ServerQueries.SERVERGROUP(_name), toMap());
     }
 

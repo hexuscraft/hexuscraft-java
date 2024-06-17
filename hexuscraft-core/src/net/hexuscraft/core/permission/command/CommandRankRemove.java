@@ -1,11 +1,10 @@
 package net.hexuscraft.core.permission.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.PluginDatabase;
+import net.hexuscraft.core.database.MiniPluginDatabase;
+import net.hexuscraft.core.permission.MiniPluginPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.permission.PluginPermission;
 import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.database.queries.PermissionQueries;
@@ -18,17 +17,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandRankRemove extends BaseCommand<HexusPlugin> {
+public final class CommandRankRemove extends BaseCommand<MiniPluginPermission> {
 
-    final PluginDatabase pluginDatabase;
+    private final MiniPluginDatabase _miniPluginDatabase;
 
-    CommandRankRemove(final PluginPermission pluginPermission, final PluginDatabase pluginDatabase) {
-        super(pluginPermission, "remove", "<Player> <Permission Group>", "Take a group from a player.", Set.of("r"), PluginPermission.PERM.COMMAND_RANK_REMOVE);
-        this.pluginDatabase = pluginDatabase;
+    CommandRankRemove(final MiniPluginPermission miniPluginPermission, final MiniPluginDatabase miniPluginDatabase) {
+        super(miniPluginPermission, "remove", "<Player> <Permission Group>", "Take a group from a player.", Set.of("r"), MiniPluginPermission.PERM.COMMAND_RANK_REMOVE);
+        _miniPluginDatabase = miniPluginDatabase;
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length != 2) {
             sender.sendMessage(help(alias));
             return;
@@ -55,14 +54,14 @@ public class CommandRankRemove extends BaseCommand<HexusPlugin> {
         final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
         if (profile == null) return;
 
-        pluginDatabase.getJedisPooled().srem(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.name());
+        _miniPluginDatabase.getJedisPooled().srem(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.name());
         sender.sendMessage(F.fMain(this) + "Removed sub-group " + F.fPermissionGroup(targetGroup) + " from " + F.fItem(profile.name) + ".");
 
-        final Player player = _miniPlugin._plugin.getServer().getPlayer(profile.name);
+        final Player player = _miniPlugin._hexusPlugin.getServer().getPlayer(profile.name);
         if (player == null) return;
 
         player.sendMessage(F.fMain(this) + "You no longer have sub-group " + F.fPermissionGroup(targetGroup) + ".");
-        ((PluginPermission) _miniPlugin).refreshPermissions(player);
+        _miniPlugin.refreshPermissions(player);
     }
 
     @Override
@@ -71,7 +70,7 @@ public class CommandRankRemove extends BaseCommand<HexusPlugin> {
         switch (args.length) {
             case 1 -> {
                 //noinspection ReassignedVariable
-                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer().getOnlinePlayers().stream();
+                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
                 if (sender instanceof final Player player) {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
                 }

@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public abstract class BaseCommand<T extends HexusPlugin> extends Command {
+public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> extends Command {
 
-    public final MiniPlugin<T> _miniPlugin;
+    public final T _miniPlugin;
 
-    public BaseCommand(final MiniPlugin<T> miniPlugin, final String name, final String usage, final String description, final Set<String> aliases, final IPermission permission) {
+    public BaseCommand(final T miniPlugin, final String name, final String usage, final String description, final Set<String> aliases, final IPermission permission) {
         super(name.toLowerCase(), description, usage, aliases.stream().map(String::toLowerCase).toList());
         setPermission(permission.toString());
         setPermissionMessage(F.fInsufficientPermissions());

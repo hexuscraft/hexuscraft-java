@@ -4,14 +4,14 @@ import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
-import net.hexuscraft.core.command.PluginCommand;
+import net.hexuscraft.core.command.MiniPluginCommand;
 import net.hexuscraft.core.database.MessagedRunnable;
-import net.hexuscraft.core.database.PluginDatabase;
+import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.player.MojangSession;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.portal.PluginPortal;
+import net.hexuscraft.core.portal.MiniPluginPortal;
 import net.hexuscraft.core.punish.command.CommandPunish;
 import net.hexuscraft.core.punish.command.CommandPunishHistory;
 import net.hexuscraft.core.punish.command.CommandRules;
@@ -30,7 +30,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.IOException;
 import java.util.*;
 
-public final class PluginPunish extends MiniPlugin<HexusPlugin> {
+public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_PUNISH,
@@ -38,21 +38,21 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
         COMMAND_RULES
     }
 
-    private PluginCommand _pluginCommand;
-    private PluginDatabase _pluginDatabase;
-    private PluginPortal _pluginPortal;
+    private MiniPluginCommand _pluginCommand;
+    private MiniPluginDatabase _miniPluginDatabase;
+    private MiniPluginPortal _miniPluginPortal;
 
     private final UUID DEFAULT_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-    public PluginPunish(final HexusPlugin plugin) {
+    public MiniPluginPunish(final HexusPlugin plugin) {
         super(plugin, "Punish");
     }
 
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
-        _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
-        _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
+        _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
+        _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
+        _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
 
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_PUNISH_HISTORY);
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_RULES);
@@ -66,7 +66,7 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
         _pluginCommand.register(new CommandPunish(this));
         _pluginCommand.register(new CommandPunishHistory(this));
 
-        _pluginDatabase.registerCallback("punishment", new MessagedRunnable(this) {
+        _miniPluginDatabase.registerCallback("punishment", new MessagedRunnable(this) {
 
             @Override
             public void run() {
@@ -74,7 +74,7 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
                 final String targetId = data[0];
                 final String punishmentId = data[1];
 
-                final Map<String, String> rawData = new HashMap<>(_pluginDatabase.getJedisPooled().hgetAll(PunishQueries.PUNISHMENT(punishmentId)));
+                final Map<String, String> rawData = new HashMap<>(_miniPluginDatabase.getJedisPooled().hgetAll(PunishQueries.PUNISHMENT(punishmentId)));
                 rawData.put("id", punishmentId);
 
                 final PunishData punishData = new PunishData(rawData);
@@ -88,7 +88,7 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
                     throw new RuntimeException(ex);
                 }
 
-                final Player target = _miniPlugin._plugin.getServer().getPlayer(targetSession.name);
+                final Player target = _miniPlugin._hexusPlugin.getServer().getPlayer(targetSession.name);
 
                 if (punishData.type.equals(PunishType.WARNING)) {
                     if (target != null) {
@@ -96,7 +96,7 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
                         target.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 1);
                     }
-                    _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
+                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
                         staff.sendMessage(F.fMain(this, F.fItem(staffSession.name), " warned ", F.fItem(targetSession.name), "."));
                         staff.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
@@ -109,7 +109,7 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
                         target.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
                         target.playSound(target.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 0.6F);
                     }
-                    _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
+                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
                         staff.sendMessage(F.fMain(this, F.fItem(staffSession.name), " muted ", F.fItem(targetSession.name), " for ", F.fItem(F.fTime(punishData.length)), "."));
                         staff.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
@@ -118,9 +118,9 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
                 }
                 if (punishData.type.equals(PunishType.BAN)) {
                     if (target != null) {
-                        _miniPlugin._plugin.getServer().getScheduler().runTask(_miniPlugin._plugin, () -> target.kickPlayer(F.fPunishBan(UUID.fromString(punishmentId), punishData.reason, punishData.length)));
+                        _miniPlugin._hexusPlugin.getServer().getScheduler().runTask(_miniPlugin._hexusPlugin, () -> target.kickPlayer(F.fPunishBan(UUID.fromString(punishmentId), punishData.reason, punishData.length)));
                     }
-                    _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(staff -> {
+                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(staff -> {
                         if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
                         staff.sendMessage(F.fMain(this, F.fItem(staffSession.name), " banned ", F.fItem(targetSession.name), " for ", F.fItem(F.fTime(punishData.length)), "."));
                         staff.sendMessage(F.fMain("", "Reason: ", C.cWhite + punishData.reason));
@@ -134,7 +134,7 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
 
     @EventHandler
     private void onConnect(final AsyncPlayerPreLoginEvent event) {
-        final Set<String> punishmentIds = _pluginDatabase.getJedisPooled().smembers(PunishQueries.LIST(event.getUniqueId().toString()));
+        final Set<String> punishmentIds = _miniPluginDatabase.getJedisPooled().smembers(PunishQueries.LIST(event.getUniqueId().toString()));
 
         // We want to display the longest ban remaining.
         // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most recent ban.
@@ -143,7 +143,7 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
         final Set<PunishData> activePunishments = new HashSet<>();
 
         for (final String id : punishmentIds) {
-            final Map<String, String> rawData = new HashMap<>(_pluginDatabase.getJedisPooled().hgetAll(PunishQueries.PUNISHMENT(id)));
+            final Map<String, String> rawData = new HashMap<>(_miniPluginDatabase.getJedisPooled().hgetAll(PunishQueries.PUNISHMENT(id)));
             rawData.put("id", id);
 
             final PunishData punishData = new PunishData(rawData);
@@ -161,13 +161,13 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
 
             final long remaining = punishData.getRemaining();
             if (remaining <= 0) {
-                _pluginDatabase.getJedisPooled().hset(PunishQueries.PUNISHMENT(id), Map.of(
+                _miniPluginDatabase.getJedisPooled().hset(PunishQueries.PUNISHMENT(id), Map.of(
                         "active", "false",
                         "removeOrigin", Long.toString(System.currentTimeMillis()),
                         "removeReason", "EXPIRED",
-                        "removeServer", _pluginPortal._serverName,
+                        "removeServer", _miniPluginPortal._serverName,
                         "removeStaffId", DEFAULT_UUID.toString(),
-                        "removeStaffServer", _pluginPortal._serverName
+                        "removeStaffServer", _miniPluginPortal._serverName
                 ));
                 continue;
             }
@@ -204,14 +204,14 @@ public final class PluginPunish extends MiniPlugin<HexusPlugin> {
                 "origin", Long.toString(System.currentTimeMillis()),
                 "length", Long.toString(length),
                 "reason", reason,
-                "server", _pluginPortal._serverName,
+                "server", _miniPluginPortal._serverName,
                 "staffId", (staffUuid == null ? DEFAULT_UUID : staffUuid).toString(),
-                "staffServer", _pluginPortal._serverName
+                "staffServer", _miniPluginPortal._serverName
         ));
 
-        _pluginDatabase.getJedisPooled().hset(PunishQueries.PUNISHMENT(punishData.id.toString()), punishData.toMap());
-        _pluginDatabase.getJedisPooled().sadd(PunishQueries.LIST(targetUuid.toString()), punishData.id.toString());
-        _pluginDatabase.getJedisPooled().publish("punishment", targetUuid + "," + punishData.id);
+        _miniPluginDatabase.getJedisPooled().hset(PunishQueries.PUNISHMENT(punishData.id.toString()), punishData.toMap());
+        _miniPluginDatabase.getJedisPooled().sadd(PunishQueries.LIST(targetUuid.toString()), punishData.id.toString());
+        _miniPluginDatabase.getJedisPooled().publish("punishment", targetUuid + "," + punishData.id);
     }
 
     @EventHandler

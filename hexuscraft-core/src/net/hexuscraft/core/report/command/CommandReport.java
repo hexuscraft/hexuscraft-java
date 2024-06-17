@@ -1,12 +1,11 @@
 package net.hexuscraft.core.report.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.report.PluginReport;
+import net.hexuscraft.core.report.MiniPluginReport;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -16,20 +15,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandReport extends BaseCommand<HexusPlugin> {
+public final class CommandReport extends BaseCommand<MiniPluginReport> {
 
-    public CommandReport(PluginReport pluginReport) {
-        super(pluginReport, "report", "<Player> <Reason>", "Report a player breaking rules.", Set.of(), PluginReport.PERM.COMMAND_REPORT);
+    public CommandReport(MiniPluginReport miniPluginReport) {
+        super(miniPluginReport, "report", "<Player> <Reason>", "Report a player breaking rules.", Set.of(), MiniPluginReport.PERM.COMMAND_REPORT);
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length < 2) {
             sender.sendMessage(help(alias));
             return;
         }
 
-        if (!(sender instanceof Player player)) {
+        if (!(sender instanceof final Player player)) {
             sender.sendMessage(F.fMain(this) + "Only players can use this command.");
             return;
         }
@@ -43,7 +42,7 @@ public class CommandReport extends BaseCommand<HexusPlugin> {
         reasonArgs.removeFirst();
         String reason = String.join(" ", reasonArgs);
 
-        _miniPlugin._plugin.getServer().getOnlinePlayers().forEach(onlinePlayer -> {
+        _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(onlinePlayer -> {
             if (!onlinePlayer.hasPermission(PermissionGroup.TRAINEE.name())) return;
             onlinePlayer.sendMessage(F.fMain(this) + "Report from " + F.fItem(sender) + ":");
             onlinePlayer.sendMessage(F.fMain("") + "Target: " + F.fItem(targetProfile.name));
@@ -58,9 +57,9 @@ public class CommandReport extends BaseCommand<HexusPlugin> {
         final List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._plugin.getServer()
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
                     .getOnlinePlayers().stream();
-            if (sender instanceof Player player)
+            if (sender instanceof final Player player)
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
 
             names.addAll(streamedOnlinePlayers.map(Player::getName).toList());

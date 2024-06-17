@@ -1,10 +1,9 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.PluginDatabase;
-import net.hexuscraft.core.portal.PluginPortal;
+import net.hexuscraft.core.database.MiniPluginDatabase;
+import net.hexuscraft.core.portal.MiniPluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import net.hexuscraft.database.serverdata.ServerGroupData;
@@ -14,24 +13,22 @@ import redis.clients.jedis.JedisPooled;
 
 import java.util.Set;
 
-public class CommandServer extends BaseCommand<HexusPlugin> {
+public final class CommandServer extends BaseCommand<MiniPluginPortal> {
 
-    private final PluginPortal _portal;
-    private final PluginDatabase _database;
+    private final MiniPluginDatabase _miniPluginDatabase;
 
-    public CommandServer(PluginPortal pluginPortal, PluginDatabase pluginDatabase) {
-        super(pluginPortal,
+    public CommandServer(MiniPluginPortal miniPluginPortal, MiniPluginDatabase miniPluginDatabase) {
+        super(miniPluginPortal,
                 "server",
                 "[Name]",
                 "View your current server or teleport to a server.",
                 Set.of("sv", "portal"),
-                PluginPortal.PERM.COMMAND_SERVER);
-        _portal = pluginPortal;
-        _database = pluginDatabase;
+                MiniPluginPortal.PERM.COMMAND_SERVER);
+        _miniPluginDatabase = miniPluginDatabase;
     }
 
     @Override
-    public final void run(CommandSender sender, String alias, String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length == 1) {
             if (!(sender instanceof Player)) {
                 sender.sendMessage(F.fMain(this) + "Only players can teleport to a server.");
@@ -39,13 +36,13 @@ public class CommandServer extends BaseCommand<HexusPlugin> {
             }
             final String serverName = args[0];
 
-            if (_portal._serverName.equals(serverName)) {
+            if (_miniPlugin._serverName.equals(serverName)) {
                 sender.sendMessage(F.fMain(this)
                         + "You are already connected to " + F.fItem(serverName) + ".");
                 return;
             }
 
-            final JedisPooled jedis = _database.getJedisPooled();
+            final JedisPooled jedis = _miniPluginDatabase.getJedisPooled();
 
             final ServerData serverData = ServerQueries.getServer(jedis, serverName);
             if (serverData == null) {
@@ -68,11 +65,11 @@ public class CommandServer extends BaseCommand<HexusPlugin> {
                 return;
             }
 
-            _portal.teleport(sender.getName(), serverName);
+            _miniPlugin.teleport(sender.getName(), serverName);
             return;
         }
         if (args.length == 0) {
-            sender.sendMessage(F.fMain(this) + "You are connected to " + F.fItem(_portal._serverName) + ".");
+            sender.sendMessage(F.fMain(this) + "You are connected to " + F.fItem(_miniPlugin._serverName) + ".");
             return;
         }
         sender.sendMessage(help(alias));

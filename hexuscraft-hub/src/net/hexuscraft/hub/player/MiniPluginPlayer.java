@@ -4,13 +4,13 @@ import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
-import net.hexuscraft.core.command.PluginCommand;
-import net.hexuscraft.core.database.PluginDatabase;
+import net.hexuscraft.core.command.MiniPluginCommand;
+import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.item.UtilItem;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.player.PlayerTabInfo;
-import net.hexuscraft.core.portal.PluginPortal;
+import net.hexuscraft.core.portal.MiniPluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import net.hexuscraft.database.serverdata.ServerGroupData;
@@ -38,19 +38,19 @@ import redis.clients.jedis.JedisPooled;
 import java.util.List;
 import java.util.Map;
 
-public class PluginPlayer extends MiniPlugin<Hub> {
+public final class MiniPluginPlayer extends MiniPlugin<Hub> {
 
     public enum PERM implements IPermission {
         COMMAND_SPAWN
     }
 
-    private PluginCommand _pluginCommand;
-    private PluginPortal _pluginPortal;
-    private PluginDatabase _pluginDatabase;
+    private MiniPluginCommand _pluginCommand;
+    private MiniPluginPortal _miniPluginPortal;
+    private MiniPluginDatabase _miniPluginDatabase;
 
     private BukkitTask _actionTextTask;
 
-    public PluginPlayer(final Hub hub) {
+    public MiniPluginPlayer(final Hub hub) {
         super(hub, "Player");
 
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SPAWN);
@@ -58,15 +58,15 @@ public class PluginPlayer extends MiniPlugin<Hub> {
 
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginCommand = (PluginCommand) dependencies.get(PluginCommand.class);
-        _pluginPortal = (PluginPortal) dependencies.get(PluginPortal.class);
-        _pluginDatabase = (PluginDatabase) dependencies.get(PluginDatabase.class);
+        _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
+        _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
+        _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
     }
 
     @Override
     public void onEnable() {
         _pluginCommand.register(new CommandSpawn(this));
-        _actionTextTask = _plugin.getServer().getScheduler().runTaskTimer(_plugin, () -> _plugin.getServer()
+        _actionTextTask = _hexusPlugin.getServer().getScheduler().runTaskTimer(_hexusPlugin, () -> _hexusPlugin.getServer()
                 .getOnlinePlayers()
                 .forEach(player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET")), 0, 40);
     }
@@ -81,11 +81,24 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         event.setJoinMessage(F.fSub("Join", event.getPlayer().getDisplayName()));
 
         final Player player = event.getPlayer();
+        setPlayerProperties(player);
+
+        if (_hexusPlugin._spawn != null)
+            player.teleport(_hexusPlugin._spawn);
+
+        refreshInventory(player);
+
+        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_miniPluginPortal._serverName), " ");
+
+        player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
+    }
+
+    private void setPlayerProperties(final Player player) {
         player.setFallDistance(0);
         player.setFlying(false);
         player.setSneaking(false);
         player.setAllowFlight(false);
-        player.setGameMode(_plugin.getServer().getDefaultGameMode());
+        player.setGameMode(_hexusPlugin.getServer().getDefaultGameMode());
         player.setWalkSpeed(0.2f);
         player.setFlySpeed(0.1f);
         player.setVelocity(new Vector());
@@ -94,15 +107,6 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         player.setFoodLevel(20);
         player.setExhaustion(0);
         player.setExp(0);
-
-        if (_plugin._spawn != null)
-            player.teleport(_plugin._spawn);
-
-        refreshInventory(player);
-
-        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), " ");
-
-        player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
     }
 
     @EventHandler
@@ -180,7 +184,7 @@ public class PluginPlayer extends MiniPlugin<Hub> {
             final ItemMeta currentItemMeta = currentItem.getItemMeta();
             if (!currentItemMeta.hasDisplayName()) return;
 
-            _pluginPortal.teleport(player.getName(), ChatColor.stripColor(currentItemMeta.getDisplayName()));
+            _miniPluginPortal.teleport(player.getName(), ChatColor.stripColor(currentItemMeta.getDisplayName()));
             player.playSound(player.getLocation(), Sound.NOTE_PLING, 100, 2);
         }
     }
@@ -202,22 +206,22 @@ public class PluginPlayer extends MiniPlugin<Hub> {
     }
 
     void openLobbyMenu(final Player player) {
-        final Server server = _plugin.getServer();
+        final Server server = _hexusPlugin.getServer();
 
         final Inventory lobbyMenu = server.createInventory(player, 54, "Lobby Menu");
 
         final BukkitScheduler scheduler = server.getScheduler();
-        scheduler.runTaskAsynchronously(_plugin, () -> {
-            final JedisPooled jedis = _pluginDatabase.getJedisPooled();
+        scheduler.runTaskAsynchronously(_hexusPlugin, () -> {
+            final JedisPooled jedis = _miniPluginDatabase.getJedisPooled();
 
             final ServerGroupData lobbyGroupData = ServerQueries.getServerGroup(jedis, "Lobby");
             if (lobbyGroupData == null) return;
 
             final ServerData[] serverDataArray = ServerQueries.getServers(jedis, lobbyGroupData);
-            scheduler.runTask(_plugin, () -> {
+            scheduler.runTask(_hexusPlugin, () -> {
                 for (ServerData serverData : serverDataArray) {
                     final int lobbyId = Integer.parseInt(serverData._name.split("-")[1]);
-                    final boolean isCurrentServer = serverData._name.equals(_pluginPortal._serverName);
+                    final boolean isCurrentServer = serverData._name.equals(_miniPluginPortal._serverName);
 
                     final ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
                     serverItem.setAmount(lobbyId);
@@ -246,7 +250,7 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         if (event.getCause() == EntityDamageEvent.DamageCause.CUSTOM) return;
         if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
             player.setVelocity(new Vector());
-            player.teleport(_plugin._spawn);
+            player.teleport(_hexusPlugin._spawn);
         }
 
         event.setCancelled(true);

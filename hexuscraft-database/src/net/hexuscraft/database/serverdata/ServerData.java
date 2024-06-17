@@ -6,7 +6,7 @@ import redis.clients.jedis.JedisPooled;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServerData {
+public final class ServerData {
 
     public final String _name;
 
@@ -50,7 +50,7 @@ public class ServerData {
         _updated = updated;
     }
 
-    public final Map<String, String> toMap() {
+    public Map<String, String> toMap() {
         final Map<String, String> map = new HashMap<>();
         map.put("address", _address);
         map.put("capacity", Integer.toString(_capacity));
@@ -64,7 +64,7 @@ public class ServerData {
         return map;
     }
 
-    public final void update(final JedisPooled jedis) {
+    public void update(final JedisPooled jedis) {
         jedis.hset(ServerQueries.SERVER(_name), toMap());
     }
 
