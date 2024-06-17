@@ -36,13 +36,13 @@ public final class CommandRankRemove extends BaseCommand<MiniPluginPermission> {
         final PermissionGroup targetGroup;
         try {
             targetGroup = PermissionGroup.valueOf(args[1]);
-        } catch (IllegalArgumentException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Invalid group. Groups: ") + F.fList(PermissionGroup.getColoredNames()) + ".");
+        } catch (final IllegalArgumentException ex) {
+            sender.sendMessage(F.fMain(this, F.fError("Invalid group. Groups: ", F.fList(PermissionGroup.getColoredNames()), ".")));
             return;
         }
 
         if (targetGroup.toString().startsWith("_")) {
-            sender.sendMessage(F.fMain(this) + F.fError("This group cannot be manually granted to players."));
+            sender.sendMessage(F.fMain(this, F.fError("This group cannot be manually granted to players.")));
             return;
         }
 
@@ -55,12 +55,12 @@ public final class CommandRankRemove extends BaseCommand<MiniPluginPermission> {
         if (profile == null) return;
 
         _miniPluginDatabase.getJedisPooled().srem(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.name());
-        sender.sendMessage(F.fMain(this) + "Removed sub-group " + F.fPermissionGroup(targetGroup) + " from " + F.fItem(profile.name) + ".");
+        sender.sendMessage(F.fMain(this, "Removed sub-group ", F.fPermissionGroup(targetGroup), " from ", F.fItem(profile.name), "."));
 
         final Player player = _miniPlugin._hexusPlugin.getServer().getPlayer(profile.name);
         if (player == null) return;
 
-        player.sendMessage(F.fMain(this) + "You no longer have sub-group " + F.fPermissionGroup(targetGroup) + ".");
+        player.sendMessage(F.fMain(this, "You no longer have sub-group ", F.fPermissionGroup(targetGroup), "."));
         _miniPlugin.refreshPermissions(player);
     }
 
