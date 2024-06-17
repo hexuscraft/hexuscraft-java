@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class F {
+public final class F {
 
     private static final String RESET = C.fReset;
     private static final String RESET_GRAY = C.fReset + C.cGray;
@@ -274,6 +274,21 @@ public class F {
 
     public static String fTabHeader(final String server) {
         return "\n     " + C.fBold + "Hexuscraft Network" + RESET + "     \n     " + C.cGreen + server + RESET + "     \n";
+    }
+
+    public static String fWelcomeMessage(final String playerName) {
+        return String.join(C.fReset + "\n", new String[]{
+                " ",
+                " ",
+                " " + C.cAqua + C.fBold + "Welcome " + playerName + " to Hexuscraft!",
+                " ",
+                " " + C.cGray + "A mini-game server inspired by the legacy Mineplex Network",
+                " " + C.cYellow + "/help" + C.cGray + " for more info",
+                " ",
+                " " + C.cGray + "We are open source! Contribute to help improve our server",
+                " " + C.fUnderline + "https://github.com/hexuscraft",
+                " "
+        });
     }
 
 }

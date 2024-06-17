@@ -21,7 +21,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -102,6 +101,8 @@ public class PluginPlayer extends MiniPlugin<Hub> {
         refreshInventory(player);
 
         PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_pluginPortal._serverName), " ");
+
+        player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
     }
 
     @EventHandler
