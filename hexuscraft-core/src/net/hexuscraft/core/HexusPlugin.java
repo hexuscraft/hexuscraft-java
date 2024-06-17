@@ -38,7 +38,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     @Override
-    public final void onLoad() {
+    public void onLoad() {
         long start = System.currentTimeMillis();
 
         require(new MiniPluginAntiCheat(this));
@@ -60,58 +60,54 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         require(new MiniPluginReport(this));
         require(new MiniPluginScoreboard(this));
         require(new MiniPluginTeleport(this));
-
-        if (_isDebug)
-            log("Core plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
+        debug("Core plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
 
         load();
-
-        if (_isDebug)
-            log("Local plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
+        debug("Local plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
 
         _miniPluginClassMap.values().forEach(miniPlugin -> miniPlugin.load(_miniPluginClassMap));
-
-        if (_isDebug)
-            log("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
+        debug("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
-    public final void onEnable() {
+    public void onEnable() {
         long start = System.currentTimeMillis();
 
         getServer().getPluginManager().registerEvents(this, this);
         enable();
         _miniPluginClassMap.values().forEach(MiniPlugin::enable);
 
-        if (_isDebug)
-            log("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
+        debug("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
-    public final void onDisable() {
+    public void onDisable() {
         long start = System.currentTimeMillis();
 
         disable();
         _miniPluginClassMap.values().forEach(MiniPlugin::disable);
         _miniPluginClassMap.clear();
 
-        if (_isDebug)
-            log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
+        debug("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void require(final MiniPlugin<? extends HexusPlugin> miniPlugin) {
-        if (_isDebug)
-            log("Instantiating " + miniPlugin._name + "...");
+    public void require(final MiniPlugin<? extends HexusPlugin> miniPlugin) {
+        debug("Instantiating " + miniPlugin._name + "...");
 
         //noinspection unchecked
         _miniPluginClassMap.put((Class<? extends MiniPlugin<? extends HexusPlugin>>) miniPlugin.getClass(), miniPlugin);
     }
 
-    public final void log(final String message) {
+    public void log(final String message) {
         getLogger().info(message);
     }
 
-    public final File getFile() {
+    public void debug(final String message) {
+        if (!_isDebug) return;
+        log(message);
+    }
+
+    public File getFile() {
         return super.getFile();
     }
 
