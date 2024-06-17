@@ -12,9 +12,9 @@ Please use the latest available source in the [main branch](https://github.com/h
 
 When reporting vulnerabilities, please include as much information as possible so the issue can be quickly rectified
 
-Vulnerabilities can be reported to a developer in our discord server - https://discord.gg/yusJMxrg3e
+Vulnerabilities can be reported via the 'Report a vulnerability' option, or to a developer in our discord server - https://discord.gg/yusJMxrg3e
 
-Look for a user with the "Admin" or "Developer" role and they will be able to assist you from there
+If reporting via our discord server, please look for a user with the "Admin" or "Developer" role and they will be able to assist you from there
 
 ## A big thank you
 
