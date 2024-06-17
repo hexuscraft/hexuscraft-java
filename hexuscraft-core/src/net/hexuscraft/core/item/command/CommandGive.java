@@ -77,7 +77,7 @@ public final class CommandGive extends BaseCommand<MiniPluginItem> {
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         List<String> names = new ArrayList<>();
         switch (args.length) {
             case 1 -> {

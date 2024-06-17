@@ -35,13 +35,10 @@ public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
         final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
         if (profile == null) return;
 
-        //noinspection ReassignedVariable
-        String primaryName = _miniPluginDatabase.getJedisPooled().get(PermissionQueries.PRIMARY(profile.uuid.toString()));
-        Set<String> groupNames = _miniPluginDatabase.getJedisPooled().smembers(PermissionQueries.GROUPS(profile.uuid.toString()));
+        final String fetchedPrimaryName = _miniPluginDatabase.getJedisPooled().get(PermissionQueries.PRIMARY(profile.uuid.toString()));
+        final String primaryName = fetchedPrimaryName == null ? PermissionGroup.MEMBER.name() : fetchedPrimaryName;
 
-        if (primaryName == null) {
-            primaryName = PermissionGroup.MEMBER.toString();
-        }
+        final Set<String> groupNames = _miniPluginDatabase.getJedisPooled().smembers(PermissionQueries.GROUPS(profile.uuid.toString()));
 
         sender.sendMessage(F.fMain(this) + "Displaying group info for " + F.fItem(profile.name) + ":\n"
                 + F.fMain("") + "Primary Group: " + F.fPermissionGroup(PermissionGroup.valueOf(primaryName)) + "\n"
@@ -49,7 +46,7 @@ public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable

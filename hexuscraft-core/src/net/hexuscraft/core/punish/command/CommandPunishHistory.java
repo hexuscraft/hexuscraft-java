@@ -49,7 +49,7 @@ public final class CommandPunishHistory extends BaseCommand<MiniPluginPunish> {
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         final List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable

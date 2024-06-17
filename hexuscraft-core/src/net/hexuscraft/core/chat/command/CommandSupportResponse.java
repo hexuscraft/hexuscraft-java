@@ -57,7 +57,7 @@ public final class CommandSupportResponse extends BaseCommand<MiniPluginChat> {
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 1) {
             return List.of();
         }

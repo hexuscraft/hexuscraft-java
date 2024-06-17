@@ -41,7 +41,7 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
     }
 
     @Override
-    public final List<String> tab(CommandSender sender, String alias, String[] args) {
+    public final List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 1) {
             for (final BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands) {
                 if (!command.getName().equals(args[0]) && !command.getAliases().contains(args[0])) continue;
