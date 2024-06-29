@@ -5,7 +5,7 @@ import org.bukkit.event.Listener;
 
 import java.util.Map;
 
-public abstract class MiniPlugin<T extends HexusPlugin> implements Listener {
+public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMiniPlugin {
 
     public final T _hexusPlugin;
     public final String _name;
@@ -61,15 +61,6 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener {
         if (finish - start > 2000L)
             log("WARNING: Took " + (System.currentTimeMillis() - start) + "ms to disable. (>2s)");
         if (_hexusPlugin._isDebug) log("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
-    }
-
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-    }
-
-    public void onEnable() {
-    }
-
-    public void onDisable() {
     }
 
 }
