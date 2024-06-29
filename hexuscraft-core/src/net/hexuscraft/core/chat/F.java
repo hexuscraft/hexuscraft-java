@@ -1,10 +1,12 @@
 package net.hexuscraft.core.chat;
 
+import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.anticheat.CheatSeverity;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.common.UtilMath;
 import net.hexuscraft.core.currency.CurrencyType;
+import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
@@ -14,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +35,11 @@ public final class F {
         return C.cBlue + prefix + ">" + SPACER_GRAY + String.join("", text);
     }
 
-    public static String fMain(final MiniPlugin<?> miniPlugin, final String... text) {
+    public static String fMain(final HexusPlugin hexusPlugin, final String... text) {
+        return fMain(hexusPlugin.getConfig().getName(), text);
+    }
+
+    public static String fMain(final MiniPlugin<? extends HexusPlugin> miniPlugin, final String... text) {
         return fMain(miniPlugin._name, text);
     }
 
@@ -107,6 +114,10 @@ public final class F {
         return fList(args.toArray(String[]::new));
     }
 
+    public static String fList(final Player[] args) {
+        return fList(Arrays.stream(args).map(Player::getDisplayName).toArray(String[]::new));
+    }
+
     public static String fList(final String text) {
         return text + "." + SPACER;
     }
@@ -123,6 +134,16 @@ public final class F {
     @SuppressWarnings("unused")
     public static String fCurrency(final CurrencyType currencyType, final int amount) {
         return fCurrency(currencyType._color, currencyType._nameSingular, currencyType._namePlural, amount);
+    }
+
+
+    public static String fMatches(final Player[] matches, final String searchName) {
+        return F.fMain(
+                "Player Search",
+                F.fItem(matches.length + (matches.length == 1 ? " Match" : " Matches")),
+                " for ",
+                F.fItem(searchName) + (matches.length == 0 ? "." : ":\n" + F.fMain("", F.fList(Arrays.stream(matches).map(Player::getName).toArray(String[]::new))))
+        );
     }
 
 
@@ -165,7 +186,9 @@ public final class F {
         return fPermissionGroup(group, false, false);
     }
 
-    public static String fInsufficientPermissions() {
+    public static String fInsufficientPermissions(final IPermission... requiredPermissions) {
+        if (requiredPermissions.length > 0)
+            return fMain("Permissions", "You have insufficient permissions to do this: ", F.fList(Arrays.stream(requiredPermissions).map(IPermission::toString).toArray(String[]::new)));
         return fMain("Permissions", "You have insufficient permissions to do this.");
     }
 
