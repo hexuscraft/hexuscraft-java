@@ -9,11 +9,11 @@ public class MessagedRunnable implements Runnable {
 
     private String _message;
 
-    protected MessagedRunnable(MiniPlugin<? extends HexusPlugin> plugin) {
+    protected MessagedRunnable(final MiniPlugin<? extends HexusPlugin> plugin) {
         _miniPlugin = plugin;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(final String message) {
         _message = message;
     }
 
