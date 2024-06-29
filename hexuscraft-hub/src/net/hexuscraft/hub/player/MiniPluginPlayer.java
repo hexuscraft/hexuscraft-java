@@ -107,6 +107,7 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
         player.setFoodLevel(20);
         player.setExhaustion(0);
         player.setExp(0);
+        player.setFallDistance(0);
     }
 
     @EventHandler
