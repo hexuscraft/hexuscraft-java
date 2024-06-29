@@ -90,7 +90,7 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > | removeStaffServer | **String**                   | 
 
 >  **SET** `user:(UUID):punishments`
-> - `(UUID)` of redis keys `punishment.(UUID)`
+> - `(UUID)` of redis keys `punishment:(UUID)`
 
 ### Motd
 
