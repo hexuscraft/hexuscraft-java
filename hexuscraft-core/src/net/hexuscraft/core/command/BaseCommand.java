@@ -8,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -46,7 +47,7 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
         try {
             run(sender, alias, args);
         } catch (final Exception ex) {
-            _miniPlugin.log("An exception occurred while CommandSender '" + sender.getName() + "' executing BaseCommand '" + alias + " " + String.join(" ", args) + "':" + ex.getMessage());
+            _miniPlugin.log("An exception occurred while CommandSender '" + sender.getName() + "' executing BaseCommand '" + alias + " " + String.join(" ", args) + "':" + ex.getMessage() + "\n> " + String.join("\n", Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)));
             sender.sendMessage(F.fMain(this, F.fError("An unknown error occurred while executing this command. Please try again later.")));
         }
         return true;
