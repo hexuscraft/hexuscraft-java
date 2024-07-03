@@ -3,6 +3,7 @@ package net.hexuscraft.core.network.command.group;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
+import net.hexuscraft.core.game.GameType;
 import net.hexuscraft.core.network.MiniPluginNetwork;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.database.serverdata.ServerGroupData;
@@ -15,20 +16,22 @@ import java.util.Set;
 
 public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwork> {
 
+    private final String[] DISALLOWED_CHARACTERS = new String[]{":", "//", "\\\\", ".."};
+
     private final MiniPluginDatabase _miniPluginDatabase;
 
     CommandNetworkGroupCreate(final MiniPluginNetwork miniPluginNetwork, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginNetwork, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE>, [Games]", "Create a server group.", Set.of("c", "add", "a"), MiniPluginNetwork.PERM.COMMAND_NETSTAT_GROUP_CREATE);
+        super(miniPluginNetwork, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout #> [Games]", "Create a server group.", Set.of("c", "add", "a"), MiniPluginNetwork.PERM.COMMAND_NETSTAT_GROUP_CREATE);
         _miniPluginDatabase = miniPluginDatabase;
     }
 
-    static class InvalidNetStatGroupCreateArgumentException extends Exception {
+    private static final class InvalidNetStatGroupCreateArgumentException extends Exception {
 
         private final CommandNetworkGroupCreate _command;
         private final String _argument;
         private final String _reason;
 
-        InvalidNetStatGroupCreateArgumentException(final CommandNetworkGroupCreate command, final String argument, final String reason) {
+        public InvalidNetStatGroupCreateArgumentException(final CommandNetworkGroupCreate command, final String argument, final String reason) {
             _command = command;
             _argument = argument;
             _reason = reason;
@@ -42,7 +45,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
 
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length < 11 || args.length > 12) {
+        if (args.length < 12) {
             sender.sendMessage(help(alias));
             return;
         }
@@ -58,6 +61,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
         final int ram;
         final int capacity;
         final boolean worldEdit;
+        final int timeoutMillis;
         final String[] games;
 
         try {
@@ -69,13 +73,13 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
 
             try {
                 requiredPermission = PermissionGroup.valueOf(args[1]);
-            } catch (IllegalArgumentException ex) {
+            } catch (final IllegalArgumentException ignored) {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Required Permission", "Invalid or unrecognised permission group");
             }
 
             try {
                 minPort = Integer.parseInt(args[2]);
-            } catch (NumberFormatException ex) {
+            } catch (final NumberFormatException ex) {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Min Port #", "Invalid or unrecognised integer");
             }
             if (minPort < 1)
@@ -85,7 +89,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
 
             try {
                 maxPort = Integer.parseInt(args[3]);
-            } catch (NumberFormatException ex) {
+            } catch (final NumberFormatException ex) {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Max Port #", "Invalid or unrecognised integer");
             }
             if (maxPort < 1)
@@ -95,7 +99,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
 
             try {
                 totalServers = Integer.parseInt(args[4]);
-            } catch (NumberFormatException ex) {
+            } catch (final NumberFormatException ex) {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Total Servers", "Invalid or unrecognised integer");
             }
             if (totalServers < 0)
@@ -103,7 +107,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
 
             try {
                 joinableServers = Integer.parseInt(args[5]);
-            } catch (NumberFormatException ex) {
+            } catch (final NumberFormatException ex) {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Joinable Servers", "Invalid or unrecognised integer");
             }
             if (joinableServers < 0)
@@ -114,16 +118,22 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Plugin", "Length too long (must be between 1-100 characters)");
             if (plugin.isEmpty())
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Plugin", "Length too short (must be between 1-100 characters)");
+            for (final String characters : DISALLOWED_CHARACTERS)
+                if (plugin.contains(characters))
+                    throw new InvalidNetStatGroupCreateArgumentException(this, "Plugin", "Invalid characters '" + characters + "'");
 
             worldZip = args[7];
             if (worldZip.length() > 100)
                 throw new InvalidNetStatGroupCreateArgumentException(this, "World Zip", "Length too long (must be between 1-100 characters)");
             if (worldZip.isEmpty())
                 throw new InvalidNetStatGroupCreateArgumentException(this, "World Zip", "Length too short (must be between 1-100 characters)");
+            for (final String characters : DISALLOWED_CHARACTERS)
+                if (worldZip.contains(characters))
+                    throw new InvalidNetStatGroupCreateArgumentException(this, "World Zip", "Invalid characters '" + characters + "'");
 
             try {
                 ram = Integer.parseInt(args[8]);
-            } catch (NumberFormatException ex) {
+            } catch (final NumberFormatException ignored) {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Ram", "Invalid or unrecognised integer");
             }
             if (ram < 1)
@@ -131,7 +141,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
 
             try {
                 capacity = Integer.parseInt(args[9]);
-            } catch (NumberFormatException ex) {
+            } catch (final NumberFormatException ignored) {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Capacity", "Invalid or unrecognised integer");
             }
             if (capacity < 0)
@@ -139,22 +149,33 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
 
             try {
                 worldEdit = Boolean.parseBoolean(args[10]);
-            } catch (Exception ex) {
+            } catch (final Exception ignored) {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "World Edit", "Must be TRUE or FALSE");
             }
 
-            if (args.length == 11)
+            try {
+                timeoutMillis = Integer.parseInt(args[11]);
+            } catch (final NumberFormatException ignored) {
+                throw new InvalidNetStatGroupCreateArgumentException(this, "Server Timeout", "Invalid or unrecognised integer");
+            }
+
+            if (args.length == 12)
                 games = new String[0];
             else
-                games = args[11].split(",");
+                games = Arrays.copyOfRange(args, 12, args.length);
+            final List<String> availableGameTypeNames = Arrays.stream(GameType.values()).map(GameType::name).toList();
+            for (final String gameName : games) {
+                if (availableGameTypeNames.contains(gameName)) continue;
+                throw new InvalidNetStatGroupCreateArgumentException(this, "Games", "Invalid or unrecognised Game Type '" + gameName + "'");
+            }
 
-        } catch (InvalidNetStatGroupCreateArgumentException ex) {
+        } catch (final InvalidNetStatGroupCreateArgumentException ex) {
             sender.sendMessage(ex.constructMessage());
             return;
         }
 
         final JedisPooled jedis = _miniPluginDatabase.getJedisPooled();
-        final ServerGroupData groupData = new ServerGroupData(name, requiredPermission.name(), minPort, maxPort, totalServers, joinableServers, plugin, worldZip, ram, capacity, worldEdit, games);
+        final ServerGroupData groupData = new ServerGroupData(name, requiredPermission.name(), minPort, maxPort, totalServers, joinableServers, plugin, worldZip, ram, capacity, worldEdit, timeoutMillis, games);
         groupData.update(jedis);
 
         sender.sendMessage(F.fMain(this, "Created server group '", F.fItem(name), "':\n", F.fList(List.of(
@@ -169,6 +190,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
                 "Ram: " + F.fItem(Integer.toString(ram)),
                 "Capacity: " + F.fItem(Integer.toString(capacity)),
                 "World Edit: " + F.fItem(Boolean.toString(worldEdit)),
+                "Server Timeout: " + F.fItem(Integer.toString(timeoutMillis)),
                 "Games: " + F.fList(games)
         ))));
     }
