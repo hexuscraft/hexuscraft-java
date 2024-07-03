@@ -20,6 +20,7 @@ public final class ServerGroupData {
     public final int _ram;
     public final int _capacity;
     public final boolean _worldEdit;
+    public final int _timeoutMillis;
     public final String[] _games;
 
     public ServerGroupData(final String name, final Map<String, String> serverGroupData) {
@@ -35,12 +36,14 @@ public final class ServerGroupData {
         _ram = Integer.parseInt(serverGroupData.getOrDefault("ram", "512"));
         _capacity = Integer.parseInt(serverGroupData.getOrDefault("capacity", "20"));
         _worldEdit = Boolean.parseBoolean(serverGroupData.getOrDefault("worldEdit", "FALSE"));
+        _timeoutMillis = Integer.parseInt(serverGroupData.getOrDefault("timeoutMillis", "10000"));
         _games = serverGroupData.getOrDefault("games", "").split(",");
     }
 
     public ServerGroupData(final String name, final String requiredPermission,
                            final int minPort, final int maxPort, final int totalServers, final int joinableServers,
-                           final String plugin, final String worldZip, final int ram, final int capacity, final boolean worldEdit, final String[] games) {
+                           final String plugin, final String worldZip, final int ram, final int capacity,
+                           final boolean worldEdit, final int timeoutMillis, final String[] games) {
         _name = name;
 
         _requiredPermission = requiredPermission;
@@ -53,6 +56,7 @@ public final class ServerGroupData {
         _ram = ram;
         _capacity = capacity;
         _worldEdit = worldEdit;
+        _timeoutMillis = timeoutMillis;
         _games = games;
     }
 
@@ -68,6 +72,7 @@ public final class ServerGroupData {
         map.put("ram", Integer.toString(_ram));
         map.put("capacity", Integer.toString(_capacity));
         map.put("worldEdit", Boolean.toString(_worldEdit));
+        map.put("timeoutMillis", Integer.toString(_timeoutMillis));
         map.put("games", String.join(",", _games));
         return map;
     }
