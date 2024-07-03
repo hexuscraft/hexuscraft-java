@@ -171,7 +171,7 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
                     final ServerData finalSelectedServer = selectedServer;
                     scheduler.runTask(_miniPlugin._hexusPlugin, () -> server.getOnlinePlayers().forEach(player -> teleport(player.getName(), finalSelectedServer._name)));
                 }, 80);
-                scheduler.runTaskLater(_miniPlugin._hexusPlugin, server.spigot()::restart, 160);
+                scheduler.runTaskLater(_miniPlugin._hexusPlugin, server::shutdown, 160);
             }
 
         });
