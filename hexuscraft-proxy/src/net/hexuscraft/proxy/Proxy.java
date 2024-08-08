@@ -39,15 +39,13 @@ public final class Proxy {
     private final ProxyServer _server;
     private final Logger _logger;
 
-    private final String MOTD_PREFIX = String.join("\n", new String[]{
-            "       §9§m     §8§m[  §r  §6§lHexuscraft§r §f§lNetwork§r  §9[1.8-1.20]§r  §8§m  ]§9§m     §r",
-            "§f§l ▶ §r"
-    });
-
     private int _playerCount = 0;
     private int _maxPlayerCount = 0;
 
-    private String _motd = MOTD_PREFIX;
+    private String _motd = String.join("\n", new String[]{
+            "       §9§m     §8§m[  §r  §6§lHexuscraft§r §f§lNetwork§r  §9[1.8-1.20]§r  §8§m  ]§9§m     §r",
+            "§f§l ▶ §r<insert funny message here>"
+    });
 
     @Inject
     public Proxy(final ProxyServer server, final Logger logger) {
@@ -78,7 +76,7 @@ public final class Proxy {
     private void updateRegisteredServers() {
         JedisPooled jedis = _pluginDatabase.getJedisPooled();
 
-        _motd = MOTD_PREFIX + ServerQueries.getMotd(jedis);
+        _motd = ServerQueries.getMotd(jedis);
 
         final Set<ServerInfo> serverInfoSet = new HashSet<>();
         Arrays.stream(ServerQueries.getServers(jedis))
