@@ -43,7 +43,7 @@ public final class F {
         return fMain(miniPlugin._name, text);
     }
 
-    public static String fMain(final BaseCommand<?> baseCommand, final String... text) {
+    public static String fMain(final BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> baseCommand, final String... text) {
         return fMain(baseCommand._miniPlugin, text);
     }
 
@@ -186,10 +186,20 @@ public final class F {
         return fPermissionGroup(group, false, false);
     }
 
+    public static String fInsufficientPermissions() {
+        return fMain("Permissions", "You have insufficient permissions to do this.");
+    }
+
     public static String fInsufficientPermissions(final IPermission... requiredPermissions) {
         if (requiredPermissions.length > 0)
-            return fMain("Permissions", "You have insufficient permissions to do this: ", F.fList(Arrays.stream(requiredPermissions).map(IPermission::toString).toArray(String[]::new)));
-        return fMain("Permissions", "You have insufficient permissions to do this.");
+            return fMain("Permissions", "You have insufficient permissions to do this.\n", F.fSub("", "Required permissions: ", F.fList(Arrays.stream(requiredPermissions).map(IPermission::toString).toArray(String[]::new))));
+        return fInsufficientPermissions();
+    }
+
+    public static String fInsufficientPermissions(final String... messages) {
+        if (messages.length > 0)
+            return fMain("Permissions", "You have insufficient permissions to ", F.fItem(F.fList(messages)), ".");
+        return fInsufficientPermissions();
     }
 
     public static String fBoolean(final boolean toggle) {
