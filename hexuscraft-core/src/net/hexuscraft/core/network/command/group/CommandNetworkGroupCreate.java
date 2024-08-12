@@ -118,18 +118,20 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Plugin", "Length too long (must be between 1-100 characters)");
             if (plugin.isEmpty())
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Plugin", "Length too short (must be between 1-100 characters)");
-            for (final String characters : DISALLOWED_CHARACTERS)
-                if (plugin.contains(characters))
-                    throw new InvalidNetStatGroupCreateArgumentException(this, "Plugin", "Invalid characters '" + characters + "'");
+            for (final String characters : DISALLOWED_CHARACTERS) {
+                if (!plugin.contains(characters)) continue;
+                throw new InvalidNetStatGroupCreateArgumentException(this, "Plugin", "Invalid characters '" + characters + "'");
+            }
 
             worldZip = args[7];
             if (worldZip.length() > 100)
                 throw new InvalidNetStatGroupCreateArgumentException(this, "World Zip", "Length too long (must be between 1-100 characters)");
             if (worldZip.isEmpty())
                 throw new InvalidNetStatGroupCreateArgumentException(this, "World Zip", "Length too short (must be between 1-100 characters)");
-            for (final String characters : DISALLOWED_CHARACTERS)
-                if (worldZip.contains(characters))
-                    throw new InvalidNetStatGroupCreateArgumentException(this, "World Zip", "Invalid characters '" + characters + "'");
+            for (final String characters : DISALLOWED_CHARACTERS) {
+                if (!worldZip.contains(characters)) continue;
+                throw new InvalidNetStatGroupCreateArgumentException(this, "World Zip", "Invalid characters '" + characters + "'");
+            }
 
             try {
                 ram = Integer.parseInt(args[8]);
