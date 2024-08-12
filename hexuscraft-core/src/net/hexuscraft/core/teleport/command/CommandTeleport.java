@@ -44,10 +44,16 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
             }
 
             targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
-            if (targets.length == 0) return;
+            if (targets.length == 0) {
+                sender.sendMessage(F.fMatches(targets, args[0]));
+                return;
+            }
 
             final Player[] potentialDestinations = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[1], sender);
-            if (potentialDestinations.length != 1) return;
+            if (potentialDestinations.length != 1) {
+                sender.sendMessage(F.fMatches(targets, args[1]));
+                return;
+            }
             destination = potentialDestinations[0].getLocation();
             destinationName = F.fItem(potentialDestinations[0].getDisplayName());
         } else if (args.length == 3) { // Teleport self to coords with yaw 0 pitch 0
@@ -84,7 +90,10 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
             }
 
             targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
-            if (targets.length == 0) return;
+            if (targets.length == 0) {
+                sender.sendMessage(F.fMatches(targets, args[0]));
+                return;
+            }
 
             final World destinationWorld = sender instanceof Player player ? player.getWorld() : _miniPlugin._hexusPlugin.getServer().getWorlds().getFirst();
             if (destinationWorld == null) {
@@ -139,7 +148,10 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
             }
 
             targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
-            if (targets.length == 0) return;
+            if (targets.length == 0) {
+                sender.sendMessage(F.fMatches(targets, args[0]));
+                return;
+            }
 
             final World destinationWorld = sender instanceof Player player ? player.getWorld() : _miniPlugin._hexusPlugin.getServer().getWorlds().getFirst();
             if (destinationWorld == null) {
