@@ -41,7 +41,8 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
         COMMAND_MOTD_VIEW,
         COMMAND_MOTD_SET,
         COMMAND_HOSTSERVER,
-        COMMAND_HOSTEVENT
+        COMMAND_HOSTEVENT,
+        COMMAND_PERFORMANCE
     }
 
     private final String PROXY_CHANNEL = "BungeeCord";
@@ -82,8 +83,12 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
         _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
         _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
 
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SERVER);
+        PermissionGroup.MEMBER._permissions.addAll(List.of(
+                PERM.COMMAND_SERVER,
+                PERM.COMMAND_PERFORMANCE
+        ));
         PermissionGroup.MVP._permissions.add(PERM.COMMAND_HOSTSERVER);
+        PermissionGroup.EVENT_LEAD._permissions.add(PERM.COMMAND_HOSTEVENT);
         PermissionGroup.ADMINISTRATOR._permissions.addAll(List.of(
                 PERM.COMMAND_RESTART,
                 PERM.COMMAND_RESTART_GROUP,
@@ -93,8 +98,6 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
                 PERM.COMMAND_MOTD_VIEW,
                 PERM.COMMAND_MOTD_SET
         ));
-        PermissionGroup.EVENT_LEAD._permissions.add(PERM.COMMAND_HOSTEVENT);
-
     }
 
     @Override
