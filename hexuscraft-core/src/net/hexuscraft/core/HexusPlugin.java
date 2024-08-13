@@ -11,7 +11,6 @@ import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.entity.MiniPluginEntity;
 import net.hexuscraft.core.gamemode.MiniPluginGameMode;
 import net.hexuscraft.core.item.MiniPluginItem;
-import net.hexuscraft.core.network.MiniPluginNetwork;
 import net.hexuscraft.core.party.MiniPluginParty;
 import net.hexuscraft.core.permission.MiniPluginPermission;
 import net.hexuscraft.core.portal.MiniPluginPortal;
@@ -52,7 +51,6 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         require(new MiniPluginEntity(this));
         require(new MiniPluginGameMode(this));
         require(new MiniPluginItem(this));
-        require(new MiniPluginNetwork(this));
         require(new MiniPluginParty(this));
         require(new MiniPluginPermission(this));
         require(new MiniPluginPortal(this));

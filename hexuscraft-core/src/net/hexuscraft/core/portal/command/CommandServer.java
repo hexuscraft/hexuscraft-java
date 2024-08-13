@@ -17,7 +17,7 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
 
     private final MiniPluginDatabase _miniPluginDatabase;
 
-    public CommandServer(MiniPluginPortal miniPluginPortal, MiniPluginDatabase miniPluginDatabase) {
+    public CommandServer(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
         super(miniPluginPortal,
                 "server",
                 "[Name]",

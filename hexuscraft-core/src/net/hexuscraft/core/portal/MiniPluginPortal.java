@@ -11,12 +11,20 @@ import net.hexuscraft.core.database.MessagedRunnable;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.portal.command.*;
+import net.hexuscraft.core.portal.command.CommandSend;
+import net.hexuscraft.core.portal.command.CommandServer;
+import net.hexuscraft.core.portal.command.CommandHostEvent;
+import net.hexuscraft.core.portal.command.CommandHostServer;
+import net.hexuscraft.core.portal.command.CommandMotd;
+import net.hexuscraft.core.portal.command.CommandNetwork;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.Server;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -32,9 +40,6 @@ import java.util.*;
 public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessageListener {
 
     public enum PERM implements IPermission {
-        COMMAND_RESTART,
-        COMMAND_RESTART_GROUP,
-        COMMAND_RESTART_SERVER,
         COMMAND_SEND,
         COMMAND_SERVER,
         COMMAND_MOTD,
@@ -42,15 +47,30 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
         COMMAND_MOTD_SET,
         COMMAND_HOSTSERVER,
         COMMAND_HOSTEVENT,
-        COMMAND_PERFORMANCE
+        COMMAND_PERFORMANCE,
+
+        COMMAND_NETWORK,
+        COMMAND_NETWORK_GROUP,
+        COMMAND_NETWORK_GROUP_CREATE,
+        COMMAND_NETWORK_GROUP_DELETE,
+        COMMAND_NETWORK_GROUP_LIST,
+        COMMAND_NETWORK_SERVER,
+        COMMAND_NETWORK_SPY,
+        COMMAND_NETWORK_RESTART,
+        COMMAND_NETWORK_RESTART_GROUP,
+        COMMAND_NETWORK_RESTART_SERVER
     }
 
     private final String PROXY_CHANNEL = "BungeeCord";
     private final String TELEPORT_CHANNEL = "PortalTeleport";
     private final String RESTART_CHANNEL = "PortalRestart";
+    @SuppressWarnings("FieldCanBeLocal")
+    private final String SPY_CHANNEL = "NetworkSpy";
 
     private MiniPluginCommand _pluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
+
+    public final Set<CommandSender> _spyingPlayers;
 
     public final long _created;
     public final String _serverName;
@@ -65,6 +85,7 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
 
         _created = System.currentTimeMillis();
         _callbacks = new HashMap<>();
+        _spyingPlayers = new HashSet<>();
 
         try {
             _serverName = read(new File("_name.dat"));
@@ -85,18 +106,25 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
 
         PermissionGroup.MEMBER._permissions.addAll(List.of(
                 PERM.COMMAND_SERVER,
-                PERM.COMMAND_PERFORMANCE
+                PERM.COMMAND_PERFORMANCE,
+                PERM.COMMAND_MOTD,
+                PERM.COMMAND_MOTD_VIEW
         ));
         PermissionGroup.MVP._permissions.add(PERM.COMMAND_HOSTSERVER);
         PermissionGroup.EVENT_LEAD._permissions.add(PERM.COMMAND_HOSTEVENT);
         PermissionGroup.ADMINISTRATOR._permissions.addAll(List.of(
-                PERM.COMMAND_RESTART,
-                PERM.COMMAND_RESTART_GROUP,
-                PERM.COMMAND_RESTART_SERVER,
                 PERM.COMMAND_SEND,
-                PERM.COMMAND_MOTD,
-                PERM.COMMAND_MOTD_VIEW,
-                PERM.COMMAND_MOTD_SET
+                PERM.COMMAND_MOTD_SET,
+                PERM.COMMAND_NETWORK,
+                PERM.COMMAND_NETWORK_SPY,
+                PERM.COMMAND_NETWORK_GROUP,
+                PERM.COMMAND_NETWORK_GROUP_CREATE,
+                PERM.COMMAND_NETWORK_GROUP_DELETE,
+                PERM.COMMAND_NETWORK_GROUP_LIST,
+                PERM.COMMAND_NETWORK_SERVER,
+                PERM.COMMAND_NETWORK_RESTART,
+                PERM.COMMAND_NETWORK_RESTART_GROUP,
+                PERM.COMMAND_NETWORK_RESTART_SERVER
         ));
     }
 
@@ -104,11 +132,17 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
     public void onEnable() {
         _pluginCommand.register(new CommandServer(this, _miniPluginDatabase));
         _pluginCommand.register(new CommandSend(this));
-        _pluginCommand.register(new CommandRestart(this));
         _pluginCommand.register(new CommandMotd(this, _miniPluginDatabase));
         _pluginCommand.register(new CommandHostEvent(this, _miniPluginDatabase));
         _pluginCommand.register(new CommandHostServer(this, _miniPluginDatabase));
+        _pluginCommand.register(new CommandNetwork(this, _miniPluginDatabase));
 
+        _miniPluginDatabase.registerCallback(SPY_CHANNEL, new MessagedRunnable(this) {
+            @Override
+            public void run() {
+                _spyingPlayers.forEach(commandSender -> commandSender.sendMessage(F.fSub(this, getMessage())));
+            }
+        });
         _miniPluginDatabase.registerCallback(TELEPORT_CHANNEL, new MessagedRunnable(this) {
 
             @Override
@@ -316,6 +350,13 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
             outServer.writeUTF(s);
         }
         _hexusPlugin.getServer().sendPluginMessage(_hexusPlugin, PROXY_CHANNEL, outServer.toByteArray());
+    }
+
+    @EventHandler
+    private void onPlayerQuit(final PlayerQuitEvent event) {
+        final Player player = event.getPlayer();
+        if (!_spyingPlayers.contains(player)) return;
+        _spyingPlayers.remove(player);
     }
 
 }

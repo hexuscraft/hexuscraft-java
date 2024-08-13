@@ -7,10 +7,10 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandRestartServer extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkRestartServer extends BaseCommand<MiniPluginPortal> {
 
-    public CommandRestartServer(MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "server", "<Server>", "Restart a specific server.", Set.of("s", "sv"), MiniPluginPortal.PERM.COMMAND_RESTART_SERVER);
+    public CommandNetworkRestartServer(final MiniPluginPortal miniPluginPortal) {
+        super(miniPluginPortal, "server", "<Server>", "Restart a specific server.", Set.of("s", "sv"), MiniPluginPortal.PERM.COMMAND_NETWORK_RESTART_SERVER);
     }
 
     @Override

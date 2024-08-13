@@ -1,9 +1,9 @@
-package net.hexuscraft.core.network.command.group;
+package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.network.MiniPluginNetwork;
+import net.hexuscraft.core.portal.MiniPluginPortal;
 import net.hexuscraft.database.queries.ServerQueries;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.JedisPooled;
@@ -12,12 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandNetworkGroupDelete extends BaseCommand<MiniPluginNetwork> {
+public final class CommandNetworkGroupDelete extends BaseCommand<MiniPluginPortal> {
 
     private final MiniPluginDatabase _miniPluginDatabase;
 
-    CommandNetworkGroupDelete(final MiniPluginNetwork miniPluginNetwork, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginNetwork, "delete", "<Name>", "Delete a server group.", Set.of("del", "d"), MiniPluginNetwork.PERM.COMMAND_NETWORK_GROUP_DELETE);
+    CommandNetworkGroupDelete(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
+        super(miniPluginPortal, "delete", "<Name>", "Delete a server group.", Set.of("del", "d"), MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_DELETE);
         _miniPluginDatabase = miniPluginDatabase;
     }
 

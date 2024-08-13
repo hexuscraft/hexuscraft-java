@@ -1,11 +1,11 @@
-package net.hexuscraft.core.network.command.group;
+package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.game.GameType;
-import net.hexuscraft.core.network.MiniPluginNetwork;
 import net.hexuscraft.core.permission.PermissionGroup;
+import net.hexuscraft.core.portal.MiniPluginPortal;
 import net.hexuscraft.database.serverdata.ServerGroupData;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.JedisPooled;
@@ -14,14 +14,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwork> {
+public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginPortal> {
 
     private final String[] DISALLOWED_CHARACTERS = new String[]{":", "//", "\\\\", ".."};
 
     private final MiniPluginDatabase _miniPluginDatabase;
 
-    CommandNetworkGroupCreate(final MiniPluginNetwork miniPluginNetwork, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginNetwork, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout #> [Games]", "Create a server group.", Set.of("c", "add", "a"), MiniPluginNetwork.PERM.COMMAND_NETWORK_GROUP_CREATE);
+    CommandNetworkGroupCreate(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
+        super(miniPluginPortal, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout #> [Games]", "Create a server group.", Set.of("c", "add", "a"), MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
         _miniPluginDatabase = miniPluginDatabase;
     }
 
