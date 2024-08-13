@@ -17,7 +17,7 @@ public final class CommandNetworkGroupList extends BaseCommand<MiniPluginNetwork
     private final MiniPluginDatabase _miniPluginDatabase;
 
     CommandNetworkGroupList(final MiniPluginNetwork miniPluginNetwork, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginNetwork, "list", "", "List all server groups.", Set.of("l"), MiniPluginNetwork.PERM.COMMAND_NETSTAT_GROUP_LIST);
+        super(miniPluginNetwork, "list", "", "List all server groups.", Set.of("l"), MiniPluginNetwork.PERM.COMMAND_NETWORK_GROUP_LIST);
         _miniPluginDatabase = miniPluginDatabase;
     }
 

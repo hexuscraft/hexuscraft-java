@@ -17,7 +17,7 @@ public final class CommandNetworkGroupDelete extends BaseCommand<MiniPluginNetwo
     private final MiniPluginDatabase _miniPluginDatabase;
 
     CommandNetworkGroupDelete(final MiniPluginNetwork miniPluginNetwork, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginNetwork, "delete", "<Name>", "Delete a server group.", Set.of("del", "d"), MiniPluginNetwork.PERM.COMMAND_NETSTAT_GROUP_DELETE);
+        super(miniPluginNetwork, "delete", "<Name>", "Delete a server group.", Set.of("del", "d"), MiniPluginNetwork.PERM.COMMAND_NETWORK_GROUP_DELETE);
         _miniPluginDatabase = miniPluginDatabase;
     }
 

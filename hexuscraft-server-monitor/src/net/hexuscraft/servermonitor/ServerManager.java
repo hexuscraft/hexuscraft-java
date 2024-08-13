@@ -22,6 +22,8 @@ public final class ServerManager {
     }
 
     public void startServer(final JedisPooled jedis, final ServerGroupData serverGroupData, final String reason) {
+        _monitor._actionDepth += 1;
+
         final ServerData[] existingServers = ServerQueries.getServers(jedis, serverGroupData);
 
         final Map<Integer, ServerData> serverDataIdMap = new HashMap<>();
@@ -39,6 +41,7 @@ public final class ServerManager {
 
         if (lowestId == 0) {
             _monitor.log("Could not start a server in group " + serverGroupData._name + ": Max Port Reached");
+            _monitor._actionDepth -= 1;
             return;
         }
 
@@ -90,9 +93,12 @@ public final class ServerManager {
         } finally {
             _monitor.log("- Done");
         }
+
+        _monitor._actionDepth -= 1;
     }
 
     public void killServer(final JedisPooled jedis, final String serverName, final String reason) {
+        _monitor._actionDepth += 1;
         _monitor.log("Killing " + serverName + ": " + reason);
 
         try {
@@ -117,6 +123,8 @@ public final class ServerManager {
         } finally {
             _monitor.log("- Done");
         }
+
+        _monitor._actionDepth -= 1;
     }
 
 }

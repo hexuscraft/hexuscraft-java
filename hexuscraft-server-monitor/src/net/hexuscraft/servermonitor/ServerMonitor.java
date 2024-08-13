@@ -26,9 +26,12 @@ public final class ServerMonitor implements Runnable {
     private final Map<String, ServerData> _serverDataMap;
     private final Map<String, ServerGroupData> _serverGroupDataMap;
 
+    public int _actionDepth;
+
     private ServerMonitor(final String[] args) {
         _console = System.console();
         _database = new PluginDatabase();
+        _actionDepth = -1;
 
         //noinspection ReassignedVariable
         InetAddress inetAddress = null;
@@ -58,7 +61,13 @@ public final class ServerMonitor implements Runnable {
     }
 
     public void log(final String message, final Object... args) {
-        _console.printf("[" + System.currentTimeMillis() + "] " + message + "\n", args);
+        final StringBuilder builder = new StringBuilder();
+        if (_actionDepth > 0)
+            builder.append(">".repeat(_actionDepth)).append(" ");
+        builder.append(message).append("\n");
+
+        _console.printf("[" + System.currentTimeMillis() + "] " + builder, args);
+        new Thread(() -> _database.getJedisPooled().publish("NetworkSpy", builder.toString())).start();
     }
 
     private void tick() {

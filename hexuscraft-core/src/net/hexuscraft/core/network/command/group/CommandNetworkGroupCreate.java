@@ -21,7 +21,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginNetwo
     private final MiniPluginDatabase _miniPluginDatabase;
 
     CommandNetworkGroupCreate(final MiniPluginNetwork miniPluginNetwork, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginNetwork, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout #> [Games]", "Create a server group.", Set.of("c", "add", "a"), MiniPluginNetwork.PERM.COMMAND_NETSTAT_GROUP_CREATE);
+        super(miniPluginNetwork, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout #> [Games]", "Create a server group.", Set.of("c", "add", "a"), MiniPluginNetwork.PERM.COMMAND_NETWORK_GROUP_CREATE);
         _miniPluginDatabase = miniPluginDatabase;
     }
 
