@@ -21,7 +21,7 @@ public final class ServerMonitor implements Runnable {
     private final Console _console;
     private final PluginDatabase _database;
     private final ServerManager _manager;
-    @SuppressWarnings("FieldCanBeLocal")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final InetAddress _inetAddress;
 
     private final Map<String, ServerData> _serverDataMap;
