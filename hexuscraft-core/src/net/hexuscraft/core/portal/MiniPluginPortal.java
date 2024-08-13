@@ -290,9 +290,9 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
         return 0;
     }
 
-    @SuppressWarnings("unused")
-    public UUID registerCallback(String channelName, ByteArrayDataInputRunnable callback) {
-        UUID id = UUID.randomUUID();
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
+    public UUID registerCallback(final String channelName, final ByteArrayDataInputRunnable callback) {
+        final UUID id = UUID.randomUUID();
         if (!_callbacks.containsKey(channelName)) {
             _callbacks.put(channelName, new HashMap<>());
         }
