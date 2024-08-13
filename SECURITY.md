@@ -6,7 +6,7 @@ Hi there - this policy details the procedures for reporting vulnerabilities with
 
 The source code here is updated fairly often, so it is possible older versions already have the vulnerability patched
 
-Please use the latest available source in the [main branch](https://github.com/hexuscraft/hexuscraft-java/tree/main) for testing vulnerabiltiies
+Please use the latest available source in the [main branch](https://github.com/hexuscraft/hexuscraft-java/tree/main) for testing vulnerabilities
 
 ## Reporting a Vulnerability
 
@@ -14,7 +14,7 @@ When reporting vulnerabilities, please include as much information as possible s
 
 Vulnerabilities can be reported via the 'Report a vulnerability' option, or to a developer in our discord server - https://discord.gg/yusJMxrg3e
 
-If reporting via our discord server, please look for a user with the "Admin" or "Developer" role and they will be able to assist you from there
+If reporting via our discord server, please look for a user with the "Admin" or "Developer" role, and they will be able to assist you from there
 
 ## A big thank you
 
