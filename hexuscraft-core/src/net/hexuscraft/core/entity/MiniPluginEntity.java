@@ -200,6 +200,7 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
         final List<String> npcStrings = new ArrayList<>();
 
         try {
+            //noinspection SpellCheckingInspection
             final Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_npcs.dat").toFile());
             while (scanner.hasNextLine()) {
                 npcStrings.add(scanner.nextLine());
