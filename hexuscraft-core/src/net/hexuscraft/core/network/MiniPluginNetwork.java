@@ -33,7 +33,7 @@ public final class MiniPluginNetwork extends MiniPlugin<HexusPlugin> {
     private MiniPluginCommand _miniPluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
 
-    public Set<CommandSender> _spyingPlayers;
+    public final Set<CommandSender> _spyingPlayers;
 
     public MiniPluginNetwork(final HexusPlugin plugin) {
         super(plugin, "Network");
