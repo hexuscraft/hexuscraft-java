@@ -2,12 +2,16 @@ package net.hexuscraft.core.portal;
 
 import com.google.common.io.ByteArrayDataInput;
 
-public final class ByteArrayDataInputRunnable implements Runnable {
+public abstract class ByteArrayDataInputRunnable implements Runnable {
 
     ByteArrayDataInput in;
 
-    public void setIn(ByteArrayDataInput in) {
+    public void setIn(final ByteArrayDataInput in) {
         this.in = in;
+    }
+
+    public ByteArrayDataInput getIn() {
+        return this.in;
     }
 
     @Override
