@@ -7,9 +7,9 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandNetworkRestartGroup extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPortal> {
 
-    public CommandNetworkRestartGroup(final MiniPluginPortal miniPluginPortal) {
+    public CommandNetworkGroupRestart(final MiniPluginPortal miniPluginPortal) {
         super(miniPluginPortal, "group", "<Server Group>", "Restart all servers of a group.", Set.of("g"), MiniPluginPortal.PERM.COMMAND_NETWORK_RESTART_GROUP);
     }
 
