@@ -11,11 +11,11 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandMotdView extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkMotdView extends BaseCommand<MiniPluginPortal> {
 
     private final MiniPluginDatabase _miniPluginDatabase;
 
-    CommandMotdView(MiniPluginPortal miniPluginPortal, MiniPluginDatabase miniPluginDatabase) {
+    CommandNetworkMotdView(MiniPluginPortal miniPluginPortal, MiniPluginDatabase miniPluginDatabase) {
         super(miniPluginPortal, "view", "", "View the current MOTD.", Set.of("v"), MiniPluginPortal.PERM.COMMAND_MOTD_VIEW);
 
         _miniPluginDatabase = miniPluginDatabase;

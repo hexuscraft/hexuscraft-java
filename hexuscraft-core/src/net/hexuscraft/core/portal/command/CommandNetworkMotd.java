@@ -6,12 +6,12 @@ import net.hexuscraft.core.portal.MiniPluginPortal;
 
 import java.util.Set;
 
-public final class CommandMotd extends BaseMultiCommand<MiniPluginPortal> {
+public final class CommandNetworkMotd extends BaseMultiCommand<MiniPluginPortal> {
 
-    public CommandMotd(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
+    public CommandNetworkMotd(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
         super(miniPluginPortal, "messageoftheday", "Manage the network MOTD.", Set.of("motd"), MiniPluginPortal.PERM.COMMAND_MOTD, Set.of(
-                new CommandMotdView(miniPluginPortal, miniPluginDatabase),
-                new CommandMotdSet(miniPluginPortal, miniPluginDatabase)
+                new CommandNetworkMotdView(miniPluginPortal, miniPluginDatabase),
+                new CommandNetworkMotdSet(miniPluginPortal, miniPluginDatabase)
         ));
     }
 

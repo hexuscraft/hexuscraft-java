@@ -13,7 +13,8 @@ public final class CommandNetwork extends BaseMultiCommand<MiniPluginPortal> {
                 new CommandNetworkGroup(miniPluginPortal, miniPluginDatabase),
                 new CommandNetworkServer(miniPluginPortal, miniPluginDatabase),
                 new CommandNetworkSpy(miniPluginPortal),
-                new CommandNetworkRestart(miniPluginPortal)
+                new CommandNetworkRestart(miniPluginPortal),
+                new CommandNetworkMotd(miniPluginPortal, miniPluginDatabase)
         ));
     }
 

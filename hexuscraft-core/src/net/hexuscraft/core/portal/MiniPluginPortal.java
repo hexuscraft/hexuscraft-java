@@ -11,12 +11,7 @@ import net.hexuscraft.core.database.MessagedRunnable;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.portal.command.CommandSend;
-import net.hexuscraft.core.portal.command.CommandServer;
-import net.hexuscraft.core.portal.command.CommandHostEvent;
-import net.hexuscraft.core.portal.command.CommandHostServer;
-import net.hexuscraft.core.portal.command.CommandMotd;
-import net.hexuscraft.core.portal.command.CommandNetwork;
+import net.hexuscraft.core.portal.command.*;
 import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
@@ -132,7 +127,6 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
     public void onEnable() {
         _pluginCommand.register(new CommandServer(this, _miniPluginDatabase));
         _pluginCommand.register(new CommandSend(this));
-        _pluginCommand.register(new CommandMotd(this, _miniPluginDatabase));
         _pluginCommand.register(new CommandHostEvent(this, _miniPluginDatabase));
         _pluginCommand.register(new CommandHostServer(this, _miniPluginDatabase));
         _pluginCommand.register(new CommandNetwork(this, _miniPluginDatabase));

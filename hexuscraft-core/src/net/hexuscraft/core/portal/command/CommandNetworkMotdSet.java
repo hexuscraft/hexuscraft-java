@@ -11,11 +11,11 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandMotdSet extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkMotdSet extends BaseCommand<MiniPluginPortal> {
 
     private final MiniPluginDatabase _miniPluginDatabase;
 
-    CommandMotdSet(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
+    CommandNetworkMotdSet(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
         super(miniPluginPortal, "set", "<Message>", "Set the current MOTD.", Set.of("s"), MiniPluginPortal.PERM.COMMAND_MOTD_SET);
 
         _miniPluginDatabase = miniPluginDatabase;
