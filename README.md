@@ -23,6 +23,11 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > - ADMINISTRATOR
 > - DEVELOPER
 
+### PunishType
+> - BAN
+> - MUTE
+> - WARNING
+
 ## Redis Keys
 
 ### Server Groups
