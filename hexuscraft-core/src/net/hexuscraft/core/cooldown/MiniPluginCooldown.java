@@ -51,7 +51,7 @@ public final class MiniPluginCooldown extends MiniPlugin<HexusPlugin> {
 
         final Cooldown cooldown = getCooldown(parent, name);
         if (cooldown == null) {
-            sender.sendMessage(F.fMain(this, "Please wait before trying to use ", F.fItem(name), "again."));
+            sender.sendMessage(F.fMain(this, "Please wait before trying to use ", F.fItem(name), " again."));
             return;
         }
 
