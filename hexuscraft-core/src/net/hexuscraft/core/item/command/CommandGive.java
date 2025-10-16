@@ -30,7 +30,19 @@ public final class CommandGive extends BaseCommand<MiniPluginItem> {
         final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
         if (targets.length == 0) return;
 
-        final int amount = args.length > 2 ? Integer.parseInt(args[2]) % 64 : 1;
+        final String[] materialNames = args[1].split(",");
+        if (materialNames.length > 36) {
+            // There are only 36 slots in a player inventory! (9 * 4)
+            sender.sendMessage(F.fMain(this, F.fError("Cannot give more than 36 materials.")));
+            return;
+        }
+
+        final int amount = args.length > 2 ? Integer.parseInt(args[2]) : 1;
+        if (materialNames.length * amount > 2304) {
+            // A player can only carry up to 2304 items in their inventory. (64 * 9 * 4)
+            sender.sendMessage(F.fMain(this, F.fError("Cannot give more than 2304 items.")));
+            return;
+        }
 
         final HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
         if (args.length > 3) {
@@ -63,16 +75,20 @@ public final class CommandGive extends BaseCommand<MiniPluginItem> {
                 continue;
             }
 
-            ItemStack stack = new ItemStack(targetMaterials[0]);
-            stack.setAmount(amount);
+            int remainingAmount = amount;
+            while (remainingAmount > 0) {
+                ItemStack stack = new ItemStack(targetMaterials[0]);
+                stack.setAmount(Math.min(remainingAmount, 64));
+                stack.addUnsafeEnchantments(enchantmentMap);
 
-            stack.addUnsafeEnchantments(enchantmentMap);
+                for (Player target : targets) {
+                    target.getInventory().addItem(stack);
+                }
 
-            for (Player target : targets) {
-                target.getInventory().addItem(stack);
+                remainingAmount -= 64;
             }
 
-            sender.sendMessage(F.fMain(this) + "Gave " + F.fItem(stack) + " to " + F.fList(Arrays.stream(targets).map(Player::getName).toArray(String[]::new)));
+            sender.sendMessage(F.fMain(this) + "Gave " + F.fItem(targetMaterials[0], amount) + " to " + F.fList(Arrays.stream(targets).map(Player::getName).toArray(String[]::new)));
         }
     }
 
