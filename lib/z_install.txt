@@ -1,2 +1,0 @@
-mvn org.apache.maven.plugins:maven-install-plugin:3.1.1:install-file -Dfile="lib/velocity-3.2.0.jar" -DgroupId="com.velocitypowered" -DartifactId="velocity-api" -Dversion="3.2.0-SNAPSHOT" -Dpackaging="jar"
-mvn org.apache.maven.plugins:maven-install-plugin:3.1.1:install-file -Dfile="lib/spigot-1.8.8.jar" -DgroupId="org.spigotmc" -DartifactId="spigot-api" -Dversion="1.8.8-R0.1-SNAPSHOT" -Dpackaging="jar"

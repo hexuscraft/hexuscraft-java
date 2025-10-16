@@ -17,7 +17,6 @@
     <packaging>pom</packaging>
 
     <build>
-        <!-- Latest plugin versions: https://maven.apache.org/plugins/index.html -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

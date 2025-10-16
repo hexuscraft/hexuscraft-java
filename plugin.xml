@@ -15,18 +15,4 @@
     <name>Plugin</name>
     <artifactId>hexuscraft-plugin</artifactId>
     <packaging>pom</packaging>
-
-    <build>
-        <!-- Latest plugin versions: https://maven.apache.org/plugins/index.html -->
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <!-- Can only exclude Jedis' pom.properties on dedicated servers as it errors on the proxy -->
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.5.0</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>

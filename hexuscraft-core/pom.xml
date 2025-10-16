@@ -20,15 +20,15 @@
             <groupId>net.hexuscraft</groupId>
             <artifactId>hexuscraft-database</artifactId>
         </dependency>
-
-        <!--suppress VulnerableLibrariesLocal -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
