@@ -66,6 +66,9 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 ### Permissions
 
+> If you have successfully setup the network and are looking to change your own rank, you can also execute the `/rank` command from the console to make things a bit easier.
+> - Example: `/rank set USERNAME DEVELOPER`
+
 > **STRING** `user:(UUID):permission:primary`
 >
 > - PermissionGroup Enum
