@@ -31,10 +31,9 @@ public final class CommandSpawn extends BaseCommand<MiniPluginPlayer> {
                 return;
             }
 
-            Player[] players = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
-            if (players.length != 1) {
-                return;
-            }
+            Player[] players = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, matches -> matches.length != 1);
+            if (players.length != 1) return;
+
             target = players[0];
         } else if (!(sender instanceof Player)) {
             sender.sendMessage(F.fMain(this) + "Only players can teleport themselves.");
