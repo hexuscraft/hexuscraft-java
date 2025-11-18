@@ -14,7 +14,7 @@ import java.util.*;
 
 public final class ServerMonitor implements Runnable {
 
-    public static void main(final String[] args) {
+    static void main(final String[] args) {
         new ServerMonitor(args);
     }
 
@@ -63,8 +63,7 @@ public final class ServerMonitor implements Runnable {
 
     public void log(final String message, final Object... args) {
         final StringBuilder builder = new StringBuilder();
-        if (_actionDepth > 0)
-            builder.append(">".repeat(_actionDepth)).append(" ");
+        if (_actionDepth > 0) builder.append(">".repeat(_actionDepth)).append(" ");
         builder.append(message).append("\n");
 
         _console.printf("[" + System.currentTimeMillis() + "] " + builder, args);
@@ -89,9 +88,10 @@ public final class ServerMonitor implements Runnable {
         });
 
         for (final ServerData serverData : _serverDataMap.values()) {
-            // Kill unresponsive servers
-            if ((System.currentTimeMillis() - serverData._updated) > 10000L) {
-                _manager.killServer(jedis, serverData._name, "Unresponsive");
+            // Kill servers without a valid server group
+            final ServerGroupData serverGroupData = _serverGroupDataMap.get(serverData._group);
+            if (serverGroupData == null) {
+                _manager.killServer(jedis, serverData._name, "Invalid Server Group");
                 return;
             }
 
@@ -102,10 +102,9 @@ public final class ServerMonitor implements Runnable {
                 return;
             }
 
-            // Kill servers without a valid server group
-            final ServerGroupData serverGroupData = _serverGroupDataMap.get(serverData._group);
-            if (serverGroupData == null) {
-                _manager.killServer(jedis, serverData._name, "Invalid Server Group");
+            // Kill unresponsive servers
+            if ((System.currentTimeMillis() - serverData._updated) > serverGroupData._timeoutMillis) {
+                _manager.killServer(jedis, serverData._name, "Unresponsive");
                 return;
             }
 
@@ -116,7 +115,7 @@ public final class ServerMonitor implements Runnable {
             joinableServersMap.get(serverGroupData).add(serverData);
         }
 
-        for (final ServerGroupData serverGroupData : _serverGroupDataMap.values()) {
+        for (final ServerGroupData serverGroupData : _serverGroupDataMap.values().stream().sorted(Comparator.comparingInt(value -> value._minPort)).toArray(ServerGroupData[]::new)) {
             final Set<ServerData> totalServers = totalServersMap.get(serverGroupData);
             final int totalServersAmount = totalServers.size();
 
