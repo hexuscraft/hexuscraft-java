@@ -49,8 +49,6 @@ public final class ServerManager {
         _monitor.log("Starting " + serverName + " (" + serverGroupData._ram + " MB): " + reason);
 
         try {
-            killServer(jedis, serverName, "Removing existing server data before start-up");
-
             final Process process = new ProcessBuilder(
                     _path + "/Scripts/StartServer.cmd",
                     serverGroupData._name + "-" + lowestId,
@@ -62,14 +60,14 @@ public final class ServerManager {
                     serverGroupData._worldZip,
                     Boolean.toString(serverGroupData._worldEdit)
             ).start();
-            final boolean finished = process.waitFor(10, TimeUnit.SECONDS);
+
+            final boolean finished = process.waitFor(serverGroupData._timeoutMillis, TimeUnit.MILLISECONDS);
 
             if (!finished) {
                 process.destroy();
-                killServer(jedis, serverName, "Script did not finish");
-                throw new IOException("Aborting as process did not finish in 10 seconds");
+                throw new IOException("Aborting as start script did not finish within " + serverGroupData._timeoutMillis + "ms");
             } else {
-                _monitor.log("- Files generated. Waiting for startup...");
+                _monitor.log("- Start script completed. Waiting for redis data...");
 
                 final long startMs = System.currentTimeMillis();
                 while (true) {
