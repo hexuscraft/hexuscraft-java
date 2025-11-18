@@ -21,7 +21,6 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > - MODERATOR
 > - SENIOR_MODERATOR
 > - ADMINISTRATOR
-> - DEVELOPER
 
 ### PunishType
 > - BAN
