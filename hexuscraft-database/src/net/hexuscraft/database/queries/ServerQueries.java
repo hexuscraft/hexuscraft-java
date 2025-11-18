@@ -25,10 +25,10 @@ public final class ServerQueries {
         return Database.buildQuery("motd");
     }
 
-    public static ServerData getServer(final JedisPooled jedis, final String name) {
-        final Map<String, String> dataMap = jedis.hgetAll(SERVER(name));
+    public static ServerData getServer(final JedisPooled jedis, final String serverName) {
+        final Map<String, String> dataMap = jedis.hgetAll(SERVER(serverName));
         if (dataMap.isEmpty()) return null;
-        return new ServerData(name, dataMap);
+        return new ServerData(serverName, dataMap);
     }
 
     public static ServerData[] getServers(final JedisPooled jedis) {
@@ -37,10 +37,10 @@ public final class ServerQueries {
         return serverDataSet.toArray(ServerData[]::new);
     }
 
-    public static ServerData[] getServers(final JedisPooled jedis, final String name) {
+    public static ServerData[] getServers(final JedisPooled jedis, final String serverGroupName) {
         final Set<ServerData> serverDataSet = new HashSet<>();
         for (ServerData serverData : getServers(jedis)) {
-            if (serverData._group.equals(name)) {
+            if (serverData._group.equals(serverGroupName)) {
                 serverDataSet.add(serverData);
             }
         }
