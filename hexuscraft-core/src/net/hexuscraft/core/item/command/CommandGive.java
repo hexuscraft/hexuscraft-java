@@ -2,7 +2,7 @@ package net.hexuscraft.core.item.command;
 
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.item.MaterialSearch;
+import net.hexuscraft.core.item.ItemSearch;
 import net.hexuscraft.core.item.MiniPluginItem;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.Material;
@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public final class CommandGive extends BaseCommand<MiniPluginItem> {
 
     public CommandGive(final MiniPluginItem itemCenter) {
-        super(itemCenter, "give", "<Players> <Item> [Amount] [Enchantment:Level ...]", "Give items to players.", Set.of("g", "item", "i"), MiniPluginItem.PERM.COMMAND_GIVE);
+        super(itemCenter, "give", "<Players> <Item> [Amount] [Enchantment:Level Enchantment:Level ...]", "Give yourself an item or give items to players with optional enchantments.", Set.of("g", "item", "i"), MiniPluginItem.PERM.COMMAND_GIVE);
     }
 
     @Override
@@ -27,8 +27,8 @@ public final class CommandGive extends BaseCommand<MiniPluginItem> {
             return;
         }
 
-        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
-        if (targets.length == 0) return;
+        final Player[] matches = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, predicateMatches -> predicateMatches.length == 0);
+        if (matches.length == 0) return;
 
         final String[] materialNames = args[1].split(",");
         if (materialNames.length > 36) {
@@ -37,7 +37,19 @@ public final class CommandGive extends BaseCommand<MiniPluginItem> {
             return;
         }
 
-        final int amount = args.length > 2 ? Integer.parseInt(args[2]) : 1;
+        final int amount;
+        try {
+            amount = args.length > 2 ? Integer.parseInt(args[2]) : 1;
+        } catch(final NumberFormatException ex) {
+            sender.sendMessage(F.fMain(this, F.fError("Invalid amount, expected a positive integer.")));
+            return;
+        }
+
+        if (amount < 1) {
+            sender.sendMessage(F.fMain(this, F.fError("Cannot give less than 1 item.")));
+            return;
+        }
+
         if (materialNames.length * amount > 2304) {
             // A player can only carry up to 2304 items in their inventory. (64 * 9 * 4)
             sender.sendMessage(F.fMain(this, F.fError("Cannot give more than 2304 items.")));
@@ -49,8 +61,7 @@ public final class CommandGive extends BaseCommand<MiniPluginItem> {
             Arrays.stream(Arrays.copyOfRange(args, 3, args.length)).map(s -> s.split(":")).forEach(strings -> {
                 Enchantment enchantment = Enchantment.getByName(strings[0]);
                 if (enchantment == null) {
-                    sender.sendMessage(F.fMain(this) + "Unknown enchantment named " + F.fItem(strings[0]) + ". Listing Enchantments:\n"
-                            + F.fMain("") + F.fList(Arrays.stream(Enchantment.values()).map(Enchantment::getName).toArray(String[]::new)));
+                    sender.sendMessage(F.fMain(this) + "Unknown enchantment named " + F.fItem(strings[0]) + ". Listing Enchantments:\n" + F.fMain("") + F.fList(Arrays.stream(Enchantment.values()).map(Enchantment::getName).toArray(String[]::new)));
                     return;
                 }
 
@@ -69,26 +80,24 @@ public final class CommandGive extends BaseCommand<MiniPluginItem> {
             });
         }
 
-        for (String materialSearchName : args[1].split(",")) {
-            Material[] targetMaterials = MaterialSearch.materialSearch(materialSearchName, sender);
-            if (targetMaterials.length != 1) {
-                continue;
-            }
+        for (final String materialSearchName : args[1].split(",")) {
+            final Material[] targetMaterials = ItemSearch.itemSearch(materialSearchName, sender, materials -> materials.length != 1);
+            if (targetMaterials.length != 1) continue;
 
             int remainingAmount = amount;
             while (remainingAmount > 0) {
-                ItemStack stack = new ItemStack(targetMaterials[0]);
+                final ItemStack stack = new ItemStack(targetMaterials[0]);
                 stack.setAmount(Math.min(remainingAmount, 64));
                 stack.addUnsafeEnchantments(enchantmentMap);
 
-                for (Player target : targets) {
+                for (final Player target : matches) {
                     target.getInventory().addItem(stack);
                 }
 
                 remainingAmount -= 64;
             }
 
-            sender.sendMessage(F.fMain(this) + "Gave " + F.fItem(targetMaterials[0], amount) + " to " + F.fList(Arrays.stream(targets).map(Player::getName).toArray(String[]::new)));
+            sender.sendMessage(F.fMain(this) + "Gave " + F.fItem(targetMaterials[0], amount) + " to " + F.fList(Arrays.stream(matches).map(Player::getName).toArray(String[]::new)));
         }
     }
 
@@ -106,7 +115,8 @@ public final class CommandGive extends BaseCommand<MiniPluginItem> {
                 names.addAll(List.of("*", "**"));
                 names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
             }
-            case 2 -> names.addAll(Arrays.stream(Material.values()).map(Material::name).toList());
+            case 2 ->
+                    names.addAll(Arrays.stream(Material.values()).filter(ItemSearch::isMaterialAnItem).map(Material::name).toList());
             case 3 -> {
                 for (int i = 1; i <= 64; i++) {
                     names.add(Integer.toString(i));
