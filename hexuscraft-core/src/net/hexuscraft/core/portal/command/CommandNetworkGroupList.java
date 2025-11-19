@@ -1,5 +1,6 @@
 package net.hexuscraft.core.portal.command;
 
+import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
@@ -8,8 +9,7 @@ import net.hexuscraft.database.queries.ServerQueries;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.JedisPooled;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Set;
 
 public final class CommandNetworkGroupList extends BaseCommand<MiniPluginPortal> {
@@ -28,10 +28,13 @@ public final class CommandNetworkGroupList extends BaseCommand<MiniPluginPortal>
             return;
         }
 
-        final JedisPooled jedis = _miniPluginDatabase.getJedisPooled();
-        final List<String> serverGroupNames = new ArrayList<>(ServerQueries.getServerGroupsAsMap(jedis).keySet());
+        sender.sendMessage(F.fMain(this, "Fetching server groups... ", C.fMagic + "..."));
 
-        sender.sendMessage(F.fMain(this, "Server Groups:\n", F.fList(serverGroupNames)));
+        _miniPlugin._hexusPlugin.runAsync(() -> {
+            final JedisPooled redis = _miniPluginDatabase.getJedisPooled();
+            final String[] serverGroupNames = Arrays.stream(ServerQueries.getServerGroups(redis)).map(serverGroupData -> serverGroupData._name).toArray(String[]::new);
+            sender.sendMessage(F.fMain(this, "Server Groups: ", F.fList(serverGroupNames)));
+        });
     }
 
 }
