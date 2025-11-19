@@ -33,7 +33,7 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
             }
             targets = new Player[]{player};
 
-            final Player[] potentialDestinations = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
+            final Player[] potentialDestinations = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, players -> players.length != 1);
             if (potentialDestinations.length != 1) return;
             destination = potentialDestinations[0].getLocation();
             destinationName = F.fItem(potentialDestinations[0].getDisplayName());
@@ -43,17 +43,12 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                 return;
             }
 
-            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
-            if (targets.length == 0) {
-                sender.sendMessage(F.fMatches(targets, args[0]));
-                return;
-            }
+            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, players -> players.length == 0);
+            if (targets.length == 0) return;
 
-            final Player[] potentialDestinations = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[1], sender);
-            if (potentialDestinations.length != 1) {
-                sender.sendMessage(F.fMatches(targets, args[1]));
-                return;
-            }
+            final Player[] potentialDestinations = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[1], sender, players -> players.length != 1);
+            if (potentialDestinations.length != 1) return;
+
             destination = potentialDestinations[0].getLocation();
             destinationName = F.fItem(potentialDestinations[0].getDisplayName());
         } else if (args.length == 3) { // Teleport self to coords with yaw 0 pitch 0
@@ -89,11 +84,8 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                 return;
             }
 
-            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
-            if (targets.length == 0) {
-                sender.sendMessage(F.fMatches(targets, args[0]));
-                return;
-            }
+            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, players -> players.length == 0);
+            if (targets.length == 0) return;
 
             final World destinationWorld = sender instanceof Player player ? player.getWorld() : _miniPlugin._hexusPlugin.getServer().getWorlds().getFirst();
             if (destinationWorld == null) {
@@ -147,11 +139,8 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                 return;
             }
 
-            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
-            if (targets.length == 0) {
-                sender.sendMessage(F.fMatches(targets, args[0]));
-                return;
-            }
+            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, players -> players.length == 0);
+            if (targets.length == 0) return;
 
             final World destinationWorld = sender instanceof Player player ? player.getWorld() : _miniPlugin._hexusPlugin.getServer().getWorlds().getFirst();
             if (destinationWorld == null) {
@@ -182,7 +171,7 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
             return;
         }
 
-        sender.sendMessage(F.fMain(this, "Teleporting ", F.fList(Arrays.stream(targets).map(Player::getName).toList()), " to ", destinationName, "."));
+        sender.sendMessage(F.fMain(this, "Teleporting ", F.fList(targets), " to ", destinationName, "."));
         Arrays.stream(targets).forEach(target -> target.teleport(destination));
     }
 

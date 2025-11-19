@@ -32,14 +32,14 @@ public final class CommandAnnouncement extends BaseCommand<MiniPluginChat> {
         try {
             permissionGroup = PermissionGroup.valueOf(args[0]);
         } catch (IllegalArgumentException ex) {
-            sender.sendMessage(F.fMain(this) + F.fItem(args[0]) + " is not a valid group. Groups: " + F.fList(PermissionGroup.getColoredNames()));
+            sender.sendMessage(F.fMain(this, F.fItem(args[0]), " is not a valid group. Groups: ", F.fList(PermissionGroup.getColoredNames())));
             return;
         }
 
         List<String> messageList = new ArrayList<>(Arrays.stream(args).toList());
         messageList.removeFirst();
         _miniPluginDatabase.getJedisPooled().publish((_miniPlugin).CHANNEL_ANNOUNCEMENT, sender.getName() + "," + permissionGroup.name() + "," + String.join(" ", messageList));
-        sender.sendMessage(F.fMain(this) + "Message has been broadcast.");
+        sender.sendMessage(F.fMain(this, "Message has been broadcast."));
     }
 
     @Override

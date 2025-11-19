@@ -8,6 +8,7 @@ import net.hexuscraft.core.common.UtilMath;
 import net.hexuscraft.core.currency.CurrencyType;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
+import net.hexuscraft.core.punish.PunishData;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,8 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public final class F {
@@ -31,24 +30,22 @@ public final class F {
 
     private static final String ITEM_COLOR = C.cYellow;
 
-    public static String fMain(final String prefix, final String... text) {
-        return C.cBlue + prefix + ">" + SPACER_GRAY + String.join("", text);
-    }
+    private static final double MILLIS_PER_SECOND = 1000;
+    private static final double MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60;
+    private static final double MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
+    private static final double MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
 
-    public static String fMain(final HexusPlugin hexusPlugin, final String... text) {
-        return fMain(hexusPlugin.getConfig().getName(), text);
+
+    public static String fMain(final String prefix, final String... text) {
+        return C.cBlue + prefix + ">" + SPACER_GRAY + String.join(RESET_GRAY, text);
     }
 
     public static String fMain(final MiniPlugin<? extends HexusPlugin> miniPlugin, final String... text) {
-        return fMain(miniPlugin._name, text);
+        return fMain(miniPlugin._prefix, text);
     }
 
     public static String fMain(final BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> baseCommand, final String... text) {
         return fMain(baseCommand._miniPlugin, text);
-    }
-
-    public static String fMain(final Player player, final String... text) {
-        return fMain(player.getDisplayName(), text);
     }
 
     public static String fMain(final Object object, final String... text) {
@@ -61,7 +58,7 @@ public final class F {
     }
 
     public static String fSub(final MiniPlugin<?> miniPlugin, final String... text) {
-        return fSub(miniPlugin._name, text);
+        return fSub(miniPlugin._prefix, text);
     }
 
     public static String fSub(final BaseCommand<?> baseCommand, final String... text) {
@@ -73,8 +70,17 @@ public final class F {
     }
 
 
+    public static String fStaff() {
+        return C.cAqua + C.fBold + C.fMagic + "#" + SPACER;
+    }
+
+    public static String fStaff(final String color) {
+        return color + C.fBold + C.fMagic + "#" + SPACER;
+    }
+
+
     public static String fItem(final String name) {
-        return ITEM_COLOR + name + RESET_GRAY;
+        return ITEM_COLOR + name;
     }
 
     public static String fItem(final String name, final int count) {
@@ -102,33 +108,25 @@ public final class F {
     }
 
     public static String fItem(final Location location) {
-        return fList(new String[]{"" + location.getX(), "" + location.getY(), "" + location.getZ(), fList(new String[]{"" + location.getYaw(), "" + location.getPitch()})});
+        return fList("" + location.getX(), "" + location.getY(), "" + location.getZ(), fList("" + location.getYaw(), "" + location.getPitch()));
     }
 
 
-    public static String fList(final String[] args) {
-        return RESET_GRAY + "[" + fItem(String.join(RESET_GRAY + ", " + ITEM_COLOR, args)) + "]";
+    public static String fList(final String... args) {
+        return "[" + fItem(String.join(RESET_GRAY + ", " + fItem(""), args)) + RESET_GRAY + "]";
     }
 
-    public static String fList(final List<String> args) {
-        return fList(args.toArray(String[]::new));
-    }
-
-    public static String fList(final Player[] args) {
+    public static String fList(final Player... args) {
         return fList(Arrays.stream(args).map(Player::getDisplayName).toArray(String[]::new));
     }
 
-    public static String fList(final String text) {
-        return text + "." + SPACER;
-    }
-
-    public static String fList(final int index) {
-        return fList(Integer.toString(index));
+    public static String fList(final int... args) {
+        return fList(Arrays.stream(args).mapToObj(Integer::toString).toArray(String[]::new));
     }
 
 
     public static String fCurrency(final String color, final String nameSingular, final String namePlural, final int amount) {
-        return color + amount + " " + (amount == 1 ? nameSingular : namePlural) + RESET_GRAY;
+        return color + amount + " " + (amount == 1 ? nameSingular : namePlural);
     }
 
     @SuppressWarnings("unused")
@@ -137,13 +135,13 @@ public final class F {
     }
 
 
+    public static String fMatches(final String[] matches, final String searchName) {
+        return F.fItem(matches.length + (matches.length == 1 ? " Match" : " Matches")) + RESET_GRAY + " for " + F.fItem(searchName) + RESET_GRAY + (matches.length == 0 ? "." : ": " + F.fList(matches));
+    }
+
+    @Deprecated(since = "2025-11-03")
     public static String fMatches(final Player[] matches, final String searchName) {
-        return F.fMain(
-                "Player Search",
-                F.fItem(matches.length + (matches.length == 1 ? " Match" : " Matches")),
-                " for ",
-                F.fItem(searchName) + (matches.length == 0 ? "." : ":\n" + F.fMain("", F.fList(Arrays.stream(matches).map(Player::getName).toArray(String[]::new))))
-        );
+        return fMatches(Arrays.stream(matches).map(Player::getName).toArray(String[]::new), searchName);
     }
 
 
@@ -165,6 +163,7 @@ public final class F {
         return fCommand(alias, command.getUsage(), command.getDescription());
     }
 
+
     public static String fChat(final int level) {
         return C.cGray + level + SPACER + C.cYellow + "%s" + SPACER + "%s";
     }
@@ -173,8 +172,9 @@ public final class F {
         return C.cGray + level + SPACER + fPermissionGroup(permissionGroup, true, true) + SPACER + C.cYellow + "%s" + SPACER + "%s";
     }
 
+
     public static String fPermissionGroup(final PermissionGroup group, final boolean uppercase, final boolean bold) {
-        return RESET + group._color + (bold ? C.fBold : "") + (uppercase ? group._prefix.toUpperCase() : group._prefix) + RESET_GRAY;
+        return group._color + (bold ? C.fBold : "") + (uppercase ? group._prefix.toUpperCase() : group._prefix);
     }
 
     @SuppressWarnings("unused")
@@ -202,65 +202,47 @@ public final class F {
         return fInsufficientPermissions();
     }
 
+
     public static String fBoolean(final boolean toggle) {
-        return RESET + (toggle ? C.cGreen : C.cRed) + StringUtils.capitalize(Boolean.toString(toggle)) + RESET_GRAY;
+        return (toggle ? C.cGreen : C.cRed) + StringUtils.capitalize(Boolean.toString(toggle));
     }
 
-    public static String fSuccess(final String action) {
-        return RESET + C.cGreen + action + RESET_GRAY;
+    public static String fSuccess(final String... text) {
+        return C.cGreen + String.join(RESET + C.cGreen, text);
     }
 
-    public static String fError(final String action) {
-        return RESET + C.cRed + action + RESET_GRAY;
+    public static String fError(final String... text) {
+        return C.cRed + String.join(RESET + C.cRed, text);
     }
 
-    public static String fError(final String... actions) {
-        return RESET + C.cRed + String.join(RESET + C.cRed, actions) + RESET_GRAY;
-    }
 
-    public static String fPunishKick(final String reason) {
-        return C.cRed + C.fBold + "You were kicked from the server" + RESET + "\n"
-                + reason + RESET + "\n"
-                + C.cDGreen + "Unfairly removed? Let us know at " + C.cGreen + "www.hexuscraft.net" + RESET;
-    }
-
-    public static String fPunishBan(final UUID id, final String reason, final long length) {
-        final String formattedLength = length == 0 ? "Permanent" : fTime(length);
-        return C.cRed + C.fBold + "You are banned for " + formattedLength + RESET + "\n"
-                + reason + RESET + "\n"
-                + C.cDGreen + "Unfairly banned? Appeal at " + C.cGreen + "www.hexuscraft.net" + RESET + "\n\n"
-                + C.cDGray + id.toString();
-    }
-
-    public static String fCheat(final String name, final String color, final String reason, final int count, final String... server) {
-        final StringBuilder builder = new StringBuilder(C.cAqua).append(C.fMagic).append("H")
-                .append(SPACER)
-                .append(C.cRed).append(C.fBold).append("HAC").append(" >")
-                .append(SPACER)
-                .append(C.cGold).append(name)
-                .append(SPACER)
-                .append(C.cYellow).append("failed")
-                .append(SPACER)
-                .append(color).append(reason)
-                .append(SPACER)
-                .append("(").append(count).append(")");
-        if (server.length > 0) {
-            builder.append(SPACER)
-                    .append(C.cYellow).append("in")
-                    .append(SPACER)
-                    .append(C.cAqua).append(server[0]);
+    public static String fPunish(final PunishData punishData) {
+        switch (punishData.type) {
+            case WARNING -> {
+                return F.fMain("Punish", "You received a warning.\n", F.fMain("", "Reason: ", F.fItem(punishData.reason)), F.fSub("", punishData.uniqueId.toString()));
+            }
+            case KICK -> {
+                return C.cRed + C.fBold + "You were kicked from the server" + RESET + "\n" + punishData.reason + RESET + "\n" + C.cDGreen + "Unfairly removed? Let us know at " + C.cGreen + "www.hexuscraft.net" + RESET + "\n\n" + C.cDGray + punishData.uniqueId.toString();
+            }
+            case BAN -> {
+                return C.cRed + C.fBold + "You are banned for " + F.fTime(punishData.getRemaining()) + RESET + "\n" + punishData.reason + RESET + "\n" + C.cDGreen + "Unfairly banned? Appeal at " + C.cGreen + "www.hexuscraft.net" + RESET + "\n\n" + C.cDGray + punishData.uniqueId.toString();
+            }
+            case MUTE -> {
+                return F.fMain("Punish", "You are muted for ", F.fItem(F.fTime(punishData.length)), "\n", F.fMain("", "Reason: ", F.fItem(punishData.reason)), F.fSub("", punishData.uniqueId.toString()));
+            }
         }
-        return builder.toString();
+        return "<unknown PunishData.type>";
     }
 
-    public static String fCheat(final Player player, final CheatSeverity severity, final String reason, final int count, final String... server) {
-        return fCheat(player.getName(), severity.getColor(), reason, count, server);
+
+    public static String fCheat(final Player player, final CheatSeverity severity, final String reason) {
+        return F.fStaff(severity._color) + F.fMain("AC", F.fItem(player.getDisplayName()), " failed ", severity._color + reason + RESET_GRAY, ".");
     }
 
-    private static final double MILLIS_PER_SECOND = 1000;
-    private static final double MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60;
-    private static final double MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
-    private static final double MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
+    public static String fCheat(final Player player, final CheatSeverity severity, final String reason, final String serverName) {
+        return F.fStaff(severity._color) + F.fMain("AC", F.fItem(player.getDisplayName()), " failed ", severity._color + reason + RESET_GRAY, " in ", serverName, ".");
+    }
+
 
     public static String fTime(final long millis, final int trim, final TimeUnit unit) {
         if (millis == -1) {
@@ -310,18 +292,7 @@ public final class F {
     }
 
     public static String fWelcomeMessage(final String playerName) {
-        return String.join(C.fReset + "\n", new String[]{
-                " ",
-                " ",
-                " " + C.cAqua + C.fBold + "Welcome " + playerName + " to Hexuscraft!",
-                " ",
-                " " + C.cGray + "A mini-game server inspired by the legacy Mineplex Network",
-                " " + C.cYellow + "/help" + C.cGray + " for more info",
-                " ",
-                " " + C.cGray + "We are open source! Contribute to help improve our server",
-                " " + C.fUnderline + "https://github.com/hexuscraft",
-                " "
-        });
+        return String.join(C.fReset + "\n", new String[]{" ", " ", " " + C.cAqua + C.fBold + "Welcome " + playerName + " to Hexuscraft!", " ", " " + C.cGray + "A mini-game server inspired by the legacy Mineplex Network", " " + C.cYellow + "/help" + C.cGray + " for more info", " ", " " + C.cGray + "We are open source! Contribute to help improve our server", " " + C.fUnderline + "https://github.com/hexuscraft", " "});
     }
 
 }

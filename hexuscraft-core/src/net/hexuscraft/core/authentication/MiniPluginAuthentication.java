@@ -25,7 +25,7 @@ public final class MiniPluginAuthentication extends MiniPlugin<HexusPlugin> {
         if (!event.getPlayer().hasPermission(PERM.REQUIRE_AUTHENTICATION.name())) {
             return;
         }
-        event.getPlayer().sendMessage(F.fMain(this) + "You are authenticated.");
+        event.getPlayer().sendMessage(F.fMain(this, "You are authenticated."));
     }
 
 }

@@ -30,7 +30,7 @@ public final class CommandSupportResponse extends BaseCommand<MiniPluginChat> {
         if (args.length > 1) {
             Player target = _miniPlugin._hexusPlugin.getServer().getPlayer(args[0]);
             if (target == null) {
-                sender.sendMessage(F.fMain(this) + "Could not find a player with specified name.");
+                sender.sendMessage(F.fMain(this, "Could not find a player with specified name."));
                 return;
             }
 

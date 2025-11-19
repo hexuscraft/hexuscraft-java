@@ -18,7 +18,7 @@ public final class CommandBroadcast extends BaseCommand<MiniPluginChat> {
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 0) {
-            _miniPlugin._hexusPlugin.getServer().broadcastMessage(F.fMain(this) + F.fItem(sender) + ": " + C.cWhite + ChatColor.translateAlternateColorCodes('&', String.join(" ", args)));
+            _miniPlugin._hexusPlugin.getServer().broadcastMessage(F.fMain(this, F.fItem(sender), ": ", C.cWhite + ChatColor.translateAlternateColorCodes('&', String.join(" ", args))));
             return;
         }
         sender.sendMessage(help(alias));

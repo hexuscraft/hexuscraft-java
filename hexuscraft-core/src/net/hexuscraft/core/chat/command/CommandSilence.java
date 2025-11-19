@@ -20,14 +20,14 @@ public final class CommandSilence extends BaseCommand<MiniPluginChat> {
                 _miniPlugin.setMuted(false, true);
                 _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
                     if (!player.hasPermission(MiniPluginChat.PERM.COMMAND_SILENCE_SEE.name())) return;
-                    _miniPlugin._hexusPlugin.getServer().broadcastMessage(F.fSub("Staff", F.fItem(sender), " ", F.fSuccess("un-muted the global chat"), "."));
+                    _miniPlugin._hexusPlugin.getServer().broadcastMessage(F.fStaff() + F.fMain(this, F.fSuccess(F.fItem(sender), " un-muted the global chat.")));
                 });
                 return;
             }
             _miniPlugin.setMuted(true, true);
             _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
                 if (!player.hasPermission(MiniPluginChat.PERM.COMMAND_SILENCE_SEE.name())) return;
-                player.sendMessage(F.fSub("Staff", F.fItem(sender), " ", F.fError("muted the global chat"), "."));
+                player.sendMessage(F.fStaff() + F.fMain(this, F.fError(F.fItem(sender), " muted the global chat")));
             });
 
             return;
