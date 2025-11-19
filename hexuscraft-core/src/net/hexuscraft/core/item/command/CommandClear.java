@@ -25,13 +25,10 @@ public final class CommandClear extends BaseCommand<MiniPluginItem> {
             return;
         }
 
-        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
+        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, matches -> matches.length == 0);
         if (targets.length == 0) return;
 
-        for (Player target : targets) {
-            target.getInventory().clear();
-        }
-
+        Arrays.stream(targets).forEach(target -> target.getInventory().clear());
         sender.sendMessage(F.fMain(this) + "Cleared the inventories of " + F.fList(Arrays.stream(targets).map(Player::getName).toArray(String[]::new)) + ".");
     }
 
