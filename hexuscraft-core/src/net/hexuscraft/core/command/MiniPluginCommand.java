@@ -10,38 +10,43 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class MiniPluginCommand extends MiniPlugin<HexusPlugin> {
 
-    private Set<Command> _commands;
-    private SimpleCommandMap _commandMap;
+    private final Set<Command> _commands;
+    private final AtomicReference<SimpleCommandMap> _commandMap;
 
     public MiniPluginCommand(final HexusPlugin plugin) {
         super(plugin, "Command");
+
+        _commands = new HashSet<>();
+        _commandMap = new AtomicReference<>(null);
     }
 
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _commands = new HashSet<>();
-        _commandMap = ((CraftServer) _hexusPlugin.getServer()).getCommandMap();
+        _commandMap.set(((CraftServer) _hexusPlugin.getServer()).getCommandMap());
     }
 
     @Override
     public void onEnable() {
-        _commandMap.getCommands().forEach(command -> command.setPermissionMessage(F.fInsufficientPermissions()));
+        _commandMap.get().getCommands().forEach(command -> command.setPermissionMessage(F.fInsufficientPermissions()));
     }
 
     @Override
     public void onDisable() {
-        for (Command command : _commands) {
-            command.unregister(_commandMap);
-        }
-        _commands = null;
-        _commandMap = null;
+        _commands.forEach(this::unregister);
+        _commands.clear();
     }
 
-    public void register(Command command) {
-        _commandMap.register("", command);
+    public void register(final Command command) {
+        _commands.add(command);
+        _commandMap.get().register("", command);
+    }
+
+    public void unregister(final Command command) {
+        command.unregister(_commandMap.get());
     }
 
 }
