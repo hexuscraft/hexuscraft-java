@@ -6,14 +6,14 @@ import java.util.UUID;
 
 public final class PunishData {
 
-    public final UUID id; // part of the key name
+    public final UUID uniqueId; // part of the key name
     public final PunishType type;
     public final Boolean active;
     public final Long origin;
     public final Long length;
     public final String reason;
     public final String server;
-    public final UUID staffId;
+    public final UUID staffUniqueId;
     public final String staffServer;
 
     // these cannot be guaranteed to exist unless 'active' is false. ye be warned!
@@ -23,15 +23,15 @@ public final class PunishData {
     public final UUID removeStaffId;
     public final String removeStaffServer;
 
-    public PunishData(Map<String, String> rawData) {
-        id = UUID.fromString(rawData.get("id"));
+    public PunishData(final Map<String, String> rawData) {
+        uniqueId = UUID.fromString(rawData.get("id"));
         type = PunishType.valueOf(rawData.get("type"));
         active = rawData.get("active").equals("true");
         origin = Long.parseLong(rawData.get("origin"));
         length = Long.parseLong(rawData.get("length"));
         reason = rawData.get("reason");
         server = rawData.get("server");
-        staffId = UUID.fromString(rawData.get("staffId"));
+        staffUniqueId = UUID.fromString(rawData.get("staffId"));
         staffServer = rawData.get("staffServer");
 
         if (!active) { // we cannot guarantee these should exist unless 'active' is false
@@ -58,7 +58,7 @@ public final class PunishData {
         map.put("length", length.toString());
         map.put("reason", reason);
         map.put("server", server);
-        map.put("staffId", staffId.toString());
+        map.put("staffId", staffUniqueId.toString());
         map.put("staffServer", staffServer);
 
         if (!active) {
@@ -74,13 +74,13 @@ public final class PunishData {
 
     @Override
     public String toString() {
-        return "PunishData " + id.toString() + ":"
+        return "PunishData " + uniqueId.toString() + ":"
                 + "\n- type: " + type.toString()
                 + "\n- active: " + active
                 + "\n- origin: " + origin
                 + "\n- length: " + length
                 + "\n- reason: " + reason
-                + "\n- staffId: " + staffId.toString()
+                + "\n- staffId: " + staffUniqueId.toString()
                 + "\n- server: " + server
                 + "\n- removeOrigin: " + removeOrigin
                 + "\n- removeReason: " + removeReason
