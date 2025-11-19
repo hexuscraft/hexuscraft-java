@@ -28,11 +28,8 @@ public final class CommandGameMode extends BaseCommand<MiniPluginGameMode> {
         final Player[] targets;
 
         if (args.length > 0) {
-            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender);
-            if (targets.length == 0) {
-                sender.sendMessage(F.fMatches(targets, args[0]));
-                return;
-            }
+            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, matches -> matches.length == 0);
+            if (targets.length == 0) return;
         } else if (sender instanceof Player player) {
             targets = new Player[]{player};
         } else {
@@ -77,7 +74,9 @@ public final class CommandGameMode extends BaseCommand<MiniPluginGameMode> {
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender);
+        if (args.length == 1)
+            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender, true);
+        return List.of();
     }
 
     private GameMode getGameModeFromToggle(final String toggle) {

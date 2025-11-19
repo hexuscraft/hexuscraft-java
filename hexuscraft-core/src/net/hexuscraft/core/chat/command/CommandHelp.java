@@ -23,13 +23,12 @@ public final class CommandHelp extends BaseCommand<MiniPluginChat> {
 
         if (args.length == 1) {
 
-
             return;
         }
 
-        sender.sendMessage(F.fMain(this) + "Hey there! Need some help?");
-        sender.sendMessage(F.fMain("", "Visit our website: " + C.cGreen + "www.hexuscraft.net"));
-        sender.sendMessage(F.fMain("", "Join our Discord: " + C.cPurple + "discord.hexuscraft.net"));
+        sender.sendMessage(F.fMain(this, "Hey there! Need some help?"));
+        sender.sendMessage(F.fMain("", "Visit our website: " + C.cGreen + "https://hexuscraft.net"));
+        sender.sendMessage(F.fMain("", "Join our Discord: " + C.cPurple + "https://discord.gg/yusJMxrg3e"));
         sender.sendMessage(F.fMain("", "Request help from staff with " + F.fItem("/support") + "."));
         sender.sendMessage(F.fMain("", "Type ", F.fItem("/" + alias + " 1"), " for a list of commands."));
     }
