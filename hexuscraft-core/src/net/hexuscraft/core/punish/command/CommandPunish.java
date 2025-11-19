@@ -68,7 +68,7 @@ public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
 
         ItemStack targetSkull = UtilItem.createItemSkull(targetOfflinePlayer.getName(), C.cGreen + C.fBold + targetOfflinePlayer.getName(), targetOfflinePlayer.getUniqueId().toString(), "", C.cWhite + reasonMessage);
 
-        ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG, C.cBlue + "Punishment History", "View the punishment history of " + F.fItem(targetOfflinePlayer.getName()));
+        ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Punishment History", "View the punishment history of " + F.fItem(targetOfflinePlayer.getName()));
 
         ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
         ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "1 Day Mute", "Severity 1", "Light chat offense", "", "Refer to guidelines for details");
