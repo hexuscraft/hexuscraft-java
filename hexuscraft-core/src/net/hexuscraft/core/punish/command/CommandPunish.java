@@ -4,14 +4,12 @@ import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.item.UtilItem;
-import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.punish.MiniPluginPunish;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -39,17 +37,20 @@ public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
             return;
         }
 
-        final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
-        if (profile == null) return;
+        // TODO: Async-ify
+        final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+        if (offlinePlayer == null) {
+            sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+            return;
+        }
 
-        String reasonMessage = String.join(" ", Arrays.stream(args).toList().subList(1, args.length));
-
-        openGui(player, profile, reasonMessage);
+        final String reasonMessage = String.join(" ", Arrays.stream(args).toList().subList(1, args.length));
+        openGui(player, offlinePlayer, reasonMessage);
     }
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        List<String> names = new ArrayList<>();
+        final List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
@@ -62,15 +63,12 @@ public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
         return names;
     }
 
-    public void openGui(Player player, MojangProfile targetProfile, String reasonMessage) {
-        Inventory gui = _miniPlugin._hexusPlugin.getServer().createInventory(player, 6*9, "Punish " + targetProfile.name);
+    public void openGui(final Player staffPlayer, final OfflinePlayer targetOfflinePlayer, final String reasonMessage) {
+        Inventory gui = _miniPlugin._hexusPlugin.getServer().createInventory(staffPlayer, 6 * 9, "Punish - " + targetOfflinePlayer.getName());
 
-        ItemStack devNotice = UtilItem.createDyeItem(DyeColor.YELLOW, C.cBlue + C.fBold + "Developer Notice", "Developers are advised against", "using the punishment system", "without consulting an " + F.fPermissionGroup(PermissionGroup.ADMINISTRATOR), "", "Exceptions allowed in emergency");
-        devNotice.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+        ItemStack targetSkull = UtilItem.createItemSkull(targetOfflinePlayer.getName(), C.cGreen + C.fBold + targetOfflinePlayer.getName(), targetOfflinePlayer.getUniqueId().toString(), "", C.cWhite + reasonMessage);
 
-        ItemStack targetSkull = UtilItem.createItemSkull(targetProfile.name, C.cGreen + C.fBold + targetProfile.name, targetProfile.uuid.toString(),"",C.cWhite + reasonMessage);
-
-        ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG, C.cBlue + "Punishment History", "View the punishment history of " + F.fItem(targetProfile.name));
+        ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG, C.cBlue + "Punishment History", "View the punishment history of " + F.fItem(targetOfflinePlayer.getName()));
 
         ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
         ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "1 Day Mute", "Severity 1", "Light chat offense", "", "Refer to guidelines for details");
@@ -92,8 +90,6 @@ public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
         ItemStack miscMute = UtilItem.createItem(Material.BOOK, C.cRed + C.fBold + "Permanent Mute", "Severity 4", "Severe chat offense", "", "Refer to guidelines for details");
         ItemStack miscBan = UtilItem.createItem(Material.REDSTONE_BLOCK, C.cRed + C.fBold + "Permanent Ban", "Severity 4", "Severe gameplay/client offense", "", "Refer to guidelines for details");
 
-        if (player.hasPermission(PermissionGroup.DEVELOPER.name()))
-            gui.setItem(0, devNotice);
         gui.setItem(4, targetSkull);
 
         gui.setItem(10, chatHeader);
@@ -118,7 +114,7 @@ public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
 
         gui.setItem(53, viewHistory);
 
-        player.openInventory(gui);
+        staffPlayer.openInventory(gui);
     }
 
 }
