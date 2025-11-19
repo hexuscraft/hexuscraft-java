@@ -3,46 +3,44 @@ package net.hexuscraft.core.permission;
 import net.hexuscraft.core.chat.C;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public enum PermissionGroup {
 
-//    Special
+//    Base Ranks
 
-//    _COMMAND_BROADCAST("", C.cWhite),
-//    _COMMAND_SILENCE("", C.cWhite),
-//
-//    _SERVER_CO_HOST("Co-Host", C.cDGreen, _COMMAND_BROADCAST, _COMMAND_SILENCE),
-//    _SERVER_HOST("Host", C.cDGreen, _SERVER_CO_HOST),
-//    _OPERATOR("", C.cWhite),
-//    _AUTHENTICATE("", C.cWhite),
-//    _CHAT_PREFIX("", C.cWhite),
+    MEMBER("Member", C.cWhite), // Member is the first rank for all new players
+    VIP("VIP", C.cGreen, MEMBER), // VIP is the first purchasable rank available on our store
+    MVP("MVP", C.cAqua, VIP), // MVP is the second purchasable rank available on our store
+    MEDIA("Media", C.cDPurple, MVP), // Media is formed of influencers, content creators and other famous personnel
 
 //    Teams
 
-    QUALITY_ASSURANCE("QA", C.cWhite),
+    BUILD_TEAM("BuildTeam", C.cWhite), // Build Team is responsible for building and updating maps used on our network
+    BUILD_LEAD("BuildLead", C.cWhite, BUILD_TEAM), // Build Lead
 
-    EVENT_MOD("E.Mod", C.cDGreen),
-    EVENT_LEAD("E.Lead", C.cDGreen, EVENT_MOD),
+    DEV_TEAM("DevTeam", C.cWhite), // Dev Team is responsible for the creation of source code used to run and maintain the network
+    DEV_LEAD("DevLead", C.cWhite, DEV_TEAM), // Dev Lead
 
-//    Ranks
+    EVENT_TEAM("EventTeam", C.cWhite), // Event Team is responsible for hosting community events for engagement, fun and prizes
+    EVENT_LEAD("EventLead", C.cWhite, EVENT_TEAM), // Event Lead
 
-    MEMBER("Member", C.cWhite),
+    MEDIA_TEAM("MediaTeam", C.cWhite), // Media Team is responsible for assisting Media rank recipients
+    MEDIA_LEAD("MediaLead", C.cWhite, MEDIA_TEAM), // Media Lead
 
-    VIP("VIP", C.cGreen, MEMBER),
-    MVP("MVP", C.cAqua, VIP),
+    QA_TEAM("QualityTeam", C.cWhite), // Quality Assurance Team is responsible for game testing, balancing, suggestions and bug reports
+    QA_LEAD("QualityLead", C.cWhite, QA_TEAM), // Quality Assurance Lead
 
-    MEDIA("Media", C.cDPurple, MVP),
+    STAFF_TEAM("StaffTeam", C.cWhite), // Staffing Team is responsible for the selection, induction and assisting of new and existing staff members
+    STAFF_LEAD("StaffLead", C.cWhite), // Staffing Lead
 
-    BUILDER("Builder", C.cBlue, MVP),
-    SENIOR_BUILDER("Sr.Build", C.cBlue, BUILDER),
+//    Staff Ranks
 
-    TRAINEE("Trainee", C.cDAqua, MVP),
-
-    MODERATOR("Mod", C.cGold, TRAINEE),
-    SENIOR_MODERATOR("Sr.Mod", C.cGold, MODERATOR),
-    ADMINISTRATOR("Admin", C.cGold, SENIOR_MODERATOR, SENIOR_BUILDER, MEDIA, EVENT_LEAD, QUALITY_ASSURANCE),
-    DEVELOPER("Dev", C.cGold, ADMINISTRATOR),
+    TRAINEE("Trainee", C.cDAqua, MEDIA), // Trainees are newly accepted moderators-in-training who must undergo several processes to become a fully-fledged moderator
+    MODERATOR("Mod", C.cGold, TRAINEE), // Moderators are responsible for handling reports, punishing rule-breakers, and helping players who need assistance
+    SENIOR_MODERATOR("Sr.Mod", C.cGold, MODERATOR), // Senior Moderators are moderators who have joined a staff-only team
+    ADMINISTRATOR("Admin", C.cGold, SENIOR_MODERATOR, BUILD_LEAD, DEV_LEAD, EVENT_LEAD, MEDIA_LEAD, QA_LEAD, STAFF_LEAD) // Administrators are responsible for the leadership and daily operations of a specific staff-only team
 
     ;
 
@@ -58,18 +56,8 @@ public enum PermissionGroup {
         _permissions = new ArrayList<>();
     }
 
-    public static String[] getColoredNames(final boolean skipServerGroups) {
-        final List<String> names = new ArrayList<>();
-        for (final PermissionGroup group : PermissionGroup.values()) {
-            final String groupName = group.name();
-            if (skipServerGroups && groupName.startsWith("_")) continue;
-            names.add(group._color + groupName);
-        }
-        return names.toArray(new String[0]);
-    }
-
     public static String[] getColoredNames() {
-        return getColoredNames(true);
+        return Arrays.stream(PermissionGroup.values()).map(group -> group._color + group.name()).toArray(String[]::new);
     }
 
 }
