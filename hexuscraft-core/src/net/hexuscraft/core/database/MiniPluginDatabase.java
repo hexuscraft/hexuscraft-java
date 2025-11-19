@@ -3,6 +3,7 @@ package net.hexuscraft.core.database;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.database.Database;
+import org.bukkit.Warning;
 import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.JedisPubSub;
@@ -98,6 +99,7 @@ public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
         if (_asyncMessageTask != null) _asyncMessageTask.cancel();
     }
 
+    @Warning(reason = "Ensure async is used before ignoring")
     public JedisPooled getJedisPooled() {
         return _database._jedisPooled;
     }
