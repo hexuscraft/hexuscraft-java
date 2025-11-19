@@ -25,7 +25,13 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
     }
 
     public String help(final String alias) {
-        return F.fMain(_miniPlugin._name, "Command Usage:\n", F.fCommand(alias, this));
+        final String commandHelp = F.fCommand(alias, this);
+        final StringBuilder helpBuilder = new StringBuilder(F.fMain(this, "Command Usage:\n", commandHelp));
+        if (commandHelp.toLowerCase().contains("players"))
+            helpBuilder.append("\n").append(F.fSub("Hint", "You can use ", F.fList(".", "*", "**"), " to specify yourself, all players, and other players respectively."));
+        else if (commandHelp.toLowerCase().contains("player"))
+            helpBuilder.append("\n").append(F.fSub("Hint", "You can use ", F.fList("."), " to specify yourself as the player."));
+        return helpBuilder.toString();
     }
 
     public final boolean isAlias(final String alias) {
@@ -47,7 +53,7 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
         try {
             run(sender, alias, args);
         } catch (final Exception ex) {
-            _miniPlugin.log("An exception occurred while CommandSender '" + sender.getName() + "' executing BaseCommand '" + alias + " " + String.join(" ", args) + "':" + ex.getMessage() + "\n> " + String.join("\n", Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)));
+            _miniPlugin.logInfo("An exception occurred while CommandSender '" + sender.getName() + "' executing BaseCommand '" + alias + " " + String.join(" ", args) + "':" + ex.getMessage() + "\n> " + String.join("\n", Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)));
             sender.sendMessage(F.fMain(this, F.fError("An unknown error occurred while executing this command. Please try again later.")));
         }
         return true;
