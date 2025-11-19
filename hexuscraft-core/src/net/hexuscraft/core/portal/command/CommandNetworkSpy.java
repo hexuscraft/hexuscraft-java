@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandNetworkSpy extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkSpy extends BaseCommand<MiniPluginPortal> {
 
     CommandNetworkSpy(final MiniPluginPortal miniPluginPortal) {
         super(miniPluginPortal, "spy", "", "Receive event logs from ServerMonitor.", Set.of(), MiniPluginPortal.PERM.COMMAND_NETWORK_SPY);
@@ -15,14 +15,14 @@ public class CommandNetworkSpy extends BaseCommand<MiniPluginPortal> {
 
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (_miniPlugin._spyingPlayers.contains(sender)) {
-            _miniPlugin._spyingPlayers.remove(sender);
-            sender.sendMessage(F.fMain(this, F.fError("You are no longer spying the network.")));
+        if (_miniPlugin._networkChannelSpies.contains(sender)) {
+            _miniPlugin._networkChannelSpies.remove(sender);
+            sender.sendMessage(F.fMain(this, F.fError("You are no longer spying network channels.")));
             return;
         }
 
-        _miniPlugin._spyingPlayers.add(sender);
-        sender.sendMessage(F.fMain(this, F.fSuccess("You are now spying the network.")));
+        _miniPlugin._networkChannelSpies.add(sender);
+        sender.sendMessage(F.fMain(this, F.fSuccess("You are now spying network channels.")));
     }
 
 }
