@@ -5,16 +5,13 @@ import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.MiniPluginPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.database.queries.PermissionQueries;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
 
@@ -32,31 +29,28 @@ public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
             return;
         }
 
-        final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
-        if (profile == null) return;
+        _miniPlugin._hexusPlugin.runAsync(() -> {
+            final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+            if (offlinePlayer == null) {
+                sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+                return;
+            }
 
-        final String fetchedPrimaryName = _miniPluginDatabase.getJedisPooled().get(PermissionQueries.PRIMARY(profile.uuid.toString()));
-        final String primaryName = fetchedPrimaryName == null ? PermissionGroup.MEMBER.name() : fetchedPrimaryName;
+            final String fetchedPrimaryName = _miniPluginDatabase.getJedisPooled().get(PermissionQueries.PRIMARY(offlinePlayer.getUniqueId()));
+            final String primaryName = fetchedPrimaryName == null ? PermissionGroup.MEMBER.name() : fetchedPrimaryName;
 
-        final Set<String> groupNames = _miniPluginDatabase.getJedisPooled().smembers(PermissionQueries.GROUPS(profile.uuid.toString()));
+            final Set<String> groupNames = _miniPluginDatabase.getJedisPooled().smembers(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
 
-        sender.sendMessage(F.fMain(this) + "Displaying group info for " + F.fItem(profile.name) + ":\n"
-                + F.fMain("") + "Primary Group: " + F.fPermissionGroup(PermissionGroup.valueOf(primaryName)) + "\n"
-                + F.fMain("") + "Sub Groups: " + F.fList(groupNames.stream().map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s))).distinct().toArray(String[]::new)));
+            sender.sendMessage(F.fMain(this, "Displaying group info for ", F.fItem(offlinePlayer.getName()), ":\n", F.fMain("", "Primary Group: ", F.fPermissionGroup(PermissionGroup.valueOf(primaryName)), " (", F.fItem(primaryName), ")"), "\n", F.fMain("", "Sub Groups: ", F.fList(groupNames.stream().map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s))).distinct().toArray(String[]::new)))));
+        });
+
     }
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        List<String> names = new ArrayList<>();
-        if (args.length == 1) {
-            //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
-            if (sender instanceof final Player player) {
-                streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
-            }
-            names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
-        }
-        return names;
+        if (args.length == 1)
+            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender, false);
+        return List.of();
     }
 
 }

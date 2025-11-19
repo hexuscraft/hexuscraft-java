@@ -5,17 +5,16 @@ import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.MiniPluginPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.database.queries.PermissionQueries;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public final class CommandRankAdd extends BaseCommand<MiniPluginPermission> {
 
@@ -51,35 +50,32 @@ public final class CommandRankAdd extends BaseCommand<MiniPluginPermission> {
             return;
         }
 
-        final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
-        if (profile == null) return;
+        final BukkitScheduler scheduler = _miniPlugin._hexusPlugin.getServer().getScheduler();
+        scheduler.runTaskAsynchronously(_miniPlugin._hexusPlugin, () -> {
+            final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+            if (offlinePlayer == null) return;
 
-        _miniPluginDatabase.getJedisPooled().sadd(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.name());
-        sender.sendMessage(F.fMain(this) + "Added sub-group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
+            sender.sendMessage(F.fMain(this, "Adding sub-group ", F.fPermissionGroup(targetGroup), " to ", F.fItem(offlinePlayer.getName()), "..."));
 
-        final Player player = _miniPlugin._hexusPlugin.getServer().getPlayer(profile.name);
-        if (player == null) return;
+            _miniPluginDatabase.getJedisPooled().sadd(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()), targetGroup.name());
+            sender.sendMessage(F.fMain(this, F.fSuccess("Added sub-group " + F.fPermissionGroup(targetGroup), " to ", F.fItem(offlinePlayer.getName()), ".")));
 
-        player.sendMessage(F.fMain(this) + "You now have sub-group " + F.fPermissionGroup(targetGroup) + ".");
-        _miniPlugin.refreshPermissions(player);
+            final Player player = _miniPlugin._hexusPlugin.getServer().getPlayer(offlinePlayer.getName());
+            if (player == null) return;
+
+            player.sendMessage(F.fMain(this) + "You now have sub-group " + F.fPermissionGroup(targetGroup) + ".");
+            _miniPlugin.refreshPermissions(player);
+        });
+
     }
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, String[] args) {
-        final List<String> names = new ArrayList<>();
-        switch (args.length) {
-            case 1 -> {
-                //noinspection ReassignedVariable
-                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
-                if (sender instanceof final Player player) {
-                    streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
-                }
-                names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
-            }
-            case 2 ->
-                    names.addAll(Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(s -> !s.startsWith("_")).toList());
-        }
-        return names;
+        if (args.length == 1)
+            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender, false);
+        if (args.length == 2)
+            return Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(permissionGroupName -> !permissionGroupName.startsWith("_")).toList();
+        return List.of();
     }
 
 }

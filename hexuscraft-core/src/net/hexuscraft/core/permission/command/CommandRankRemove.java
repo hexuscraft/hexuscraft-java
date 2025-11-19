@@ -5,9 +5,9 @@ import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.MiniPluginPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.database.queries.PermissionQueries;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -51,17 +51,22 @@ public final class CommandRankRemove extends BaseCommand<MiniPluginPermission> {
             return;
         }
 
-        final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
-        if (profile == null) return;
+        _miniPlugin._hexusPlugin.runAsync(() -> {
+           final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+           if (offlinePlayer == null) {
+               sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+               return;
+           }
 
-        _miniPluginDatabase.getJedisPooled().srem(PermissionQueries.GROUPS(profile.uuid.toString()), targetGroup.name());
-        sender.sendMessage(F.fMain(this, "Removed sub-group ", F.fPermissionGroup(targetGroup), " from ", F.fItem(profile.name), "."));
+            _miniPluginDatabase.getJedisPooled().srem(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()), targetGroup.name());
+            sender.sendMessage(F.fMain(this, "Removed sub-group ", F.fPermissionGroup(targetGroup), " from ", F.fItem(offlinePlayer.getName()), "."));
 
-        final Player player = _miniPlugin._hexusPlugin.getServer().getPlayer(profile.name);
-        if (player == null) return;
+            final Player player = offlinePlayer.getPlayer();
+            if (player == null) return;
 
-        player.sendMessage(F.fMain(this, "You no longer have sub-group ", F.fPermissionGroup(targetGroup), "."));
-        _miniPlugin.refreshPermissions(player);
+            player.sendMessage(F.fMain(this, "You no longer have sub-group ", F.fPermissionGroup(targetGroup), "."));
+            _miniPlugin.refreshPermissions(player);
+        });
     }
 
     @Override

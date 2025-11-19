@@ -3,11 +3,11 @@ package net.hexuscraft.core.permission.command;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.permission.MiniPluginPermission;
-import net.hexuscraft.core.player.MojangProfile;
+import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.database.queries.PermissionQueries;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -37,12 +37,12 @@ public final class CommandRankSet extends BaseCommand<MiniPluginPermission> {
         try {
             targetGroup = PermissionGroup.valueOf(args[1]);
         } catch (final IllegalArgumentException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Invalid group. Groups: ") + F.fList(PermissionGroup.getColoredNames()) + ".");
+            sender.sendMessage(F.fMain(this, F.fError("Invalid group. Groups: ", F.fList(PermissionGroup.getColoredNames()), ".")));
             return;
         }
 
         if (targetGroup.toString().startsWith("_")) {
-            sender.sendMessage(F.fMain(this) + F.fError("This group cannot be manually granted to players."));
+            sender.sendMessage(F.fMain(this, F.fError("This group cannot be manually granted to players.")));
             return;
         }
 
@@ -51,19 +51,22 @@ public final class CommandRankSet extends BaseCommand<MiniPluginPermission> {
             return;
         }
 
-        final MojangProfile profile = PlayerSearch.fetchMojangProfile(args[0], sender);
-        if (profile == null) return;
+        _miniPlugin._hexusPlugin.runAsync(() -> {
+            final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0]);
+            if (offlinePlayer == null) {
+                sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+                return;
+            }
 
-        _miniPluginDatabase.getJedisPooled().set(PermissionQueries.PRIMARY(profile.uuid.toString()), targetGroup.name());
-        sender.sendMessage(F.fMain(this) + "Assigned primary group " + F.fPermissionGroup(targetGroup) + " to " + F.fItem(profile.name) + ".");
+            _miniPluginDatabase.getJedisPooled().set(PermissionQueries.PRIMARY(offlinePlayer.getUniqueId()), targetGroup.name());
+            sender.sendMessage(F.fMain(this, "Assigned primary group ", F.fPermissionGroup(targetGroup), " to ", F.fItem(offlinePlayer.getName()), "."));
 
-        final Player player = _miniPlugin._hexusPlugin.getServer().getPlayer(profile.name);
-        if (player == null) {
-            return;
-        }
+            final Player player = offlinePlayer.getPlayer();
+            if (player == null) return;
 
-        player.sendMessage(F.fMain(this) + "Your primary group is now " + F.fPermissionGroup(targetGroup) + ".");
-        _miniPlugin.refreshPermissions(player);
+            player.sendMessage(F.fMain(this) + "Your primary group is now " + F.fPermissionGroup(targetGroup) + ".");
+            _miniPlugin.refreshPermissions(player);
+        });
     }
 
     @Override
