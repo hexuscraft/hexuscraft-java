@@ -13,6 +13,8 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -27,21 +29,17 @@ import java.util.*;
 public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
-        COMMAND_ENTITY,
-        COMMAND_ENTITY_LIST,
-        COMMAND_ENTITY_PURGE,
-        COMMAND_ENTITY_REFRESH
+        COMMAND_ENTITY, COMMAND_ENTITY_LIST, COMMAND_ENTITY_PURGE, COMMAND_ENTITY_REFRESH
     }
 
     private MiniPluginCommand _pluginCommand;
+    private final Map<Entity, Location> _entityLocationMap = new HashMap<>();
 
     public MiniPluginEntity(final HexusPlugin plugin) {
         super(plugin, "Entity");
 
-        PermissionGroup.BUILDER._permissions.addAll(List.of(
-                PERM.COMMAND_ENTITY,
-                PERM.COMMAND_ENTITY_LIST
-        ));
+        PermissionGroup.BUILDER._permissions.add(PERM.COMMAND_ENTITY);
+        PermissionGroup.BUILDER._permissions.add(PERM.COMMAND_ENTITY_LIST);
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_ENTITY_REFRESH);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_ENTITY_PURGE);
@@ -56,24 +54,18 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
     public void onEnable() {
         _pluginCommand.register(new CommandEntity(this));
 
-        _hexusPlugin.getServer().getWorlds().forEach(this::refreshNPCs);
-
-        final Map<Entity, Location> entityLocationMap = new HashMap<>();
         final Server server = _hexusPlugin.getServer();
+        server.getWorlds().forEach(this::refreshNPCs);
         server.getScheduler().runTaskTimer(_hexusPlugin, () -> server.getWorlds().forEach(world -> world.getEntities().forEach(entity -> {
-            final Location from = entityLocationMap.get(entity);
-            final Location to = entity.getLocation();
+            final EntityMoveEvent event = new EntityMoveEvent(entity, _entityLocationMap.get(entity), entity.getLocation());
+            _entityLocationMap.put(entity, event._to);
+            if (!event.isAny()) return;
 
-            if (!to.equals(from)) {
-                final EntityMoveEvent event = new EntityMoveEvent(entity, from, to);
-                _hexusPlugin.getServer().getPluginManager().callEvent(event);
-                if (event.isCancelled()) {
-                    entity.teleport(event.getFrom());
-                    return;
-                }
-            }
+            _hexusPlugin.getServer().getPluginManager().callEvent(event);
+            if (!event.isCancelled()) return;
 
-            entityLocationMap.put(entity, to);
+            entity.teleport(event._from);
+            _entityLocationMap.put(entity, event._from);
         })), 0, 1L);
     }
 
@@ -82,21 +74,33 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
         _hexusPlugin.getServer().getWorlds().forEach(this::removeNPCs);
     }
 
-    public void createEntity(final World world, final double x, final double y, final double z,
-                             final float yaw, final float pitch, final String[] data) {
-//        log(String.join(", ", new String[]{world.toString(), Double.toString(x), Double.toString(y), Double.toString(z), Float.toString(yaw), Float.toString(pitch), String.join(":", data)}));
+    public void createEntity(final World world, final double x, final double y, final double z, final float yaw, final float pitch, final String[] data) {
         final Location location = new Location(world, x, y, z, yaw, pitch);
 
-        //noinspection ReassignedVariable
-        Entity entity = null;
+        final List<Entity> spawnedEntities = new ArrayList<>();
         switch (data[0]) {
             case "REWARDS" -> {
                 final Creeper creeper = world.spawn(location, Creeper.class);
+                spawnedEntities.add(creeper);
                 creeper.setPowered(true);
-                creeper.setCustomName(C.cGreen + C.fBold + "Server Rewards");
-                creeper.setCustomNameVisible(true);
+                creeper.teleport(location);
+                creeper.setMetadata("Invulnerable", new FixedMetadataValue(_hexusPlugin, 1));
 
-                entity = creeper;
+                final Silverfish silverfish = world.spawn(location, Silverfish.class);
+                spawnedEntities.add(silverfish);
+                creeper.setPassenger(silverfish);
+                silverfish.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, true, false));
+                silverfish.setMetadata("NoAI", new FixedMetadataValue(_hexusPlugin, 1));
+                silverfish.setMetadata("Invulnerable", new FixedMetadataValue(_hexusPlugin, 1));
+
+                final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
+                spawnedEntities.add(armorStand);
+                silverfish.setPassenger(armorStand);
+                armorStand.setCustomName(C.cGreen + C.fBold + "Server Rewards");
+                armorStand.setCustomNameVisible(true);
+                armorStand.setGravity(false);
+                armorStand.setMarker(true);
+                armorStand.setMetadata("Invisible", new FixedMetadataValue(_hexusPlugin, 1));
             }
             case "GAME" -> {
                 switch (data[1]) {
@@ -104,6 +108,7 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
                         final Skeleton skeleton = (Skeleton) world.spawnEntity(location, EntityType.SKELETON);
                         skeleton.setCustomName(C.cGreen + C.fBold + "Clans");
                         skeleton.setCustomNameVisible(true);
+                        skeleton.teleport(location);
 
                         final PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 200, true, false);
                         slow.apply(skeleton);
@@ -115,7 +120,7 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
                         equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
                         equipment.setItemInHand(new ItemStack(Material.BOW));
 
-                        entity = skeleton;
+                        spawnedEntities.add(skeleton);
                     }
                     case "SURVIVAL_GAMES" -> {
                         final Zombie zombie = (Zombie) world.spawnEntity(location, EntityType.ZOMBIE);
@@ -123,6 +128,7 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
                         zombie.setVillager(false);
                         zombie.setCustomName(C.cGreen + C.fBold + "Survival Games");
                         zombie.setCustomNameVisible(true);
+                        zombie.teleport(location);
 
                         final PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 200, true, false);
                         slow.apply(zombie);
@@ -134,12 +140,13 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
                         equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
                         equipment.setItemInHand(new ItemStack(Material.IRON_SWORD));
 
-                        entity = zombie;
+                        spawnedEntities.add(zombie);
                     }
                     case "TOWER_BATTLES" -> {
                         final PigZombie pigZombie = (PigZombie) world.spawnEntity(location, EntityType.PIG_ZOMBIE);
                         pigZombie.setCustomName(C.cGreen + C.fBold + "Tower Battles");
                         pigZombie.setCustomNameVisible(true);
+                        pigZombie.teleport(location);
 
                         final PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 200, true, false);
                         slow.apply(pigZombie);
@@ -151,12 +158,13 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
                         equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
                         equipment.setItemInHand(new ItemStack(Material.DIRT));
 
-                        entity = pigZombie;
+                        spawnedEntities.add(pigZombie);
                     }
                     case "SKYWARS" -> {
                         final Skeleton skeleton = (Skeleton) world.spawnEntity(location, EntityType.SKELETON);
                         skeleton.setCustomName(C.cGreen + C.fBold + "Skywars");
                         skeleton.setCustomNameVisible(true);
+                        skeleton.teleport(location);
 
                         final PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 200, true, false);
                         slow.apply(skeleton);
@@ -168,23 +176,23 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
                         equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
                         equipment.setItemInHand(new ItemStack(Material.BOW));
 
-                        entity = skeleton;
+                        spawnedEntities.add(skeleton);
                     }
                 }
             }
         }
 
-        if (entity == null) {
-            log("Attempted to create entity with unknown data types: " + String.join(",", data));
+        if (spawnedEntities.isEmpty()) {
+            logInfo("Attempted to create entity with unknown data types: " + String.join(",", data));
             return;
         }
 
-        entity.setMetadata("NPC", new FixedMetadataValue(_hexusPlugin, data[0]));
-        for (int i = 1; i < data.length; i++) {
-            entity.setMetadata(data[i - 1], new FixedMetadataValue(_hexusPlugin, data[i]));
-        }
-
-        entity.teleport(location);
+        spawnedEntities.forEach(entity -> {
+            entity.setMetadata("NPC", new FixedMetadataValue(_hexusPlugin, data[0]));
+            for (int i = 1; i < data.length; i++) {
+                entity.setMetadata(data[i - 1], new FixedMetadataValue(_hexusPlugin, data[i]));
+            }
+        });
     }
 
     public void removeNPCs(final World world) {
@@ -200,13 +208,12 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
         final List<String> npcStrings = new ArrayList<>();
 
         try {
-            //noinspection SpellCheckingInspection
             final Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_npcs.dat").toFile());
             while (scanner.hasNextLine()) {
                 npcStrings.add(scanner.nextLine());
             }
         } catch (FileNotFoundException ex) {
-            log("Could not locate _npcs.dat in world '" + world.getName() + "'");
+            logInfo("Could not locate _npcs.dat in world '" + world.getName() + "'");
         }
 
         npcStrings.forEach(s -> {
@@ -228,8 +235,9 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
     }
 
     public Entity[] list() {
-        // TODO
-        return new Entity[0];
+        final List<Entity> npcs = new ArrayList<>();
+        _hexusPlugin.getServer().getWorlds().forEach(world -> npcs.addAll(world.getEntities().stream().filter(entity -> entity.hasMetadata("NPC")).toList()));
+        return npcs.toArray(Entity[]::new);
     }
 
     @SuppressWarnings("SameReturnValue")
@@ -238,12 +246,16 @@ public final class MiniPluginEntity extends MiniPlugin<HexusPlugin> {
         return 0;
     }
 
-    // TODO: Fix this - it keeps crashing :(
-//    @EventHandler
-//    public void onEntityMove(final EntityMoveEvent event) {
-//        if (!event.getEntity().hasMetadata("NPC")) return;
-//        if (!event.isHorizontal(false)) return;
-//        event.setCancelled(true);
-//    }
+    @EventHandler
+    public void onEntityMove(final EntityMoveEvent event) {
+        if (!event.getEntity().hasMetadata("NPC")) return;
+        if (!event.isHorizontal(false)) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onEntityTeleport(final EntityTeleportEvent event) {
+        _entityLocationMap.put(event.getEntity(), event.getTo());
+    }
 
 }

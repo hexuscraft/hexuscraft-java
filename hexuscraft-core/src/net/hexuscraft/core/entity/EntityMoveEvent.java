@@ -7,49 +7,46 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
 
-@SuppressWarnings("unused")
 public final class EntityMoveEvent extends EntityEvent implements Cancellable {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final HandlerList _handlerList = new HandlerList();
+    private boolean _isCancelled;
 
-    private boolean cancel = false;
-
-    private final Location _from;
-    private final Location _to;
+    public final Location _from;
+    public final Location _to;
 
     public EntityMoveEvent(final Entity entity, final Location from, final Location to) {
         super(entity);
         _from = from;
         _to = to;
+        _isCancelled = false;
     }
 
     @Override
     public boolean isCancelled() {
-        return cancel;
+        return _isCancelled;
     }
 
     @Override
-    public void setCancelled(boolean cancel) {
-        this.cancel = cancel;
+    public void setCancelled(final boolean cancelled) {
+        this._isCancelled = cancelled;
     }
 
     @NotNull
     @Override
     public HandlerList getHandlers() {
-        return handlers;
+        return _handlerList;
     }
 
     @NotNull
-    public HandlerList getHandlerList() {
-        return handlers;
+    public static HandlerList getHandlerList() {
+        return _handlerList;
     }
 
-    public Location getFrom() {
-        return _from;
-    }
-
-    public Location getTo() {
-        return _to;
+    public boolean isAny() {
+        if (_from == null) return false;
+        if (_to == null) return false;
+        return isHorizontal(false) || isVertical(false) || isYaw() || isPitch();
     }
 
     public boolean isHorizontal(final boolean block) {
