@@ -22,7 +22,7 @@ public final class MiniPluginCooldown extends MiniPlugin<HexusPlugin> {
     private Cooldown getCooldown(final Object parent, final String name) {
         if (!_cooldownMap.containsKey(parent)) return null;
         for (final Cooldown cooldown : _cooldownMap.get(parent)) {
-            if (!cooldown._name.equals(name)) continue;
+            if (!cooldown._name().equals(name)) continue;
             return cooldown;
         }
         return null;
@@ -40,7 +40,7 @@ public final class MiniPluginCooldown extends MiniPlugin<HexusPlugin> {
     public boolean use(final Object parent, final String name, final Long delayMs) {
         final Cooldown cooldown = getCooldown(parent, name);
         if (cooldown != null)
-            return calculateRemaining(System.currentTimeMillis(), cooldown._started, cooldown._delayMs) <= 0;
+            return calculateRemaining(System.currentTimeMillis(), cooldown._started(), cooldown._delayMs()) <= 0;
 
         addCooldown(parent, new Cooldown(name, System.currentTimeMillis(), delayMs));
         return true;
@@ -55,7 +55,7 @@ public final class MiniPluginCooldown extends MiniPlugin<HexusPlugin> {
             return;
         }
 
-        sender.sendMessage(F.fMain(this, "You cannot use ", F.fItem(name), " for another ", F.fTime(calculateRemaining(System.currentTimeMillis(), cooldown._started, cooldown._delayMs))));
+        sender.sendMessage(F.fMain(this, "You cannot use ", F.fItem(name), " for another ", F.fTime(calculateRemaining(System.currentTimeMillis(), cooldown._started(), cooldown._delayMs()))));
     }
 
 }
