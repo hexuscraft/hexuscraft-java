@@ -20,6 +20,8 @@ import net.hexuscraft.core.scoreboard.MiniPluginScoreboard;
 import net.hexuscraft.core.teleport.MiniPluginTeleport;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.util.HashMap;
@@ -29,11 +31,11 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
 
     private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPluginClassMap;
 
-    public final boolean _isDebug;
+    private final BukkitScheduler _bukkitScheduler;
 
     public HexusPlugin() {
         _miniPluginClassMap = new HashMap<>();
-        _isDebug = new File("_debug.dat").isFile() || new File("../_debug.dat").isFile();
+        _bukkitScheduler = getServer().getScheduler();
     }
 
     @Override
@@ -58,13 +60,13 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         require(new MiniPluginReport(this));
         require(new MiniPluginScoreboard(this));
         require(new MiniPluginTeleport(this));
-        debug("Core plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
+        logInfo("Core plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
 
         load();
-        debug("Local plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
+        logInfo("Local plugins instantiated in " + (System.currentTimeMillis() - start) + "ms.");
 
         _miniPluginClassMap.values().forEach(miniPlugin -> miniPlugin.load(_miniPluginClassMap));
-        debug("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
+        logInfo("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
@@ -75,7 +77,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         enable();
         _miniPluginClassMap.values().forEach(MiniPlugin::enable);
 
-        debug("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
+        logInfo("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
@@ -86,27 +88,58 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         _miniPluginClassMap.values().forEach(MiniPlugin::disable);
         _miniPluginClassMap.clear();
 
-        debug("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
+        logInfo("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public void require(final MiniPlugin<? extends HexusPlugin> miniPlugin) {
-        debug("Instantiating " + miniPlugin._name + "...");
+        logInfo("Instantiating " + miniPlugin._prefix + "...");
 
         //noinspection unchecked
         _miniPluginClassMap.put((Class<? extends MiniPlugin<? extends HexusPlugin>>) miniPlugin.getClass(), miniPlugin);
     }
 
-    public void log(final String message) {
+    public void logInfo(final String message) {
         getLogger().info(message);
     }
 
-    public void debug(final String message) {
-        if (!_isDebug) return;
-        log(message);
+    public void logWarning(final String message) {
+        getLogger().warning(message);
+    }
+
+    public void logSevere(final String message) {
+        getLogger().severe(message);
     }
 
     public File getFile() {
         return super.getFile();
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public BukkitTask runSync(final Runnable runnable) {
+        return _bukkitScheduler.runTask(this, runnable);
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public BukkitTask runSyncLater(final Runnable runnable, final long delayTicks) {
+        return _bukkitScheduler.runTaskLater(this, runnable, delayTicks);
+    }
+
+    @SuppressWarnings("unused")
+    public BukkitTask runSyncTimer(final Runnable runnable, final long initialDelayTicks, final long repeatEveryTicks) {
+        return _bukkitScheduler.runTaskTimer(this, runnable, initialDelayTicks, repeatEveryTicks);
+    }
+
+    public BukkitTask runAsync(final Runnable runnable) {
+        return _bukkitScheduler.runTaskAsynchronously(this, runnable);
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public BukkitTask runAsyncLater(final Runnable runnable, final long delayTicks) {
+        return _bukkitScheduler.runTaskLaterAsynchronously(this, runnable, delayTicks);
+    }
+
+    public BukkitTask runAsyncTimer(final Runnable runnable, final long initialDelayTicks, final long repeatEveryTicks) {
+        return _bukkitScheduler.runTaskTimerAsynchronously(this, runnable, initialDelayTicks, repeatEveryTicks);
     }
 
 }
