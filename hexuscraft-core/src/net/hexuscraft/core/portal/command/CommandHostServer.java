@@ -9,7 +9,6 @@ import net.hexuscraft.database.queries.ServerQueries;
 import net.hexuscraft.database.serverdata.ServerData;
 import net.hexuscraft.database.serverdata.ServerGroupData;
 import org.bukkit.command.CommandSender;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.JedisPooled;
 
@@ -18,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
 
@@ -45,18 +46,17 @@ public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
         }
         _pending.add(sender);
 
-        final BukkitScheduler scheduler = _miniPlugin._hexusPlugin.getServer().getScheduler();
-        sender.sendMessage(F.fMain(this, "Searching for existing servers..."));
-
-        scheduler.runTaskAsynchronously(_miniPlugin._hexusPlugin, () -> {
+        _miniPlugin._hexusPlugin.runAsync(() -> {
             final JedisPooled jedis = _miniPluginDatabase.getJedisPooled();
 
+            sender.sendMessage(F.fMain(this, "Checking for existing server data..."));
+
             final String serverName;
+            // TODO: Async this
             try {
                 serverName = ((Callable<String>) () -> {
                     for (ServerData serverData : ServerQueries.getServers(jedis))
-                        if (serverData._group.split("-", 2)[0].equals(sender.getName()))
-                            return serverData._name;
+                        if (serverData._group.split("-", 2)[0].equals(sender.getName())) return serverData._name;
                     return null;
                 }).call();
             } catch (Exception e) {
@@ -74,35 +74,69 @@ public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
             try {
                 sender.sendMessage(F.fMain(this, "Creating server group..."));
                 final int port = ThreadLocalRandom.current().nextInt(50000, 51000);
-                final ServerGroupData groupData = new ServerGroupData(sender.getName(), PermissionGroup.MEMBER.name(),
-                        port - 1, port, 1, 0,
-                        "Arcade.jar", "Lobby_Arcade.zip", 512, 40, false,
-                        10000, new String[]{});
+                final ServerGroupData groupData = new ServerGroupData(sender.getName(), PermissionGroup.MEMBER.name(), port - 1, port, 1, 0, "Arcade.jar", "Arcade.zip", 512, 40, false, 10000, new String[]{});
                 groupData.update(jedis);
-                sender.sendMessage(F.fMain(this, "Waiting for your server to start..."));
+                sender.sendMessage(F.fMain(this, F.fSuccess("Successfully created server group."), "\n", F.fMain("", "You will be automatically teleported to your server soon.")));
             } catch (Exception e) {
                 _pending.remove(sender);
                 sender.sendMessage(F.fMain(this, F.fError("There was an error performing your request. Maybe try again later?")));
                 return;
             }
 
-            final BukkitTask[] tasks = new BukkitTask[1]; // a bit of a dodgy workaround - but it works
+            final AtomicReference<BukkitTask> bukkitTaskAtomicReference = new AtomicReference<>();
             final long start = System.currentTimeMillis();
-            tasks[0] = scheduler.runTaskTimerAsynchronously(_miniPlugin._hexusPlugin, () -> {
-                if (System.currentTimeMillis() - start > 30000) {
-                    sender.sendMessage(F.fMain(this, F.fError("Could not locate your server within 30 seconds. There might not be enough resources available to start your server. Maybe try again later?")));
+
+            final AtomicBoolean sent10sReminder = new AtomicBoolean(false);
+            final AtomicBoolean sent20sReminder = new AtomicBoolean(false);
+            final AtomicBoolean sent30sReminder = new AtomicBoolean(false);
+            final AtomicBoolean sent40sReminder = new AtomicBoolean(false);
+            final AtomicBoolean sent50sReminder = new AtomicBoolean(false);
+
+            bukkitTaskAtomicReference.set(_miniPlugin._hexusPlugin.runAsyncTimer(() -> {
+                if (!sent10sReminder.get() && System.currentTimeMillis() - start > 10000) {
+                    sent10sReminder.set(true);
+                    sender.sendMessage(F.fMain(this, "Still waiting for your server to start... (10s elapsed)"));
+                    return;
+                }
+
+                if (!sent20sReminder.get() && System.currentTimeMillis() - start > 20000) {
+                    sent20sReminder.set(true);
+                    sender.sendMessage(F.fMain(this, "Still waiting for your server to start... (20s elapsed)"));
+                    return;
+                }
+
+                if (!sent30sReminder.get() && System.currentTimeMillis() - start > 30000) {
+                    sent30sReminder.set(true);
+                    sender.sendMessage(F.fMain(this, "Still waiting for your server to start... (30s elapsed)"));
+                    return;
+                }
+
+                if (!sent40sReminder.get() && System.currentTimeMillis() - start > 40000) {
+                    sent40sReminder.set(true);
+                    sender.sendMessage(F.fMain(this, "Still waiting for your server to start... (40s elapsed)"));
+                    return;
+                }
+
+                if (!sent50sReminder.get() && System.currentTimeMillis() - start > 50000) {
+                    sent50sReminder.set(true);
+                    sender.sendMessage(F.fMain(this, "Still waiting for your server to start... (50s elapsed)"));
+                    return;
+                }
+
+                if (System.currentTimeMillis() - start > 60000) {
+                    sender.sendMessage(F.fMain(this, F.fError("Could not locate your server within 60 seconds. There might not be enough resources available to start your server. Maybe try again later?")));
                     _pending.remove(sender);
-                    tasks[0].cancel();
+                    bukkitTaskAtomicReference.get().cancel();
                     return;
                 }
 
                 for (ServerData serverData : ServerQueries.getServers(jedis, new ServerGroupData(sender.getName(), Map.of()))) {
-                    scheduler.runTaskLaterAsynchronously(_miniPlugin._hexusPlugin, () -> _miniPlugin.teleport(sender.getName(), serverData._name), 20L);
+                    _miniPlugin._hexusPlugin.runAsyncLater(() -> _miniPlugin.teleport(sender.getName(), serverData._name), 20L);
                     _pending.remove(sender);
-                    tasks[0].cancel();
+                    bukkitTaskAtomicReference.get().cancel();
                     return;
                 }
-            }, 100L, 20L);
+            }, 100L, 20L));
         });
     }
 }
