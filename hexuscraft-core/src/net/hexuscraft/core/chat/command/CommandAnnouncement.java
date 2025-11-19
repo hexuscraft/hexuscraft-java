@@ -7,7 +7,6 @@ import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.PermissionGroup;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +27,7 @@ public final class CommandAnnouncement extends BaseCommand<MiniPluginChat> {
             return;
         }
 
-        PermissionGroup permissionGroup;
+        final PermissionGroup permissionGroup;
         try {
             permissionGroup = PermissionGroup.valueOf(args[0]);
         } catch (IllegalArgumentException ex) {
@@ -36,9 +35,8 @@ public final class CommandAnnouncement extends BaseCommand<MiniPluginChat> {
             return;
         }
 
-        List<String> messageList = new ArrayList<>(Arrays.stream(args).toList());
-        messageList.removeFirst();
-        _miniPluginDatabase.getJedisPooled().publish((_miniPlugin).CHANNEL_ANNOUNCEMENT, sender.getName() + "," + permissionGroup.name() + "," + String.join(" ", messageList));
+        // TODO: Async-ify
+        _miniPluginDatabase.getJedisPooled().publish((_miniPlugin).CHANNEL_ANNOUNCEMENT, sender.getName() + "," + permissionGroup.name() + "," + String.join(" ", Arrays.stream(args).skip(1).toArray(String[]::new)));
         sender.sendMessage(F.fMain(this, "Message has been broadcast."));
     }
 
