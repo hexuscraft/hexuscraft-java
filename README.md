@@ -6,7 +6,11 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 ## Enums
 
+> Enums are subject to change. Refer to the linked src file to confirm the list is up-to-date.
+
 ### PermissionGroup
+
+https://github.com/hexuscraft/hexuscraft-java/blob/main/hexuscraft-core/src/net/hexuscraft/core/permission/PermissionGroup.java
 
 > - QUALITY_ASSURANCE
 > - EVENT_MOD
@@ -23,13 +27,20 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > - ADMINISTRATOR
 
 ### PunishType
+
+https://github.com/hexuscraft/hexuscraft-java/blob/main/hexuscraft-core/src/net/hexuscraft/core/punish/PunishType.java
+
 > - BAN
 > - MUTE
 > - WARNING
 
 ## Redis Keys
 
+> Redis entries are subject to change. Refer to the linked src file to confirm the fields are up-to-date.
+
 ### Server Groups
+
+https://github.com/hexuscraft/hexuscraft-java/blob/main/hexuscraft-database/src/net/hexuscraft/database/serverdata/ServerGroupData.java
 
 > **HASH** `servergroup:(String)`
 > 
@@ -49,6 +60,8 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 ### Servers
 
+https://github.com/hexuscraft/hexuscraft-java/blob/main/hexuscraft-database/src/net/hexuscraft/database/serverdata/ServerData.java
+
 > **HASH** `server:(String)`
 >
 > | Field    | Type              |
@@ -65,6 +78,14 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 ### Permissions
 
+> If you have successfully setup the network and are looking to change your own rank, you can also execute the `/rank` command from the console to make things a bit easier.
+> 
+> Note that you must run this command from a notchian server running a Hexuscraft plugin. You cannot run this command on the proxy or via servermonitor as of right now.
+>
+> Refer to the PermissionGroup enum for a list of ranks.
+> 
+> - Example: `/rank set USERNAME DEVELOPER`
+
 > **STRING** `user:(UUID):permission:primary`
 >
 > - PermissionGroup Enum
@@ -74,6 +95,8 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > - PermissionGroup Enum 
 
 ### Punishments
+
+https://github.com/hexuscraft/hexuscraft-java/blob/main/hexuscraft-core/src/net/hexuscraft/core/punish/PunishData.java
 
 > **HASH** `punishment:(UUID)`
 > 
@@ -99,5 +122,8 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 ### Motd
 
 > **STRING** `motd`
-> - Changes the **bottom** line of the proxy's MOTD.
-> - The top line is set by `MOTD_PREFIX` located in `hexuscraft-proxy/src/net/hexuscraft/proxy/Proxy.java`
+> - Changes the proxy's MOTD. Example:
+> ```
+> §r         §r§9§m   §r§8§m[ §r   §r§6§lHexuscraft§r  §6§lNetwork§r   §8§m ]§r§9§m   §r
+> §r     §eMINI-GAMES, PRIVATE SERVERS, TOURNAMENTS§r
+> ```
