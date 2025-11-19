@@ -10,7 +10,7 @@ import java.util.Set;
 public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPortal> {
 
     public CommandNetworkGroupRestart(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "group", "<Server Group>", "Restart all servers of a group.", Set.of("g"), MiniPluginPortal.PERM.COMMAND_NETWORK_RESTART_GROUP);
+        super(miniPluginPortal, "restart", "<Server Group>", "Restart all servers of a group.", Set.of("r", "reboot", "rb"), MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_RESTART);
     }
 
     @Override
@@ -20,7 +20,7 @@ public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPort
             return;
         }
 
-        if (!_miniPlugin.doesServerGroupExist(args[0])) {
+        if (_miniPlugin.getServerGroupDataFromName(args[0]) == null) {
             sender.sendMessage(F.fMain(this) + F.fError("There is no server group with name " + F.fItem(args[0]) + "."));
             return;
         }
