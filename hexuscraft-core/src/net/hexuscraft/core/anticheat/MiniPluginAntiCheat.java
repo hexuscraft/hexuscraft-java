@@ -6,6 +6,8 @@ import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.punish.MiniPluginPunish;
+import net.hexuscraft.core.punish.PunishType;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,6 +26,7 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
     }
 
     private MiniPluginPortal _miniPluginPortal;
+    private MiniPluginPunish _miniPluginPunish;
 
     private final Map<Player, Map<String, Integer>> _violations;
 
@@ -38,6 +41,7 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
+        _miniPluginPunish = (MiniPluginPunish) dependencies.get(MiniPluginPunish.class);
     }
 
     @Override
@@ -101,16 +105,12 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
         }
     }
 
-    public void alert(final Player player, final String reason, final CheatSeverity severity, final int count) {
-        _hexusPlugin.getServer()
-                .getOnlinePlayers()
-                .stream()
-                .filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name()))
-                .forEach(staff -> staff.sendMessage(F.fCheat(player, severity, reason, count, _miniPluginPortal._serverName)));
+    public void alert(final Player player, final String reason, final CheatSeverity severity) {
+        _hexusPlugin.getServer().getOnlinePlayers().stream().filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name())).forEach(staff -> staff.sendMessage(F.fCheat(player, severity, reason, _miniPluginPortal._serverName)));
     }
 
     public void kick(final Player player, final String reason) {
-        player.kickPlayer(F.fPunishKick("Automatic cheat detection - " + reason));
+        _miniPluginPunish.punish(player.getUniqueId(), null, PunishType.KICK, 0, reason);
     }
 
     public void flag(final Player player, final String reason, final CheatSeverity severity) {
@@ -124,7 +124,7 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
         final int newCount = playerViolations.get(keyName) + 1;
         playerViolations.put(keyName, newCount);
 
-        alert(player, reason, severity, newCount);
+        alert(player, newCount + " " + reason, severity);
         if (newCount == 10) {
             kick(player, reason);
         }
