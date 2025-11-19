@@ -3,9 +3,9 @@ package net.hexuscraft.core.report.command;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.permission.PermissionGroup;
-import net.hexuscraft.core.player.MojangProfile;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.report.MiniPluginReport;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -33,8 +33,9 @@ public final class CommandReport extends BaseCommand<MiniPluginReport> {
             return;
         }
 
-        MojangProfile targetProfile = PlayerSearch.fetchMojangProfile(args[0], player);
-        if (targetProfile == null) {
+        final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], player);
+        if (offlinePlayer == null) {
+            sender.sendMessage(F.fMatches(new String[]{}, args[0]));
             return;
         }
 
@@ -45,11 +46,11 @@ public final class CommandReport extends BaseCommand<MiniPluginReport> {
         _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(onlinePlayer -> {
             if (!onlinePlayer.hasPermission(PermissionGroup.TRAINEE.name())) return;
             onlinePlayer.sendMessage(F.fMain(this) + "Report from " + F.fItem(sender) + ":");
-            onlinePlayer.sendMessage(F.fMain("") + "Target: " + F.fItem(targetProfile.name));
+            onlinePlayer.sendMessage(F.fMain("") + "Target: " + F.fItem(offlinePlayer.getName()));
             onlinePlayer.sendMessage(F.fMain("") + "Reason: " + F.fItem(reason));
         });
 
-        sender.sendMessage(F.fMain(this) + "Report against " + F.fItem(targetProfile.name) + " has been submitted for review. You will receive a response shortly.");
+        sender.sendMessage(F.fMain(this) + "Report against " + F.fItem(offlinePlayer.getName()) + " has been submitted for review. You will receive a response shortly.");
     }
 
     @Override
