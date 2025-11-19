@@ -1,5 +1,6 @@
 package net.hexuscraft.core.portal.command;
 
+import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.portal.MiniPluginPortal;
@@ -10,7 +11,7 @@ import java.util.Set;
 public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPortal> {
 
     public CommandNetworkServerRestart(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "server", "<Server>", "Restart a specific server.", Set.of("s", "sv"), MiniPluginPortal.PERM.COMMAND_NETWORK_RESTART_SERVER);
+        super(miniPluginPortal, "restart", "<Server>", "The specified server will prevent new players from joining, send existing players to a Lobby, and then restart.", Set.of("r", "reboot", "rb"), MiniPluginPortal.PERM.COMMAND_NETWORK_SERVER_RESTART);
     }
 
     @Override
@@ -20,13 +21,17 @@ public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPor
             return;
         }
 
-        if (!_miniPlugin.doesServerExistWithName(args[0])) {
-            sender.sendMessage(F.fMain(this) + F.fError("Could not locate server with name " + F.fItem(args[0]) + "."));
-            return;
-        }
+        sender.sendMessage(F.fMain(this, "Locating server ", F.fItem(args[0]), "... ", C.fMagic + "..."));
+        _miniPlugin._hexusPlugin.runAsync(() -> {
+            if (_miniPlugin.getServerDataFromName(args[0]) == null) {
+                _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this, F.fError("Could not locate server with name ", F.fItem(args[0]), "."))));
+                return;
+            }
 
-        sender.sendMessage(F.fMain(this) + "Sending restart command to server " + F.fItem(args[0]) + ".");
-        _miniPlugin.restartServer(args[0]);
+            _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this, F.fSuccess("Successfully located server ", F.fItem(args[0]), "."), " Sending restart command... ", C.fMagic + "...")));
+            _miniPlugin.restartServer(args[0]);
+            _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to server ", F.fItem(args[0]), "."), " The server will automatically transfer players to the lobby")));
+        });
     }
 
 
