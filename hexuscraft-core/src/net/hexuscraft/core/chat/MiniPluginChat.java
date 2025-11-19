@@ -7,8 +7,8 @@ import net.hexuscraft.core.command.MiniPluginCommand;
 import net.hexuscraft.core.database.MessagedRunnable;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.IPermission;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.permission.MiniPluginPermission;
+import net.hexuscraft.core.permission.PermissionGroup;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -35,6 +35,8 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
     }
 
     public final String CHANNEL_ANNOUNCEMENT = "ChatAnnouncement";
+    public final String CHANNEL_SUPPORT = "ChatSupport";
+    public final String CHANNEL_SUPPORT_RESPONSE = "ChatSupportResponse";
 
     private MiniPluginCommand _pluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
@@ -74,7 +76,7 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
         _pluginCommand.register(new CommandAnnouncement(this, _miniPluginDatabase));
         _pluginCommand.register(new CommandBroadcast(this));
         _pluginCommand.register(new CommandSilence(this));
-        _pluginCommand.register(new CommandSupport(this, _miniPluginPermission));
+        _pluginCommand.register(new CommandSupport(this, _miniPluginPermission, _miniPluginDatabase));
         _pluginCommand.register(new CommandSupportResponse(this, _miniPluginPermission));
         _pluginCommand.register(new CommandHelp(this));
 
@@ -103,6 +105,20 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
                 });
             }
 
+        });
+
+        _miniPluginDatabase.registerCallback(CHANNEL_SUPPORT, new MessagedRunnable(this) {
+            @Override
+            public void run() {
+                // TODO: this
+            }
+        });
+
+        _miniPluginDatabase.registerCallback(CHANNEL_SUPPORT_RESPONSE, new MessagedRunnable(this) {
+            @Override
+            public void run() {
+                // TODO: this
+            }
         });
     }
 
