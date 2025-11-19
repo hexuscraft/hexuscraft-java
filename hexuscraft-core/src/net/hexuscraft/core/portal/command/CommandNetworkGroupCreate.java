@@ -1,5 +1,6 @@
 package net.hexuscraft.core.portal.command;
 
+import net.hexuscraft.core.chat.C;
 import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
@@ -20,8 +21,8 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginPorta
 
     private final MiniPluginDatabase _miniPluginDatabase;
 
-    CommandNetworkGroupCreate(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout #> [Games]", "Create a server group.", Set.of("c", "add", "a"), MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
+    private CommandNetworkGroupCreate(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
+        super(miniPluginPortal, "create", "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout (ms) #> [Games]", "Create a server group.", Set.of("c", "add", "a"), MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
         _miniPluginDatabase = miniPluginDatabase;
     }
 
@@ -37,10 +38,9 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginPorta
             _reason = reason;
         }
 
-        public String constructMessage() {
-            return F.fMain(_command, F.fError("Invalid argument '", F.fItem(_argument), "': "), F.fItem(_reason));
+        private String constructMessage() {
+            return F.fMain(_command, F.fError("Invalid argument ", F.fItem(_argument), ": "), F.fItem(_reason));
         }
-
     }
 
     @Override
@@ -161,10 +161,8 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginPorta
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Server Timeout", "Invalid or unrecognised integer");
             }
 
-            if (args.length == 12)
-                games = new String[0];
-            else
-                games = Arrays.copyOfRange(args, 12, args.length);
+            if (args.length == 12) games = new String[0];
+            else games = Arrays.copyOfRange(args, 12, args.length);
             final List<String> availableGameTypeNames = Arrays.stream(GameType.values()).map(GameType::name).toList();
             for (final String gameName : games) {
                 if (availableGameTypeNames.contains(gameName)) continue;
@@ -176,31 +174,20 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginPorta
             return;
         }
 
-        final JedisPooled jedis = _miniPluginDatabase.getJedisPooled();
-        final ServerGroupData groupData = new ServerGroupData(name, requiredPermission.name(), minPort, maxPort, totalServers, joinableServers, plugin, worldZip, ram, capacity, worldEdit, timeoutMillis, games);
-        groupData.update(jedis);
+        sender.sendMessage(F.fMain(this, "Creating server group with name ", F.fItem(name), "... ", C.fMagic + "..."));
 
-        sender.sendMessage(F.fMain(this, "Created server group '", F.fItem(name), "':\n", F.fList(List.of(
-                "Name: " + F.fItem(name),
-                "Required Permission: " + F.fItem(requiredPermission.name()),
-                "Min Port: " + F.fItem(Integer.toString(minPort)),
-                "Max Port: " + F.fItem(Integer.toString(maxPort)),
-                "Total Servers: " + F.fItem(Integer.toString(totalServers)),
-                "Joinable Servers: " + F.fItem(Integer.toString(joinableServers)),
-                "Plugin: " + F.fItem(plugin),
-                "World Zip: " + F.fItem(worldZip),
-                "Ram: " + F.fItem(Integer.toString(ram)),
-                "Capacity: " + F.fItem(Integer.toString(capacity)),
-                "World Edit: " + F.fItem(Boolean.toString(worldEdit)),
-                "Server Timeout: " + F.fItem(Integer.toString(timeoutMillis)),
-                "Games: " + F.fList(games)
-        ))));
+        _miniPlugin._hexusPlugin.runAsync(() -> {
+            final JedisPooled jedis = _miniPluginDatabase.getJedisPooled();
+            final ServerGroupData groupData = new ServerGroupData(name, requiredPermission.name(), minPort, maxPort, totalServers, joinableServers, plugin, worldZip, ram, capacity, worldEdit, timeoutMillis, games);
+            groupData.update(jedis);
+
+            _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this, F.fSuccess("Successfully created server group with name ", F.fItem(name), ":\n"), F.fList("Name: " + F.fItem(name), "Required Permission: " + F.fItem(requiredPermission.name()), "Min Port: " + F.fItem(Integer.toString(minPort)), "Max Port: " + F.fItem(Integer.toString(maxPort)), "Total Servers: " + F.fItem(Integer.toString(totalServers)), "Joinable Servers: " + F.fItem(Integer.toString(joinableServers)), "Plugin: " + F.fItem(plugin), "World Zip: " + F.fItem(worldZip), "Ram: " + F.fItem(Integer.toString(ram)), "Capacity: " + F.fItem(Integer.toString(capacity)), "World Edit: " + F.fItem(Boolean.toString(worldEdit)), "Server Timeout: " + F.fItem(Integer.toString(timeoutMillis)), "Games: " + F.fList(games)))));
+        });
     }
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length == 2)
-            return Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).toList();
+        if (args.length == 2) return Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).toList();
         return List.of();
     }
 }
