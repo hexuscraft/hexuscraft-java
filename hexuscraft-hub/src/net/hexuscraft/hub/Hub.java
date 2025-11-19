@@ -2,6 +2,7 @@ package net.hexuscraft.hub;
 
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.hub.doublejump.MiniPluginDoubleJump;
+import net.hexuscraft.hub.hubscoreboard.MiniPluginHubScoreboard;
 import net.hexuscraft.hub.player.MiniPluginPlayer;
 import net.hexuscraft.hub.team.MiniPluginTeam;
 import org.bukkit.GameMode;
@@ -23,6 +24,7 @@ public final class Hub extends HexusPlugin {
         require(new MiniPluginDoubleJump(this));
         require(new MiniPluginPlayer(this));
         require(new MiniPluginTeam(this));
+        require(new MiniPluginHubScoreboard(this));
     }
 
     @Override
@@ -33,7 +35,7 @@ public final class Hub extends HexusPlugin {
     @EventHandler
     public void onWorldLoad(final WorldLoadEvent event) {
         final World world = event.getWorld();
-        log("WORLD NAME: '" + world.getName() + "'");
+        logInfo("WORLD NAME: '" + world.getName() + "'");
         if (!world.getName().equals("world")) return;
 
         _spawn = new Location(world, 0, 100, 0, 0, 0);
@@ -42,7 +44,7 @@ public final class Hub extends HexusPlugin {
             final Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_spawn.dat").toFile());
             _spawn = new Location(event.getWorld(), scanner.nextDouble(), scanner.nextDouble(), scanner.nextDouble(), scanner.nextFloat(), scanner.nextFloat());
         } catch (FileNotFoundException ex) {
-            log("Could not locate _spawn.dat in world '" + world.getName() + "'");
+            logInfo("Could not locate _spawn.dat in world '" + world.getName() + "'");
         }
     }
 
