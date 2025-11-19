@@ -10,10 +10,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
 
@@ -28,19 +25,31 @@ public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
 
         _callbacks = new HashMap<>();
 
-        final String host;
-        final int port;
+        // Default redis config
+        String host = "127.0.0.1";
+        int port = 6379;
+        String username = "default";
+        String password = "";
 
         try {
-            final Scanner redisScanner = new Scanner(new File("_redis.dat"));
+            final File redisFile = new File("_redis.dat");
+            final Scanner redisScanner = new Scanner(redisFile);
             host = redisScanner.nextLine();
-            port = redisScanner.nextInt();
-        } catch (FileNotFoundException ex) {
+            if (redisScanner.hasNextLine()) {
+                port = Integer.parseInt(redisScanner.nextLine());
+                if (redisScanner.hasNextLine()) {
+                    username = redisScanner.nextLine();
+                    if (redisScanner.hasNextLine()) password = redisScanner.nextLine();
+                }
+            }
+            redisScanner.close();
+        } catch (final NullPointerException | NoSuchElementException _) {
+        } catch (final FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
 
         try {
-            _database = new Database(host, port);
+            _database = new Database(host, port, username, password);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -54,9 +63,15 @@ public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
                     getJedisPooled().psubscribe(new JedisPubSub() {
 
                         @Override
-                        public void onPMessage(String pattern, String channel, String message) {
-                            if (!_callbacks.containsKey(channel)) return;
-                            _callbacks.get(channel).forEach((uuid, callback) -> {
+                        public void onPMessage(final String pattern, final String channelName, final String message) {
+                            if (!_callbacks.containsKey(channelName)) return;
+                            if (_callbacks.containsKey("*")) _callbacks.get("*").forEach((_, callback) -> {
+                                callback.setPattern(pattern);
+                                callback.setChannelName(channelName);
+                                callback.setMessage(message);
+                                callback.run();
+                            });
+                            _callbacks.get(channelName).forEach((_, callback) -> {
                                 callback.setMessage(message);
                                 callback.run();
                             });
@@ -64,12 +79,12 @@ public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
 
                         @Override
                         public void onPSubscribe(String pattern, int subscribedChannels) {
-//                            log("[JEDIS] Subscribed to '" + pattern + "' (" + subscribedChannels + ")");
+                            _hexusPlugin.logInfo("[JEDIS] Subscribed to '" + pattern + "' (" + subscribedChannels + ")");
                         }
 
                     }, "*");
                 } catch (JedisConnectionException ex) {
-                    log("[JEDIS] Exception while connecting to database: " + ex.getMessage());
+                    logInfo("[JEDIS] Exception while connecting to database: " + ex.getMessage());
                 } catch (Exception ex) {
                     break;
                 }
@@ -106,7 +121,7 @@ public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
             uuidRunnableMap.remove(id);
 
             // remove the map if there are no more callbacks
-            if (!uuidRunnableMap.values().isEmpty()) {
+            if (!uuidRunnableMap.isEmpty()) {
                 return;
             }
             _callbacks.remove(s);
