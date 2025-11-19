@@ -6,7 +6,9 @@ import net.hexuscraft.core.entity.MiniPluginEntity;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public final class CommandEntityList extends BaseCommand<MiniPluginEntity> {
@@ -22,14 +24,12 @@ public final class CommandEntityList extends BaseCommand<MiniPluginEntity> {
             return;
         }
 
-        Entity[] entities = _miniPlugin.list();
+        final Entity[] entities = _miniPlugin.list();
 
-        sender.sendMessage(F.fMain(this) + "Listing entities:");
-
-        Arrays.stream(entities).toList().forEach(entity -> sender.sendMessage(F.fMain("") + entity.getName() + " [" + entity.getLocation().toString() + "]"));
-
-        sender.sendMessage(F.fMain(this) + "Listed " + F.fItem(entities.length + " Entities") + ".");
-
+        final List<String> response = new ArrayList<>();
+        response.add(F.fMain(this, "Listing ", F.fItem(String.valueOf(entities.length)), " entities:"));
+        response.addAll(Arrays.stream(entities).map(entity -> F.fMain("", F.fItem(entity.getCustomName()), " (", entity.getType().name(), ") (", F.fItem(entity.getLocation()), ")")).toList());
+        sender.sendMessage(String.join("\n", response));
     }
 
 }
