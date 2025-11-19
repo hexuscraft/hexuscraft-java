@@ -4,6 +4,7 @@ import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.portal.MiniPluginPortal;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -28,15 +29,21 @@ public final class CommandSend extends BaseCommand<MiniPluginPortal> {
         final String targetName = args[0];
         final String serverName = args[1];
 
-        if (PlayerSearch.fetchMojangProfile(targetName, sender) == null) return;
+        _miniPlugin._hexusPlugin.runAsync(() -> {
+            final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(targetName);
+            if (offlinePlayer == null) {
+                sender.sendMessage(F.fMain("Offline Player Search", F.fMatches(new String[]{}, targetName)));
+                return;
+            }
 
-        if (!_miniPlugin.doesServerExistWithName(serverName)) {
-            sender.sendMessage(F.fMain(this) + F.fError("Could not locate a server with name ", F.fItem(serverName), "."));
-            return;
-        }
+            if (_miniPlugin.getServerDataFromName(serverName) == null) {
+                sender.sendMessage(F.fMain(this, F.fError("Could not locate a server with name ", F.fItem(serverName), ".")));
+                return;
+            }
 
-        sender.sendMessage(F.fMain(this) + "Sending " + F.fItem(targetName) + " to server " + F.fItem(serverName) + ".");
-        _miniPlugin.teleport(targetName, serverName, sender.getName());
+            sender.sendMessage(F.fMain(this, "Sending ", F.fItem(targetName), " to server ", F.fItem(serverName), "."));
+            _miniPlugin.teleport(targetName, serverName, sender.getName());
+        });
     }
 
     @Override
