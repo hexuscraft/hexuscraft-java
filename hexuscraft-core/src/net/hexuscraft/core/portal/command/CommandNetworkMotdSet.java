@@ -23,11 +23,14 @@ public final class CommandNetworkMotdSet extends BaseCommand<MiniPluginPortal> {
 
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
-        sender.sendMessage(F.fMain(this) + "Updating the MOTD...");
         final String message = ChatColor.translateAlternateColorCodes('&', String.join(" ", args));
-        ServerQueries.setMotd(_miniPluginDatabase.getJedisPooled(), message);
-        sender.sendMessage(F.fMain(this) + "Updated the MOTD:\n" + F.fMain(C.cDGray + C.fBold) + C.fReset + message + "\n"
-                + F.fMain(this) + "It may take a few seconds for all proxies to update.");
+        sender.sendMessage(F.fMain(this, "Please wait... Updating the MOTD to:\n", C.fReset + message));
+
+        _miniPlugin._hexusPlugin.runAsync(() -> {
+            ServerQueries.setMotd(_miniPluginDatabase.getJedisPooled(), message);
+            _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this, F.fSuccess("Successfully updated the MOTD:\n"), C.fReset + message) + "\n" + F.fMain("", "It may take a few seconds for all proxies to update.")));
+        });
+
     }
 
 }
