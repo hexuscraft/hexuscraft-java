@@ -38,6 +38,7 @@ public final class MiniPluginScoreboard extends MiniPlugin<HexusPlugin> {
         _scoreboardMap.clear();
     }
 
+// TODO: Race condition with mini plugins which modify the scoreboard. Set low event priority.
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
