@@ -24,7 +24,8 @@ public final class MiniPluginGameLobby extends MiniPlugin<Arcade> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(
+            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _miniPluginGame = (MiniPluginGame) dependencies.get(MiniPluginGame.class);
     }
 
@@ -33,7 +34,8 @@ public final class MiniPluginGameLobby extends MiniPlugin<Arcade> {
         if (_miniPluginGame._gameState.equals(GameState.IN_PROGRESS)) return;
 
         final Player player = event.getPlayer();
-        player.teleport(_hexusPlugin.getServer().getWorlds().getFirst().getSpawnLocation().add(new Vector(0.5, 0, 0.5)));
+        player.teleport(
+                _hexusPlugin.getServer().getWorlds().getFirst().getSpawnLocation().add(new Vector(0.5, 0, 0.5)));
         player.resetPlayerTime();
         player.resetPlayerWeather();
         player.resetMaxHealth();
