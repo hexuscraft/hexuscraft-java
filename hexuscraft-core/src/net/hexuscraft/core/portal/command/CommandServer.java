@@ -11,8 +11,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.UnifiedJedis;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -50,9 +48,8 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
                 return;
             }
             if (serverData._updatedByMonitor) {
-                sender.sendMessage(
-                        F.fMain(this, F.fError("We found a server with name ", F.fItem(serverName),
-                                " but it has not finished starting yet. Perhaps try again in a few moments?")));
+                sender.sendMessage(F.fMain(this, F.fError("We found a server with name ", F.fItem(serverName),
+                        " but it has not finished starting yet. Perhaps try again in a few moments?")));
                 return;
             }
 
@@ -62,7 +59,7 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
                         F.fError("Could not locate servergroup with name ", F.fItem(serverData._group)));
                 return;
             }
-            
+
             if (serverGroupData._requiredPermission != null && !serverGroupData._requiredPermission.isEmpty() &&
                     !sender.hasPermission(serverGroupData._requiredPermission)) {
                 sender.sendMessage(F.fInsufficientPermissions());
@@ -81,10 +78,7 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        final List<String> completions = new ArrayList<>();
-        _miniPlugin._serverCache.values().forEach(
-                serverDatas -> Arrays.stream(serverDatas).map(serverData -> serverData._name)
-                        .forEach(completions::add));
-        return completions;
+        if (args.length == 1) return _miniPlugin._serverCache.stream().map(serverData -> serverData._name).toList();
+        return List.of();
     }
 }
