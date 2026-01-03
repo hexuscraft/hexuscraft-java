@@ -18,10 +18,6 @@
     <dependencies>
         <dependency>
             <groupId>net.hexuscraft</groupId>
-            <artifactId>hexuscraft-database</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.hexuscraft</groupId>
             <artifactId>hexuscraft-common</artifactId>
         </dependency>
         <dependency>
