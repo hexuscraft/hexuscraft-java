@@ -47,14 +47,14 @@ public enum PermissionGroup {
     public final String _prefix;
     public final String _color;
     public final int _weight;
-    public final PermissionGroup[] _parents;
+    public final PermissionGroup[] _inherits;
     public final List<IPermission> _permissions;
 
-    PermissionGroup(final String prefix, final String color, final int weight, final PermissionGroup... parents) {
+    PermissionGroup(final String prefix, final String color, final int weight, final PermissionGroup... inherits) {
         _prefix = prefix;
         _color = color;
         _weight = weight;
-        _parents = parents;
+        _inherits = inherits;
         _permissions = new ArrayList<>();
     }
 
