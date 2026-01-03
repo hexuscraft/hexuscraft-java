@@ -23,6 +23,16 @@ public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPort
             return;
         }
 
+        if (args[0].equals("*")) {
+            sender.sendMessage(F.fMain(this, "Sending restart command to all server groups..."));
+            _miniPlugin._serverGroupCache.stream()
+                    .filter(serverGroupData -> !serverGroupData._name.equals(_miniPlugin._serverGroupName))
+                    .map(serverData -> serverData._name).forEach(_miniPlugin::restartServerGroupYields);
+            _miniPlugin.restartServerGroupYields(_miniPlugin._serverGroupName);
+            sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to all server groups.")));
+            return;
+        }
+
         _miniPlugin._hexusPlugin.runAsync(() -> {
             final ServerGroupData serverGroupData;
             try {

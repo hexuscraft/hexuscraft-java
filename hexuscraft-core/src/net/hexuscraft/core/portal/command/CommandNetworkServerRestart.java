@@ -24,6 +24,15 @@ public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPor
             return;
         }
 
+        if (args[0].equals("*")) {
+            sender.sendMessage(F.fMain(this, "Sending restart command to all servers..."));
+            _miniPlugin._serverCache.stream().filter(serverData -> !serverData._name.equals(_miniPlugin._serverName))
+                    .map(serverData -> serverData._name).forEach(_miniPlugin::restartServerYields);
+            _miniPlugin.restartServerYields(_miniPlugin._serverName);
+            sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to all servers.")));
+            return;
+        }
+
         _miniPlugin._hexusPlugin.runAsync(() -> {
             final ServerData serverData;
             try {
