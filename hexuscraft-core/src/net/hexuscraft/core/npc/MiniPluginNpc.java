@@ -6,7 +6,10 @@ import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.MiniPluginCommand;
+import net.hexuscraft.core.entity.EntityMoveEvent;
+import net.hexuscraft.core.entity.UtilEntity;
 import net.hexuscraft.core.npc.command.CommandNpc;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -85,28 +88,42 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
                 spawnedEntities.add(creeper);
                 creeper.setPowered(true);
                 creeper.teleport(location);
-                creeper.setMetadata("Invulnerable", new FixedMetadataValue(_hexusPlugin, 1));
+
+                final NBTTagCompound creperNBT = UtilEntity.getNBTTagCompound(creeper);
+                creperNBT.setByte("NoAI", (byte) 1);
+                creperNBT.setByte("Silent", (byte) 1);
+                creperNBT.setByte("Invulnerable", (byte) 1);
+                UtilEntity.saveNBTTagCompound(creeper, creperNBT);
 
                 final Silverfish silverfish = world.spawn(location, Silverfish.class);
                 spawnedEntities.add(silverfish);
-                creeper.setPassenger(silverfish);
                 silverfish.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1, true, false));
-                silverfish.setMetadata("NoAI", new FixedMetadataValue(_hexusPlugin, 1));
-                silverfish.setMetadata("Invulnerable", new FixedMetadataValue(_hexusPlugin, 1));
+
+                final NBTTagCompound silverfishNBT = UtilEntity.getNBTTagCompound(silverfish);
+                silverfishNBT.setByte("NoAI", (byte) 1);
+                silverfishNBT.setByte("Silent", (byte) 1);
+                silverfishNBT.setByte("Invulnerable", (byte) 1);
+                UtilEntity.saveNBTTagCompound(silverfish, silverfishNBT);
 
                 final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
                 spawnedEntities.add(armorStand);
-                silverfish.setPassenger(armorStand);
                 armorStand.setCustomName(C.cGreen + C.fBold + "Server Rewards");
                 armorStand.setCustomNameVisible(true);
                 armorStand.setGravity(false);
                 armorStand.setMarker(true);
-                armorStand.setMetadata("Invisible", new FixedMetadataValue(_hexusPlugin, 1));
+
+                final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
+                armorStandNBT.setByte("Invisible", (byte) 1);
+                UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
+
+                creeper.setPassenger(silverfish);
+                silverfish.setPassenger(armorStand);
             }
             case "GAME" -> {
                 switch (data[1]) {
                     case "CLANS" -> {
                         final Skeleton skeleton = (Skeleton) world.spawnEntity(location, EntityType.SKELETON);
+                        spawnedEntities.add(skeleton);
                         skeleton.setCustomName(C.cGreen + C.fBold + "Clans");
                         skeleton.setCustomNameVisible(true);
                         skeleton.teleport(location);
@@ -121,11 +138,10 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
                         equipment.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
                         equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
                         equipment.setItemInHand(new ItemStack(Material.BOW));
-
-                        spawnedEntities.add(skeleton);
                     }
                     case "SURVIVAL_GAMES" -> {
                         final Zombie zombie = (Zombie) world.spawnEntity(location, EntityType.ZOMBIE);
+                        spawnedEntities.add(zombie);
                         zombie.setBaby(false);
                         zombie.setVillager(false);
                         zombie.setCustomName(C.cGreen + C.fBold + "Survival Games");
@@ -142,11 +158,10 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
                         equipment.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
                         equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
                         equipment.setItemInHand(new ItemStack(Material.IRON_SWORD));
-
-                        spawnedEntities.add(zombie);
                     }
                     case "TOWER_BATTLES" -> {
                         final PigZombie pigZombie = (PigZombie) world.spawnEntity(location, EntityType.PIG_ZOMBIE);
+                        spawnedEntities.add(pigZombie);
                         pigZombie.setCustomName(C.cGreen + C.fBold + "Tower Battles");
                         pigZombie.setCustomNameVisible(true);
                         pigZombie.teleport(location);
@@ -161,11 +176,10 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
                         equipment.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
                         equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
                         equipment.setItemInHand(new ItemStack(Material.DIRT));
-
-                        spawnedEntities.add(pigZombie);
                     }
                     case "SKYWARS" -> {
                         final Skeleton skeleton = (Skeleton) world.spawnEntity(location, EntityType.SKELETON);
+                        spawnedEntities.add(skeleton);
                         skeleton.setCustomName(C.cGreen + C.fBold + "Skywars");
                         skeleton.setCustomNameVisible(true);
                         skeleton.teleport(location);
@@ -180,8 +194,6 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
                         equipment.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
                         equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
                         equipment.setItemInHand(new ItemStack(Material.BOW));
-
-                        spawnedEntities.add(skeleton);
                     }
                 }
             }
@@ -270,10 +282,7 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
     }
 
     public enum PERM implements IPermission {
-        COMMAND_ENTITY,
-        COMMAND_ENTITY_LIST,
-        COMMAND_ENTITY_PURGE,
-        COMMAND_ENTITY_REFRESH
+        COMMAND_ENTITY, COMMAND_ENTITY_LIST, COMMAND_ENTITY_PURGE, COMMAND_ENTITY_REFRESH
     }
 
 }
