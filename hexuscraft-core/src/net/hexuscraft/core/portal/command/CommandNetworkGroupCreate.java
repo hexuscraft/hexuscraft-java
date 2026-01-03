@@ -2,10 +2,10 @@ package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.common.chat.F;
 import net.hexuscraft.common.database.serverdata.ServerGroupData;
+import net.hexuscraft.common.enums.GameType;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.game.GameType;
 import net.hexuscraft.core.portal.MiniPluginPortal;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.exceptions.JedisException;
