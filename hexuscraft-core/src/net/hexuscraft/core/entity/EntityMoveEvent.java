@@ -1,4 +1,4 @@
-package net.hexuscraft.core.npc;
+package net.hexuscraft.core.entity;
 
 import com.avaje.ebean.validation.NotNull;
 import org.bukkit.Location;
