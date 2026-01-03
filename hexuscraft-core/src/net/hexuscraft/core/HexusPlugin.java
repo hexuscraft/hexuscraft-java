@@ -2,11 +2,11 @@ package net.hexuscraft.core;
 
 import net.hexuscraft.core.anticheat.MiniPluginAntiCheat;
 import net.hexuscraft.core.authentication.MiniPluginAuthentication;
+import net.hexuscraft.core.bossbar.MiniPluginBossBar;
 import net.hexuscraft.core.buildversion.MiniPluginBuildVersion;
 import net.hexuscraft.core.chat.MiniPluginChat;
 import net.hexuscraft.core.combat.MiniPluginCombat;
 import net.hexuscraft.core.command.MiniPluginCommand;
-import net.hexuscraft.core.cooldown.MiniPluginCooldown;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.disguise.MiniPluginDisguise;
 import net.hexuscraft.core.gamemode.MiniPluginGameMode;
@@ -59,11 +59,11 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
 
         require(new MiniPluginAntiCheat(this));
         require(new MiniPluginAuthentication(this));
+        require(new MiniPluginBossBar(this));
         require(new MiniPluginBuildVersion(this));
         require(new MiniPluginChat(this));
         require(new MiniPluginCombat(this));
         require(new MiniPluginCommand(this));
-        require(new MiniPluginCooldown(this));
         require(new MiniPluginDatabase(this));
         require(new MiniPluginDisguise(this));
         require(new MiniPluginGameMode(this));
