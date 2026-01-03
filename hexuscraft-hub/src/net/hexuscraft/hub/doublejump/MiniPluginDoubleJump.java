@@ -41,7 +41,7 @@ public final class MiniPluginDoubleJump extends MiniPlugin<Hub> {
 
         event.setCancelled(true);
         player.setVelocity(player.getLocation().getDirection().setY(1));
-        player.playSound(player.getLocation(), Sound.GHAST_FIREBALL, 1000000, 1);
+        player.playSound(player.getLocation(), Sound.GHAST_FIREBALL, Float.MAX_VALUE, 1);
     }
 
 }
