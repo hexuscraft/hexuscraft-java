@@ -1,8 +1,8 @@
 package net.hexuscraft.core.cooldown;
 
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.chat.F;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -46,16 +46,18 @@ public final class MiniPluginCooldown extends MiniPlugin<HexusPlugin> {
         return true;
     }
 
-    public void use(final Object parent, final String name, final Long delayMs, final CommandSender sender) {
-        if (use(parent, name, delayMs)) return;
+    public boolean use(final Object parent, final String name, final Long delayMs, final CommandSender sender) {
+        if (use(parent, name, delayMs)) return true;
 
         final Cooldown cooldown = getCooldown(parent, name);
         if (cooldown == null) {
             sender.sendMessage(F.fMain(this, "Please wait before trying to use ", F.fItem(name), " again."));
-            return;
+            return false;
         }
 
-        sender.sendMessage(F.fMain(this, "You cannot use ", F.fItem(name), " for another ", F.fTime(calculateRemaining(System.currentTimeMillis(), cooldown._started(), cooldown._delayMs()))));
+        sender.sendMessage(F.fMain(this, "You cannot use ", F.fItem(name), " for another ",
+                F.fTime(calculateRemaining(System.currentTimeMillis(), cooldown._started(), cooldown._delayMs()))));
+        return false;
     }
 
 }

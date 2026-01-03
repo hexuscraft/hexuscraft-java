@@ -1,9 +1,9 @@
 package net.hexuscraft.core.permission.command;
 
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.permission.MiniPluginPermission;
-import net.hexuscraft.core.permission.PermissionGroup;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -12,7 +12,8 @@ import java.util.Set;
 public final class CommandRankList extends BaseCommand<MiniPluginPermission> {
 
     CommandRankList(MiniPluginPermission miniPluginPermission) {
-        super(miniPluginPermission, "list", "", "List all permission groups.", Set.of("l"), MiniPluginPermission.PERM.COMMAND_RANK_LIST);
+        super(miniPluginPermission, "list", "", "List all permission groups.", Set.of("l"),
+                MiniPluginPermission.PERM.COMMAND_RANK_LIST);
     }
 
     @Override
@@ -23,7 +24,9 @@ public final class CommandRankList extends BaseCommand<MiniPluginPermission> {
         }
 
         sender.sendMessage(F.fMain(this) + "Listing Groups:\n"
-                + F.fMain("") + F.fList(Arrays.stream(PermissionGroup.values()).map(group -> group._color + group.name()).toArray(String[]::new)));
+                + F.fMain("") +
+                F.fItem(Arrays.stream(PermissionGroup.values()).map(group -> group._color + group.name())
+                        .toArray(String[]::new)));
     }
 
 

@@ -1,7 +1,7 @@
 package net.hexuscraft.build.world.command;
 
 import net.hexuscraft.build.world.MiniPluginWorld;
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
@@ -16,7 +16,8 @@ import java.util.Set;
 public final class CommandWorldCreate extends BaseCommand<MiniPluginWorld> {
 
     public CommandWorldCreate(final MiniPluginWorld miniPluginWorld) {
-        super(miniPluginWorld, "create", "<Name>", "Create a new void world.", Set.of("c"), MiniPluginWorld.PERM.COMMAND_WORLD_CREATE);
+        super(miniPluginWorld, "create", "<Name>", "Create a new void world.", Set.of("c"),
+                MiniPluginWorld.PERM.COMMAND_WORLD_CREATE);
     }
 
     @Override

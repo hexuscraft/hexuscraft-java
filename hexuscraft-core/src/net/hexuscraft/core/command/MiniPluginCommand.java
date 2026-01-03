@@ -1,8 +1,8 @@
 package net.hexuscraft.core.command;
 
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.chat.F;
 import org.bukkit.command.Command;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
@@ -21,11 +21,12 @@ public final class MiniPluginCommand extends MiniPlugin<HexusPlugin> {
         super(plugin, "Command");
 
         _commands = new HashSet<>();
-        _commandMap = new AtomicReference<>(null);
+        _commandMap = new AtomicReference<>();
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(
+            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _commandMap.set(((CraftServer) _hexusPlugin.getServer()).getCommandMap());
     }
 

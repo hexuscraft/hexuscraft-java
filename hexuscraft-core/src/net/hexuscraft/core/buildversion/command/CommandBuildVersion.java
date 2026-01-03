@@ -1,7 +1,7 @@
 package net.hexuscraft.core.buildversion.command;
 
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.buildversion.MiniPluginBuildVersion;
-import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -12,7 +12,8 @@ import java.util.Set;
 public final class CommandBuildVersion extends BaseCommand<MiniPluginBuildVersion> {
 
     public CommandBuildVersion(final MiniPluginBuildVersion plugin) {
-        super(plugin, "buildversion", "", "View information about the current plugin.", Set.of("bv"), MiniPluginBuildVersion.PERM.COMMAND_BUILDVERSION);
+        super(plugin, "buildversion", "", "View information about the current plugin.", Set.of("bv"),
+                MiniPluginBuildVersion.PERM.COMMAND_BUILDVERSION);
     }
 
     @Override

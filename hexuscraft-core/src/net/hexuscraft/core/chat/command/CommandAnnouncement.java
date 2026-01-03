@@ -1,10 +1,10 @@
 package net.hexuscraft.core.chat.command;
 
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.chat.MiniPluginChat;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.permission.PermissionGroup;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -16,7 +16,8 @@ public final class CommandAnnouncement extends BaseCommand<MiniPluginChat> {
     final MiniPluginDatabase _miniPluginDatabase;
 
     public CommandAnnouncement(final MiniPluginChat miniPluginChat, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginChat, "announce", "<Permission Group> <Message>", "Broadcast a server-wide message.", Set.of("announcement"), MiniPluginChat.PERM.COMMAND_ANNOUNCEMENT);
+        super(miniPluginChat, "announce", "<Permission Group> <Message>", "Broadcast a message to the entire network.",
+                Set.of("announcement"), MiniPluginChat.PERM.COMMAND_ANNOUNCEMENT);
         _miniPluginDatabase = miniPluginDatabase;
     }
 
@@ -31,12 +32,15 @@ public final class CommandAnnouncement extends BaseCommand<MiniPluginChat> {
         try {
             permissionGroup = PermissionGroup.valueOf(args[0]);
         } catch (IllegalArgumentException ex) {
-            sender.sendMessage(F.fMain(this, F.fItem(args[0]), " is not a valid group. Groups: ", F.fList(PermissionGroup.getColoredNames())));
+            sender.sendMessage(F.fMain(this, F.fItem(args[0]), " is not a valid group. Groups: ",
+                    F.fItem(PermissionGroup.getColoredNames())));
             return;
         }
 
         // TODO: Async-ify
-        _miniPluginDatabase.getJedisPooled().publish((_miniPlugin).CHANNEL_ANNOUNCEMENT, sender.getName() + "," + permissionGroup.name() + "," + String.join(" ", Arrays.stream(args).skip(1).toArray(String[]::new)));
+        _miniPluginDatabase.getUnifiedJedis().publish((_miniPlugin).CHANNEL_ANNOUNCEMENT,
+                sender.getName() + "," + permissionGroup.name() + "," +
+                        String.join(" ", Arrays.stream(args).skip(1).toArray(String[]::new)));
         sender.sendMessage(F.fMain(this, "Message has been broadcast."));
     }
 

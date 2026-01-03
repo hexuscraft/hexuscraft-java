@@ -1,13 +1,14 @@
 package net.hexuscraft.core.anticheat;
 
+import net.hexuscraft.common.IPermission;
+import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.enums.CheatSeverity;
+import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.enums.PunishType;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.chat.F;
-import net.hexuscraft.core.permission.IPermission;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.MiniPluginPortal;
 import net.hexuscraft.core.punish.MiniPluginPunish;
-import net.hexuscraft.core.punish.PunishType;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,14 +22,9 @@ import java.util.Map;
 
 public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
 
-    public enum PERM implements IPermission {
-        CHEAT_ALERTS
-    }
-
+    private final Map<Player, Map<String, Integer>> _violations;
     private MiniPluginPortal _miniPluginPortal;
     private MiniPluginPunish _miniPluginPunish;
-
-    private final Map<Player, Map<String, Integer>> _violations;
 
     public MiniPluginAntiCheat(final HexusPlugin plugin) {
         super(plugin, "Anti Cheat");
@@ -39,7 +35,8 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(
+            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
         _miniPluginPunish = (MiniPluginPunish) dependencies.get(MiniPluginPunish.class);
     }
@@ -106,7 +103,10 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
     }
 
     public void alert(final Player player, final String reason, final CheatSeverity severity) {
-        _hexusPlugin.getServer().getOnlinePlayers().stream().filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name())).forEach(staff -> staff.sendMessage(F.fCheat(player, severity, reason, _miniPluginPortal._serverName)));
+        _hexusPlugin.getServer().getOnlinePlayers().stream()
+                .filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name()))
+                .forEach(staff -> staff.sendMessage(
+                        F.fCheat(player.getDisplayName(), severity, reason, _miniPluginPortal._serverName)));
     }
 
     public void kick(final Player player, final String reason) {
@@ -128,6 +128,10 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
         if (newCount == 10) {
             kick(player, reason);
         }
+    }
+
+    public enum PERM implements IPermission {
+        CHEAT_ALERTS
     }
 
 }

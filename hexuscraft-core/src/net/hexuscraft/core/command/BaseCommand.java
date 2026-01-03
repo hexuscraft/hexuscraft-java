@@ -1,9 +1,9 @@
 package net.hexuscraft.core.command;
 
+import net.hexuscraft.common.IPermission;
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.chat.F;
-import net.hexuscraft.core.permission.IPermission;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -16,8 +16,10 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
 
     public final T _miniPlugin;
 
-    public BaseCommand(final T miniPlugin, final String name, final String usage, final String description, final Set<String> aliases, final IPermission permission) {
+    public BaseCommand(final T miniPlugin, final String name, final String usage, final String description,
+                       final Set<String> aliases, final IPermission permission) {
         super(name.toLowerCase(), description, usage, aliases.stream().map(String::toLowerCase).toList());
+
         setPermission(permission.toString());
         setPermissionMessage(F.fInsufficientPermissions());
 
@@ -25,17 +27,12 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
     }
 
     public String help(final String alias) {
-        final String commandHelp = F.fCommand(alias, this);
-        final StringBuilder helpBuilder = new StringBuilder(F.fMain(this, "Command Usage:\n", commandHelp));
-        if (commandHelp.toLowerCase().contains("players"))
-            helpBuilder.append("\n").append(F.fSub("Hint", "You can use ", F.fList(".", "*", "**"), " to specify yourself, all players, and other players respectively."));
-        else if (commandHelp.toLowerCase().contains("player"))
-            helpBuilder.append("\n").append(F.fSub("Hint", "You can use ", F.fList("."), " to specify yourself as the player."));
-        return helpBuilder.toString();
+        return F.fMain(this, "Command Usage:\n", F.fCommand(alias, getUsage(), getDescription()));
     }
 
     public final boolean isAlias(final String alias) {
-        return getName().equalsIgnoreCase(alias) || getAliases().contains(alias.toLowerCase());
+        return getName().equalsIgnoreCase(alias) ||
+                getAliases().stream().map(String::toLowerCase).toList().contains(alias.toLowerCase());
     }
 
     public void run(final CommandSender sender, final String alias, final String[] args) {
@@ -46,6 +43,11 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
     }
 
     @Override
+    public String toString() {
+        return _miniPlugin.toString();
+    }
+
+    @Override
     public final boolean execute(final CommandSender sender, final String alias, final String[] args) {
         if (!testPermission(sender)) {
             return true;
@@ -53,8 +55,12 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
         try {
             run(sender, alias, args);
         } catch (final Exception ex) {
-            _miniPlugin.logInfo("An exception occurred while CommandSender '" + sender.getName() + "' executing BaseCommand '" + alias + " " + String.join(" ", args) + "':" + ex.getMessage() + "\n> " + String.join("\n", Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)));
-            sender.sendMessage(F.fMain(this, F.fError("An unknown error occurred while executing this command. Please try again later.")));
+            _miniPlugin.logInfo(
+                    "An exception occurred while CommandSender '" + sender.getName() + "' executing BaseCommand '" +
+                            alias + " " + String.join(" ", args) + "':" + ex.getMessage() + "\n> " + String.join("\n",
+                            Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("An unknown error occurred while executing this command. Please try again later.")));
         }
         return true;
     }

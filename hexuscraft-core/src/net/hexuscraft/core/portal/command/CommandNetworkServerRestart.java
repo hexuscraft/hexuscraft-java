@@ -1,17 +1,20 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.core.chat.C;
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.database.serverdata.ServerData;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.portal.MiniPluginPortal;
 import org.bukkit.command.CommandSender;
+import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.Set;
 
 public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPortal> {
 
     public CommandNetworkServerRestart(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "restart", "<Server>", "The specified server will prevent new players from joining, send existing players to a Lobby, and then restart.", Set.of("r", "reboot", "rb"), MiniPluginPortal.PERM.COMMAND_NETWORK_SERVER_RESTART);
+        super(miniPluginPortal, "restart", "<Server>",
+                "The specified server will prevent new players from joining, send existing players to a Lobby, and then restart.",
+                Set.of("r", "reboot", "rb"), MiniPluginPortal.PERM.COMMAND_NETWORK_SERVER_RESTART);
     }
 
     @Override
@@ -21,16 +24,32 @@ public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPor
             return;
         }
 
-        sender.sendMessage(F.fMain(this, "Locating server ", F.fItem(args[0]), "... ", C.fMagic + "..."));
         _miniPlugin._hexusPlugin.runAsync(() -> {
-            if (_miniPlugin.getServerDataFromName(args[0]) == null) {
-                _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this, F.fError("Could not locate server with name ", F.fItem(args[0]), "."))));
+            final ServerData serverData;
+            try {
+                serverData = _miniPlugin.getServerDataFromName(args[0]);
+            } catch (final JedisException ex) {
+                sender.sendMessage(F.fMain(this, F.fError(
+                        "JedisException while fetching server data. Please try again later or contact dev-ops if this issue persists.")));
                 return;
             }
 
-            _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this, F.fSuccess("Successfully located server ", F.fItem(args[0]), "."), " Sending restart command... ", C.fMagic + "...")));
-            _miniPlugin.restartServer(args[0]);
-            _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to server ", F.fItem(args[0]), "."), " The server will automatically transfer players to the lobby")));
+            if (serverData == null) {
+                sender.sendMessage(
+                        F.fMain(this, F.fError("Could not locate server with name ", F.fItem(args[0]), ".")));
+                return;
+            }
+
+            _miniPlugin._hexusPlugin.runAsync(() -> {
+                try {
+                    _miniPlugin.restartServerYields(serverData._name);
+                } catch (final JedisException ex) {
+                    sender.sendMessage(F.fMain(this, F.fError(
+                            "JedisException while restarting server. Please try again later or contact dev-ops if this issue persists.")));
+                    return;
+                }
+                sender.sendMessage(F.fMain(this, "Restarting server ", F.fItem(serverData._name), "..."));
+            });
         });
     }
 

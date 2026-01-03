@@ -8,13 +8,13 @@ public final class MessagedRunnable implements Runnable {
         _message = message;
     }
 
-    public void setMessage(String message) {
-        _message = message;
-    }
-
     @SuppressWarnings("unused")
     public String getMessage() {
         return _message;
+    }
+
+    public void setMessage(String message) {
+        _message = message;
     }
 
     @Override

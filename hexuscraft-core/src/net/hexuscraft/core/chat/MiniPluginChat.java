@@ -1,49 +1,43 @@
 package net.hexuscraft.core.chat;
 
+import net.hexuscraft.common.IPermission;
+import net.hexuscraft.common.chat.C;
+import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.database.queries.PermissionQueries;
+import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.messages.SupportMessage;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.command.*;
 import net.hexuscraft.core.command.MiniPluginCommand;
-import net.hexuscraft.core.database.MessagedRunnable;
 import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.permission.IPermission;
 import net.hexuscraft.core.permission.MiniPluginPermission;
-import net.hexuscraft.core.permission.PermissionGroup;
+import net.hexuscraft.core.permission.PermissionProfile;
+import net.hexuscraft.core.player.PlayerSearch;
+import net.hexuscraft.core.portal.MiniPluginPortal;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import redis.clients.jedis.exceptions.JedisException;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
 
-    public enum PERM implements IPermission {
-        COMMAND_ANNOUNCEMENT,
-        COMMAND_BROADCAST,
-        COMMAND_HELP,
-        COMMAND_SILENCE,
-        COMMAND_SILENCE_SEE,
-        COMMAND_SUPPORT,
-        COMMAND_SUPPORT_RESPONSE,
-
-        CHAT_PREFIX
-    }
-
     public final String CHANNEL_ANNOUNCEMENT = "ChatAnnouncement";
-    public final String CHANNEL_SUPPORT = "ChatSupport";
-    public final String CHANNEL_SUPPORT_RESPONSE = "ChatSupportResponse";
-
+    public final Set<CommandSender> _receivedTipSet;
     private MiniPluginCommand _pluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
     private MiniPluginPermission _miniPluginPermission;
-
+    private MiniPluginPortal _miniPluginPortal;
     private boolean _chatMuted = false;
-    public final Set<CommandSender> _receivedTipSet;
 
     public MiniPluginChat(final HexusPlugin plugin) {
         super(plugin, "Chat");
@@ -55,7 +49,7 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
 
         PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_SILENCE);
         PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_SILENCE_SEE);
-        PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_SUPPORT_RESPONSE);
+        PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_SUPPORT_STAFF);
 
         PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_BROADCAST);
 
@@ -65,10 +59,12 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(
+            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
         _miniPluginPermission = (MiniPluginPermission) dependencies.get(MiniPluginPermission.class);
         _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
+        _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
     }
 
     @Override
@@ -76,49 +72,80 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
         _pluginCommand.register(new CommandAnnouncement(this, _miniPluginDatabase));
         _pluginCommand.register(new CommandBroadcast(this));
         _pluginCommand.register(new CommandSilence(this));
-        _pluginCommand.register(new CommandSupport(this, _miniPluginPermission, _miniPluginDatabase));
+        _pluginCommand.register(
+                new CommandSupport(this, _miniPluginPermission, _miniPluginDatabase, _miniPluginPortal));
         _pluginCommand.register(new CommandSupportResponse(this, _miniPluginPermission));
         _pluginCommand.register(new CommandHelp(this));
 
-        _miniPluginDatabase.registerCallback(CHANNEL_ANNOUNCEMENT, new MessagedRunnable(this) {
+        _miniPluginDatabase.registerConsumer(CHANNEL_ANNOUNCEMENT, (_, _, message) -> {
+            final String[] args = message.split(",", 3);
+            String senderName = args[0];
+            String groupName = args[1];
+            String announcementMessage = ChatColor.translateAlternateColorCodes('&', args[2]);
 
-            @Override
-            public void run() {
-                String message = getMessage();
-                String[] args = message.split(",", 3);
-                String senderName = args[0];
-                String groupName = args[1];
-                String announcementMessage = ChatColor.translateAlternateColorCodes('&', args[2]);
+            PermissionGroup permissionGroup = PermissionGroup.valueOf(groupName);
 
-                PermissionGroup permissionGroup = PermissionGroup.valueOf(groupName);
+            _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
+                if (player.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
+                    player.sendMessage(
+                            F.fSub("Staff", F.fItem(senderName), " broadcast to ", F.fPermissionGroup(permissionGroup),
+                                    "."));
+                }
 
-                _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
-                    if (player.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
-                        player.sendMessage(F.fSub("Staff", F.fItem(senderName), " broadcast to ", F.fPermissionGroup(permissionGroup), "."));
-                    }
+                if (!player.hasPermission(permissionGroup.name())) {
+                    return;
+                }
 
-                    if (!player.hasPermission(permissionGroup.name())) return;
-
-                    //noinspection deprecation
-                    player.sendTitle(C.cYellow + "Announcement", announcementMessage);
-                    player.sendMessage(F.fMain("Announcement", C.cAqua + announcementMessage));
-                });
-            }
-
+                //noinspection deprecation
+                player.sendTitle(C.cYellow + "Announcement", announcementMessage);
+                player.sendMessage(F.fMain("Announcement", C.cAqua + announcementMessage));
+                player.playSound(player.getLocation(), Sound.NOTE_PLING, Integer.MAX_VALUE, 2);
+            });
         });
 
-        _miniPluginDatabase.registerCallback(CHANNEL_SUPPORT, new MessagedRunnable(this) {
-            @Override
-            public void run() {
-                // TODO: this
-            }
-        });
+        _miniPluginDatabase.registerConsumer(SupportMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+            final SupportMessage messageData = SupportMessage.fromString(rawMessage);
 
-        _miniPluginDatabase.registerCallback(CHANNEL_SUPPORT_RESPONSE, new MessagedRunnable(this) {
-            @Override
-            public void run() {
-                // TODO: this
+            final String senderName;
+            final PermissionGroup[] senderPermissionGroups;
+
+            try {
+                senderName = PlayerSearch.offlinePlayerSearch(messageData._senderUniqueId()).getName();
+            } catch (final IOException ex) {
+                logSevere(ex);
+                return;
             }
+
+            final PermissionProfile[] permissionProfiles = _miniPluginPermission._permissionProfiles.keySet().stream()
+                    .filter(player -> player.getUniqueId().equals(messageData._senderUniqueId()))
+                    .map(_miniPluginPermission._permissionProfiles::get).toArray(PermissionProfile[]::new);
+            if (permissionProfiles.length == 1) senderPermissionGroups = permissionProfiles[0]._groups();
+            else {
+                final Set<PermissionGroup> permissionGroups = new HashSet<>();
+                try {
+                    PermissionQueries.getGroupNames(_miniPluginDatabase.getUnifiedJedis(),
+                            messageData._senderUniqueId()).forEach(permissionGroupName -> {
+                        try {
+                            permissionGroups.add(PermissionGroup.valueOf(permissionGroupName));
+                        } catch (final IllegalArgumentException ex) {
+                            ex.printStackTrace();
+                        }
+                    });
+                } catch (final JedisException ex) {
+                    ex.printStackTrace();
+                }
+                if (permissionGroups.isEmpty()) permissionGroups.add(PermissionGroup.MEMBER);
+                senderPermissionGroups = permissionGroups.toArray(PermissionGroup[]::new);
+            }
+
+            _hexusPlugin.getServer().getOnlinePlayers().stream()
+                    .filter(player -> player.getUniqueId().equals(messageData._senderUniqueId()) ||
+                            player.hasPermission(PermissionGroup.TRAINEE.name())).forEach(player -> {
+                        player.sendMessage(C.cPurple + messageData._serverName() + " " +
+                                F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(senderPermissionGroups)) + " " +
+                                senderName + C.cPurple + " " + messageData._message());
+                        player.playSound(player.getLocation(), Sound.NOTE_PLING, Integer.MAX_VALUE, 2);
+                    });
         });
     }
 
@@ -135,9 +162,9 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
         _chatMuted = toggle;
         if (sendDefaultMessage.length > 0 && sendDefaultMessage[0]) {
             if (_chatMuted) {
-                _hexusPlugin.getServer().broadcastMessage(F.fMain(this) + "The global chat is now muted.");
+                _hexusPlugin.getServer().broadcastMessage(F.fMain(this, F.fError("The chat is now muted.")));
             } else {
-                _hexusPlugin.getServer().broadcastMessage(F.fMain(this) + "The global chat is no longer muted.");
+                _hexusPlugin.getServer().broadcastMessage(F.fMain(this, F.fSuccess("The chat is no longer muted.")));
             }
         }
     }
@@ -147,19 +174,26 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
         final Player player = event.getPlayer();
 
         if (player.hasPermission(PERM.CHAT_PREFIX.name())) {
-            event.setFormat(F.fChat(0, _miniPluginPermission._primaryGroupMap.get(player)));
+            event.setFormat(F.fChat(0, PermissionGroup.getGroupWithHighestWeight(
+                    _miniPluginPermission._permissionProfiles.get(player)._groups())));
         } else {
             event.setFormat(F.fChat(0));
         }
 
         if (!_chatMuted) return;
         event.setCancelled(true);
-        player.sendMessage(F.fMain(this) + "The global chat is currently muted.");
+        player.sendMessage(F.fMain(this, F.fError("The chat is currently muted.")));
     }
 
     @EventHandler
     private void onPlayerQuit(final PlayerQuitEvent event) {
         _receivedTipSet.remove(event.getPlayer());
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_ANNOUNCEMENT, COMMAND_BROADCAST, COMMAND_HELP, COMMAND_SILENCE, COMMAND_SILENCE_SEE, COMMAND_SUPPORT, COMMAND_SUPPORT_STAFF,
+
+        CHAT_PREFIX
     }
 
 }

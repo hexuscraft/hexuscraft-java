@@ -1,6 +1,6 @@
 package net.hexuscraft.core.punish.command;
 
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.punish.MiniPluginPunish;
 import org.bukkit.command.CommandSender;
@@ -20,9 +20,9 @@ public final class CommandRules extends BaseCommand<MiniPluginPunish> {
             return;
         }
 
-        sender.sendMessage(F.fMain(this) + "Listing Rules:");
-        sender.sendMessage(F.fMain("") + F.fList(1) + "Don't use gameplay-affecting client modifications");
-        sender.sendMessage(F.fMain("") + F.fList(2) + "Don't be a dick");
+        sender.sendMessage(F.fMain(this, "Server Rules:") + "\n" +
+                F.fMain("", "1. Don't use gameplay-affecting client modifications") + "\n" +
+                F.fMain("", "2. Be respectful, civil, and kind to all players"));
     }
 
 }

@@ -1,36 +1,30 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.database.queries.ServerQueries;
+import net.hexuscraft.common.database.serverdata.ServerData;
+import net.hexuscraft.common.database.serverdata.ServerGroupData;
+import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.portal.MiniPluginPortal;
-import net.hexuscraft.database.queries.ServerQueries;
-import net.hexuscraft.database.serverdata.ServerData;
-import net.hexuscraft.database.serverdata.ServerGroupData;
 import org.bukkit.command.CommandSender;
-import org.bukkit.scheduler.BukkitTask;
-import redis.clients.jedis.JedisPooled;
+import org.bukkit.entity.Player;
+import redis.clients.jedis.exceptions.JedisException;
 
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
 
     private final MiniPluginDatabase _miniPluginDatabase;
 
-    private final Set<CommandSender> _pending;
-
     public CommandHostServer(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal, "hostserver", "", "Start a new private server.", Set.of("hps"), MiniPluginPortal.PERM.COMMAND_HOSTSERVER);
+        super(miniPluginPortal, "hostserver", "", "Start a private server or teleport to your existing server.",
+                Set.of("hps", "mps", "hosthps", "hostmps"), MiniPluginPortal.PERM.COMMAND_HOSTSERVER);
 
         _miniPluginDatabase = miniPluginDatabase;
-        _pending = new HashSet<>();
     }
 
     @Override
@@ -40,103 +34,45 @@ public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
             return;
         }
 
-        if (_pending.contains(sender)) {
-            sender.sendMessage(F.fMain(this, F.fError("You already have a pending request! Please wait until your previous request has completed...")));
-            return;
-        }
-        _pending.add(sender);
-
         _miniPlugin._hexusPlugin.runAsync(() -> {
-            final JedisPooled jedis = _miniPluginDatabase.getJedisPooled();
-
-            sender.sendMessage(F.fMain(this, "Checking for existing server data..."));
-
-            final String serverName;
-            // TODO: Async this
+            final ServerData[] serverData;
             try {
-                serverName = ((Callable<String>) () -> {
-                    for (ServerData serverData : ServerQueries.getServers(jedis))
-                        if (serverData._group.split("-", 2)[0].equals(sender.getName())) return serverData._name;
-                    return null;
-                }).call();
-            } catch (Exception e) {
-                _pending.remove(sender);
-                sender.sendMessage(F.fMain(this, F.fError("There was an error fetching existing server data. Maybe try again later?")));
+                serverData = ServerQueries.getServers(_miniPluginDatabase.getUnifiedJedis(), "_" + sender.getName());
+            } catch (final JedisException ex) {
+                sender.sendMessage(F.fMain(this, F.fError(
+                        "There was an error fetching server data. Please try again later or contact a staff member if this issue persists.")));
                 return;
             }
 
-            if (serverName != null) {
-                _pending.remove(sender);
-                sender.sendMessage(F.fMain(this, F.fError("You are already the host of a private server!\n"), F.fMain("", "Connect to it with ", F.fItem("/server " + serverName + "."))));
+            if (serverData.length > 0) {
+                if (!(sender instanceof final Player player)) {
+                    sender.sendMessage(F.fMain(this, F.fError("Only players can teleport to their private server.")));
+                    return;
+                }
+
+                if (serverData[0]._name.equals(_miniPlugin._serverName)) {
+                    sender.sendMessage(F.fMain(this,
+                            F.fError("You are already connected to ", F.fItem(_miniPlugin._serverName), ".")));
+                    return;
+                }
+
+                _miniPlugin.teleportAsync(player, serverData[0]._name);
                 return;
             }
 
+            final int port = ThreadLocalRandom.current().nextInt(50000, 51000);
             try {
-                sender.sendMessage(F.fMain(this, "Creating server group..."));
-                final int port = ThreadLocalRandom.current().nextInt(50000, 51000);
-                final ServerGroupData groupData = new ServerGroupData(sender.getName(), PermissionGroup.MEMBER.name(), port - 1, port, 1, 0, "Arcade.jar", "Arcade.zip", 512, 40, false, 10000, new String[]{});
-                groupData.update(jedis);
-                sender.sendMessage(F.fMain(this, F.fSuccess("Successfully created server group."), "\n", F.fMain("", "You will be automatically teleported to your server soon.")));
-            } catch (Exception e) {
-                _pending.remove(sender);
-                sender.sendMessage(F.fMain(this, F.fError("There was an error performing your request. Maybe try again later?")));
+                new ServerGroupData("_" + sender.getName(), PermissionGroup.MEMBER.name(), port, port, 1, 0,
+                        "Arcade.jar", "Arcade.zip", 512, 100, false, 10000, new String[]{},
+                        sender instanceof final Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(
+                        _miniPluginDatabase.getUnifiedJedis());
+            } catch (final JedisException ex) {
+                sender.sendMessage(F.fMain(this, F.fError(
+                        "There was an error creating your server data. Please try again later or contact a staff member if this issue persists.")));
                 return;
             }
-
-            final AtomicReference<BukkitTask> bukkitTaskAtomicReference = new AtomicReference<>();
-            final long start = System.currentTimeMillis();
-
-            final AtomicBoolean sent10sReminder = new AtomicBoolean(false);
-            final AtomicBoolean sent20sReminder = new AtomicBoolean(false);
-            final AtomicBoolean sent30sReminder = new AtomicBoolean(false);
-            final AtomicBoolean sent40sReminder = new AtomicBoolean(false);
-            final AtomicBoolean sent50sReminder = new AtomicBoolean(false);
-
-            bukkitTaskAtomicReference.set(_miniPlugin._hexusPlugin.runAsyncTimer(() -> {
-                if (!sent10sReminder.get() && System.currentTimeMillis() - start > 10000) {
-                    sent10sReminder.set(true);
-                    sender.sendMessage(F.fMain(this, "Still waiting for your server to start... (10s elapsed)"));
-                    return;
-                }
-
-                if (!sent20sReminder.get() && System.currentTimeMillis() - start > 20000) {
-                    sent20sReminder.set(true);
-                    sender.sendMessage(F.fMain(this, "Still waiting for your server to start... (20s elapsed)"));
-                    return;
-                }
-
-                if (!sent30sReminder.get() && System.currentTimeMillis() - start > 30000) {
-                    sent30sReminder.set(true);
-                    sender.sendMessage(F.fMain(this, "Still waiting for your server to start... (30s elapsed)"));
-                    return;
-                }
-
-                if (!sent40sReminder.get() && System.currentTimeMillis() - start > 40000) {
-                    sent40sReminder.set(true);
-                    sender.sendMessage(F.fMain(this, "Still waiting for your server to start... (40s elapsed)"));
-                    return;
-                }
-
-                if (!sent50sReminder.get() && System.currentTimeMillis() - start > 50000) {
-                    sent50sReminder.set(true);
-                    sender.sendMessage(F.fMain(this, "Still waiting for your server to start... (50s elapsed)"));
-                    return;
-                }
-
-                if (System.currentTimeMillis() - start > 60000) {
-                    sender.sendMessage(F.fMain(this, F.fError("Could not locate your server within 60 seconds. There might not be enough resources available to start your server. Maybe try again later?")));
-                    _pending.remove(sender);
-                    bukkitTaskAtomicReference.get().cancel();
-                    return;
-                }
-
-                for (ServerData serverData : ServerQueries.getServers(jedis, new ServerGroupData(sender.getName(), Map.of()))) {
-                    _miniPlugin._hexusPlugin.runAsyncLater(() -> _miniPlugin.teleport(sender.getName(), serverData._name), 20L);
-                    _pending.remove(sender);
-                    bukkitTaskAtomicReference.get().cancel();
-                    return;
-                }
-            }, 100L, 20L));
+            sender.sendMessage(F.fMain(this, F.fSuccess("Successfully created your server group data."),
+                    " You will be automatically teleported in a few moments."));
         });
     }
 }

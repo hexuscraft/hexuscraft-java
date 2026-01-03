@@ -1,48 +1,38 @@
 package net.hexuscraft.core.permission;
 
+import net.hexuscraft.common.IPermission;
+import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.database.queries.PermissionQueries;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.chat.F;
 import net.hexuscraft.core.command.MiniPluginCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.command.CommandRank;
-import net.hexuscraft.core.portal.MiniPluginPortal;
-import net.hexuscraft.database.queries.PermissionQueries;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.scheduler.BukkitTask;
-import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
-    public enum PERM implements IPermission {
-        COMMAND_RANK, COMMAND_RANK_ADD, COMMAND_RANK_INFO, COMMAND_RANK_LIST, COMMAND_RANK_REMOVE, COMMAND_RANK_SET, COMMAND_RANK_CLEAR,
-
-        OPERATOR
-    }
-
-    private MiniPluginPortal _miniPluginPortal;
+    public final HashMap<UUID, Set<PermissionGroup>> _preLoginGroups;
+    public final HashMap<Player, PermissionProfile> _permissionProfiles;
     private MiniPluginCommand _miniPluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
-
-    public final HashMap<Player, PermissionGroup> _primaryGroupMap;
-    public final HashMap<Player, Set<PermissionGroup>> _secondaryGroupsMap;
-
-    private final HashMap<Player, PermissionAttachment> _permissionAttachmentMap;
 
     public MiniPluginPermission(final HexusPlugin plugin) {
         super(plugin, "Permissions");
 
-        _primaryGroupMap = new HashMap<>();
-        _secondaryGroupsMap = new HashMap<>();
-        _permissionAttachmentMap = new HashMap<>();
+        _preLoginGroups = new HashMap<>();
+        _permissionProfiles = new HashMap<>();
 
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_RANK);
         PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_RANK_LIST);
@@ -52,13 +42,12 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.OPERATOR);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RANK_ADD);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RANK_REMOVE);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RANK_SET);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_RANK_CLEAR);
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
+    public void onLoad(
+            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _miniPluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
         _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
     }
@@ -66,122 +55,125 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
     @Override
     public void onEnable() {
         _miniPluginCommand.register(new CommandRank(this, _miniPluginDatabase));
-        _hexusPlugin.getServer().getOnlinePlayers().forEach(this::loadPermissionsAsync);
     }
 
     @Override
     public void onDisable() {
         _hexusPlugin.getServer().getOnlinePlayers().forEach(this::clearPermissions);
-        _primaryGroupMap.clear();
-        _secondaryGroupsMap.clear();
-        _permissionAttachmentMap.forEach((_, permissionAttachment) -> permissionAttachment.remove());
-        _permissionAttachmentMap.clear();
-    }
-
-    public void refreshPermissions(Player player) {
-        clearPermissions(player);
-        loadPermissionsAsync(player);
+        _preLoginGroups.clear();
+        _permissionProfiles.forEach((_, permissionProfile) -> permissionProfile._attachment().remove());
+        _permissionProfiles.clear();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    private void onPlayerJoin(final PlayerJoinEvent event) {
-        loadPermissionsAsync(event.getPlayer());
+    public void onAsyncPlayerPreLogin(final AsyncPlayerPreLoginEvent event) {
+        final UUID uniqueId = event.getUniqueId();
+
+        final Set<PermissionGroup> groups = new HashSet<>();
+        try {
+            _miniPluginDatabase.getUnifiedJedis().smembers(PermissionQueries.GROUPS(uniqueId))
+                    .forEach(secondaryGroupName -> {
+                        try {
+                            groups.add(PermissionGroup.valueOf(secondaryGroupName));
+                        } catch (final IllegalArgumentException ex) {
+                            logWarning("Could not parse permission group '" + secondaryGroupName + "' for player '" +
+                                    event.getName() + "' as it does not exist.");
+                        }
+                    });
+        } catch (final JedisException ex) {
+            logSevere(ex);
+        }
+
+        _preLoginGroups.put(uniqueId, groups);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    private BukkitTask loadPermissionsAsync(final Player player) {
-        _primaryGroupMap.put(player, PermissionGroup.MEMBER);
-        _secondaryGroupsMap.put(player, Set.of());
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerJoin(final PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
+        final UUID uniqueId = player.getUniqueId();
 
-        final JedisPooled redis = _miniPluginDatabase.getJedisPooled();
-        final UUID uuid = player.getUniqueId();
+        final AtomicReference<Set<PermissionGroup>> groups = new AtomicReference<>(_preLoginGroups.get(uniqueId));
+        _preLoginGroups.remove(uniqueId);
 
-        return _hexusPlugin.runAsync(() -> {
-            try {
-                final String primaryGroupName = redis.get(PermissionQueries.PRIMARY(uuid));
-                if (!player.isOnline()) return; // Player might have left before the redis query finishes
+        if (groups.get() == null) {
+            groups.set(new HashSet<>());
+            _hexusPlugin.runSyncLater(() -> player.sendMessage(F.fMain(this, F.fError(
+                            "There was an error parsing your permissions profile. You have been temporarily given the ",
+                            F.fPermissionGroup(PermissionGroup.MEMBER),
+                            " permission group for this session. Please contact an administrator if this issue persists."))),
+                    10);
+        }
 
-                try {
-                    _primaryGroupMap.put(player, PermissionGroup.valueOf(primaryGroupName));
-                } catch (final IllegalArgumentException ex) {
-                    _hexusPlugin.runSync(() -> player.sendMessage(F.fMain(this, F.fError("Sorry, you currently possess a primary permission group (", F.fItem(primaryGroupName), ") that does not exist on this server. (", F.fItem(_miniPluginPortal._serverName), "). You will temporarily possess the ", F.fPermissionGroup(_primaryGroupMap.get(player)), " primary group for the duration of this session. Please contact an administrator if this issue persists. Apologies for any inconvenience caused."))));
-                    logWarning("Player '" + player.getName() + "' (" + player.getUniqueId() + ") has primary group '" + primaryGroupName + "' that does not exist on this server. They have been assigned primary group '" + _primaryGroupMap.get(player).name() + "' for this session.");
-                }
-            } catch (final JedisException ex) {
-                _hexusPlugin.runSync(() -> player.sendMessage(F.fMain(this, F.fError("Sorry, we were unable to fetch your primary permission group. You will temporarily possess the ", F.fPermissionGroup(_primaryGroupMap.get(player)), " primary group for the duration of this session. Please contact an administrator if this issue persists. Apologies for any inconvenience caused."))));
-                logWarning("Unable to fetch primary permission group of player '" + player.getName() + "' (" + player.getUniqueId() + "). They have been assigned primary group '" + _primaryGroupMap.get(player).name() + "' for this session.");
-            }
+        if (groups.get().isEmpty()) groups.get().add(PermissionGroup.MEMBER);
 
-            try {
-                final Set<String> secondaryGroupNames = redis.smembers(PermissionQueries.GROUPS(uuid));
-                if (!player.isOnline()) return; // Player might have left before the redis query finishes
+        _permissionProfiles.put(player, new PermissionProfile(groups.get().toArray(PermissionGroup[]::new),
+                player.addAttachment(_hexusPlugin)));
+        refreshPermissions(player);
+    }
 
-                secondaryGroupNames.forEach(secondaryGroupName -> {
-                    try {
-                        _secondaryGroupsMap.get(player).add(PermissionGroup.valueOf(secondaryGroupName));
-                    } catch (final IllegalArgumentException ex) {
-                        _hexusPlugin.runSync(() -> player.sendMessage(F.fMain(this, F.fError("Sorry, you currently possess a secondary permission group (", F.fItem(secondaryGroupName), ") that does not exist on this server. (", F.fItem(_miniPluginPortal._serverName), "). You will not be granted this secondary permission group for this session. Please contact an administrator if this issue persists. Apologies for any inconvenience caused."))));
-                        logWarning("Player '" + player.getName() + "' (" + player.getUniqueId() + ") has secondary group '" + secondaryGroupName + "' that does not exist on this server. They will not be granted this secondary group for this session.");
-                    }
-                });
-            } catch (final JedisException ex) {
-                _hexusPlugin.runSync(() -> player.sendMessage(F.fMain(this, F.fError("Sorry, we were unable to fetch your secondary permission groups. You will not be assigned any secondary permission groups for the duration of this session. Please contact an administrator if this issue persists. Apologies for any inconvenience caused."))));
-                logWarning("Unable to fetch secondary permission groups of player '" + player.getName() + "' (" + player.getUniqueId() + "). They will not be assigned any secondary groups for this session.");
-            }
+    public void refreshPermissions(final Player player) {
+        clearPermissions(player);
 
-            _hexusPlugin.runSync(() -> {
-                final PermissionAttachment permissionAttachment = player.addAttachment(_hexusPlugin);
-                _permissionAttachmentMap.put(player, permissionAttachment);
+        final PermissionProfile profile = _permissionProfiles.get(player);
+        if (profile == null) {
+            logWarning("Unable to grant permissions for player '" + player.getName() +
+                    "' as they have no permission profile.");
+            return;
+        }
 
-                player.setOp(false);
-                setBukkitPermissions(permissionAttachment, false);
+        final PermissionAttachment attachment = profile._attachment();
+        Arrays.stream(profile._groups()).forEach(group -> grantPermissions(attachment, group));
 
-                grantPermissions(permissionAttachment, _primaryGroupMap.get(player));
-                _secondaryGroupsMap.get(player).forEach(permissionGroup -> grantPermissions(permissionAttachment, permissionGroup));
-
-                if (!player.hasPermission(PERM.OPERATOR.name())) return;
-                player.setOp(true);
-                setBukkitPermissions(permissionAttachment, true);
-            });
-        });
-
+        if (player.hasPermission(PERM.OPERATOR.name())) player.setOp(true);
+        else denyBukkitPermissions(attachment);
     }
 
     @EventHandler
     private void onPlayerQuit(final PlayerQuitEvent event) {
-        clearPermissions(event.getPlayer());
+        final Player player = event.getPlayer();
+        clearPermissions(player);
+        _permissionProfiles.remove(player);
+        _preLoginGroups.remove(player.getUniqueId());
     }
 
     private void clearPermissions(final Player player) {
         player.setOp(false);
 
-        if (_permissionAttachmentMap.containsKey(player)) {
-            final PermissionAttachment permissionAttachment = _permissionAttachmentMap.get(player);
-            player.removeAttachment(permissionAttachment);
-            permissionAttachment.remove();
+        final PermissionProfile profile = _permissionProfiles.get(player);
+        if (profile == null) {
+            logWarning("Unable to clear permissions for player '" + player.getName() +
+                    "' as they have no permission profile.");
+            return;
         }
 
-        _permissionAttachmentMap.remove(player);
-        _primaryGroupMap.remove(player);
-        _secondaryGroupsMap.remove(player);
+        final PermissionAttachment attachment = profile._attachment();
+        attachment.getPermissions().forEach((s, _) -> attachment.unsetPermission(s));
     }
 
-    private void setBukkitPermissions(final PermissionAttachment attachment, final boolean toggle) {
-        attachment.setPermission("minecraft.command.me", toggle);
-        attachment.setPermission("minecraft.command.tell", toggle);
-        attachment.setPermission("bukkit.command.help", toggle);
-        attachment.setPermission("bukkit.command.plugins", toggle);
-        attachment.setPermission("bukkit.command.version", toggle);
+    private void denyBukkitPermissions(final PermissionAttachment attachment) {
+        attachment.setPermission("minecraft.command.me", false);
+        attachment.setPermission("minecraft.command.tell", false);
+        attachment.setPermission("bukkit.command.help", false);
+        attachment.setPermission("bukkit.command.plugins", false);
+        attachment.setPermission("bukkit.command.version", false);
     }
 
-    private void grantPermissions(final PermissionAttachment attachment, final PermissionGroup group) {
+    private void grantPermissions(final PermissionAttachment attachment,
+                                  final PermissionGroup group) {
         attachment.setPermission(group.name(), true);
         group._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(), true));
 
         Arrays.stream(group._parents).forEach(parentGroup -> {
             grantPermissions(attachment, parentGroup);
-            parentGroup._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(), true));
+            parentGroup._permissions.forEach(
+                    basePermission -> attachment.setPermission(basePermission.toString(), true));
         });
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_RANK, COMMAND_RANK_ADD, COMMAND_RANK_INFO, COMMAND_RANK_LIST, COMMAND_RANK_REMOVE, COMMAND_RANK_CLEAR,
+
+        OPERATOR
     }
 
 }

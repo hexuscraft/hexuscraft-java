@@ -1,6 +1,6 @@
 package net.hexuscraft.core.item;
 
-import net.hexuscraft.core.chat.C;
+import net.hexuscraft.common.chat.C;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;

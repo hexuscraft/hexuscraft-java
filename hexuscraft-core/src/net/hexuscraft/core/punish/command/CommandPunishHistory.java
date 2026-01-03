@@ -1,10 +1,10 @@
 package net.hexuscraft.core.punish.command;
 
-import net.hexuscraft.core.chat.C;
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.C;
+import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.item.UtilItem;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.punish.MiniPluginPunish;
 import org.bukkit.Material;
@@ -22,7 +22,8 @@ import java.util.stream.Stream;
 public final class CommandPunishHistory extends BaseCommand<MiniPluginPunish> {
 
     public CommandPunishHistory(MiniPluginPunish miniPluginPunish) {
-        super(miniPluginPunish, "punishmenthistory", "[Player]", "View the history of punishments.", Set.of("punishhistory", "xh"), MiniPluginPunish.PERM.COMMAND_PUNISH_HISTORY);
+        super(miniPluginPunish, "punishmenthistory", "[Player]", "View the history of punishments.",
+                Set.of("punishhistory", "xh"), MiniPluginPunish.PERM.COMMAND_PUNISH_HISTORY);
     }
 
     @Override
@@ -50,7 +51,8 @@ public final class CommandPunishHistory extends BaseCommand<MiniPluginPunish> {
                 targetOfflinePlayer = senderPlayer;
             }
 
-            sender.sendMessage(F.fMain(this) + "Viewing punishment history of " + F.fItem(targetOfflinePlayer.getName()) + ".");
+            sender.sendMessage(
+                    F.fMain(this) + "Viewing punishment history of " + F.fItem(targetOfflinePlayer.getName()) + ".");
             openGui(senderPlayer, targetOfflinePlayer);
         });
     }
@@ -60,7 +62,8 @@ public final class CommandPunishHistory extends BaseCommand<MiniPluginPunish> {
         final List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
+            Stream<? extends Player> streamedOnlinePlayers =
+                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
             if (sender instanceof final Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }
@@ -72,11 +75,15 @@ public final class CommandPunishHistory extends BaseCommand<MiniPluginPunish> {
 
 
     public void openGui(final Player sender, final OfflinePlayer targetOfflinePlayer) {
-        Inventory gui = _miniPlugin._hexusPlugin.getServer().createInventory(sender, 6 * 9, "Punish History - " + targetOfflinePlayer.getName());
+        Inventory gui = _miniPlugin._hexusPlugin.getServer()
+                .createInventory(sender, 6 * 9, "Punish History - " + targetOfflinePlayer.getName());
 
-        ItemStack targetSkull = UtilItem.createItemSkull(targetOfflinePlayer.getName(), C.cGreen + C.fBold + targetOfflinePlayer.getName(), targetOfflinePlayer.getUniqueId().toString(), "", C.cWhite + "Viewing punishment history");
+        ItemStack targetSkull = UtilItem.createItemSkull(targetOfflinePlayer.getName(),
+                C.cGreen + C.fBold + targetOfflinePlayer.getName(), targetOfflinePlayer.getUniqueId().toString(), "",
+                C.cWhite + "Viewing punishment history");
 
-        ItemStack openPunishGui = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Apply Punishment", "Open the punishment menu for " + F.fItem(targetOfflinePlayer.getName()));
+        ItemStack openPunishGui = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Apply Punishment",
+                "Open the punishment menu for " + F.fItem(targetOfflinePlayer.getName()));
 
         if (sender.hasPermission(PermissionGroup.TRAINEE.name())) gui.setItem(53, openPunishGui);
 

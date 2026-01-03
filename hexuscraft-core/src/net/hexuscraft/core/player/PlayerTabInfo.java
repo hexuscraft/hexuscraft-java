@@ -28,7 +28,8 @@ public final class PlayerTabInfo {
     }
 
     public static void sendActionText(Player player, String message) {
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutChat(new ChatComponentText(message), (byte) 2));
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(
+                new PacketPlayOutChat(new ChatComponentText(message), (byte) 2));
     }
 
 }

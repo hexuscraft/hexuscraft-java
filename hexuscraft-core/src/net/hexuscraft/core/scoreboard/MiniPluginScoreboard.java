@@ -4,6 +4,7 @@ import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Objective;
@@ -38,22 +39,21 @@ public final class MiniPluginScoreboard extends MiniPlugin<HexusPlugin> {
         _scoreboardMap.clear();
     }
 
-// TODO: Race condition with mini plugins which modify the scoreboard. Set low event priority.
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-        Scoreboard scoreboard = _hexusPlugin.getServer().getScoreboardManager().getNewScoreboard();
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerJoin(final PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
+        final Scoreboard scoreboard = _hexusPlugin.getServer().getScoreboardManager().getNewScoreboard();
         player.setScoreboard(scoreboard);
         _scoreboardMap.put(player, scoreboard);
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
+    public void onPlayerQuit(final PlayerQuitEvent event) {
+        final Player player = event.getPlayer();
         player.setScoreboard(_hexusPlugin.getServer().getScoreboardManager().getMainScoreboard());
 
-        Scoreboard scoreboard = _scoreboardMap.get(player);
+        if (!_scoreboardMap.containsKey(player)) return;
+        final Scoreboard scoreboard = _scoreboardMap.get(player);
         scoreboard.getTeams().forEach(Team::unregister);
         scoreboard.getEntries().forEach(scoreboard::resetScores);
         scoreboard.getObjectives().forEach(Objective::unregister);

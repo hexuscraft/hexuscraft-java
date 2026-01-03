@@ -1,12 +1,12 @@
 package net.hexuscraft.core.permission.command;
 
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.database.queries.PermissionQueries;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.MiniPluginPermission;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.database.queries.PermissionQueries;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,7 +21,8 @@ public final class CommandRankAdd extends BaseCommand<MiniPluginPermission> {
     final MiniPluginDatabase _miniPluginDatabase;
 
     CommandRankAdd(final MiniPluginPermission miniPluginPermission, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPermission, "add", "<Player> <Permission Group>", "Add a group to a player.", Set.of("a"), MiniPluginPermission.PERM.COMMAND_RANK_ADD);
+        super(miniPluginPermission, "add", "<Player> <Permission Group>", "Add a group to a player.", Set.of("a"),
+                MiniPluginPermission.PERM.COMMAND_RANK_ADD);
         _miniPluginDatabase = miniPluginDatabase;
     }
 
@@ -36,7 +37,9 @@ public final class CommandRankAdd extends BaseCommand<MiniPluginPermission> {
         try {
             targetGroup = PermissionGroup.valueOf(args[1]);
         } catch (IllegalArgumentException ex) {
-            sender.sendMessage(F.fMain(this) + F.fError("Invalid group. Groups: ") + F.fList(PermissionGroup.getColoredNames()) + ".");
+            sender.sendMessage(
+                    F.fMain(this) + F.fError("Invalid group. Groups: ") + F.fItem(PermissionGroup.getColoredNames()) +
+                            ".");
             return;
         }
 
@@ -55,10 +58,13 @@ public final class CommandRankAdd extends BaseCommand<MiniPluginPermission> {
             final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
             if (offlinePlayer == null) return;
 
-            sender.sendMessage(F.fMain(this, "Adding sub-group ", F.fPermissionGroup(targetGroup), " to ", F.fItem(offlinePlayer.getName()), "..."));
+            sender.sendMessage(F.fMain(this, "Adding sub-group ", F.fPermissionGroup(targetGroup), " to ",
+                    F.fItem(offlinePlayer.getName()), "..."));
 
-            _miniPluginDatabase.getJedisPooled().sadd(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()), targetGroup.name());
-            sender.sendMessage(F.fMain(this, F.fSuccess("Added sub-group " + F.fPermissionGroup(targetGroup), " to ", F.fItem(offlinePlayer.getName()), ".")));
+            _miniPluginDatabase.getUnifiedJedis()
+                    .sadd(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()), targetGroup.name());
+            sender.sendMessage(F.fMain(this, F.fSuccess("Added sub-group " + F.fPermissionGroup(targetGroup), " to ",
+                    F.fItem(offlinePlayer.getName()), ".")));
 
             final Player player = _miniPlugin._hexusPlugin.getServer().getPlayer(offlinePlayer.getName());
             if (player == null) return;
@@ -72,9 +78,11 @@ public final class CommandRankAdd extends BaseCommand<MiniPluginPermission> {
     @Override
     public List<String> tab(final CommandSender sender, final String alias, String[] args) {
         if (args.length == 1)
-            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender, false);
+            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender,
+                    false);
         if (args.length == 2)
-            return Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).filter(permissionGroupName -> !permissionGroupName.startsWith("_")).toList();
+            return Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name)
+                    .filter(permissionGroupName -> !permissionGroupName.startsWith("_")).toList();
         return List.of();
     }
 

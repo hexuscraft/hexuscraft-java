@@ -1,8 +1,8 @@
 package net.hexuscraft.hub.player.command;
 
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.hub.player.MiniPluginPlayer;
 import org.bukkit.command.CommandSender;
@@ -13,7 +13,8 @@ import java.util.Set;
 public final class CommandSpawn extends BaseCommand<MiniPluginPlayer> {
 
     public CommandSpawn(final MiniPluginPlayer miniPluginPlayer) {
-        super(miniPluginPlayer, "spawn", "[Player]", "Warp to spawn.", Set.of("stuck", "hub", "lobby"), MiniPluginPlayer.PERM.COMMAND_SPAWN);
+        super(miniPluginPlayer, "spawn", "[Player]", "Warp to spawn.", Set.of("stuck", "hub", "lobby"),
+                MiniPluginPlayer.PERM.COMMAND_SPAWN);
     }
 
     @Override
@@ -31,7 +32,9 @@ public final class CommandSpawn extends BaseCommand<MiniPluginPlayer> {
                 return;
             }
 
-            Player[] players = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, matches -> matches.length != 1);
+            Player[] players =
+                    PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0],
+                            sender, matches -> matches.length != 1);
             if (players.length != 1) return;
 
             target = players[0];
@@ -48,13 +51,14 @@ public final class CommandSpawn extends BaseCommand<MiniPluginPlayer> {
             return;
         }
 
-        target.sendMessage(F.fMain(this) + "You were teleported to spawn by " + F.fItem(sender) + ".");
-        sender.sendMessage(F.fMain(this) + "Teleported " + F.fItem(target) + " to spawn.");
+        target.sendMessage(F.fMain(this) + "You were teleported to spawn by " +
+                F.fItem(sender instanceof final Player player ? player.getDisplayName() : sender.getName()) + ".");
+        sender.sendMessage(F.fMain(this) + "Teleported " + F.fItem(target.getDisplayName()) + " to spawn.");
         _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(staff -> {
-            if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {
-                return;
-            }
-            staff.sendMessage(F.fSub(this) + F.fItem(sender) + " teleported " + F.fItem(target) + " to spawn.");
+            if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
+            staff.sendMessage(F.fStaff() + F.fMain(this,
+                    F.fItem(sender instanceof final Player player ? player.getDisplayName() : sender.getName()),
+                    " teleported ", F.fItem(target.getDisplayName()), " to spawn."));
         });
     }
 }

@@ -1,18 +1,13 @@
 package net.hexuscraft.core.authentication;
 
+import net.hexuscraft.common.IPermission;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.chat.F;
-import net.hexuscraft.core.permission.IPermission;
-import net.hexuscraft.core.permission.PermissionGroup;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public final class MiniPluginAuthentication extends MiniPlugin<HexusPlugin> {
-
-    public enum PERM implements IPermission {
-        REQUIRE_AUTHENTICATION
-    }
 
     public MiniPluginAuthentication(final HexusPlugin plugin) {
         super(plugin, "Authentication");
@@ -23,9 +18,12 @@ public final class MiniPluginAuthentication extends MiniPlugin<HexusPlugin> {
     @EventHandler
     private void onPlayerJoin(final PlayerJoinEvent event) {
         if (!event.getPlayer().hasPermission(PERM.REQUIRE_AUTHENTICATION.name())) {
-            return;
         }
-        event.getPlayer().sendMessage(F.fMain(this, "You are authenticated."));
+        // TOOD: 2fa
+    }
+
+    public enum PERM implements IPermission {
+        REQUIRE_AUTHENTICATION
     }
 
 }

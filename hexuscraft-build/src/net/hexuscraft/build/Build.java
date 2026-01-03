@@ -2,8 +2,8 @@ package net.hexuscraft.build;
 
 import net.hexuscraft.build.parse.MiniPluginParse;
 import net.hexuscraft.build.world.MiniPluginWorld;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.HexusPlugin;
-import net.hexuscraft.core.permission.PermissionGroup;
 import net.hexuscraft.core.teleport.MiniPluginTeleport;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -14,9 +14,9 @@ import org.bukkit.event.world.WorldLoadEvent;
 public final class Build extends HexusPlugin {
 
     public Build() {
-        PermissionGroup.BUILDER._permissions.add(MiniPluginTeleport.PERM.COMMAND_TELEPORT);
-        PermissionGroup.BUILDER._permissions.add(MiniPluginTeleport.PERM.COMMAND_TELEPORT_COORDINATES);
-        PermissionGroup.SENIOR_BUILDER._permissions.add(MiniPluginTeleport.PERM.COMMAND_TELEPORT_OTHERS);
+        PermissionGroup.BUILD_TEAM._permissions.add(MiniPluginTeleport.PERM.COMMAND_TELEPORT);
+        PermissionGroup.BUILD_TEAM._permissions.add(MiniPluginTeleport.PERM.COMMAND_TELEPORT_COORDINATES);
+        PermissionGroup.BUILD_LEAD._permissions.add(MiniPluginTeleport.PERM.COMMAND_TELEPORT_OTHERS);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package net.hexuscraft.build.parse.command;
 
 import net.hexuscraft.build.parse.MiniPluginParse;
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -13,20 +13,6 @@ public final class CommandParse extends BaseCommand<MiniPluginParse> {
 
     @SuppressWarnings("FieldCanBeLocal")
     private final Integer MINIMUM_RADIUS = 1;
-
-    private static final class ExInvalidSender extends Exception {}
-
-    private static final class ExInvalidRadius extends Exception {}
-
-    private static final class ExInvalidWorld extends Exception {}
-
-    private static final class ExRadiusTooSmall extends Exception {
-        public final Integer _minimumRadius;
-
-        public ExRadiusTooSmall(final Integer minimumRadius) {
-            _minimumRadius = minimumRadius;
-        }
-    }
 
     public CommandParse(final MiniPluginParse parse) {
         super(parse, "parse", "<Radius>",
@@ -73,6 +59,23 @@ public final class CommandParse extends BaseCommand<MiniPluginParse> {
         }
 
         _miniPlugin.parse(world, radius);
+    }
+
+    private static final class ExInvalidSender extends Exception {
+    }
+
+    private static final class ExInvalidRadius extends Exception {
+    }
+
+    private static final class ExInvalidWorld extends Exception {
+    }
+
+    private static final class ExRadiusTooSmall extends Exception {
+        public final Integer _minimumRadius;
+
+        public ExRadiusTooSmall(final Integer minimumRadius) {
+            _minimumRadius = minimumRadius;
+        }
     }
 
 }

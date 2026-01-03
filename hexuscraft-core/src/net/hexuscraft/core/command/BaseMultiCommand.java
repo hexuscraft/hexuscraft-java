@@ -1,9 +1,9 @@
 package net.hexuscraft.core.command;
 
+import net.hexuscraft.common.IPermission;
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.chat.F;
-import net.hexuscraft.core.permission.IPermission;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -13,7 +13,8 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
 
     private final Set<BaseCommand<T>> _commands;
 
-    public BaseMultiCommand(final T miniPlugin, String name, String description, Set<String> aliases, IPermission permission, Set<BaseCommand<T>> commands) {
+    public BaseMultiCommand(final T miniPlugin, String name, String description, Set<String> aliases,
+                            IPermission permission, Set<BaseCommand<T>> commands) {
         super(miniPlugin, name, "", description, aliases, permission);
         _commands = commands;
     }
@@ -29,12 +30,13 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
             }
         }
 
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append(help(alias));
 
         _commands.stream().sorted(Comparator.comparing(Command::getName)).forEach(command -> {
             if (!command.testPermissionSilent(sender)) return;
-            builder.append("\n").append(F.fCommand(alias + " " + command.getName(), command));
+            builder.append("\n")
+                    .append(F.fCommand(alias + " " + command.getName(), command.getUsage(), command.getDescription()));
         });
 
         sender.sendMessage(builder.toString());

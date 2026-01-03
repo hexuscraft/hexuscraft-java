@@ -6,15 +6,16 @@ public abstract class ByteArrayDataInputRunnable implements Runnable {
 
     ByteArrayDataInput in;
 
-    public void setIn(final ByteArrayDataInput in) {
-        this.in = in;
-    }
-
     public ByteArrayDataInput getIn() {
         return this.in;
     }
 
+    public void setIn(final ByteArrayDataInput in) {
+        this.in = in;
+    }
+
     @Override
-    public void run() {}
+    public void run() {
+    }
 
 }

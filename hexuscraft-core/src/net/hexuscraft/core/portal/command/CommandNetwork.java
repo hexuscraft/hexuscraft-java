@@ -9,12 +9,13 @@ import java.util.Set;
 public final class CommandNetwork extends BaseMultiCommand<MiniPluginPortal> {
 
     public CommandNetwork(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal, "network", "Manage the network.", Set.of("net"), MiniPluginPortal.PERM.COMMAND_NETWORK, Set.of(
-                new CommandNetworkGroup(miniPluginPortal, miniPluginDatabase),
-                new CommandNetworkServer(miniPluginPortal, miniPluginDatabase),
-                new CommandNetworkSpy(miniPluginPortal),
-                new CommandNetworkMotd(miniPluginPortal, miniPluginDatabase)
-        ));
+        super(miniPluginPortal, "network", "Manage the network.", Set.of("net"), MiniPluginPortal.PERM.COMMAND_NETWORK,
+                Set.of(
+                        new CommandNetworkGroup(miniPluginPortal, miniPluginDatabase),
+                        new CommandNetworkServer(miniPluginPortal, miniPluginDatabase),
+                        new CommandNetworkSpy(miniPluginPortal),
+                        new CommandNetworkMotd(miniPluginPortal, miniPluginDatabase)
+                ));
     }
 
 }

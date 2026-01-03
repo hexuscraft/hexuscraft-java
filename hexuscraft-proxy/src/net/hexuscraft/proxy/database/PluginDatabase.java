@@ -1,8 +1,8 @@
 package net.hexuscraft.proxy.database;
 
-import net.hexuscraft.database.Database;
-import redis.clients.jedis.JedisPooled;
+import net.hexuscraft.common.database.Database;
 import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.io.File;
@@ -50,7 +50,7 @@ public final class PluginDatabase {
         new Thread(() -> {
             while (true) {
                 try {
-                    getJedisPooled().psubscribe(new JedisPubSub() {
+                    getUnifiedJedis().psubscribe(new JedisPubSub() {
 
                         @Override
                         public void onPMessage(String pattern, String channel, String message) {
@@ -78,8 +78,8 @@ public final class PluginDatabase {
         });
     }
 
-    public JedisPooled getJedisPooled() {
-        return _database._jedisPooled;
+    public UnifiedJedis getUnifiedJedis() {
+        return _database._unifiedJedis;
     }
 
     @SuppressWarnings({"UnusedReturnValue", "unused"})

@@ -1,6 +1,6 @@
 package net.hexuscraft.core.gamemode.command;
 
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.gamemode.MiniPluginGameMode;
 import net.hexuscraft.core.player.PlayerSearch;
@@ -15,7 +15,8 @@ import java.util.Set;
 public final class CommandGameMode extends BaseCommand<MiniPluginGameMode> {
 
     public CommandGameMode(final MiniPluginGameMode miniPluginGameMode) {
-        super(miniPluginGameMode, "gamemode", "<Players> [Toggle]", "Toggle creative mode.", Set.of("gm"), MiniPluginGameMode.PERM.COMMAND_GAMEMODE);
+        super(miniPluginGameMode, "gamemode", "<Players> [Toggle]", "Toggle creative mode.", Set.of("gm"),
+                MiniPluginGameMode.PERM.COMMAND_GAMEMODE);
     }
 
     @Override
@@ -28,7 +29,8 @@ public final class CommandGameMode extends BaseCommand<MiniPluginGameMode> {
         final Player[] targets;
 
         if (args.length > 0) {
-            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, matches -> matches.length == 0);
+            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0],
+                    sender, matches -> matches.length == 0);
             if (targets.length == 0) return;
         } else if (sender instanceof Player player) {
             targets = new Player[]{player};
@@ -69,13 +71,16 @@ public final class CommandGameMode extends BaseCommand<MiniPluginGameMode> {
         }
 
         Arrays.stream(targets).forEach(target -> target.setGameMode(newGameMode));
-        sender.sendMessage(F.fMain(this, F.fList(targets), " Creative Mode: ", F.fBoolean(newGameMode.equals(GameMode.CREATIVE))));
+        sender.sendMessage(
+                F.fMain(this, F.fItem(Arrays.stream(targets).map(Player::getDisplayName).toArray(String[]::new)),
+                        " Creative Mode: ", F.fBoolean(newGameMode.equals(GameMode.CREATIVE))));
     }
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         if (args.length == 1)
-            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender, true);
+            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender,
+                    true);
         return List.of();
     }
 

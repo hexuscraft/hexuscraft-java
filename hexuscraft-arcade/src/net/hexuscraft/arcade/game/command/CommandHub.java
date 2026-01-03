@@ -1,7 +1,7 @@
 package net.hexuscraft.arcade.game.command;
 
 import net.hexuscraft.arcade.game.MiniPluginGame;
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.portal.MiniPluginPortal;
 import org.bukkit.command.CommandSender;
@@ -14,7 +14,8 @@ public final class CommandHub extends BaseCommand<MiniPluginGame> {
     private final MiniPluginPortal _miniPluginPortal;
 
     public CommandHub(final MiniPluginGame miniPluginGame, final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginGame, "hub", "", "Teleport back to a lobby server.", Set.of("lobby"), MiniPluginGame.PERM.COMMAND_HUB);
+        super(miniPluginGame, "hub", "", "Teleport back to a lobby server.", Set.of("lobby"),
+                MiniPluginGame.PERM.COMMAND_HUB);
         _miniPluginPortal = miniPluginPortal;
     }
 

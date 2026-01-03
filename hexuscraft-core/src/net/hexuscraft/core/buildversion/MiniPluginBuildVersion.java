@@ -1,20 +1,16 @@
 package net.hexuscraft.core.buildversion;
 
+import net.hexuscraft.common.IPermission;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.buildversion.command.CommandBuildVersion;
 import net.hexuscraft.core.command.MiniPluginCommand;
-import net.hexuscraft.core.permission.IPermission;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
 public final class MiniPluginBuildVersion extends MiniPlugin<HexusPlugin> {
-
-    public enum PERM implements IPermission {
-        COMMAND_BUILDVERSION
-    }
 
     private MiniPluginCommand _pluginCommand;
 
@@ -23,7 +19,8 @@ public final class MiniPluginBuildVersion extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(
+            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
     }
 
@@ -42,6 +39,10 @@ public final class MiniPluginBuildVersion extends MiniPlugin<HexusPlugin> {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_BUILDVERSION
     }
 
 }

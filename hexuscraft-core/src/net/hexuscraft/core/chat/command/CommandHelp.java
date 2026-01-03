@@ -1,7 +1,7 @@
 package net.hexuscraft.core.chat.command;
 
-import net.hexuscraft.core.chat.C;
-import net.hexuscraft.core.chat.F;
+import net.hexuscraft.common.chat.C;
+import net.hexuscraft.common.chat.F;
 import net.hexuscraft.core.chat.MiniPluginChat;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.command.CommandSender;
@@ -11,7 +11,8 @@ import java.util.Set;
 public final class CommandHelp extends BaseCommand<MiniPluginChat> {
 
     public CommandHelp(final MiniPluginChat miniPluginChat) {
-        super(miniPluginChat, "help", "", "Need some help? We got you covered.", Set.of("?"), MiniPluginChat.PERM.COMMAND_HELP);
+        super(miniPluginChat, "help", "", "Need some help? We got you covered.", Set.of("?"),
+                MiniPluginChat.PERM.COMMAND_HELP);
     }
 
     @Override

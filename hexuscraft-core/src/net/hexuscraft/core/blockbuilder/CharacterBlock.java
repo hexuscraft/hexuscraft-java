@@ -141,10 +141,10 @@ public enum CharacterBlock {
             new Vector2(3, 4)
     ));
 
+    public final List<Vector2> _blocks;
+
     CharacterBlock(List<Vector2> blocks) {
         _blocks = blocks;
     }
-
-    public final List<Vector2> _blocks;
 
 }

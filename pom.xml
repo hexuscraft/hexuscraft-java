@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -23,11 +23,13 @@
         <module>hexuscraft-arcade</module>
         <module>hexuscraft-build</module>
         <module>hexuscraft-clans</module>
+        <module>hexuscraft-common</module>
         <module>hexuscraft-core</module>
         <module>hexuscraft-database</module>
         <module>hexuscraft-hub</module>
         <module>hexuscraft-proxy</module>
         <module>hexuscraft-server-monitor</module>
+        <module>hexuscraft-web-translator</module>
     </modules>
 
     <repositories>
@@ -39,6 +41,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>net.hexuscraft</groupId>
+                <artifactId>hexuscraft-common</artifactId>
+                <version>1.0.0</version>
+            </dependency>
             <dependency>
                 <groupId>net.hexuscraft</groupId>
                 <artifactId>hexuscraft-core</artifactId>
@@ -68,12 +75,22 @@
             <dependency>
                 <groupId>redis.clients</groupId>
                 <artifactId>jedis</artifactId>
-                <version>7.0.0</version>
+                <version>7.1.0</version>
             </dependency>
             <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.13.2</version>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-all</artifactId>
+                <version>1.7.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-circuitbreaker</artifactId>
+                <version>1.7.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-retry</artifactId>
+                <version>1.7.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
