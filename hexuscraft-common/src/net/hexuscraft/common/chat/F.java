@@ -162,7 +162,7 @@ public final class F {
 
 
     public static String fBoolean(final boolean toggle) {
-        return (toggle ? C.cGreen : C.cRed) + toggle;
+        return (toggle ? C.cGreen : C.cRed) + (toggle ? "True" : "False");
     }
 
     public static String fSuccess(final String... text) {
