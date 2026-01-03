@@ -21,7 +21,7 @@ public final class CommandSilence extends BaseCommand<MiniPluginChat> {
     public void run(final CommandSender sender, final String alias, final String[] args) {
         if (args.length == 0) {
             if (_miniPlugin.getMuted()) {
-                _miniPlugin.setMuted(false, true);
+                _miniPlugin.setMuted(false);
                 _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
                     if (!player.hasPermission(MiniPluginChat.PERM.COMMAND_SILENCE_SEE.name())) return;
 
@@ -33,7 +33,7 @@ public final class CommandSilence extends BaseCommand<MiniPluginChat> {
                 });
                 return;
             }
-            _miniPlugin.setMuted(true, true);
+            _miniPlugin.setMuted(true);
             _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
                 if (!player.hasPermission(MiniPluginChat.PERM.COMMAND_SILENCE_SEE.name())) return;
                 player.sendMessage(F.fStaff() + F.fMain(this, F.fError(
