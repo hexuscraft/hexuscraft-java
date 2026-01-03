@@ -1,6 +1,7 @@
 package net.hexuscraft.common.database.serverdata;
 
 import net.hexuscraft.common.database.queries.ServerQueries;
+import net.hexuscraft.common.utils.UtilUniqueId;
 import redis.clients.jedis.UnifiedJedis;
 
 import java.util.HashMap;
@@ -13,7 +14,7 @@ public final class ServerGroupData {
 
     public final int _capacity;
     public final String[] _games;
-    public final UUID _hostUUID;
+    public final UUID _hostUniqueId;
     public final int _joinableServers;
     public final int _maxPort;
     public final int _minPort;
@@ -40,14 +41,15 @@ public final class ServerGroupData {
         _worldEdit = Boolean.parseBoolean(serverGroupData.getOrDefault("worldEdit", "FALSE"));
         _timeoutMillis = Integer.parseInt(serverGroupData.getOrDefault("timeoutMillis", "10000"));
         _games = serverGroupData.getOrDefault("games", "").split(",");
-        _hostUUID = UUID.fromString(serverGroupData.getOrDefault("hostUUID", "00000000-0000-0000-0000-000000000000"));
+        _hostUniqueId =
+                UUID.fromString(serverGroupData.getOrDefault("hostUniqueId", UtilUniqueId.EMPTY_UUID.toString()));
     }
 
     public ServerGroupData(final String name, final String requiredPermission,
                            final int minPort, final int maxPort, final int totalServers, final int joinableServers,
                            final String plugin, final String worldZip, final int ram, final int capacity,
                            final boolean worldEdit, final int timeoutMillis, final String[] games,
-                           final UUID hostUUID) {
+                           final UUID hostUniqueId) {
         _name = name;
 
         _requiredPermission = requiredPermission;
@@ -62,7 +64,7 @@ public final class ServerGroupData {
         _worldEdit = worldEdit;
         _timeoutMillis = timeoutMillis;
         _games = games;
-        _hostUUID = (hostUUID == null) ? UUID.fromString("00000000-0000-0000-0000-000000000000") : hostUUID;
+        _hostUniqueId = (hostUniqueId == null) ? UtilUniqueId.EMPTY_UUID : hostUniqueId;
     }
 
     public Map<String, String> toMap() {
@@ -79,7 +81,7 @@ public final class ServerGroupData {
         map.put("worldEdit", Boolean.toString(_worldEdit));
         map.put("timeoutMillis", Integer.toString(_timeoutMillis));
         map.put("games", String.join(",", _games));
-        map.put("hostUUID", _hostUUID.toString());
+        map.put("hostUniqueId", _hostUniqueId.toString());
         return map;
     }
 
