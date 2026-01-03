@@ -10,6 +10,7 @@ import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.enums.PunishType;
 import net.hexuscraft.common.messages.PunishmentAppliedMessage;
+import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.MiniPluginCommand;
@@ -44,7 +45,6 @@ import java.util.stream.Collectors;
 public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
 
     private static final Logger log = LoggerFactory.getLogger(MiniPluginPunish.class);
-    private final UUID DEFAULT_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
     private MiniPluginCommand _pluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
     private MiniPluginPortal _miniPluginPortal;
@@ -92,20 +92,20 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
                 if (targetOfflinePlayer == null) return;
 
                 final AtomicReference<String> staffName = new AtomicReference<>();
-                if (punishData.staffUniqueId.equals(UUID.fromString("00000000-0000-0000-0000-000000000000")))
+                if (punishData.staffUniqueId.equals(UtilUniqueId.EMPTY_UUID))
                     staffName.set(_hexusPlugin.getServer().getConsoleSender().getName());
                 else try {
-                    staffName.set(PlayerSearch.offlinePlayerSearch(punishData.staffUniqueId).getName());
-                } catch (final IOException ex) {
-                    logWarning("IOException while fetching name of staff id '" + punishData.staffUniqueId +
-                            "' for punishment '" + punishData.uniqueId + "': " + ex.getMessage());
+                    staffName.set(Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(punishData.staffUniqueId))
+                            .getName());
+                } catch (final IOException | NullPointerException ex) {
+                    logSevere(ex);
                     staffName.set("<unknown>");
                 }
 
                 Optional.ofNullable(targetOfflinePlayer.getPlayer()).ifPresent((final Player targetPlayer) -> {
                     final String punishMessage = F.fPunish(punishData);
                     targetPlayer.sendMessage(punishMessage);
-                    targetPlayer.playSound(targetPlayer.getLocation(), Sound.CAT_MEOW, Integer.MAX_VALUE, 0.6F);
+                    targetPlayer.playSound(targetPlayer.getLocation(), Sound.CAT_MEOW, Float.MAX_VALUE, 0.6F);
 
                     if (punishData.type == PunishType.BAN) {
                         // TODO: Change from bungeecord channels to redis channels. Implement behaviour on proxy.
@@ -176,7 +176,7 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
                         _miniPluginDatabase.getUnifiedJedis().hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
                                 Map.of("active", "false", "removeOrigin", Long.toString(System.currentTimeMillis()),
                                         "removeReason", "EXPIRED", "removeServer", _miniPluginPortal._serverName,
-                                        "removeStaffId", DEFAULT_UUID.toString(), "removeStaffServer",
+                                        "removeStaffId", UtilUniqueId.EMPTY_UUID.toString(), "removeStaffServer",
                                         _miniPluginPortal._serverName));
                         continue;
                     }
@@ -214,7 +214,7 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
                 Map.of("id", UUID.randomUUID().toString(), "type", punishType.name(), "active", "true", "origin",
                         Long.toString(System.currentTimeMillis()), "length", Long.toString(length), "reason", reason,
                         "server", _miniPluginPortal._serverName, "staffId",
-                        (staffUuid == null ? DEFAULT_UUID : staffUuid).toString(), "staffServer",
+                        (staffUuid == null ? UtilUniqueId.EMPTY_UUID : staffUuid).toString(), "staffServer",
                         _miniPluginPortal._serverName));
 
         _hexusPlugin.runAsync(() -> {
