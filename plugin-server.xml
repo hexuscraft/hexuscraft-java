@@ -51,7 +51,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <configuration>
                     <finalName>${project.name}</finalName>
-                    <outputDirectory>${project.basedir}/../out/</outputDirectory>
+                    <outputDirectory>${project.basedir}/../out/shaded/</outputDirectory>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <filters>
                         <filter>
