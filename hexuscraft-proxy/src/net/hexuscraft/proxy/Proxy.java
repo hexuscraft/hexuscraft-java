@@ -23,6 +23,7 @@ import net.hexuscraft.common.data.PunishData;
 import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.enums.PunishType;
+import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.proxy.database.PluginDatabase;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,8 +46,6 @@ public final class Proxy {
 
     private final String MOTD_PREFIX =
             String.join("\n", "            §6§lHexuscraft§r §f§lNetwork§r  §9[1.8-1.21]§r", " §f§l▶§r ");
-
-    private final UUID DEFAULT_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     private final PluginDatabase _pluginDatabase;
     private final ProxyServer _server;
@@ -205,7 +204,7 @@ public final class Proxy {
                                 Map.of("active", "false", "removeOrigin", Long.toString(System.currentTimeMillis()),
                                         "removeReason", "EXPIRED", "removeServer",
                                         "Proxy-" + _server.getBoundAddress().toString(), "removeStaffId",
-                                        DEFAULT_UUID.toString(), "removeStaffServer",
+                                        UtilUniqueId.EMPTY_UUID.toString(), "removeStaffServer",
                                         "Proxy-" + _server.getBoundAddress().toString()));
                         continue;
                     }
