@@ -3,6 +3,7 @@ package net.hexuscraft.hub;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.hub.doublejump.MiniPluginDoubleJump;
 import net.hexuscraft.hub.hubscoreboard.MiniPluginHubScoreboard;
+import net.hexuscraft.hub.news.MiniPluginNews;
 import net.hexuscraft.hub.player.MiniPluginPlayer;
 import net.hexuscraft.hub.team.MiniPluginTeam;
 import org.bukkit.GameMode;
@@ -22,9 +23,10 @@ public final class Hub extends HexusPlugin {
     @Override
     public void load() {
         require(new MiniPluginDoubleJump(this));
+        require(new MiniPluginHubScoreboard(this));
+        require(new MiniPluginNews(this));
         require(new MiniPluginPlayer(this));
         require(new MiniPluginTeam(this));
-        require(new MiniPluginHubScoreboard(this));
     }
 
     @Override
