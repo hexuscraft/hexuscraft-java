@@ -54,13 +54,13 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
             return List.of();
         }
 
-        List<String> completes = new ArrayList<>();
+        final List<String> completions = new ArrayList<>();
         _commands.forEach(commandBase -> {
             if (!commandBase.testPermissionSilent(sender)) return;
-            completes.add(commandBase.getName());
-            completes.addAll(commandBase.getAliases());
+            completions.add(commandBase.getName());
+            completions.addAll(commandBase.getAliases());
         });
-        return completes;
+        return completions;
     }
 
 }

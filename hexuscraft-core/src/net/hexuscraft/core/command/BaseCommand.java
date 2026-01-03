@@ -7,9 +7,9 @@ import net.hexuscraft.core.MiniPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> extends Command {
@@ -36,6 +36,8 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
     }
 
     public void run(final CommandSender sender, final String alias, final String[] args) {
+        sender.sendMessage(F.fMain(this,
+                F.fError("This command has no implementation. Please contact a staff member if this issue persists.")));
     }
 
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
@@ -67,21 +69,11 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
 
     @Override
     public final List<String> tabComplete(final CommandSender sender, final String alias, final String[] args) {
-        if (!testPermission(sender)) {
-            return List.of();
-        }
+        if (!testPermission(sender)) return List.of();
 
-        final List<String> completes = new ArrayList<>();
-        tab(sender, alias, args).forEach(s -> {
-            if (s == null) {
-                return;
-            } // allows using stream.map() to nullify unwanted completions
-            if (!s.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) {
-                return;
-            }
-            completes.add(s);
-        });
-        return completes;
+        return tab(sender, alias, args).stream().filter(Objects::nonNull)
+                .filter(completion -> completion.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
+                .toList();
     }
 
 }
