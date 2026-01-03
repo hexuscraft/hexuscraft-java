@@ -102,4 +102,8 @@ public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
         });
     }
 
+    public void unregisterConsumers() {
+        _consumers.clear();
+    }
+
 }
