@@ -7,7 +7,6 @@ import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.Set;
 
@@ -20,15 +19,18 @@ public final class CommandBroadcast extends BaseCommand<MiniPluginChat> {
 
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length > 0) {
-            _miniPlugin._hexusPlugin.getServer().getOnlinePlayers()
-                    .forEach(player -> player.playSound(player.getLocation(), Sound.NOTE_PLING, Integer.MAX_VALUE, 2));
-            _miniPlugin._hexusPlugin.getServer().broadcastMessage(F.fMain(this,
-                    F.fItem(sender instanceof final Player player ? player.getDisplayName() : sender.getName()), ": ",
-                    C.cWhite + ChatColor.translateAlternateColorCodes('&', String.join(" ", args))));
+        if (args.length == 0) {
+            sender.sendMessage(help(alias));
             return;
         }
-        sender.sendMessage(help(alias));
-    }
 
+        final String message = ChatColor.translateAlternateColorCodes('&', String.join(" ", args));
+
+        _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
+            //noinspection deprecation
+            player.sendTitle(C.cYellow + "Broadcast", message);
+            player.sendMessage(F.fMain("Broadcast", C.cAqua + message));
+            player.playSound(player.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
+        });
+    }
 }
