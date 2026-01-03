@@ -50,6 +50,7 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
         PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_SILENCE);
         PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_SILENCE_SEE);
         PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_SUPPORT_STAFF);
+        PermissionGroup.TRAINEE._permissions.add(PERM.BYPASS_SILENCE);
 
         PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_BROADCAST);
 
@@ -99,7 +100,7 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
                 //noinspection deprecation
                 player.sendTitle(C.cYellow + "Announcement", announcementMessage);
                 player.sendMessage(F.fMain("Announcement", C.cAqua + announcementMessage));
-                player.playSound(player.getLocation(), Sound.NOTE_PLING, Integer.MAX_VALUE, 2);
+                player.playSound(player.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
             });
         });
 
@@ -144,7 +145,7 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
                         player.sendMessage(C.cPurple + messageData._serverName() + " " +
                                 F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(senderPermissionGroups)) + " " +
                                 senderName + C.cPurple + " " + messageData._message());
-                        player.playSound(player.getLocation(), Sound.NOTE_PLING, Integer.MAX_VALUE, 2);
+                        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
                     });
         });
     }
@@ -158,15 +159,10 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
         return _chatMuted;
     }
 
-    public void setMuted(boolean toggle, boolean... sendDefaultMessage) {
+    public void setMuted(boolean toggle) {
         _chatMuted = toggle;
-        if (sendDefaultMessage.length > 0 && sendDefaultMessage[0]) {
-            if (_chatMuted) {
-                _hexusPlugin.getServer().broadcastMessage(F.fMain(this, F.fError("The chat is now muted.")));
-            } else {
-                _hexusPlugin.getServer().broadcastMessage(F.fMain(this, F.fSuccess("The chat is no longer muted.")));
-            }
-        }
+        _hexusPlugin.getServer().broadcastMessage(F.fMain(this,
+                toggle ? F.fError("The chat is now silenced.") : F.fSuccess("The chat is no longer silenced.")));
     }
 
     @EventHandler
@@ -180,9 +176,10 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
             event.setFormat(F.fChat(0));
         }
 
-        if (!_chatMuted) return;
-        event.setCancelled(true);
-        player.sendMessage(F.fMain(this, F.fError("The chat is currently muted.")));
+        if (_chatMuted && !player.hasPermission(PERM.BYPASS_SILENCE.name())) {
+            event.setCancelled(true);
+            player.sendMessage(F.fMain(this, F.fError("The chat is currently silenced.")));
+        }
     }
 
     @EventHandler
@@ -193,7 +190,9 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
     public enum PERM implements IPermission {
         COMMAND_ANNOUNCEMENT, COMMAND_BROADCAST, COMMAND_HELP, COMMAND_SILENCE, COMMAND_SILENCE_SEE, COMMAND_SUPPORT, COMMAND_SUPPORT_STAFF,
 
-        CHAT_PREFIX
+        CHAT_PREFIX,
+
+        BYPASS_SILENCE
     }
 
 }
