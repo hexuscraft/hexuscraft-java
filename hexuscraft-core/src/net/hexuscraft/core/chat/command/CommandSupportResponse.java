@@ -52,7 +52,7 @@ public final class CommandSupportResponse extends BaseCommand<MiniPluginChat> {
                             sourceStr + C.fReset + C.cPurple + " -> " + C.fReset + targetStr + C.fReset + " " +
                                     C.cPurple + String.join(" ", Arrays.stream(args).toList().subList(1, args.length)));
                     if (player.equals(target)) {
-                        player.playSound(player.getLocation(), Sound.NOTE_PLING, Integer.MAX_VALUE, 2);
+                        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
                     }
                 }
             }
