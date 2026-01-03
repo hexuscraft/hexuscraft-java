@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>net.hexuscraft</groupId>
-            <artifactId>hexuscraft-database</artifactId>
+            <artifactId>hexuscraft-common</artifactId>
         </dependency>
     </dependencies>
 
