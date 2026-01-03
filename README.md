@@ -71,7 +71,7 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > | worldEdit          | **Boolean**                             |
 > | timeoutMillis      | **Integer**                             |
 > | games              | **String** (Game Enums split by commas) |
-> | hostUUID           | **String** (Player UUID)                |
+> | hostUniqueId           | **String** (Player UUID)                |
 
 ### Servers
 
