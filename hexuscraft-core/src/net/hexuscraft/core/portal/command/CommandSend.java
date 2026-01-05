@@ -32,7 +32,7 @@ public final class CommandSend extends BaseCommand<MiniPluginPortal> {
         final OfflinePlayer targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(targetName, sender);
         if (targetOfflinePlayer == null) return;
 
-        if (_miniPlugin.getServerDataFromName(serverName) == null) {
+        if (_miniPlugin.getServer(serverName) == null) {
             sender.sendMessage(F.fMain(this, F.fError("Could not locate server with name ", F.fItem(serverName), ".")));
             return;
         }

@@ -1,9 +1,9 @@
 package net.hexuscraft.hub.player;
 
 import net.hexuscraft.common.IPermission;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
-import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.UtilCooldown;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
@@ -32,6 +32,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +51,7 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
     }
 
     @Override
-    public void onLoad(
-            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
         _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
         _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
@@ -61,10 +61,7 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
     @Override
     public void onEnable() {
         _pluginCommand.register(new CommandSpawn(this));
-        _actionTextTask = _hexusPlugin.getServer().getScheduler().runTaskTimer(_hexusPlugin,
-                () -> _hexusPlugin.getServer().getOnlinePlayers().forEach(
-                        player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET")), 0,
-                40);
+        _actionTextTask = _hexusPlugin.getServer().getScheduler().runTaskTimer(_hexusPlugin, () -> _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> PlayerTabInfo.sendActionText(player, C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET")), 0, 40);
     }
 
     @Override
@@ -99,9 +96,7 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
         PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_miniPluginPortal._serverName), " ");
 
         player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
-        player.setPlayerListName(F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(
-                _miniPluginPermission._permissionProfiles.get(player)._groups()), true, true) + C.fReset + " " +
-                player.getDisplayName());
+        player.setPlayerListName(F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(_miniPluginPermission._permissionProfiles.get(player)._groups()), true, true) + C.fReset + " " + player.getDisplayName());
     }
 
     @EventHandler
@@ -112,16 +107,11 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
     private void refreshInventory(Player player) {
         final PlayerInventory inventory = player.getInventory();
 
-        final ItemStack gameCompass =
-                UtilItem.createItem(Material.COMPASS, C.cGreen + C.fBold + "Game Menu", "Click to open the Game Menu");
-        final ItemStack profileSkull = UtilItem.createItemSkull(player.getName(), C.cGreen + C.fBold + player.getName(),
-                "Click to open the Profile Menu");
-        final ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST, C.cGreen + C.fBold + "Cosmetics Menu",
-                "Click to open the Cosmetics Menu");
-        final ItemStack shopEmerald =
-                UtilItem.createItem(Material.EMERALD, C.cGreen + C.fBold + "Shop Menu", "Click to open the Shop Menu");
-        final ItemStack lobbyClock =
-                UtilItem.createItem(Material.WATCH, C.cGreen + C.fBold + "Lobby Menu", "Click to open the Lobby Menu");
+        final ItemStack gameCompass = UtilItem.createItem(Material.COMPASS, C.cGreen + C.fBold + "Game Menu", "Click to open the Game Menu");
+        final ItemStack profileSkull = UtilItem.createItemSkull(player.getName(), C.cGreen + C.fBold + player.getName(), "Click to open the Profile Menu");
+        final ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST, C.cGreen + C.fBold + "Cosmetics Menu", "Click to open the Cosmetics Menu");
+        final ItemStack shopEmerald = UtilItem.createItem(Material.EMERALD, C.cGreen + C.fBold + "Shop Menu", "Click to open the Shop Menu");
+        final ItemStack lobbyClock = UtilItem.createItem(Material.WATCH, C.cGreen + C.fBold + "Lobby Menu", "Click to open the Lobby Menu");
 
         inventory.clear();
         inventory.setItem(0, gameCompass);
@@ -183,17 +173,11 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
             if (currentItem.hasItemMeta()) {
                 final ItemMeta currentItemMeta = currentItem.getItemMeta();
                 if (currentItemMeta.hasDisplayName()) {
+                    if (!UtilCooldown.use(player, "Lobby Server Teleport", 1000L)) return;
+
                     final String targetServerName = ChatColor.stripColor(currentItemMeta.getDisplayName());
-
-                    if (!_miniPluginPortal._serverName.equals(targetServerName)) {
-                        if (!UtilCooldown.use(player, "Lobby Server Teleport", 1000L)) return;
-                        _miniPluginPortal.teleport(player, targetServerName);
-                        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-                        return;
-                    }
-
-                    player.sendMessage(
-                            F.fMain(this, F.fError("You are already connected to ", F.fItem(targetServerName), ".")));
+                    _miniPluginPortal.teleport(player, targetServerName);
+                    player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
                 }
             }
         }
@@ -227,24 +211,22 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
 
         final Inventory lobbyMenu = server.createInventory(player, 54, "Lobby Menu");
 
-        _miniPluginPortal._serverCache.stream().limit(54).filter(serverData -> !serverData._updatedByMonitor)
-                .filter(serverData -> serverData._group.equals("Lobby"))
-                .forEach(serverData -> {
-                    final int lobbyId = Integer.parseInt(serverData._name.split("-")[1]);
-                    final boolean isCurrentServer = serverData._name.equals(_miniPluginPortal._serverName);
+        Arrays.stream(_miniPluginPortal.getServers("Lobby")).limit(54).forEach(serverData -> {
+            final int lobbyId = Integer.parseInt(serverData._name.split(serverData._group + "-")[1]);
+            if (lobbyId > 54) return;
 
-                    final ItemStack serverItem =
-                            new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
-                    serverItem.setAmount(lobbyId);
+            final boolean isCurrentServer = serverData._name.equals(_miniPluginPortal._serverName);
 
-                    final ItemMeta serverItemMeta = serverItem.getItemMeta();
-                    serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby-" + lobbyId);
-                    serverItemMeta.setLore(List.of(C.cGray + (isCurrentServer ? "You are here" : "Click to join"), "",
-                            F.fItem(serverData._players + "/" + serverData._capacity + " Players")));
+            final ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
+            serverItem.setAmount(lobbyId);
 
-                    serverItem.setItemMeta(serverItemMeta);
-                    lobbyMenu.setItem(lobbyId - 1, serverItem);
-                });
+            final ItemMeta serverItemMeta = serverItem.getItemMeta();
+            serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby-" + lobbyId);
+            serverItemMeta.setLore(List.of(C.cGray + (isCurrentServer ? "You are here" : "Click to join"), "", F.fItem(serverData._players + "/" + serverData._capacity + " Players")));
+
+            serverItem.setItemMeta(serverItemMeta);
+            lobbyMenu.setItem(lobbyId - 1, serverItem);
+        });
         player.openInventory(lobbyMenu);
         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }

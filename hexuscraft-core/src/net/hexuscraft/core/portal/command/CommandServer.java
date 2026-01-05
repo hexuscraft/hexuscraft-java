@@ -1,16 +1,14 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.common.utils.F;
-import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.database.data.ServerData;
-import net.hexuscraft.common.database.data.ServerGroupData;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.portal.MiniPluginPortal;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import redis.clients.jedis.UnifiedJedis;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -19,8 +17,7 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
     private final MiniPluginDatabase _miniPluginDatabase;
 
     public CommandServer(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal, "server", "[Name]", "View your current server or teleport to a server.",
-                Set.of("sv", "portal"), MiniPluginPortal.PERM.COMMAND_SERVER);
+        super(miniPluginPortal, "server", "[Name]", "View your current server or teleport to a server.", Set.of("sv", "portal"), MiniPluginPortal.PERM.COMMAND_SERVER);
         _miniPluginDatabase = miniPluginDatabase;
     }
 
@@ -33,36 +30,9 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
             }
             final String serverName = args[0];
 
-            if (_miniPlugin._serverName.equals(serverName)) {
-                sender.sendMessage(F.fMain(this,
-                        F.fError("You are already connected to ", F.fItem(_miniPlugin._serverName), ".")));
-                return;
-            }
-
-            final UnifiedJedis jedis = _miniPluginDatabase.getUnifiedJedis();
-
-            final ServerData serverData = _miniPlugin.getServerDataFromName(serverName);
+            final ServerData serverData = _miniPlugin.getServer(serverName);
             if (serverData == null) {
-                sender.sendMessage(
-                        F.fMain(this) + F.fError("Could not locate server with name ", F.fItem(serverName), "."));
-                return;
-            }
-            if (serverData._updatedByMonitor) {
-                sender.sendMessage(F.fMain(this, F.fError("We found a server with name ", F.fItem(serverName),
-                        " but it has not finished starting yet. Perhaps try again in a few moments?")));
-                return;
-            }
-
-            final ServerGroupData serverGroupData = ServerQueries.getServerGroup(jedis, serverData._group);
-            if (serverGroupData == null) {
-                sender.sendMessage(F.fMain(this) +
-                        F.fError("Could not locate servergroup with name ", F.fItem(serverData._group)));
-                return;
-            }
-
-            if (serverGroupData._requiredPermission != null && !serverGroupData._requiredPermission.isEmpty() &&
-                    !sender.hasPermission(serverGroupData._requiredPermission)) {
-                sender.sendMessage(F.fInsufficientPermissions());
+                sender.sendMessage(F.fMain(this) + F.fError("Could not locate server with name ", F.fItem(serverName), "."));
                 return;
             }
 
@@ -78,7 +48,8 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length == 1) return _miniPlugin._serverCache.stream().map(serverData -> serverData._name).toList();
+        if (args.length == 1)
+            return Arrays.stream(_miniPlugin.getServers()).map(serverData -> serverData._name).toList();
         return List.of();
     }
 }

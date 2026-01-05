@@ -4,15 +4,15 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.utils.F;
-import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.database.data.ServerData;
 import net.hexuscraft.common.database.data.ServerGroupData;
-import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.database.messages.PortalRestartServerGroupMessage;
 import net.hexuscraft.common.database.messages.PortalRestartServerMessage;
 import net.hexuscraft.common.database.messages.PortalTeleportMessage;
 import net.hexuscraft.common.database.messages.PortalTeleportOtherMessage;
+import net.hexuscraft.common.database.queries.ServerQueries;
+import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
@@ -52,11 +52,11 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
     public final long _createdMillis;
     public final String _serverName;
     public final String _serverGroupName;
-    public final Set<ServerGroupData> _serverGroupCache;
-    public final Set<ServerData> _serverCache;
 
     private final Messenger _messenger;
     private final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
+    private final Set<ServerGroupData> _serverGroupCache;
+    private final Set<ServerData> _serverCache;
     private MiniPluginCommand _miniPluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
     private BukkitTask _updateServerDataTask;
@@ -221,6 +221,11 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
     }
 
     public void teleport(final Player player, final String serverName) {
+        if (serverName.equals(_serverName)) {
+            player.sendMessage(F.fMain(this, F.fError("You are already connected to ", F.fItem(serverName), ".")));
+            return;
+        }
+
         player.sendMessage(F.fMain(this, "You were sent from ", F.fItem(_serverName), " to ", F.fItem(serverName), "."));
 
         // TODO: Change from bungeecord channels to redis channels. Implement behaviour on proxy.
@@ -249,16 +254,32 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
         teleport(player, availableServers[new Random().nextInt(availableServers.length)]._name);
     }
 
-    public ServerData getServerDataFromName(final String serverName) {
-        return _serverCache.stream().filter(serverData -> serverData._name.equals(serverName)).findAny().orElse(null);
+    public ServerData[] getServers() {
+        return _serverCache.stream().filter(serverData -> !serverData._updatedByMonitor).toArray(ServerData[]::new);
     }
 
-    public ServerGroupData getServerGroupDataFromName(final String serverGroupName) {
-        return _serverGroupCache.stream().filter(serverGroupData -> serverGroupData._name.equals(serverGroupName)).findAny().orElse(null);
+    public ServerData[] getServers(final String serverGroupName) {
+        return Arrays.stream(getServers()).filter(serverData -> serverData._group.equals(serverGroupName)).toArray(ServerData[]::new);
     }
 
     public String[] getServerNames() {
-        return _serverCache.stream().map(serverData -> serverData._name).sorted(Comparator.comparing(String::toLowerCase)).toArray(String[]::new);
+        return Arrays.stream(getServers()).map(serverData -> serverData._name).toArray(String[]::new);
+    }
+
+    public String[] getServerNames(final String serverGroupName) {
+        return Arrays.stream(getServers(serverGroupName)).map(serverData -> serverData._name).toArray(String[]::new);
+    }
+
+    public ServerData getServer(final String serverName) {
+        return Arrays.stream(getServers()).filter(serverData -> serverData._name.equals(serverName)).findAny().orElse(null);
+    }
+
+    public ServerGroupData[] getServerGroups() {
+        return _serverGroupCache.toArray(ServerGroupData[]::new);
+    }
+
+    public ServerGroupData getServerGroup(final String serverGroupName) {
+        return Arrays.stream(getServerGroups()).filter(serverGroupData -> serverGroupData._name.equals(serverGroupName)).findAny().orElse(null);
     }
 
     public String[] getServerGroupNames() {

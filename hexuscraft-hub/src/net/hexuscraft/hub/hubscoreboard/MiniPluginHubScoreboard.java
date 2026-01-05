@@ -1,7 +1,7 @@
 package net.hexuscraft.hub.hubscoreboard;
 
-import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.C;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.permission.MiniPluginPermission;
@@ -17,10 +17,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class MiniPluginHubScoreboard extends MiniPlugin<Hub> {
 
@@ -35,16 +32,14 @@ public final class MiniPluginHubScoreboard extends MiniPlugin<Hub> {
     }
 
     @Override
-    public void onLoad(
-            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
         _miniPluginPermission = (MiniPluginPermission) dependencies.get(MiniPluginPermission.class);
     }
 
     @Override
     public void onEnable() {
-        _hexusPlugin.getServer().getOnlinePlayers().stream().map(player -> new PlayerJoinEvent(player, null))
-                .forEach(this::onPlayerJoin);
+        _hexusPlugin.getServer().getOnlinePlayers().stream().map(player -> new PlayerJoinEvent(player, null)).forEach(this::onPlayerJoin);
     }
 
     @Override
@@ -86,14 +81,7 @@ public final class MiniPluginHubScoreboard extends MiniPlugin<Hub> {
     }
 
     private String[] generateSidebarLines(final Player player) {
-        return new String[]{
-                C.cAqua + C.fBold + "Server", _miniPluginPortal._serverName, "",
-                C.cGreen + C.fBold + "Players",
-                "" + _miniPluginPortal._serverCache.stream().mapToInt(s -> s._players).sum(), "",
-                C.cYellow + C.fBold + "Coins", "0", "",
-                C.cGold + C.fBold + "Rank", PermissionGroup.getGroupWithHighestWeight(
-                _miniPluginPermission._permissionProfiles.get(player)._groups())._prefix, "",
-                C.cRed + C.fBold + "Website", "www.hexuscraft.net"};
+        return new String[]{C.cAqua + C.fBold + "Server", _miniPluginPortal._serverName, "", C.cGreen + C.fBold + "Players", "" + Arrays.stream(_miniPluginPortal.getServers()).mapToInt(s -> s._players).sum(), "", C.cYellow + C.fBold + "Coins", "0", "", C.cGold + C.fBold + "Rank", PermissionGroup.getGroupWithHighestWeight(_miniPluginPermission._permissionProfiles.get(player)._groups())._prefix, "", C.cRed + C.fBold + "Website", "www.hexuscraft.net"};
     }
 
 }

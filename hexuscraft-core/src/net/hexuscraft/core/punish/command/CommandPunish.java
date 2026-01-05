@@ -23,8 +23,7 @@ import java.util.stream.Stream;
 public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
 
     public CommandPunish(MiniPluginPunish miniPluginPunish) {
-        super(miniPluginPunish, "punishment", "<Player> <Reason>", "Open the punishment panel.", Set.of("punish", "x"),
-                MiniPluginPunish.PERM.COMMAND_PUNISH);
+        super(miniPluginPunish, "punishment", "<Player> <Reason>", "Open the punishment panel.", Set.of("punish", "x"), MiniPluginPunish.PERM.COMMAND_PUNISH);
     }
 
     @Override
@@ -33,20 +32,22 @@ public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
             sender.sendMessage(help(alias));
             return;
         }
+
         if (!(sender instanceof final Player player)) {
             sender.sendMessage(F.fMain(this) + "Only players can run this command.");
             return;
         }
 
-        // TODO: Async-ify
-        final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
-        if (offlinePlayer == null) {
-            sender.sendMessage(F.fMatches(new String[]{}, args[0]));
-            return;
-        }
+        _miniPlugin._hexusPlugin.runAsync(() -> {
+            final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+            if (offlinePlayer == null) {
+                sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+                return;
+            }
 
-        final String reasonMessage = String.join(" ", Arrays.stream(args).toList().subList(1, args.length));
-        openGui(player, offlinePlayer, reasonMessage);
+            final String reasonMessage = String.join(" ", Arrays.asList(args).subList(1, args.length));
+            openGui(player, offlinePlayer, reasonMessage);
+        });
     }
 
     @Override
@@ -54,8 +55,7 @@ public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
         final List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers =
-                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
             if (sender instanceof final Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }
@@ -66,49 +66,31 @@ public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
     }
 
     public void openGui(final Player staffPlayer, final OfflinePlayer targetOfflinePlayer, final String reasonMessage) {
-        Inventory gui = _miniPlugin._hexusPlugin.getServer()
-                .createInventory(staffPlayer, 6 * 9, "Punish - " + targetOfflinePlayer.getName());
+        Inventory gui = _miniPlugin._hexusPlugin.getServer().createInventory(staffPlayer, 6 * 9, "Punish - " + targetOfflinePlayer.getName());
 
-        ItemStack targetSkull = UtilItem.createItemSkull(targetOfflinePlayer.getName(),
-                C.cGreen + C.fBold + targetOfflinePlayer.getName(), targetOfflinePlayer.getUniqueId().toString(), "",
-                C.cWhite + reasonMessage);
+        ItemStack targetSkull = UtilItem.createItemSkull(targetOfflinePlayer.getName(), C.cGreen + C.fBold + targetOfflinePlayer.getName(), targetOfflinePlayer.getUniqueId().toString(), "", C.cWhite + reasonMessage);
 
-        ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Punishment History",
-                "View the punishment history of " + F.fItem(targetOfflinePlayer.getName()));
+        ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Punishment History", "View the punishment history of " + F.fItem(targetOfflinePlayer.getName()));
 
         ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
-        ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "1 Day Mute", "Severity 1",
-                "Light chat offense", "", "Refer to guidelines for details");
-        ItemStack chat2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cYellow + C.fBold + "3 Days Mute", "Severity 2",
-                "Moderate chat offense", "", "Refer to guidelines for details");
-        ItemStack chat3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "5 Days Mute", "Severity 3",
-                "Heavy chat offense", "", "Refer to guidelines for details");
+        ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "1 Day Mute", "Severity 1", "Light chat offense", "", "Refer to guidelines for details");
+        ItemStack chat2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cYellow + C.fBold + "3 Days Mute", "Severity 2", "Moderate chat offense", "", "Refer to guidelines for details");
+        ItemStack chat3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "5 Days Mute", "Severity 3", "Heavy chat offense", "", "Refer to guidelines for details");
 
         ItemStack gameplayHeader = UtilItem.createItem(Material.IRON_BLOCK, C.cBlue + C.fBold + "Gameplay Offenses");
-        ItemStack gameplay1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "1 Day Ban", "Severity 1",
-                "Light gameplay offense", "", "Refer to guidelines for details");
-        ItemStack gameplay2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cYellow + C.fBold + "3 Days Ban", "Severity 2",
-                "Moderate gameplay offense", "", "Refer to guidelines for details");
-        ItemStack gameplay3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "5 Days Ban", "Severity 3",
-                "Heavy gameplay offense", "", "Refer to guidelines for details");
+        ItemStack gameplay1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "1 Day Ban", "Severity 1", "Light gameplay offense", "", "Refer to guidelines for details");
+        ItemStack gameplay2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cYellow + C.fBold + "3 Days Ban", "Severity 2", "Moderate gameplay offense", "", "Refer to guidelines for details");
+        ItemStack gameplay3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "5 Days Ban", "Severity 3", "Heavy gameplay offense", "", "Refer to guidelines for details");
 
         ItemStack clientHeader = UtilItem.createItem(Material.IRON_SWORD, C.cBlue + C.fBold + "Client Offenses");
-        ItemStack client1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "7 Days Ban", "Severity 1",
-                "Light client offense", "", "Refer to guidelines for details");
-        ItemStack client2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cYellow + C.fBold + "14 Days Ban", "Severity 2",
-                "Moderate client offense", "", "Refer to guidelines for details");
-        ItemStack client3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "30 Days Ban", "Severity 3",
-                "Heavy client offense", "", "Refer to guidelines for details");
+        ItemStack client1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "7 Days Ban", "Severity 1", "Light client offense", "", "Refer to guidelines for details");
+        ItemStack client2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cYellow + C.fBold + "14 Days Ban", "Severity 2", "Moderate client offense", "", "Refer to guidelines for details");
+        ItemStack client3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "30 Days Ban", "Severity 3", "Heavy client offense", "", "Refer to guidelines for details");
 
         ItemStack miscHeader = UtilItem.createItem(Material.LEVER, C.cBlue + C.fBold + "Miscellaneous");
-        ItemStack miscWarn =
-                UtilItem.createItem(Material.PAPER, C.cGreen + C.fBold + "Warning", "Severity 1", "A friendly waring",
-                        "", "Refer to guidelines for details");
-        ItemStack miscMute = UtilItem.createItem(Material.BOOK, C.cRed + C.fBold + "Permanent Mute", "Severity 4",
-                "Severe chat offense", "", "Refer to guidelines for details");
-        ItemStack miscBan =
-                UtilItem.createItem(Material.REDSTONE_BLOCK, C.cRed + C.fBold + "Permanent Ban", "Severity 4",
-                        "Severe gameplay/client offense", "", "Refer to guidelines for details");
+        ItemStack miscWarn = UtilItem.createItem(Material.PAPER, C.cGreen + C.fBold + "Warning", "Severity 1", "A friendly waring", "", "Refer to guidelines for details");
+        ItemStack miscMute = UtilItem.createItem(Material.BOOK, C.cRed + C.fBold + "Permanent Mute", "Severity 4", "Severe chat offense", "", "Refer to guidelines for details");
+        ItemStack miscBan = UtilItem.createItem(Material.REDSTONE_BLOCK, C.cRed + C.fBold + "Permanent Ban", "Severity 4", "Severe gameplay/client offense", "", "Refer to guidelines for details");
 
         gui.setItem(4, targetSkull);
 
