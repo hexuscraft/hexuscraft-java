@@ -15,6 +15,7 @@ import net.hexuscraft.core.portal.MiniPluginPortal;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.exceptions.JedisException;
 
 import java.time.Duration;
@@ -27,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class MiniPluginHost extends MiniPlugin<Arcade> {
 
     private final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5).toMillis();
-
+    private final AtomicReference<BukkitTask> _hostAbandonedTask;
     public AtomicReference<UUID> _hostUniqueId;
     private MiniPluginCommand _miniPluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
@@ -39,6 +40,7 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_SET_HOST);
         _hostUniqueId = new AtomicReference<>(UtilUniqueId.EMPTY_UUID);
+        _hostAbandonedTask = new AtomicReference<>();
     }
 
     @Override
@@ -70,7 +72,7 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
             }, 60L);
         });
 
-        _hexusPlugin.runSyncTimer(() -> {
+        _hostAbandonedTask.set(_hexusPlugin.runSyncTimer(() -> {
             // We want to run the host check even if the server was started with no host, as an admin can become the host of any existing server.
             if (_hostUniqueId.get().equals(UtilUniqueId.EMPTY_UUID)) return;
 
@@ -79,12 +81,14 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
             if (isHostOnline) return;
             if ((System.currentTimeMillis() - _hostLastSeenMillis.get()) < MAX_HOST_LAST_SEEN_MILLIS) return;
 
+            _hostAbandonedTask.get().cancel();
             _hexusPlugin.getServer()
-                    .broadcastMessage(F.fMain(this, "The host has abandoned this server. Thanks for playing!"));
+                    .broadcastMessage(F.fMain(this,
+                            "The host has abandoned this server. You will be sent back to a lobby. Thanks for playing!"));
             _hexusPlugin.getServer().getOnlinePlayers().forEach(
                     player -> player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, Float.MAX_VALUE, 1));
-            _miniPluginDatabase.getUnifiedJedis().srem(ServerQueries.SERVERGROUP(_miniPluginPortal._serverGroupName));
-        }, 0, 20L);
+            _miniPluginDatabase.getUnifiedJedis().del(ServerQueries.SERVERGROUP(_miniPluginPortal._serverGroupName));
+        }, 0, 20L));
     }
 
     @EventHandler
