@@ -1,4 +1,4 @@
-package net.hexuscraft.common.database.serverdata;
+package net.hexuscraft.common.enums;
 
 public enum ServerGroupType {
     DEDICATED,

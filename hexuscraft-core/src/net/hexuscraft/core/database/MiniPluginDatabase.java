@@ -63,7 +63,6 @@ public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
         return _database._unifiedJedis;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public void registerConsumer(final String pattern, final PubSubConsumer consumer) {
         final Map<PubSubConsumer, JedisPubSub> consumerMap;
         if (_consumers.containsKey(pattern)) consumerMap = _consumers.get(pattern);
@@ -93,7 +92,6 @@ public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
         _hexusPlugin.runAsync(() -> getUnifiedJedis().psubscribe(jedisPubSub, pattern));
     }
 
-    @SuppressWarnings("unused")
     public void unregisterConsumer(final PubSubConsumer consumer) {
         _consumers.forEach((pattern, consumerMap) -> {
             consumerMap.remove(consumer);

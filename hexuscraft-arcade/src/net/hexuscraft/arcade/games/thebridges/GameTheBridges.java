@@ -4,7 +4,6 @@ import net.hexuscraft.arcade.game.Game;
 import net.hexuscraft.arcade.game.GameTeam;
 import org.bukkit.Color;
 
-@SuppressWarnings("unused")
 public final class GameTheBridges extends Game {
 
     private GameTheBridges() {

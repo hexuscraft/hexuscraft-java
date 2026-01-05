@@ -9,10 +9,10 @@ import java.util.Set;
 public final class CommandNetworkServer extends BaseMultiCommand<MiniPluginPortal> {
 
     public CommandNetworkServer(final MiniPluginPortal miniPluginPortal,
-                                @SuppressWarnings("unused") final MiniPluginDatabase miniPluginDatabase) {
+                                final MiniPluginDatabase miniPluginDatabase) {
         super(miniPluginPortal, "server", "Manage servers.", Set.of("s"), MiniPluginPortal.PERM.COMMAND_NETWORK_SERVER,
                 Set.of(new CommandNetworkServerRestart(miniPluginPortal),
-                        new CommandNetworkServerList(miniPluginPortal, miniPluginDatabase)));
+                        new CommandNetworkServerList(miniPluginPortal)));
     }
 
 }

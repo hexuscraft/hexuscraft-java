@@ -1,7 +1,7 @@
 package net.hexuscraft.core.anticheat;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.enums.CheatSeverity;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.enums.PunishType;
@@ -110,7 +110,7 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
     }
 
     public void kick(final Player player, final String reason) {
-        _miniPluginPunish.punish(player.getUniqueId(), null, PunishType.KICK, 0, reason);
+        _miniPluginPunish.punishAsync(player.getUniqueId(), null, PunishType.KICK, 0, reason);
     }
 
     public void flag(final Player player, final String reason, final CheatSeverity severity) {

@@ -1,7 +1,7 @@
 package net.hexuscraft.common.enums;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.chat.C;
+import net.hexuscraft.common.utils.C;
 
 import java.util.ArrayList;
 import java.util.Arrays;

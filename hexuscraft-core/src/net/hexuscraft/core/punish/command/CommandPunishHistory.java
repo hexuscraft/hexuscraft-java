@@ -1,7 +1,7 @@
 package net.hexuscraft.core.punish.command;
 
-import net.hexuscraft.common.chat.C;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.C;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.item.UtilItem;
@@ -43,16 +43,11 @@ public final class CommandPunishHistory extends BaseCommand<MiniPluginPunish> {
 
             if (args.length == 1) {
                 targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
-                if (targetOfflinePlayer == null) {
-                    sender.sendMessage(F.fMatches(new String[]{}, args[0]));
-                    return;
-                }
+                if (targetOfflinePlayer == null) return;
             } else {
                 targetOfflinePlayer = senderPlayer;
             }
 
-            sender.sendMessage(
-                    F.fMain(this) + "Viewing punishment history of " + F.fItem(targetOfflinePlayer.getName()) + ".");
             openGui(senderPlayer, targetOfflinePlayer);
         });
     }

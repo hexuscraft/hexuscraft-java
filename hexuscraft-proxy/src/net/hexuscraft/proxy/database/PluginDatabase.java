@@ -82,7 +82,6 @@ public final class PluginDatabase {
         return _database._unifiedJedis;
     }
 
-    @SuppressWarnings({"UnusedReturnValue", "unused"})
     public UUID registerCallback(String channelName, MessagedRunnable callback) {
         UUID id = UUID.randomUUID();
         if (!_callbacks.containsKey(channelName)) {
@@ -92,7 +91,6 @@ public final class PluginDatabase {
         return id;
     }
 
-    @SuppressWarnings("unused")
     public void unregisterCallback(UUID id) {
         _callbacks.forEach((s, uuidRunnableMap) -> {
             if (!uuidRunnableMap.containsKey(id)) return;

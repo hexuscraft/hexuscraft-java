@@ -1,8 +1,8 @@
 package net.hexuscraft.core.player;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-public record MojangSession(UUID _uuid, String _name, HashMap<String, String> _properties) {
+public record MojangSession(UUID _uuid, String _name, Map<String, String> _properties) {
 
 }

@@ -1,16 +1,17 @@
 package net.hexuscraft.core.npc.command;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.npc.MiniPluginNpc;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Set;
 
 public final class CommandNpcPurge extends BaseCommand<MiniPluginNpc> {
 
     CommandNpcPurge(final MiniPluginNpc miniPluginNpc) {
-        super(miniPluginNpc, "purge", "", "Temporarily purge all NPCs.", Set.of("kill", "p"),
+        super(miniPluginNpc, "purge", "", "Temporarily purge all NPCs.", Set.of("p", "kill", "k", "destroy", "d"),
                 MiniPluginNpc.PERM.COMMAND_ENTITY_PURGE);
     }
 
@@ -21,9 +22,13 @@ public final class CommandNpcPurge extends BaseCommand<MiniPluginNpc> {
             return;
         }
 
-        int amount = _miniPlugin.purge();
+        if (!(sender instanceof final Player player)) {
+            sender.sendMessage(F.fMain(this, F.fError("Only players can purge NPCs in their current world.")));
+            return;
+        }
 
-        sender.sendMessage(F.fMain(this) + "Temporarily purged " + F.fItem(amount + " NPCs") + ".");
+        _miniPlugin.removeNPCs(player.getWorld());
+        sender.sendMessage(F.fMain(this, "Purged all NPCs in your world."));
     }
 
 }

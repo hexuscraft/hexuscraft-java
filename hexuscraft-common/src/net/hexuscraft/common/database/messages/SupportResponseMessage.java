@@ -1,4 +1,4 @@
-package net.hexuscraft.common.messages;
+package net.hexuscraft.common.database.messages;
 
 import org.json.JSONObject;
 

@@ -1,7 +1,7 @@
 package net.hexuscraft.build.parse.command;
 
 import net.hexuscraft.build.parse.MiniPluginParse;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;

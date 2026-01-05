@@ -1,6 +1,6 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
@@ -35,7 +35,9 @@ public final class CommandNetworkGroupDelete extends BaseCommand<MiniPluginPorta
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        return Arrays.stream(ServerQueries.getServerGroups(_miniPluginDatabase.getUnifiedJedis()))
-                .map(serverGroupData -> serverGroupData._name).toList();
+        if (args.length == 1)
+            return Arrays.asList(_miniPlugin.getServerGroupNames());
+        return List.of();
     }
+
 }

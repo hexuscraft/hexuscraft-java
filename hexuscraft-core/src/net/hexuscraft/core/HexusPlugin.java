@@ -149,17 +149,14 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         return getName();
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public BukkitTask runSync(final Runnable runnable) {
         return _scheduler.runTask(this, runnable);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public BukkitTask runSyncLater(final Runnable runnable, final long delayTicks) {
         return _scheduler.runTaskLater(this, runnable, delayTicks);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public BukkitTask runSyncTimer(final Runnable runnable, final long initialDelayTicks, final long repeatEveryTicks) {
         return _scheduler.runTaskTimer(this, runnable, initialDelayTicks, repeatEveryTicks);
     }
@@ -168,7 +165,6 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         return _scheduler.runTaskAsynchronously(this, runnable);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public BukkitTask runAsyncLater(final Runnable runnable, final long delayTicks) {
         return _scheduler.runTaskLaterAsynchronously(this, runnable, delayTicks);
     }

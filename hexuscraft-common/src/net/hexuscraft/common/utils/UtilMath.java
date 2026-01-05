@@ -15,7 +15,6 @@ public final class UtilMath {
         return trim(n, degree, RoundingMode.FLOOR);
     }
 
-    @SuppressWarnings("unused")
     public static double trim(final double n, final RoundingMode mode) {
         return trim(n, 1, mode);
     }

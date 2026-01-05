@@ -1,6 +1,6 @@
 package net.hexuscraft.core.cooldown;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilCooldown;
 import org.bukkit.command.CommandSender;
 

@@ -1,9 +1,8 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.common.chat.F;
-import net.hexuscraft.common.database.queries.ServerQueries;
-import net.hexuscraft.common.database.serverdata.ServerData;
-import net.hexuscraft.common.database.serverdata.ServerGroupData;
+import net.hexuscraft.common.utils.F;
+import net.hexuscraft.common.database.data.ServerData;
+import net.hexuscraft.common.database.data.ServerGroupData;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.command.BaseCommand;
@@ -35,28 +34,29 @@ public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
         }
 
         _miniPlugin._hexusPlugin.runAsync(() -> {
-            final ServerData[] serverData;
-            try {
-                serverData = ServerQueries.getServers(_miniPluginDatabase.getUnifiedJedis(), "EVENT");
-            } catch (final JedisException ex) {
-                sender.sendMessage(F.fMain(this, F.fError(
-                        "JedisException while fetching existing server data. Contact dev-ops or event-lead if this issue persists.")));
-                return;
-            }
-
-            if (serverData.length > 0) {
+            final ServerData[] existingServerDatas =
+                    _miniPlugin._serverCache.stream().filter(serverData -> serverData._group.equals("EVENT"))
+                            .toArray(ServerData[]::new);
+            if (existingServerDatas.length > 0) {
                 if (!(sender instanceof final Player player)) {
                     sender.sendMessage(F.fMain(this, F.fError("Only players can teleport to their private server.")));
                     return;
                 }
 
-                if (serverData[0]._name.equals(_miniPlugin._serverName)) {
+                if (existingServerDatas[0]._name.equals(_miniPlugin._serverName)) {
                     sender.sendMessage(F.fMain(this,
                             F.fError("You are already connected to ", F.fItem(_miniPlugin._serverName), ".")));
                     return;
                 }
 
-                _miniPlugin.teleportAsync(player, serverData[0]._name);
+                if (existingServerDatas[0]._updatedByMonitor) {
+                    sender.sendMessage(F.fMain(this,
+                            F.fError("We found a server with name ", F.fItem(existingServerDatas[0]._name),
+                                    " but it has not finished starting yet. Perhaps try again in a few moments?")));
+                    return;
+                }
+
+                _miniPlugin.teleport(player, existingServerDatas[0]._name);
                 return;
             }
 
@@ -68,11 +68,11 @@ public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
                         _miniPluginDatabase.getUnifiedJedis());
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this, F.fError(
-                        "There was an error creating your server data. Please try again later or contact a staff member if this issue persists.")));
+                        "JedisException while creating server punish. Contact dev-ops if this issue persists.")));
                 return;
             }
-            sender.sendMessage(F.fMain(this, F.fSuccess("Successfully created your server group data."),
-                    " You will be automatically teleported in a few moments."));
+            sender.sendMessage(F.fMain(this, F.fSuccess("Successfully created server group punish."),
+                    " You will be automatically teleported in ~30 seconds."));
         });
     }
 }

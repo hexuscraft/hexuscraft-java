@@ -19,16 +19,15 @@ public final class MiniPluginNews extends MiniPlugin<Hub> {
     }
 
     @Override
-    public void onLoad(final
-                       Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(
+            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _miniPluginBossBar = (MiniPluginBossBar) dependencies.get(MiniPluginBossBar.class);
     }
 
     @EventHandler
     private void onPlayerJoin(final PlayerJoinEvent event) {
-        final BossBar bossBar = _miniPluginBossBar.registerBossBar(event.getPlayer());
-        bossBar._message.set("§6§lTest of the hub news system");
-        bossBar._progress.set(0.5f);
+        final BossBar bossBar = _miniPluginBossBar.registerBossBar(
+                new BossBar(event.getPlayer(), 0, "§6§lTest of the hub news system", 0.5f));
     }
 
 }

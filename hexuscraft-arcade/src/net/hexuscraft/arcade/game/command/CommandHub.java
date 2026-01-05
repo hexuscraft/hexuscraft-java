@@ -1,7 +1,7 @@
 package net.hexuscraft.arcade.game.command;
 
 import net.hexuscraft.arcade.game.MiniPluginGame;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.portal.MiniPluginPortal;
 import org.bukkit.command.CommandSender;

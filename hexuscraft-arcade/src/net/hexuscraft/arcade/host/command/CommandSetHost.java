@@ -1,7 +1,7 @@
 package net.hexuscraft.arcade.host.command;
 
 import net.hexuscraft.arcade.host.MiniPluginHost;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;

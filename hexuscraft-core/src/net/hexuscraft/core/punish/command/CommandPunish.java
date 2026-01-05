@@ -1,7 +1,7 @@
 package net.hexuscraft.core.punish.command;
 
-import net.hexuscraft.common.chat.C;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.C;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.item.UtilItem;
 import net.hexuscraft.core.player.PlayerSearch;

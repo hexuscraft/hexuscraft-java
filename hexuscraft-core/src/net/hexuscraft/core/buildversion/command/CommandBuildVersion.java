@@ -1,6 +1,6 @@
 package net.hexuscraft.core.buildversion.command;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.buildversion.MiniPluginBuildVersion;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.command.CommandSender;

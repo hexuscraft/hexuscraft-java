@@ -1,6 +1,6 @@
 package net.hexuscraft.core.player;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilUniqueId;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -12,18 +12,18 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public final class PlayerSearch {
 
-    public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers,
-                                              final String searchName) {
+    public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers, final String searchName) {
         if (searchName.equals("*") || searchName.equals("**")) return onlinePlayers.toArray(Player[]::new);
 
         final List<Player> matches = new ArrayList<>();
@@ -37,8 +37,7 @@ public final class PlayerSearch {
         return matches.toArray(Player[]::new);
     }
 
-    public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers, final String searchName,
-                                              final CommandSender sender, final Predicate<Player[]> shouldSendMatches) {
+    public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers, final String searchName, final CommandSender sender, final Predicate<Player[]> shouldSendMatches) {
         if (searchName.equals(".") && sender instanceof final Player player) return new Player[]{player};
 
         final List<? extends Player> onlinePlayersList = new ArrayList<>(onlinePlayers);
@@ -46,13 +45,11 @@ public final class PlayerSearch {
 
         final Player[] matches = onlinePlayerSearch(onlinePlayersList, searchName);
         if (shouldSendMatches.test(matches))
-            sender.sendMessage(F.fMain("Online Player Search",
-                    F.fMatches(Arrays.stream(matches).map(Player::getDisplayName).toArray(String[]::new), searchName)));
+            sender.sendMessage(F.fMain("Online Player Search", F.fMatches(Arrays.stream(matches).map(Player::getDisplayName).toArray(String[]::new), searchName)));
         return matches;
     }
 
-    public static List<String> onlinePlayerCompletions(final Collection<? extends Player> onlinePlayers,
-                                                       final CommandSender sender, final boolean showSelectors) {
+    public static List<String> onlinePlayerCompletions(final Collection<? extends Player> onlinePlayers, final CommandSender sender, final boolean showSelectors) {
         final List<String> completions = new ArrayList<>();
         if (sender instanceof final Player player) {
             completions.add(".");
@@ -72,7 +69,10 @@ public final class PlayerSearch {
 
     public static OfflinePlayer offlinePlayerSearch(final String searchName, final CommandSender sender) {
         if (searchName.equals(".") && sender instanceof final Player player) return player;
-        return offlinePlayerSearch(searchName);
+        final OfflinePlayer targetOfflinePlayer = offlinePlayerSearch(searchName);
+        if (targetOfflinePlayer == null)
+            sender.sendMessage(F.fMain("Offline Player Search", F.fMatches(new String[0], searchName)));
+        return targetOfflinePlayer;
     }
 
     public static OfflinePlayer offlinePlayerSearch(final UUID uniqueId) throws IOException {
@@ -82,54 +82,20 @@ public final class PlayerSearch {
         if (offlinePlayer.getName() != null && !offlinePlayer.getName().equals(uniqueId.toString()))
             return offlinePlayer;
 
-        return offlinePlayerSearch(getNameFromUniqueId(uniqueId));
-
+        return offlinePlayerSearch(fetchMojangSession(uniqueId)._name());
     }
 
-    public static String getNameFromUniqueId(final UUID uniqueId)
-            throws UncheckedIOException, IOException {
-        return fetchMojangSession(uniqueId)._name();
+    public static OfflinePlayer offlinePlayerSearch(final UUID uniqueId, final CommandSender sender) throws IOException {
+        final OfflinePlayer targetOfflinePlayer = offlinePlayerSearch(uniqueId);
+        if (targetOfflinePlayer == null)
+            sender.sendMessage(F.fMain("Offline Player Search", F.fMatches(new String[0], uniqueId.toString())));
+        return targetOfflinePlayer;
     }
 
-    public static MojangProfile fetchMojangProfile(final String name) throws IOException, URISyntaxException {
-        final URL url = new URI("https://api.mojang.com/users/profiles/minecraft/" + name).toURL();
-
-        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setInstanceFollowRedirects(false);
-
-        final BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder content = new StringBuilder();
-        String inputLine;
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
-        }
-        in.close();
-
-        final JSONObject jsonObject = new JSONObject(content.toString());
-
-        Bukkit.getLogger().info(connection.getResponseCode() + ":" + connection.getResponseMessage());
-
-        switch (connection.getResponseCode()) {
-            case 200 -> {
-                UUID mojangId = UUID.fromString(addUUIDDashes(jsonObject.getString("id")));
-                String mojangName = jsonObject.getString("name");
-
-                // TODO: Caching
-
-                return new MojangProfile(mojangId, mojangName);
-            }
-            case 404 -> throw new IOException("Could not locate a user with that name.");
-            default -> throw new IOException(jsonObject.getString("errorMessage"));
-        }
-    }
-
-    private static HttpURLConnection getMojangSessionUrlConnection(UUID uuid) throws IOException {
+    public static MojangSession fetchMojangSession(UUID uuid) throws IOException {
         final URL url;
         try {
-            url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" +
-                    uuid.toString().replaceAll("-", "")).toURL();
+            url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replaceAll("-", "")).toURL();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -138,43 +104,17 @@ public final class PlayerSearch {
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setInstanceFollowRedirects(false);
-        return connection;
-    }
 
-    public static MojangSession fetchMojangSession(UUID uuid) throws IOException {
-        final HttpURLConnection connection = getMojangSessionUrlConnection(uuid);
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputLine;
-        final StringBuilder content = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
-        }
-        in.close();
-
-        JSONObject jsonObject = new JSONObject(content.toString());
-        if (connection.getResponseCode() != 200) {
-            throw new IOException(jsonObject.getString("errorMessage"));
+        final String content;
+        try (final BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            content = in.lines().collect(Collectors.joining());
         }
 
-        UUID mojangId = UUID.fromString(addUUIDDashes(jsonObject.getString("id")));
-        String mojangName = jsonObject.getString("name");
+        final JSONObject jsonObject = new JSONObject(content);
+        if (connection.getResponseCode() != 200) throw new IOException(jsonObject.getString("errorMessage"));
 
-        HashMap<String, String> properties = new HashMap<>();
-
-        JSONArray propertiesArray = jsonObject.getJSONArray("properties");
-        for (Object propertyObject : propertiesArray) {
-            JSONObject propertyJSONObject = (JSONObject) propertyObject;
-            properties.put("name", propertyJSONObject.getString("name"));
-            properties.put("value", propertyJSONObject.getString("value"));
-        }
-
-        // TODO: Caching
-        return new MojangSession(mojangId, mojangName, properties);
-    }
-
-    private static String addUUIDDashes(String idNoDashes) {
-        return new StringBuilder(idNoDashes).insert(20, '-').insert(16, '-').insert(12, '-').insert(8, '-').toString();
+        final JSONArray propertiesArray = jsonObject.getJSONArray("properties");
+        return new MojangSession(UUID.fromString(new StringBuilder(jsonObject.getString("id")).insert(20, '-').insert(16, '-').insert(12, '-').insert(8, '-').toString()), jsonObject.getString("name"), IntStream.range(0, propertiesArray.length()).mapToObj(propertiesArray::getJSONObject).collect(Collectors.toMap(obj -> obj.getString("name"), obj -> obj.getString("value"), (_, replacement) -> replacement, HashMap::new)));
     }
 
 }

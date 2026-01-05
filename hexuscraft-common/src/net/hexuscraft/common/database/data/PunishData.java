@@ -1,6 +1,9 @@
-package net.hexuscraft.common.data;
+package net.hexuscraft.common.database.data;
 
+import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.enums.PunishType;
+import net.hexuscraft.common.database.messages.PunishmentAppliedMessage;
+import redis.clients.jedis.UnifiedJedis;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -109,6 +112,12 @@ public final class PunishData {
         // Temporary comparison
         Long currentMillis = System.currentTimeMillis();
         return getRemaining(currentMillis) > punishData.getRemaining(currentMillis) ? this : punishData;
+    }
+
+    public void publish(final UnifiedJedis jedis, final UUID targetUuid) {
+        jedis.hset(PunishQueries.PUNISHMENT(uniqueId), toMap());
+        jedis.sadd(PunishQueries.LIST(targetUuid), uniqueId.toString());
+        new PunishmentAppliedMessage(targetUuid, uniqueId).publish(jedis);
     }
 
 }

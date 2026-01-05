@@ -17,19 +17,16 @@ public final class MiniPluginDoubleJump extends MiniPlugin<Hub> {
         super(hub, "Double Jump");
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         event.getPlayer().setAllowFlight(true);
     }
 
-    @EventHandler
-    public void onGameModeChangedEvent(final PlayerGameModeChangeEvent event) {
-        final Player player = event.getPlayer();
-
-        if (player.getGameMode().equals(GameMode.CREATIVE)) return;
-        if (player.getAllowFlight()) return;
-
-        player.setAllowFlight(true);
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onGameModeChanged(final PlayerGameModeChangeEvent event) {
+        // For some reason we need to delay this by a tick even though EventPriority.MONITOR should be the last to fire.
+        // Probably some quirky nms logic when changing game mode.
+        _hexusPlugin.runSyncLater(() -> event.getPlayer().setAllowFlight(true), 1);
     }
 
     @EventHandler

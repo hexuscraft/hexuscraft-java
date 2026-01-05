@@ -1,7 +1,7 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.common.chat.F;
-import net.hexuscraft.common.database.serverdata.ServerGroupData;
+import net.hexuscraft.common.utils.F;
+import net.hexuscraft.common.database.data.ServerGroupData;
 import net.hexuscraft.common.enums.GameType;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.command.BaseCommand;
@@ -175,7 +175,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginPorta
                         _miniPluginDatabase.getUnifiedJedis());
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this, F.fError(
-                        "JedisException while updating server group data. Please contact dev-ops if this issue persists.")));
+                        "JedisException while updating server group punish. Please contact dev-ops if this issue persists.")));
                 _miniPlugin._hexusPlugin.logWarning(
                         "JedisException while '" + sender.getName() + "' creating server group '" + name + "': " +
                                 ex.getMessage());

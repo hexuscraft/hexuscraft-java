@@ -1,11 +1,10 @@
-package net.hexuscraft.common.chat;
+package net.hexuscraft.common.utils;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.data.PunishData;
+import net.hexuscraft.common.database.data.PunishData;
 import net.hexuscraft.common.enums.CheatSeverity;
 import net.hexuscraft.common.enums.CurrencyType;
 import net.hexuscraft.common.enums.PermissionGroup;
-import net.hexuscraft.common.utils.UtilMath;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +56,7 @@ public final class F {
     public static String fItem(final String... args) {
         if (args.length == 0) return "[]";
         if (args.length == 1) return C.cYellow + args[0];
-        return "[" + fItem(String.join(C.cGray + ", " + fItem(""), args)) + C.cGray + "]";
+        return C.cGray + "[" + fItem(String.join(C.cGray + ", " + fItem(""), args)) + C.cGray + "]";
     }
 
     public static String fItem(final String name, final int count) {
@@ -74,7 +73,6 @@ public final class F {
         return color + amount + " " + (amount == 1 ? nameSingular : namePlural);
     }
 
-    @SuppressWarnings("unused")
     public static String fCurrency(final CurrencyType currencyType, final int amount) {
         return fCurrency(currencyType._color, currencyType._nameSingular, currencyType._namePlural, amount);
     }
@@ -132,7 +130,6 @@ public final class F {
         return group._color + (bold ? C.fBold : "") + (uppercase ? group._prefix.toUpperCase() : group._prefix);
     }
 
-    @SuppressWarnings("unused")
     public static String fPermissionGroup(final PermissionGroup group, final boolean uppercase) {
         return fPermissionGroup(group, uppercase, false);
     }

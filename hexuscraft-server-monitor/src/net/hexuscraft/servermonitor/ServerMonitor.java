@@ -1,8 +1,8 @@
 package net.hexuscraft.servermonitor;
 
 import net.hexuscraft.common.database.queries.ServerQueries;
-import net.hexuscraft.common.database.serverdata.ServerData;
-import net.hexuscraft.common.database.serverdata.ServerGroupData;
+import net.hexuscraft.common.database.data.ServerData;
+import net.hexuscraft.common.database.data.ServerGroupData;
 import net.hexuscraft.servermonitor.database.PluginDatabase;
 import redis.clients.jedis.UnifiedJedis;
 

@@ -1,16 +1,12 @@
 package net.hexuscraft.common.database.queries;
 
 import net.hexuscraft.common.database.Database;
-import net.hexuscraft.common.database.serverdata.ServerData;
-import net.hexuscraft.common.database.serverdata.ServerGroupData;
+import net.hexuscraft.common.database.data.ServerData;
+import net.hexuscraft.common.database.data.ServerGroupData;
 import redis.clients.jedis.UnifiedJedis;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-@SuppressWarnings("unused")
 public final class ServerQueries {
 
     public static String SERVER(final String name) {
@@ -39,13 +35,8 @@ public final class ServerQueries {
     }
 
     public static ServerData[] getServers(final UnifiedJedis jedis, final String serverGroupName) {
-        final Set<ServerData> serverDataSet = new HashSet<>();
-        for (ServerData serverData : getServers(jedis)) {
-            if (serverData._group.equals(serverGroupName)) {
-                serverDataSet.add(serverData);
-            }
-        }
-        return serverDataSet.toArray(ServerData[]::new);
+        return Arrays.stream(getServers(jedis)).filter(serverData -> serverData._group.equals(serverGroupName))
+                .toArray(ServerData[]::new);
     }
 
     public static ServerData[] getServers(final UnifiedJedis jedis, final ServerGroupData serverGroupData) {

@@ -1,6 +1,6 @@
 package net.hexuscraft.common.enums;
 
-import net.hexuscraft.common.chat.C;
+import net.hexuscraft.common.utils.C;
 
 public enum CheatSeverity {
 

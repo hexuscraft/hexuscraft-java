@@ -1,4 +1,4 @@
-package net.hexuscraft.common.database.serverdata;
+package net.hexuscraft.common.database.data;
 
 import net.hexuscraft.common.database.queries.ServerQueries;
 import redis.clients.jedis.UnifiedJedis;

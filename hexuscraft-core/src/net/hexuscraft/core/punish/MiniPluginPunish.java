@@ -3,13 +3,13 @@ package net.hexuscraft.core.punish;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.chat.C;
-import net.hexuscraft.common.chat.F;
-import net.hexuscraft.common.data.PunishData;
+import net.hexuscraft.common.utils.C;
+import net.hexuscraft.common.utils.F;
+import net.hexuscraft.common.database.data.PunishData;
 import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.enums.PunishType;
-import net.hexuscraft.common.messages.PunishmentAppliedMessage;
+import net.hexuscraft.common.database.messages.PunishmentAppliedMessage;
 import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
@@ -32,6 +32,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.UnifiedJedis;
@@ -54,8 +55,7 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(
-            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
         _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
         _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
@@ -73,20 +73,18 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
         _pluginCommand.register(new CommandPunishHistory(this));
 
         _miniPluginDatabase.registerConsumer(PunishmentAppliedMessage.CHANNEL_NAME, (_, _, message) -> {
-            final PunishmentAppliedMessage punishmentAppliedMessage = PunishmentAppliedMessage.fromString(message);
+            final PunishmentAppliedMessage punishmentAppliedMessage = PunishmentAppliedMessage.parse(message);
             _hexusPlugin.runAsync(() -> {
-                final Map<String, String> rawData = new HashMap<>(_miniPluginDatabase.getUnifiedJedis()
-                        .hgetAll(PunishQueries.PUNISHMENT(punishmentAppliedMessage._punishmentId())));
-                rawData.put("id", punishmentAppliedMessage._punishmentId().toString());
+                final Map<String, String> rawData = new HashMap<>(_miniPluginDatabase.getUnifiedJedis().hgetAll(PunishQueries.PUNISHMENT(punishmentAppliedMessage._punishmentUUID)));
+                rawData.put("id", punishmentAppliedMessage._punishmentUUID.toString());
 
                 final PunishData punishData = new PunishData(rawData);
 
                 final OfflinePlayer targetOfflinePlayer;
                 try {
-                    targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(punishmentAppliedMessage._targetUniqueId());
+                    targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(punishmentAppliedMessage._targetUUID);
                 } catch (final IOException ex) {
-                    logWarning("Could not fetch offline player for punish target '" +
-                            punishmentAppliedMessage._targetUniqueId() + "': " + ex.getMessage());
+                    logWarning("Could not fetch offline player for punish target '" + punishmentAppliedMessage._targetUUID + "': " + ex.getMessage());
                     return;
                 }
                 if (targetOfflinePlayer == null) return;
@@ -95,8 +93,7 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
                 if (punishData.staffUniqueId.equals(UtilUniqueId.EMPTY_UUID))
                     staffName.set(_hexusPlugin.getServer().getConsoleSender().getName());
                 else try {
-                    staffName.set(Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(punishData.staffUniqueId))
-                            .getName());
+                    staffName.set(Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(punishData.staffUniqueId)).getName());
                 } catch (final IOException | NullPointerException ex) {
                     logSevere(ex);
                     staffName.set("<unknown>");
@@ -118,24 +115,17 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
                     }
                 });
 
-                _hexusPlugin.getServer().getOnlinePlayers().stream()
-                        .filter((final Player onlineStaffPlayer) -> onlineStaffPlayer.hasPermission(
-                                PermissionGroup.TRAINEE.name())).forEach((final Player onlineStaffPlayer) -> {
-                            switch (punishData.type) {
-                                case PunishType.WARNING -> onlineStaffPlayer.sendMessage(
-                                        F.fMain(this, F.fItem(staffName), " warned ", F.fItem(targetOfflinePlayer.getName()),
-                                                ".\n", F.fMain("", "Reason: ", C.cWhite + punishData.reason)));
-                                case PunishType.MUTE -> onlineStaffPlayer.sendMessage(
-                                        F.fMain(this, F.fItem(staffName), " muted ", F.fItem(targetOfflinePlayer.getName()),
-                                                ".\n", F.fMain("", "Duration: ", C.cWhite + F.fTime(punishData.length)), "\n",
-                                                F.fMain("", "Reason: ", C.cWhite + punishData.reason)));
-                                case PunishType.BAN -> onlineStaffPlayer.sendMessage(
-                                        F.fMain(this, F.fItem(staffName), " banned ", F.fItem(targetOfflinePlayer.getName()),
-                                                ".\n", F.fMain("", "Duration: ", C.cWhite + F.fTime(punishData.length)), "\n",
-                                                F.fMain("", "Reason: ", C.cWhite + punishData.reason)));
-                                default -> logWarning("Unknown punishment type: " + punishData.type);
-                            }
-                        });
+                _hexusPlugin.getServer().getOnlinePlayers().stream().filter((final Player onlineStaffPlayer) -> onlineStaffPlayer.hasPermission(PermissionGroup.TRAINEE.name())).forEach((final Player onlineStaffPlayer) -> {
+                    switch (punishData.type) {
+                        case PunishType.WARNING ->
+                                onlineStaffPlayer.sendMessage(F.fMain(this, F.fItem(staffName), " warned ", F.fItem(targetOfflinePlayer.getName()), ".\n", F.fMain("", "Reason: ", C.cWhite + punishData.reason)));
+                        case PunishType.MUTE ->
+                                onlineStaffPlayer.sendMessage(F.fMain(this, F.fItem(staffName), " muted ", F.fItem(targetOfflinePlayer.getName()), ".\n", F.fMain("", "Duration: ", C.cWhite + F.fTime(punishData.length)), "\n", F.fMain("", "Reason: ", C.cWhite + punishData.reason)));
+                        case PunishType.BAN ->
+                                onlineStaffPlayer.sendMessage(F.fMain(this, F.fItem(staffName), " banned ", F.fItem(targetOfflinePlayer.getName()), ".\n", F.fMain("", "Duration: ", C.cWhite + F.fTime(punishData.length)), "\n", F.fMain("", "Reason: ", C.cWhite + punishData.reason)));
+                        default -> logWarning("Unknown punishment type: " + punishData.type);
+                    }
+                });
             });
         });
     }
@@ -146,9 +136,7 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
 
         try {
             final UnifiedJedis jedis = _miniPluginDatabase.getUnifiedJedis();
-            final Set<UUID> punishmentIds =
-                    jedis.smembers(PunishQueries.LIST(event.getUniqueId())).stream().map(UUID::fromString)
-                            .collect(Collectors.toSet());
+            final Set<UUID> punishmentIds = jedis.smembers(PunishQueries.LIST(event.getUniqueId())).stream().map(UUID::fromString).collect(Collectors.toSet());
 
             // We want to display the longest ban remaining.
             // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most recent ban.
@@ -158,8 +146,7 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
 
             for (final UUID punishmentUniqueId : punishmentIds) {
                 try {
-                    final Map<String, String> rawData =
-                            new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
+                    final Map<String, String> rawData = new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
                     rawData.put("id", punishmentUniqueId.toString());
 
                     final PunishData punishData = new PunishData(rawData);
@@ -173,17 +160,13 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
 
                     final long remaining = punishData.getRemaining();
                     if (remaining <= 0) {
-                        _miniPluginDatabase.getUnifiedJedis().hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
-                                Map.of("active", "false", "removeOrigin", Long.toString(System.currentTimeMillis()),
-                                        "removeReason", "EXPIRED", "removeServer", _miniPluginPortal._serverName,
-                                        "removeStaffId", UtilUniqueId.EMPTY_UUID.toString(), "removeStaffServer",
-                                        _miniPluginPortal._serverName));
+                        _miniPluginDatabase.getUnifiedJedis().hset(PunishQueries.PUNISHMENT(punishmentUniqueId), Map.of("active", "false", "removeOrigin", Long.toString(System.currentTimeMillis()), "removeReason", "EXPIRED", "removeServer", _miniPluginPortal._serverName, "removeStaffId", UtilUniqueId.EMPTY_UUID.toString(), "removeStaffServer", _miniPluginPortal._serverName));
                         continue;
                     }
 
                     activePunishments.add(punishData);
                 } catch (final JedisException ex) {
-                    logWarning("Error while checking punish data player");
+                    logWarning("Error while checking punish punish player");
                 }
             }
 
@@ -204,26 +187,12 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
 
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, F.fPunish(punishData.get()));
         } catch (final JedisException ex) {
-            logWarning("Error while fetching punishment data for '" + event.getName() + "': " + ex.getMessage());
+            logWarning("Error while fetching punishment punish for '" + event.getName() + "': " + ex.getMessage());
         }
     }
 
-    public void punish(final UUID targetUuid, final UUID staffUuid, final PunishType punishType, final long length,
-                       final String reason) {
-        final PunishData punishData = new PunishData(
-                Map.of("id", UUID.randomUUID().toString(), "type", punishType.name(), "active", "true", "origin",
-                        Long.toString(System.currentTimeMillis()), "length", Long.toString(length), "reason", reason,
-                        "server", _miniPluginPortal._serverName, "staffId",
-                        (staffUuid == null ? UtilUniqueId.EMPTY_UUID : staffUuid).toString(), "staffServer",
-                        _miniPluginPortal._serverName));
-
-        _hexusPlugin.runAsync(() -> {
-            _miniPluginDatabase.getUnifiedJedis()
-                    .hset(PunishQueries.PUNISHMENT(punishData.uniqueId), punishData.toMap());
-            _miniPluginDatabase.getUnifiedJedis().sadd(PunishQueries.LIST(targetUuid), punishData.uniqueId.toString());
-            _miniPluginDatabase.getUnifiedJedis().publish(PunishmentAppliedMessage.CHANNEL_NAME,
-                    new PunishmentAppliedMessage(targetUuid, punishData.uniqueId).toString());
-        });
+    public BukkitTask punishAsync(final UUID targetUUID, final UUID staffUUID, final PunishType punishType, final long lengthMillis, final String reason) {
+        return _hexusPlugin.runAsync(() -> new PunishData(Map.of("id", UUID.randomUUID().toString(), "type", punishType.name(), "active", "true", "origin", Long.toString(System.currentTimeMillis()), "lengthMillis", Long.toString(lengthMillis), "reason", reason, "server", _miniPluginPortal._serverName, "staffId", (staffUUID == null ? UtilUniqueId.EMPTY_UUID : staffUUID).toString(), "staffServer", _miniPluginPortal._serverName)).publish(_miniPluginDatabase.getUnifiedJedis(), targetUUID));
     }
 
     @EventHandler
@@ -355,14 +324,15 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
         final UUID uuid = UUID.fromString(ChatColor.stripColor(skullLore.getFirst()));
         final OfflinePlayer targetOfflinePlayer;
         try {
-            targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(uuid);
+            targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(uuid, clicker);
+            if (targetOfflinePlayer == null) return;
         } catch (final IOException ex) {
-            logWarning("IOException while offline player searching for uuid '" + uuid + "': " + ex.getMessage());
+            logSevere(ex);
+            clicker.sendMessage(F.fMain(this, F.fError("IOException while fetching OfflinePlayer. Please try again later or contact dev-ops if this issue persists.")));
             return;
         }
 
-        punish(targetOfflinePlayer.getUniqueId(), clicker.getUniqueId(), punishType, punishLengthMillis,
-                ChatColor.stripColor(skullLore.get(2)));
+        punishAsync(targetOfflinePlayer.getUniqueId(), clicker.getUniqueId(), punishType, punishLengthMillis, ChatColor.stripColor(skullLore.get(2)));
         clicker.closeInventory();
     }
 

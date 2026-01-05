@@ -1,12 +1,13 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.common.chat.F;
-import net.hexuscraft.common.database.serverdata.ServerGroupData;
+import net.hexuscraft.common.utils.F;
+import net.hexuscraft.common.database.data.ServerGroupData;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.portal.MiniPluginPortal;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.exceptions.JedisException;
 
+import java.util.List;
 import java.util.Set;
 
 public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPortal> {
@@ -39,7 +40,7 @@ public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPort
                 serverGroupData = _miniPlugin.getServerGroupDataFromName(args[0]);
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this, F.fError(
-                        "JedisException while fetching server group data. Please try again later or contact dev-ops if this issue persists.")));
+                        "JedisException while fetching server group punish. Please try again later or contact dev-ops if this issue persists.")));
                 return;
             }
 
@@ -60,6 +61,13 @@ public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPort
                 sender.sendMessage(F.fMain(this, "Restarting server group ", F.fItem(serverGroupData._name), "..."));
             });
         });
+    }
+
+    @Override
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
+        if (args.length == 1)
+            return _miniPlugin._serverGroupCache.stream().map(serverGroupData -> serverGroupData._name).toList();
+        return List.of();
     }
 
 }

@@ -1,7 +1,7 @@
 package net.hexuscraft.core.permission;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.database.queries.PermissionQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.HexusPlugin;
@@ -90,6 +90,13 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
         refreshPermissions(player);
     }
 
+    @EventHandler
+    private void onPlayerQuit(final PlayerQuitEvent event) {
+        final Player player = event.getPlayer();
+        clearPermissions(player);
+        _permissionProfiles.remove(player);
+    }
+
     public void refreshPermissions(final Player player) {
         clearPermissions(player);
 
@@ -105,13 +112,6 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
         if (player.hasPermission(PERM.OPERATOR.name())) player.setOp(true);
         else denyBukkitPermissions(attachment);
-    }
-
-    @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event) {
-        final Player player = event.getPlayer();
-        clearPermissions(player);
-        _permissionProfiles.remove(player);
     }
 
     private void clearPermissions(final Player player) {

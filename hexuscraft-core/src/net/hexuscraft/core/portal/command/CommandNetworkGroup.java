@@ -13,7 +13,7 @@ public final class CommandNetworkGroup extends BaseMultiCommand<MiniPluginPortal
                 MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP, Set.of(
                         new CommandNetworkGroupCreate(miniPluginPortal, miniPluginDatabase),
                         new CommandNetworkGroupDelete(miniPluginPortal, miniPluginDatabase),
-                        new CommandNetworkGroupList(miniPluginPortal, miniPluginDatabase),
+                        new CommandNetworkGroupList(miniPluginPortal),
                         new CommandNetworkGroupRestart(miniPluginPortal)
                 ));
     }

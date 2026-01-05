@@ -1,8 +1,7 @@
-package net.hexuscraft.common.chat;
+package net.hexuscraft.common.utils;
 
 import java.util.Map;
 
-@SuppressWarnings("unused")
 public final class C {
 
     public static final String fBold = "§l";

@@ -1,8 +1,7 @@
 package net.hexuscraft.common.enums;
 
-import net.hexuscraft.common.chat.C;
+import net.hexuscraft.common.utils.C;
 
-@SuppressWarnings("unused")
 public enum CurrencyType {
 
     COIN("Coin", "Coins", C.cGold),

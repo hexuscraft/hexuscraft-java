@@ -1,12 +1,10 @@
 package net.hexuscraft.hub.player;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.chat.C;
-import net.hexuscraft.common.chat.F;
-import net.hexuscraft.common.database.queries.ServerQueries;
-import net.hexuscraft.common.database.serverdata.ServerData;
-import net.hexuscraft.common.database.serverdata.ServerGroupData;
+import net.hexuscraft.common.utils.C;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.UtilCooldown;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.MiniPluginCommand;
@@ -31,10 +29,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import redis.clients.jedis.UnifiedJedis;
 
 import java.util.List;
 import java.util.Map;
@@ -136,26 +132,36 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
         inventory.setHeldItemSlot(0);
     }
 
-    private void onItemInteract(final Player player, final ItemStack itemStack) {
+    private boolean onItemInteract(final Player player, final ItemStack itemStack) {
+        if (!itemStack.hasItemMeta()) return false;
+
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+        if (!itemMeta.hasDisplayName()) return false;
+
         final Material itemType = itemStack.getType();
+        final String displayName = ChatColor.stripColor(itemMeta.getDisplayName());
 
-        if (!itemStack.hasItemMeta()) return;
-        final ItemMeta currentItemMeta = itemStack.getItemMeta();
-
-        if (!currentItemMeta.hasDisplayName()) return;
-        final String displayName = currentItemMeta.getDisplayName();
-
-        if (itemType.equals(Material.COMPASS) && displayName.contains("Game Menu")) {
+        if (itemType.equals(Material.COMPASS) && displayName.equals("Game Menu")) {
             openGameMenu(player);
-        } else if (itemType.equals(Material.SKULL_ITEM) && displayName.contains(player.getName())) {
-            openProfileMenu(player);
-        } else if (itemType.equals(Material.CHEST) && displayName.contains("Cosmetics Menu")) {
-            openCosmeticsMenu(player);
-        } else if (itemType.equals(Material.EMERALD) && displayName.contains("Shop Menu")) {
-            openShopMenu(player);
-        } else if (itemType.equals(Material.WATCH) && displayName.contains("Lobby Menu")) {
-            openLobbyMenu(player);
+            return true;
         }
+        if (itemType.equals(Material.SKULL_ITEM) && displayName.equals(player.getName())) {
+            openProfileMenu(player);
+            return true;
+        }
+        if (itemType.equals(Material.CHEST) && displayName.equals("Cosmetics Menu")) {
+            openCosmeticsMenu(player);
+            return true;
+        }
+        if (itemType.equals(Material.EMERALD) && displayName.equals("Shop Menu")) {
+            openShopMenu(player);
+            return true;
+        }
+        if (itemType.equals(Material.WATCH) && displayName.equals("Lobby Menu")) {
+            openLobbyMenu(player);
+            return true;
+        }
+        return false;
     }
 
     @EventHandler
@@ -166,47 +172,54 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
         final Inventory clickedInventory = event.getClickedInventory();
         if (clickedInventory == null) {
             event.setCancelled(true);
-            return;
-        }
-
-        if (clickedInventory.equals(player.getInventory())) {
+        } else if (clickedInventory.equals(player.getInventory())) {
             event.setCancelled(true);
 
             final ItemStack currentItem = event.getCurrentItem();
-            if (currentItem == null) return;
-
-            onItemInteract(player, currentItem);
-            return;
-        }
-
-        if (clickedInventory.getName().equals("Lobby Menu")) {
+            if (currentItem != null && onItemInteract(player, currentItem)) return;
+        } else if (clickedInventory.getName().equals("Lobby Menu")) {
             event.setCancelled(true);
-
             final ItemStack currentItem = event.getCurrentItem();
-            if (!currentItem.hasItemMeta()) return;
+            if (currentItem.hasItemMeta()) {
+                final ItemMeta currentItemMeta = currentItem.getItemMeta();
+                if (currentItemMeta.hasDisplayName()) {
+                    final String targetServerName = ChatColor.stripColor(currentItemMeta.getDisplayName());
 
-            final ItemMeta currentItemMeta = currentItem.getItemMeta();
-            if (!currentItemMeta.hasDisplayName()) return;
+                    if (!_miniPluginPortal._serverName.equals(targetServerName)) {
+                        if (!UtilCooldown.use(player, "Lobby Server Teleport", 1000L)) return;
+                        _miniPluginPortal.teleport(player, targetServerName);
+                        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+                        return;
+                    }
 
-            _miniPluginPortal.teleportAsync(player, ChatColor.stripColor(currentItemMeta.getDisplayName()));
-            player.playSound(player.getLocation(), Sound.NOTE_PLING, 100, 2);
+                    player.sendMessage(
+                            F.fMain(this, F.fError("You are already connected to ", F.fItem(targetServerName), ".")));
+                }
+            }
         }
+
+        // Player has clicked an item (or empty space) in an inventory which does not return
+        player.playSound(player.getLocation(), Sound.ITEM_BREAK, Float.MAX_VALUE, 0.5F);
     }
 
     void openGameMenu(final Player player) {
-        player.sendMessage("open game");
+        player.sendMessage(F.fMain("Games", "This feature is currently work in progress. Please try again later!"));
+        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     void openProfileMenu(final Player player) {
-        player.sendMessage("open profile");
+        player.sendMessage(F.fMain("Profile", "This feature is currently work in progress. Please try again later!"));
+        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     void openCosmeticsMenu(final Player player) {
-        player.sendMessage("open cosmetics");
+        player.sendMessage(F.fMain("Cosmetics", "This feature is currently work in progress. Please try again later!"));
+        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     void openShopMenu(final Player player) {
-        player.sendMessage("open shop");
+        player.sendMessage(F.fMain("Shop", "This feature is currently work in progress. Please try again later!"));
+        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     void openLobbyMenu(final Player player) {
@@ -214,16 +227,9 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
 
         final Inventory lobbyMenu = server.createInventory(player, 54, "Lobby Menu");
 
-        final BukkitScheduler scheduler = server.getScheduler();
-        scheduler.runTaskAsynchronously(_hexusPlugin, () -> {
-            final UnifiedJedis jedis = _miniPluginDatabase.getUnifiedJedis();
-
-            final ServerGroupData lobbyGroupData = ServerQueries.getServerGroup(jedis, "Lobby");
-            if (lobbyGroupData == null) return;
-
-            final ServerData[] serverDataArray = ServerQueries.getServers(jedis, lobbyGroupData);
-            scheduler.runTask(_hexusPlugin, () -> {
-                for (ServerData serverData : serverDataArray) {
+        _miniPluginPortal._serverCache.stream().limit(54).filter(serverData -> !serverData._updatedByMonitor)
+                .filter(serverData -> serverData._group.equals("Lobby"))
+                .forEach(serverData -> {
                     final int lobbyId = Integer.parseInt(serverData._name.split("-")[1]);
                     final boolean isCurrentServer = serverData._name.equals(_miniPluginPortal._serverName);
 
@@ -238,10 +244,9 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
 
                     serverItem.setItemMeta(serverItemMeta);
                     lobbyMenu.setItem(lobbyId - 1, serverItem);
-                }
-                player.openInventory(lobbyMenu);
-            });
-        });
+                });
+        player.openInventory(lobbyMenu);
+        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     @EventHandler

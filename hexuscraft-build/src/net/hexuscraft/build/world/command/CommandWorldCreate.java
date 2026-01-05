@@ -1,7 +1,7 @@
 package net.hexuscraft.build.world.command;
 
 import net.hexuscraft.build.world.MiniPluginWorld;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.Difficulty;
 import org.bukkit.World;

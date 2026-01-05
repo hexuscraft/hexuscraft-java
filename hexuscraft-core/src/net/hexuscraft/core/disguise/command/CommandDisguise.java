@@ -1,6 +1,6 @@
 package net.hexuscraft.core.disguise.command;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.disguise.MiniPluginDisguise;
 import net.hexuscraft.core.player.PlayerSearch;

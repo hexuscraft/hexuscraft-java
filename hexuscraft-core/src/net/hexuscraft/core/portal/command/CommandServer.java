@@ -1,9 +1,9 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.database.queries.ServerQueries;
-import net.hexuscraft.common.database.serverdata.ServerData;
-import net.hexuscraft.common.database.serverdata.ServerGroupData;
+import net.hexuscraft.common.database.data.ServerData;
+import net.hexuscraft.common.database.data.ServerGroupData;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.portal.MiniPluginPortal;
@@ -41,7 +41,7 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
 
             final UnifiedJedis jedis = _miniPluginDatabase.getUnifiedJedis();
 
-            final ServerData serverData = ServerQueries.getServer(jedis, serverName);
+            final ServerData serverData = _miniPlugin.getServerDataFromName(serverName);
             if (serverData == null) {
                 sender.sendMessage(
                         F.fMain(this) + F.fError("Could not locate server with name ", F.fItem(serverName), "."));
@@ -66,7 +66,7 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
                 return;
             }
 
-            _miniPlugin.teleportAsync(player, serverName);
+            _miniPlugin.teleport(player, serverName);
             return;
         }
         if (args.length == 0) {

@@ -1,6 +1,6 @@
 package net.hexuscraft.core.chat;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import org.bukkit.Location;
 
 public class FBukkit {

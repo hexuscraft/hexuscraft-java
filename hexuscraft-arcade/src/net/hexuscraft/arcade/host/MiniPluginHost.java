@@ -3,7 +3,7 @@ package net.hexuscraft.arcade.host;
 import net.hexuscraft.arcade.Arcade;
 import net.hexuscraft.arcade.host.command.CommandSetHost;
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.UtilUniqueId;

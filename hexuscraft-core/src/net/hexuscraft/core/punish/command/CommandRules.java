@@ -1,6 +1,6 @@
 package net.hexuscraft.core.punish.command;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.punish.MiniPluginPunish;
 import org.bukkit.command.CommandSender;

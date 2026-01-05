@@ -1,7 +1,7 @@
 package net.hexuscraft.core.command;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import org.bukkit.command.Command;

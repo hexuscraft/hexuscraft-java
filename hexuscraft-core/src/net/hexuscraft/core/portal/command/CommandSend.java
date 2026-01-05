@@ -1,6 +1,6 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.portal.MiniPluginPortal;
@@ -16,8 +16,7 @@ import java.util.stream.Stream;
 public final class CommandSend extends BaseCommand<MiniPluginPortal> {
 
     public CommandSend(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "send", "<Player> <Name>", "Teleport a player to a server.", Set.of(),
-                MiniPluginPortal.PERM.COMMAND_SEND);
+        super(miniPluginPortal, "send", "<Player> <Name>", "Teleport a player to a server.", Set.of(), MiniPluginPortal.PERM.COMMAND_SEND);
     }
 
     @Override
@@ -30,25 +29,20 @@ public final class CommandSend extends BaseCommand<MiniPluginPortal> {
         final String targetName = args[0];
         final String serverName = args[1];
 
-        _miniPlugin._hexusPlugin.runAsync(() -> {
-            final OfflinePlayer targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(targetName);
-            if (targetOfflinePlayer == null) {
-                sender.sendMessage(F.fMain("Offline Player Search", F.fMatches(new String[]{}, targetName)));
-                return;
-            }
+        final OfflinePlayer targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(targetName, sender);
+        if (targetOfflinePlayer == null) return;
 
-            if (_miniPlugin.getServerDataFromName(serverName) == null) {
-                sender.sendMessage(
-                        F.fMain(this, F.fError("Could not locate server with name ", F.fItem(serverName), ".")));
-                return;
-            }
+        if (_miniPlugin.getServerDataFromName(serverName) == null) {
+            sender.sendMessage(F.fMain(this, F.fError("Could not locate server with name ", F.fItem(serverName), ".")));
+            return;
+        }
 
-            if (sender instanceof final OfflinePlayer senderOfflinePlayer) {
-                _miniPlugin.teleportAsync(targetOfflinePlayer, serverName, senderOfflinePlayer);
-                return;
-            }
-            _miniPlugin.teleportAsync(targetOfflinePlayer, serverName);
-        });
+        if (sender instanceof final Player player) {
+            _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(), serverName, player.getUniqueId()));
+            return;
+        }
+
+        _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(), serverName));
     }
 
     @Override
@@ -56,8 +50,7 @@ public final class CommandSend extends BaseCommand<MiniPluginPortal> {
         final List<String> names = new ArrayList<>();
         if (args.length == 1) {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers =
-                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
+            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
             if (sender instanceof final Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }

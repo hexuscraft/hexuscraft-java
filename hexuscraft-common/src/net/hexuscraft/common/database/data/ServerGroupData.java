@@ -1,4 +1,4 @@
-package net.hexuscraft.common.database.serverdata;
+package net.hexuscraft.common.database.data;
 
 import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.utils.UtilUniqueId;
@@ -45,11 +45,10 @@ public final class ServerGroupData {
                 UUID.fromString(serverGroupData.getOrDefault("hostUniqueId", UtilUniqueId.EMPTY_UUID.toString()));
     }
 
-    public ServerGroupData(final String name, final String requiredPermission,
-                           final int minPort, final int maxPort, final int totalServers, final int joinableServers,
-                           final String plugin, final String worldZip, final int ram, final int capacity,
-                           final boolean worldEdit, final int timeoutMillis, final String[] games,
-                           final UUID hostUniqueId) {
+    public ServerGroupData(final String name, final String requiredPermission, final int minPort, final int maxPort,
+                           final int totalServers, final int joinableServers, final String plugin,
+                           final String worldZip, final int ram, final int capacity, final boolean worldEdit,
+                           final int timeoutMillis, final String[] games, final UUID hostUniqueId) {
         _name = name;
 
         _requiredPermission = requiredPermission;

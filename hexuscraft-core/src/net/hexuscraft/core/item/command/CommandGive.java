@@ -1,6 +1,6 @@
 package net.hexuscraft.core.item.command;
 
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.item.ItemSearch;
 import net.hexuscraft.core.item.MiniPluginItem;
@@ -103,7 +103,7 @@ public final class CommandGive extends BaseCommand<MiniPluginItem> {
                 data.set(Byte.parseByte(argSplitted[1]));
             } catch (final NumberFormatException ex) {
                 sender.sendMessage(F.fMain(this,
-                        F.fError("Invalid material data for ", F.fItem(targetMaterials[0].name()),
+                        F.fError("Invalid material punish for ", F.fItem(targetMaterials[0].name()),
                                 ", expected an integer. "), "Defaulting to ", F.fItem(data.get()), "."));
             }
 

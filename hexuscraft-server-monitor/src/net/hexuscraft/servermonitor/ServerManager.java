@@ -1,8 +1,8 @@
 package net.hexuscraft.servermonitor;
 
 import net.hexuscraft.common.database.queries.ServerQueries;
-import net.hexuscraft.common.database.serverdata.ServerData;
-import net.hexuscraft.common.database.serverdata.ServerGroupData;
+import net.hexuscraft.common.database.data.ServerData;
+import net.hexuscraft.common.database.data.ServerGroupData;
 import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.exceptions.JedisException;
 
@@ -63,7 +63,7 @@ public final class ServerManager {
             new ServerData(serverName, "", serverGroupData._capacity, System.currentTimeMillis(), serverGroupData._name,
                     "", 0, serverPort, 20, System.currentTimeMillis(), true).update(jedis);
         } catch (final JedisException ex) {
-            _monitor.log("JedisException while creating template server data for startServer(" + serverGroupData._name +
+            _monitor.log("JedisException while creating template server punish for startServer(" + serverGroupData._name +
                     ": " + reason + "): " + ex.getMessage());
             return Optional.empty();
         }
@@ -101,7 +101,7 @@ public final class ServerManager {
 
         final Thread thread = new Thread(() -> {
             try {
-                _monitor.log(serverName + ": Async-waiting for redis data...");
+                _monitor.log(serverName + ": Async-waiting for redis punish...");
 
                 final long startMs = System.currentTimeMillis();
                 while (true) {

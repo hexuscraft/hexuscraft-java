@@ -13,8 +13,6 @@ import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
@@ -25,63 +23,86 @@ import java.util.*;
 public final class MiniPluginBossBar extends MiniPlugin<HexusPlugin> {
 
     final Map<Player, Set<BossBar>> _bossBarMap;
+    final Map<Player, Wither> _witherMap;
 
     public MiniPluginBossBar(final HexusPlugin plugin) {
         super(plugin, "Boss Bar");
         _bossBarMap = new HashMap<>();
+        _witherMap = new HashMap<>();
     }
 
     @Override
     public void onEnable() {
-        _hexusPlugin.runSyncTimer(() -> {
+        _hexusPlugin.runAsyncTimer(() -> {
             _bossBarMap.forEach((player, bossBars) -> {
                 final BossBar activeBossBar =
                         bossBars.stream().max(Comparator.comparing(bossBar -> bossBar._weight.get())).orElse(null);
                 if (activeBossBar == null) return;
 
                 final Location location = player.getLocation();
-                location.add(player.getEyeLocation().getDirection().multiply(40));
+                location.add(player.getEyeLocation().getDirection().multiply(10));
                 location.setY(Math.clamp(location.getY(), 1, 255));
+                location.setYaw(0);
+                location.setPitch(0);
 
-                activeBossBar._entity.setHealth(Math.clamp(activeBossBar._progress.get() * 100, 1, 100));
-                activeBossBar._entity.setCustomName(activeBossBar._message.get());
-                activeBossBar._entity.teleport(location);
+                final Wither wither = _witherMap.get(player);
+                wither.teleport(location);
+                wither.setHealth(Math.clamp(activeBossBar._progress.get() * 100, 1, 100));
+                wither.setCustomName(activeBossBar._message.get());
+
+                wither.getWorld().getPlayers().stream().filter(otherPlayer -> !player.equals(otherPlayer)).forEach(
+                        otherPlayer -> ((CraftPlayer) otherPlayer).getHandle().playerConnection.sendPacket(
+                                new PacketPlayOutEntityDestroy(wither.getEntityId())));
             });
         }, 0, 1);
     }
 
-    public BossBar registerBossBar(final Player player) {
-        final BossBar bossBar =
-                new BossBar(player, (Wither) player.getWorld().spawnEntity(player.getLocation(), EntityType.WITHER));
+    public BossBar registerBossBar(final BossBar bossBar) {
+        if (!_witherMap.containsKey(bossBar._player)) {
+            final Wither wither =
+                    (Wither) bossBar._player.getWorld().spawnEntity(bossBar._player.getLocation(), EntityType.WITHER);
+            wither.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false),
+                    true);
+            wither.setMaxHealth(100);
+            wither.setHealth(100);
+            wither.setCustomNameVisible(false);
+            wither.setRemoveWhenFarAway(false);
+            wither.setTarget(null);
+            wither.setMaximumNoDamageTicks(Integer.MAX_VALUE);
+            wither.setNoDamageTicks(Integer.MAX_VALUE);
+            wither.setMetadata("BossBarNPC", new FixedMetadataValue(_hexusPlugin, true));
 
-        bossBar._entity.getWorld().getPlayers().stream().filter(otherPlayer -> !player.equals(otherPlayer)).forEach(
-                otherPlayer -> ((CraftPlayer) otherPlayer).getHandle().playerConnection.sendPacket(
-                        new PacketPlayOutEntityDestroy(bossBar._entity.getEntityId())));
+            final NBTTagCompound nbtTagCompound = UtilEntity.getNBTTagCompound(wither);
+            nbtTagCompound.setByte("NoAI", (byte) 1);
+            nbtTagCompound.setByte("Silent", (byte) 1);
+            UtilEntity.saveNBTTagCompound(wither, nbtTagCompound);
 
-        bossBar._entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100, 1, false, false), true);
-        bossBar._entity.setMaxHealth(100);
-        bossBar._entity.setHealth(100);
-        bossBar._entity.setCustomNameVisible(true);
-        bossBar._entity.setRemoveWhenFarAway(false);
-        bossBar._entity.setMetadata("BossBarNPC", new FixedMetadataValue(_hexusPlugin, true));
+            _witherMap.put(bossBar._player, wither);
+        }
 
-        final NBTTagCompound nbtTagCompound = UtilEntity.getNBTTagCompound(bossBar._entity);
-        nbtTagCompound.setByte("NoAI", (byte) 1);
-        nbtTagCompound.setByte("Silent", (byte) 1);
-        UtilEntity.saveNBTTagCompound(bossBar._entity, nbtTagCompound);
-
-        if (!_bossBarMap.containsKey(bossBar._player)) _bossBarMap.put(bossBar._player, new HashSet<>());
-        _bossBarMap.get(bossBar._player).add(bossBar);
+        final Set<BossBar> bossBars;
+        if (_bossBarMap.containsKey(bossBar._player)) bossBars = _bossBarMap.get(bossBar._player);
+        else {
+            bossBars = new HashSet<>();
+            _bossBarMap.put(bossBar._player, bossBars);
+        }
+        bossBars.add(bossBar);
 
         return bossBar;
     }
 
     public void unregisterBossBar(final BossBar bossBar) {
-        bossBar._entity.remove();
-
         final Set<BossBar> bossBarSet = _bossBarMap.get(bossBar._player);
         bossBarSet.remove(bossBar);
-        if (bossBarSet.isEmpty()) _bossBarMap.remove(bossBar._player);
+
+        if (bossBarSet.isEmpty()) {
+            _bossBarMap.remove(bossBar._player);
+
+            if (_witherMap.containsKey(bossBar._player)) {
+                _witherMap.get(bossBar._player).remove();
+                _witherMap.remove(bossBar._player);
+            }
+        }
     }
 
     @EventHandler
@@ -94,24 +115,6 @@ public final class MiniPluginBossBar extends MiniPlugin<HexusPlugin> {
     private void onEntityDamage(final EntityDamageEvent event) {
         if (!event.getEntity().hasMetadata("BossBarNPC")) return;
         event.setCancelled(true);
-    }
-
-    @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event) {
-        _bossBarMap.forEach((player, bossBars) -> {
-            if (player.equals(event.getPlayer())) return;
-            bossBars.forEach(bossBar -> ((CraftPlayer) event.getPlayer()).getHandle().playerConnection.sendPacket(
-                    new PacketPlayOutEntityDestroy(bossBar._entity.getEntityId())));
-        });
-    }
-
-    @EventHandler
-    private void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
-        _bossBarMap.forEach((player, bossBars) -> {
-            if (player.equals(event.getPlayer())) return;
-            bossBars.forEach(bossBar -> ((CraftPlayer) event.getPlayer()).getHandle().playerConnection.sendPacket(
-                    new PacketPlayOutEntityDestroy(bossBar._entity.getEntityId())));
-        });
     }
 
     @EventHandler

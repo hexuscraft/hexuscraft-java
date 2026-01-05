@@ -1,7 +1,7 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.common.chat.C;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.C;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;

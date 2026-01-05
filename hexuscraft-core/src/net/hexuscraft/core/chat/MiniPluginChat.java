@@ -1,11 +1,11 @@
 package net.hexuscraft.core.chat;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.chat.C;
-import net.hexuscraft.common.chat.F;
+import net.hexuscraft.common.utils.C;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.database.queries.PermissionQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
-import net.hexuscraft.common.messages.SupportMessage;
+import net.hexuscraft.common.database.messages.SupportMessage;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.command.*;
