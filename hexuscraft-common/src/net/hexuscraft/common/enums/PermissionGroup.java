@@ -12,48 +12,54 @@ public enum PermissionGroup {
 
 //    Base Ranks
 
-    MEMBER("Member", C.cWhite, 1), // Default rank for all new players
-    VIP("VIP", C.cGreen, 2, MEMBER), // First purchasable rank available at store.hexuscraft.net
-    MVP("MVP", C.cAqua, 3, VIP), // Second purchasable rank available at store.hexuscraft.net
-    MEDIA("Media", C.cDPurple, 4, MVP), // Influencers, content creators and other famous personnel
+    PLAYER("Player", C.cWhite, 1, "A normal Hexian player. Thanks for playing our server!"),
+    VIP("VIP", C.cGreen, 2, "The first purchasable rank, available at store.hexuscraft.net.", PLAYER),
+    MVP("MVP", C.cAqua, 3, "The second purchasable rank, available at store.hexuscraft.net.", VIP),
+    MEDIA("Media", C.cDPurple, 4, "Content creators and influencers who create Minecraft gameplay videos.", MVP),
 
-//    Teams
+//    Public Teams
 
-    BUILD_TEAM("BuildTeam", C.cWhite, 0), // Build Team
-    BUILD_LEAD("BuildLead", C.cWhite, 0, BUILD_TEAM), // Build Team Lead
+    BUILD_TEAM("Builder", C.cBlue, 10, "Builders are responsible for creating and updating our game and lobby maps.", MEDIA), // Build Team
+    BUILD_LEAD("BuildLead", C.cWhite, 0, "Build Lead", BUILD_TEAM), // Build Team Lead
 
-    DEV_TEAM("DevTeam", C.cWhite, 0), // Dev Team
-    DEV_LEAD("DevLead", C.cWhite, 0, DEV_TEAM), // Dev Team Lead
+    EVENT_TEAM("E.Team", C.cWhite, 0, "Event Team"), // Events Team
+    EVENT_LEAD("E.Lead", C.cWhite, 0, "Event Lead", EVENT_TEAM), // Events Team Lead
 
-    EVENT_TEAM("EventTeam", C.cWhite, 0), // Events Team
-    EVENT_LEAD("EventLead", C.cWhite, 0, EVENT_TEAM), // Events Team Lead
+    MEDIA_TEAM("M.Team", C.cWhite, 0, "Media Team", MEDIA), // Media Team
+    MEDIA_LEAD("M.Lead", C.cWhite, 0, "Media Lead", MEDIA_TEAM), // Media Team Lead
 
-    MEDIA_TEAM("MediaTeam", C.cWhite, 0, MEDIA), // Media Team
-    MEDIA_LEAD("MediaLead", C.cWhite, 0, MEDIA_TEAM), // Media Team Lead
+    QUALITY_ASSURANCE_TEAM("QaTeam", C.cWhite, 0, "QA Team"),
+    QUALITY_ASSURANCE_LEAD("QaLead", C.cWhite, 0, "QA Lead", QUALITY_ASSURANCE_TEAM),
 
-    QA_TEAM("QaTeam", C.cWhite, 0), // QA Team
-    QA_LEAD("QaLead", C.cWhite, 0, QA_TEAM), // QA Team Lead
+// Staff-Only Teams
+
+    STAFF_MANAGEMENT_TEAM("SmTeam", C.cWhite, 0, "Staff Management Team"),
+    STAFF_MANAGEMENT_LEAD("SmLead", C.cWhite, 0, "Staff Management Lead", STAFF_MANAGEMENT_TEAM),
 
 //    Staff Ranks
 
-    TRAINEE("Trainee", C.cDAqua, 5, MVP), // Newly accepted moderators-in-training
-    MODERATOR("Mod", C.cYellow, 6, TRAINEE), // Moderators who help moderate the server
-    SENIOR_MODERATOR("Sr.Mod", C.cGold, 7, MODERATOR), // Moderators who have joined a staff-only team
-    ADMINISTRATOR("Admin", C.cRed, 8,
-            SENIOR_MODERATOR), // Leaders of a staff-only team with access to all network permissions
+    TRAINEE("Trainee", C.cDAqua, 200, "Trainees are moderators-in-training, undergoing a trial phase before becoming a fully-fleged moderator. You can contact them for assistance with /a.", MVP),
+    MODERATOR("Mod", C.cYellow, 201, "Moderators are responsible for assisting players, handling player reports and punishing rule-breakers. You can contact them for assistance with /a.", TRAINEE),
+    SENIOR_MODERATOR("Sr.Mod", C.cGold, 202, "Senior Moderators are moderators who have joined a staff-only team. They are responsible for performing their team's duties in addition to assisting players, handling player reports and punishing rule-breakers. You can contact them for assistance with /a.", MODERATOR),
+    ADMINISTRATOR("Admin", C.cRed, 203, "Administrators lead a team. They are responsible for managing their team ", SENIOR_MODERATOR),
 
     ;
+
+    public static final PermissionGroup MEMBER = PLAYER; // Legacy -- will go through redis and change old values soon
 
     public final String _prefix;
     public final String _color;
     public final int _weight;
+    public final String _description;
     public final PermissionGroup[] _inherits;
+
     public final List<IPermission> _permissions;
 
-    PermissionGroup(final String prefix, final String color, final int weight, final PermissionGroup... inherits) {
+    PermissionGroup(final String prefix, final String color, final int weight, final String description, final PermissionGroup... inherits) {
         _prefix = prefix;
         _color = color;
         _weight = weight;
+        _description = description;
         _inherits = inherits;
         _permissions = new ArrayList<>();
     }
