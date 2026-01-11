@@ -18,30 +18,20 @@ public final class F {
     private static final double MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
 
 
-    public static String fMain(final String prefix, final String... text) {
-        return C.cBlue + prefix + ">" + C.cGray + " " + String.join(C.cGray, text);
+    private static String f(final String prefix, final String... text) {
+        return prefix + ">" + C.cGray + " " + String.join(C.cGray, text);
     }
 
-    public static String fMain(final Object object, final String... text) {
-        return fMain(object.toString(), text);
+    public static String fMain(final Object prefix, final String... text) {
+        return f(C.cBlue + prefix.toString(), text);
     }
 
-
-    public static String fSub(final String prefix, final String... text) {
-        return fMain(C.cDGray + prefix, text);
+    public static String fSub(final Object prefix, final String... text) {
+        return f(C.cDGray + prefix.toString(), text);
     }
 
-    public static String fSub(final Object object, final String... text) {
-        return fSub(object.toString(), text);
-    }
-
-
-    public static String fStaff() {
-        return C.cAqua + C.fBold + C.fMagic + "#" + C.fReset + " ";
-    }
-
-    public static String fStaff(final String color) {
-        return color + C.fBold + C.fMagic + "#" + C.fReset + " ";
+    public static String fStaff(final Object prefix, final String... text) {
+        return f(C.cDAqua + prefix.toString(), text);
     }
 
 
