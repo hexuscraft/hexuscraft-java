@@ -1,7 +1,7 @@
 package net.hexuscraft.arcade.host;
 
 import net.hexuscraft.arcade.Arcade;
-import net.hexuscraft.arcade.host.command.CommandHostSet;
+import net.hexuscraft.arcade.host.command.CommandHost;
 import net.hexuscraft.common.IPermission;
 import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
@@ -42,9 +42,9 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
         _hostAbandonedTask = new AtomicReference<>();
         _hostLastSeenMillis = new AtomicLong(System.currentTimeMillis());
 
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_HOST);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_HOST);
         PermissionGroup.EVENT_LEAD._permissions.add(PERM.COMMAND_HOST_SET);
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_HOST_VIEW);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_HOST_VIEW);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
 
     @Override
     public void onEnable() {
-        _miniPluginCommand.register(new CommandHostSet(this));
+        _miniPluginCommand.register(new CommandHost(this));
 
         _hexusPlugin.runAsync(() -> {
             try {
@@ -86,7 +86,7 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
                 player.sendTitle(C.cYellow + "Server Abandoned", "Sending you back to a lobby...");
                 player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, Float.MAX_VALUE, 1);
             });
-            _miniPluginDatabase.getUnifiedJedis().del(ServerQueries.SERVERGROUP(_miniPluginPortal._serverGroupName));
+            _miniPluginDatabase.getJedis().del(ServerQueries.SERVERGROUP(_miniPluginPortal._serverGroupName));
         }, 0, 20L));
     }
 

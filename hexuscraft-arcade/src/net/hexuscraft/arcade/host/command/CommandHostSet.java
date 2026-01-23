@@ -12,11 +12,11 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class CommandHostSet extends BaseCommand<MiniPluginHost> {
     public CommandHostSet(final MiniPluginHost miniPluginHost) {
-        super(miniPluginHost, "set", "[Player]", "View or set the host of this server.", Set.of(),
-                MiniPluginHost.PERM.COMMAND_HOST_SET);
+        super(miniPluginHost, "set", "[Player]", "View or set the host of this server.", Set.of("s"), MiniPluginHost.PERM.COMMAND_HOST_SET);
     }
 
     @Override
@@ -26,52 +26,48 @@ public class CommandHostSet extends BaseCommand<MiniPluginHost> {
             return;
         }
 
-        if (args.length == 0) {
-            if (_miniPlugin._hostOfflinePlayer.get() == null) {
-                sender.sendMessage(F.fMain(this, F.fError("There is already no server host.")));
-                return;
-            }
-
-            sender.sendMessage(F.fMain(this, "There is now no server host."));
-            _miniPlugin._hostOfflinePlayer.set(null);
+        if (args.length == 0 && _miniPlugin._hostOfflinePlayer.get() == null) {
+            sender.sendMessage(F.fMain(this, F.fError("There is already no server host.")));
             return;
         }
 
-        final Player[] matches =
-                PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0],
-                        sender, players -> players.length != 1);
+        final Consumer<Player> sendHostRemovalMessage = (final Player player) -> {
+            //noinspection deprecation
+            player.sendTitle(C.cYellow + "Server Host", "You are no longer the host of this server.");
+            player.sendMessage(F.fMain(this, F.fError("You are no longer the host of this server.")));
+            player.playSound(player.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
+        };
+
+        if (args.length == 0) {
+            final OfflinePlayer oldHost = _miniPlugin._hostOfflinePlayer.getAndSet(null);
+            sender.sendMessage(F.fMain(this, "There is no longer a server host."));
+            if (oldHost.isOnline()) sendHostRemovalMessage.accept(oldHost.getPlayer());
+            return;
+        }
+
+        final Player[] matches = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0], sender, players -> players.length != 1);
         if (matches.length != 1) return;
 
         final Player newHost = matches[0];
         final OfflinePlayer oldHost = _miniPlugin._hostOfflinePlayer.getAndSet(newHost);
-
-        if (newHost.equals(oldHost)) {
+        
+        if (newHost == oldHost) {
             sender.sendMessage(F.fMain(this, F.fError(F.fItem(newHost.getDisplayName()), " is already the host of this server.")));
             return;
         }
 
+        _miniPlugin._hostOfflinePlayer.set(newHost);
         sender.sendMessage(F.fMain(this, "Set the server host to ", F.fItem(newHost.getDisplayName()), "."));
-
         //noinspection deprecation
         newHost.sendTitle(C.cYellow + "Server Host", "You are now the host of this server.");
         newHost.sendMessage(F.fMain(this, F.fSuccess("You are now the host of this server.")));
         newHost.playSound(newHost.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
-
-        if (oldHost == null) return;
-        if (!oldHost.isOnline()) return;
-
-        final Player oldHostPlayer = oldHost.getPlayer();
-        //noinspection deprecation
-        oldHostPlayer.sendTitle(C.cYellow + "Server Host", "You are no longer the host of this server.");
-        oldHostPlayer.sendMessage(F.fMain(this, F.fError("You are no longer the host of this server.")));
-        oldHostPlayer.playSound(newHost.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
     }
 
     @Override
     public List<String> tab(CommandSender sender, String alias, String[] args) {
         if (args.length == 1)
-            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender,
-                    false);
+            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender, false);
         return List.of();
     }
 }
