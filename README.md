@@ -157,7 +157,7 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 ### Motd
 
 > **STRING** `motd`
-> - Changes the proxy's MOTD. Example:
+> - Changes the MOTD on proxy servers. Example:
 > ```
 > §eMINI-GAMES, PRIVATE SERVERS, TOURNAMENTS
 > ```
