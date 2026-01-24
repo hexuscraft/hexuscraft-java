@@ -14,7 +14,7 @@
 
     <name>WebTranslator</name>
     <artifactId>hexuscraft-web-translator</artifactId>
-    <description>Translates web requests from Tebex to the network</description>
+    <description>Handles Tebex and Votifier web requests</description>
 
     <build>
         <sourceDirectory>${project.basedir}/src</sourceDirectory>
