@@ -12,11 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.exceptions.JedisException;
 
-import java.util.Arrays;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
 
@@ -35,7 +31,7 @@ public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
             return;
         }
 
-        final String serverGroupName = "EVENT";
+        final String serverGroupName = "Event";
 
         final ServerData[] existingServers = _miniPlugin.getServers(serverGroupName);
         if (existingServers.length > 0) {
@@ -53,29 +49,9 @@ public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
             return;
         }
 
-        final Set<Integer> portsInUse = Arrays.stream(_miniPlugin.getServerGroups()).filter(serverGroupData -> serverGroupData._name.startsWith("_")).map(serverGroupData -> serverGroupData._minPort).collect(Collectors.toUnmodifiableSet());
-        if (portsInUse.size() > MiniPluginPortal.MAX_PORT_PRIVATE_SERVERS - MiniPluginPortal.MIN_PORT_PRIVATE_SERVERS) {
-            sender.sendMessage(F.fMain(this, "Sorry, but we are currently at maximum capacity for private servers. Please try again later."));
-            return;
-        }
-
-        int portRange = MiniPluginPortal.MAX_PORT_PRIVATE_SERVERS - MiniPluginPortal.MIN_PORT_PRIVATE_SERVERS + 1;
-        boolean[] used = new boolean[portRange];
-        for (int p : portsInUse) {
-            if (p >= MiniPluginPortal.MIN_PORT_PRIVATE_SERVERS && p <= MiniPluginPortal.MAX_PORT_PRIVATE_SERVERS)
-                used[p - MiniPluginPortal.MIN_PORT_PRIVATE_SERVERS] = true;
-        }
-        int[] free = IntStream.range(0, portRange).filter(i -> !used[i]).map(i -> MiniPluginPortal.MIN_PORT_PRIVATE_SERVERS + i).toArray();
-
-        if (free.length == 0) {
-            sender.sendMessage(F.fMain(this, "Sorry, but we are currently at maximum capacity for private servers. Please try again later."));
-            return;
-        }
-
-        int port = free[ThreadLocalRandom.current().nextInt(free.length)];
         _miniPlugin._hexusPlugin.runAsync(() -> {
             try {
-                new ServerGroupData(serverGroupName, PermissionGroup.MEMBER.name(), port, port, 1, 0, "Arcade.jar", "Arcade.zip", 512, 100, false, 10000, new String[]{"SURVIVAL_GAMES"}, sender instanceof final Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(_miniPluginDatabase.getUnifiedJedis());
+                new ServerGroupData(serverGroupName, PermissionGroup.PLAYER.name(), MiniPluginPortal.EVENT_SERVER_PORT, MiniPluginPortal.EVENT_SERVER_PORT, 1, 0, "Arcade.jar", "Arcade.zip", 512, 100, false, 10000, new String[]{"SURVIVAL_GAMES"}, sender instanceof final Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(_miniPluginDatabase.getJedis());
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this, F.fError("There was an error creating your server. Please try again in a few moments or contact an administrator if this issue persists.")));
                 return;

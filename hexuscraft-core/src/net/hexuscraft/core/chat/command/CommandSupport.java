@@ -49,7 +49,7 @@ public final class CommandSupport extends BaseCommand<MiniPluginChat> {
 
         _miniPlugin._hexusPlugin.runAsync(() -> {
             try {
-                _miniPluginDatabase.getUnifiedJedis().publish(SupportMessage.CHANNEL_NAME,
+                _miniPluginDatabase.getJedis().publish(SupportMessage.CHANNEL_NAME,
                         new SupportMessage(player.getUniqueId(), String.join(" ", args),
                                 _miniPluginPortal._serverName).toString());
             } catch (final JedisException ex) {

@@ -65,11 +65,11 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
                 logSevere(ex);
             }
 
-            // We want to wait a few seconds before attempting to teleport the server host so the proxies and notchians have time to update their server cache
+            // We want to wait a little bit before attempting to teleport the server host so the proxies and notchians have time to update their server cache
             _hexusPlugin.runAsyncLater(() -> {
                 if (_hostOfflinePlayer.get() == null) return;
                 _miniPluginPortal.teleportAsync(_hostOfflinePlayer.get().getUniqueId(), _miniPluginPortal._serverName);
-            }, 60L);
+            }, 30L);
         });
 
         _hostAbandonedTask.set(_hexusPlugin.runSyncTimer(() -> {

@@ -16,7 +16,7 @@ public final class MiniPluginReport extends MiniPlugin<HexusPlugin> {
     public MiniPluginReport(final HexusPlugin plugin) {
         super(plugin, "Reports");
 
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_REPORT);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_REPORT);
     }
 
     @Override

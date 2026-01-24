@@ -1,9 +1,9 @@
 package net.hexuscraft.core.permission;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.database.queries.PermissionQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.MiniPluginCommand;
@@ -30,8 +30,8 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
         _permissionProfiles = new HashMap<>();
 
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_RANK);
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_RANK_LIST);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_RANK);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_RANK_LIST);
 
         PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_RANK_INFO);
 
@@ -42,8 +42,7 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(
-            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _miniPluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
         _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
     }
@@ -64,29 +63,29 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
     public void onPlayerLogin(final PlayerLoginEvent event) {
         final Player player = event.getPlayer();
 
-        final Set<PermissionGroup> groups = new HashSet<>();
+        final Set<String> permissionGroupNames;
         try {
-            _miniPluginDatabase.getUnifiedJedis().smembers(PermissionQueries.GROUPS(player.getUniqueId()))
-                    .forEach(secondaryGroupName -> {
-                        try {
-                            groups.add(PermissionGroup.valueOf(secondaryGroupName));
-                        } catch (final IllegalArgumentException ex) {
-                            logWarning("Could not parse permission group '" + secondaryGroupName + "' for player '" +
-                                    player.getName() + "' as it does not exist.");
-                        }
-                    });
+            permissionGroupNames = _miniPluginDatabase.getJedis().smembers(PermissionQueries.GROUPS(player.getUniqueId()));
         } catch (final JedisException ex) {
             logSevere(ex);
-            player.sendMessage(F.fMain(this, F.fError(
-                    "There was an error parsing your permissions profile. You have been temporarily given the ",
-                    F.fPermissionGroup(PermissionGroup.MEMBER),
-                    " permission group for this session. Please contact an administrator if this issue persists.")));
+            event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
+            event.setKickMessage("There was an error while fetching your permission groups. Please try again later or contact an administrator if this issue persists.");
+            return;
         }
 
-        if (groups.isEmpty()) groups.add(PermissionGroup.MEMBER);
+        final Set<PermissionGroup> permissionGroups = new HashSet<>();
+        permissionGroupNames.forEach(permissionGroupName -> {
+            try {
+                permissionGroups.add(PermissionGroup.valueOf(permissionGroupName));
+            } catch (final IllegalArgumentException ex) {
+                logWarning(ex);
+                player.sendMessage(F.fMain(this, F.fError("There was an error while parsing one of your permission groups '", F.fItem(permissionGroupName), "'. Please contact an administrator if this issue persists across multiple servers.")));
+            }
+        });
 
-        _permissionProfiles.put(player, new PermissionProfile(groups.toArray(PermissionGroup[]::new),
-                player.addAttachment(_hexusPlugin)));
+        if (permissionGroups.isEmpty()) permissionGroups.add(PermissionGroup.PLAYER);
+
+        _permissionProfiles.put(player, new PermissionProfile(permissionGroups.toArray(PermissionGroup[]::new), player.addAttachment(_hexusPlugin)));
         refreshPermissions(player);
     }
 
@@ -102,8 +101,7 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
         final PermissionProfile profile = _permissionProfiles.get(player);
         if (profile == null) {
-            logWarning("Unable to grant permissions for player '" + player.getName() +
-                    "' as they have no permission profile.");
+            logWarning("Unable to grant permissions for player '" + player.getName() + "' as they have no permission profile.");
             return;
         }
 
@@ -119,8 +117,7 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
         final PermissionProfile profile = _permissionProfiles.get(player);
         if (profile == null) {
-            logWarning("Unable to clear permissions for player '" + player.getName() +
-                    "' as they have no permission profile.");
+            logWarning("Unable to clear permissions for player '" + player.getName() + "' as they have no permission profile.");
             return;
         }
 
@@ -142,8 +139,7 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
         Arrays.stream(group._inherits).forEach(parentGroup -> {
             grantPermissions(attachment, parentGroup);
-            parentGroup._permissions.forEach(
-                    basePermission -> attachment.setPermission(basePermission.toString(), true));
+            parentGroup._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(), true));
         });
     }
 

@@ -23,7 +23,7 @@ public final class MiniPluginGame extends MiniPlugin<Arcade> {
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME_SET);
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_HUB);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_HUB);
     }
 
     @Override

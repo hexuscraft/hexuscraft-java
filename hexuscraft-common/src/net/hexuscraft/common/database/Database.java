@@ -1,23 +1,78 @@
 package net.hexuscraft.common.database;
 
 import redis.clients.jedis.*;
-import redis.clients.jedis.mcf.HealthCheckStrategy;
-import redis.clients.jedis.mcf.PingStrategy;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public final class Database {
 
     public static final String KEY_DELIMITER = ":";
 
-    public final UnifiedJedis _unifiedJedis;
+    public final UnifiedJedis _jedis;
+    private final Map<String, Map<PubSubConsumer, JedisPubSub>> _consumers;
 
     // TODO::::::::: https://redis.io/docs/latest/develop/clients/jedis/produsage/
 
-    public Database(final String host, final int port, final String username, final String password) throws Exception {
-        final HostAndPort hostAndPort = new HostAndPort(host, port);
+    public Database(final String host, final int port, final String username, final String password, final String clientName) throws Exception {
+        _consumers = new HashMap<>();
+        _jedis = buildUnifiedJedis(host, port, username, password, clientName);
+    }
 
-        final JedisClientConfig clientConfig = DefaultJedisClientConfig.builder().user(username).password(password).protocol(RedisProtocol.RESP3).socketTimeoutMillis(5000).connectionTimeoutMillis(5000).build();
+    public Database() {
+        final AtomicReference<String> atomicHost = new AtomicReference<>("127.0.0.1");
+        final AtomicInteger atomicPort = new AtomicInteger(6379);
+        final AtomicReference<String> atomicUsername = new AtomicReference<>("default");
+        final AtomicReference<String> atomicPassword = new AtomicReference<>("");
+
+        final File redisFile = new File("_redis.dat");
+        try (final Scanner scanner = new Scanner(redisFile)) {
+            ((Runnable) () -> {
+                if (!scanner.hasNextLine()) return;
+                atomicHost.set(scanner.nextLine());
+
+                if (!scanner.hasNextLine()) return;
+                atomicPort.set(Integer.parseInt(scanner.nextLine()));
+
+                if (!scanner.hasNextLine()) return;
+                atomicUsername.set(scanner.nextLine());
+
+                if (!scanner.hasNextLine()) return;
+                atomicPassword.set(scanner.nextLine());
+            }).run();
+        } catch (final FileNotFoundException ex) {
+            System.out.println("WARNING: Could not locate '" + redisFile.getName() + "'. Using default credentials '" + atomicUsername.get() + ":" + atomicPassword.get() + "@" + atomicHost.get() + ":" + atomicPort.get() + "'.");
+        }
+
+        final AtomicReference<String> clientName = new AtomicReference<>();
+        final File nameFile = new File("_name.dat");
+        try (final Scanner scanner = new Scanner(nameFile)) {
+            clientName.set(scanner.nextLine());
+        } catch (final FileNotFoundException ex) {
+            clientName.set(new Random().ints(16, 0, 36).mapToObj("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"::charAt).map(String::valueOf).collect(Collectors.joining()));
+            System.out.println("WARNING: Could not locate '" + nameFile.getName() + "'. Using random client name '" + clientName.get() + "'.");
+        }
+
+        _consumers = new HashMap<>();
+        _jedis = buildUnifiedJedis(atomicHost.get(), atomicPort.get(), atomicUsername.get(), atomicPassword.get(), clientName.get());
+        java.security.Security.setProperty("networkaddress.cache.ttl", "0");
+        java.security.Security.setProperty("networkaddress.cache.negative.ttl", "0");
+    }
+
+    public static String buildQuery(final String... args) {
+        return String.join(KEY_DELIMITER, args);
+    }
+
+    private UnifiedJedis buildUnifiedJedis(final String host, final int port, final String username, final String password, final String clientName) {
+        final HostAndPort hostAndPort = new HostAndPort(host, port);
 
         final ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
         connectionPoolConfig.setMaxTotal(32);
@@ -28,25 +83,40 @@ public final class Database {
         connectionPoolConfig.setTestWhileIdle(true);
         connectionPoolConfig.setTimeBetweenEvictionRuns(Duration.ofSeconds(1));
 
-        final HealthCheckStrategy.Config healthCheckStrategyConfig = PingStrategy.Config.builder().interval(5000).timeout(3000).numProbes(5).delayInBetweenProbes(100).build();
+        final JedisClientConfig jedisClientConfig = DefaultJedisClientConfig.builder().clientName(clientName).database(0).user(username).password(password).build();
 
-        final PingStrategy pingStrategy = new PingStrategy(hostAndPort, clientConfig, healthCheckStrategyConfig);
-
-        final MultiDbConfig.DatabaseConfig multiDbConfigDatabaseConfig = MultiDbConfig.DatabaseConfig.builder(hostAndPort, clientConfig).connectionPoolConfig(connectionPoolConfig).weight(1f).healthCheckStrategy(pingStrategy).build();
-
-        final MultiDbConfig.CircuitBreakerConfig multiDbConfigCircuitBreakerConfig = MultiDbConfig.CircuitBreakerConfig.builder().slidingWindowSize(2).failureRateThreshold(10.0f).minNumOfFailures(1000).build();
-
-        final MultiDbConfig.RetryConfig multiDbConfigRetryConfig = MultiDbConfig.RetryConfig.builder().maxAttempts(3).waitDuration(500).exponentialBackoffMultiplier(2).build();
-
-        final MultiDbConfig multiDbConfig = MultiDbConfig.builder().database(multiDbConfigDatabaseConfig).failureDetector(multiDbConfigCircuitBreakerConfig).failbackSupported(true).failbackCheckInterval(120000).gracePeriod(60000).commandRetry(multiDbConfigRetryConfig).fastFailover(true).retryOnFailover(false).build();
-
-        final MultiDbClient multiDbClient = MultiDbClient.builder().multiDbConfig(multiDbConfig).build();
-
-        _unifiedJedis = multiDbClient;
+        return RedisClient.builder().clientConfig(jedisClientConfig).hostAndPort(hostAndPort).poolConfig(connectionPoolConfig).build();
     }
 
-    public static String buildQuery(final String... args) {
-        return String.join(KEY_DELIMITER, args);
+    public void registerConsumer(final String pattern, final PubSubConsumer consumer) {
+        final Map<PubSubConsumer, JedisPubSub> consumerMap;
+        if (_consumers.containsKey(pattern)) consumerMap = _consumers.get(pattern);
+        else {
+            consumerMap = new HashMap<>();
+            _consumers.put(pattern, consumerMap);
+        }
+
+        final JedisPubSub jedisPubSub = new JedisPubSub() {
+            @Override
+            public void onPMessage(final String pattern, final String channelName, final String message) {
+                consumer.accept(pattern, channelName, message);
+            }
+        };
+
+        consumerMap.put(consumer, jedisPubSub);
+        new Thread(() -> _jedis.psubscribe(jedisPubSub, pattern)).start();
+    }
+
+    public void unregisterConsumer(final PubSubConsumer consumer) {
+        _consumers.forEach((pattern, consumerMap) -> {
+            consumerMap.remove(consumer);
+            if (!consumerMap.isEmpty()) return;
+            _consumers.remove(pattern);
+        });
+    }
+
+    public void unregisterConsumers() {
+        _consumers.clear();
     }
 
 }

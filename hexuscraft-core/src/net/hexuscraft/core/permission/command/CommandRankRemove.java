@@ -60,7 +60,7 @@ public final class CommandRankRemove extends BaseCommand<MiniPluginPermission> {
                 return;
             }
 
-            _miniPluginDatabase.getUnifiedJedis()
+            _miniPluginDatabase.getJedis()
                     .srem(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()), targetGroup.name());
             sender.sendMessage(F.fMain(this, "Removed sub-group ", F.fPermissionGroup(targetGroup), " from ",
                     F.fItem(offlinePlayer.getName()), "."));

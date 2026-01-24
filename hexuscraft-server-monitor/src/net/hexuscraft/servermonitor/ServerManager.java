@@ -1,8 +1,8 @@
 package net.hexuscraft.servermonitor;
 
-import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.database.data.ServerData;
 import net.hexuscraft.common.database.data.ServerGroupData;
+import net.hexuscraft.common.database.queries.ServerQueries;
 import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.exceptions.JedisException;
 
@@ -54,10 +54,10 @@ public final class ServerManager {
             return Optional.empty();
         }
 
-        int serverPort = serverGroupData._minPort + lowestId.get() - 1;
-
         final String serverName = serverGroupData._name + "-" + lowestId;
         _monitor.log(serverName + ": Starting: " + reason);
+
+        final int serverPort = serverGroupData._minPort + lowestId.get() - 1;
 
         try {
             new ServerData(serverName, "", serverGroupData._capacity, System.currentTimeMillis(), serverGroupData._name,
@@ -101,7 +101,7 @@ public final class ServerManager {
 
         final Thread thread = new Thread(() -> {
             try {
-                _monitor.log(serverName + ": Async-waiting for redis punish...");
+                _monitor.log(serverName + ": Async-waiting for redis data...");
 
                 final long startMs = System.currentTimeMillis();
                 while (true) {

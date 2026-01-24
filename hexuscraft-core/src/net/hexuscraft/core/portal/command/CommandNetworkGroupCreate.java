@@ -172,7 +172,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginPorta
             try {
                 new ServerGroupData(name, requiredPermission.name(), minPort, maxPort, totalServers, joinableServers,
                         plugin, worldZip, ram, capacity, worldEdit, timeoutMillis, games, null).update(
-                        _miniPluginDatabase.getUnifiedJedis());
+                        _miniPluginDatabase.getJedis());
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this, F.fError(
                         "JedisException while updating server group punish. Please contact dev-ops if this issue persists.")));

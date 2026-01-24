@@ -20,13 +20,14 @@ public final class Hub extends HexusPlugin {
 
     public Location _spawn = null;
 
-    @Override
-    public void load() {
-        require(new MiniPluginDoubleJump(this));
-        require(new MiniPluginHubScoreboard(this));
-        require(new MiniPluginNews(this));
-        require(new MiniPluginPlayer(this));
-        require(new MiniPluginTeam(this));
+    public Hub() {
+        super();
+
+        require(MiniPluginDoubleJump.class);
+        require(MiniPluginHubScoreboard.class);
+        require(MiniPluginNews.class);
+        require(MiniPluginPlayer.class);
+        require(MiniPluginTeam.class);
     }
 
     @Override

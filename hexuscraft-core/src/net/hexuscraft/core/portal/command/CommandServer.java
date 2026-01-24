@@ -36,7 +36,7 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
                 return;
             }
 
-            _miniPlugin.teleport(player, serverName);
+            _miniPlugin.teleport(player, serverData._name);
             return;
         }
         if (args.length == 0) {

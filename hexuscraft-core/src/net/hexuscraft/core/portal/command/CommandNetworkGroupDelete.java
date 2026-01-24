@@ -29,7 +29,7 @@ public final class CommandNetworkGroupDelete extends BaseCommand<MiniPluginPorta
         }
 
         final String key = ServerQueries.SERVERGROUP(args[0]);
-        _miniPluginDatabase.getUnifiedJedis().del(key);
+        _miniPluginDatabase.getJedis().del(key);
         sender.sendMessage(F.fMain(this, "Deleted ", F.fItem(key)));
     }
 

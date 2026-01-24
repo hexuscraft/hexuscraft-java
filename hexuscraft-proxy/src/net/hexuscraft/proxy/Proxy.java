@@ -18,13 +18,13 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.util.Favicon;
-import net.hexuscraft.common.utils.F;
+import net.hexuscraft.common.database.Database;
 import net.hexuscraft.common.database.data.PunishData;
 import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.enums.PunishType;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilUniqueId;
-import net.hexuscraft.proxy.database.PluginDatabase;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import redis.clients.jedis.UnifiedJedis;
@@ -43,9 +43,9 @@ import java.util.stream.Collectors;
 @Plugin(id = "hexuscraft-proxy", name = "Proxy", version = "1.0.0")
 public final class Proxy {
 
-    private final String MOTD_PREFIX = String.join("\n", "            §6§lHexuscraft§r §f§lNetwork§r  §9[1.8-1.21]§r", " §f§l▶§r ");
+    private final String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §9[1.8 & 1.21]§r", " §f§l▶§r ");
 
-    private final PluginDatabase _pluginDatabase;
+    private final Database _database;
     private final ProxyServer _server;
     private final Logger _logger;
     private final AtomicReference<String> _motd;
@@ -54,7 +54,7 @@ public final class Proxy {
 
     @Inject
     public Proxy(final ProxyServer server, final Logger logger) {
-        _pluginDatabase = new PluginDatabase();
+        _database = new Database();
         _server = server;
         _logger = logger;
         _motd = new AtomicReference<>(MOTD_PREFIX + "<insert funny message here>");
@@ -72,20 +72,18 @@ public final class Proxy {
     }
 
     private void updateMOTD() {
-        final UnifiedJedis jedis = _pluginDatabase.getUnifiedJedis();
+        final UnifiedJedis jedis = _database._jedis;
         _motd.set(MOTD_PREFIX + ServerQueries.getMotd(jedis));
 
     }
 
     private void updateServers() {
-        final UnifiedJedis jedis = _pluginDatabase.getUnifiedJedis();
-
         final List<ServerInfo> allServers = new ArrayList<>();
         final List<String> fallbackServers = new ArrayList<>();
         final AtomicInteger playerCount = new AtomicInteger();
         final AtomicInteger capacityCount = new AtomicInteger();
 
-        Arrays.stream(ServerQueries.getServers(jedis)).forEach(serverData -> {
+        Arrays.stream(ServerQueries.getServers(_database._jedis)).forEach(serverData -> {
             if (serverData._updatedByMonitor) return;
 
             final ServerInfo serverInfo = new ServerInfo(serverData._name, new InetSocketAddress(serverData._address, serverData._port));
@@ -143,7 +141,7 @@ public final class Proxy {
     @Subscribe
     private void onLogin(final LoginEvent event) {
         try {
-            final UnifiedJedis jedis = _pluginDatabase.getUnifiedJedis();
+            final UnifiedJedis jedis = _database._jedis;
             final Set<UUID> punishmentIds = jedis.smembers(PunishQueries.LIST(event.getPlayer().getUniqueId())).stream().map(UUID::fromString).collect(Collectors.toSet());
 
             // We want to display the longest ban remaining.
@@ -168,7 +166,7 @@ public final class Proxy {
 
                     final long remaining = punishData.getRemaining();
                     if (remaining <= 0) {
-                        _pluginDatabase.getUnifiedJedis().hset(PunishQueries.PUNISHMENT(punishmentUniqueId), Map.of("active", "false", "removeOrigin", Long.toString(System.currentTimeMillis()), "removeReason", "EXPIRED", "removeServer", "Proxy-" + _server.getBoundAddress().toString(), "removeStaffId", UtilUniqueId.EMPTY_UUID.toString(), "removeStaffServer", "Proxy-" + _server.getBoundAddress().toString()));
+                        _database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId), Map.of("active", "false", "removeOrigin", Long.toString(System.currentTimeMillis()), "removeReason", "EXPIRED", "removeServer", "Proxy-" + _server.getBoundAddress().toString(), "removeStaffId", UtilUniqueId.EMPTY_UUID.toString(), "removeStaffServer", "Proxy-" + _server.getBoundAddress().toString()));
                         continue;
                     }
 

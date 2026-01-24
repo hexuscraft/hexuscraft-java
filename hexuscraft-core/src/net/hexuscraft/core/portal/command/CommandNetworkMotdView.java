@@ -26,7 +26,7 @@ public final class CommandNetworkMotdView extends BaseCommand<MiniPluginPortal> 
     public void run(final CommandSender sender, final String alias, final String[] args) {
         sender.sendMessage(F.fMain(this, "Viewing the current MOTD:\n", F.fSub("", C.fReset +
                 ChatColor.translateAlternateColorCodes('&',
-                        ServerQueries.getMotd(_miniPluginDatabase.getUnifiedJedis())))));
+                        ServerQueries.getMotd(_miniPluginDatabase.getJedis())))));
     }
 
 }

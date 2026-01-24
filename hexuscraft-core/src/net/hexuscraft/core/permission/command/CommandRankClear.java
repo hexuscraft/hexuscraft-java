@@ -41,7 +41,7 @@ public final class CommandRankClear extends BaseCommand<MiniPluginPermission> {
 
             sender.sendMessage(F.fMain(this, "Clearing sub-groups of ", F.fItem(offlinePlayer.getName()), "..."));
 
-            _miniPluginDatabase.getUnifiedJedis().del(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
+            _miniPluginDatabase.getJedis().del(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
             sender.sendMessage(
                     F.fMain(this, F.fSuccess("Cleared sub-groups of ", F.fItem(offlinePlayer.getName()), ".")));
 

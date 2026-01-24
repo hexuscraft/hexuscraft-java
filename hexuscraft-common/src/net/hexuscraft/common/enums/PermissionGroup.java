@@ -45,8 +45,6 @@ public enum PermissionGroup {
 
     ;
 
-    public static final PermissionGroup MEMBER = PLAYER; // Legacy -- will go through redis and change old values soon
-
     public final String _prefix;
     public final String _color;
     public final int _weight;

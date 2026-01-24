@@ -26,8 +26,7 @@ public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPort
 
         if (args[0].equals("*")) {
             sender.sendMessage(F.fMain(this, "Sending restart command to all server groups..."));
-            Arrays.stream(_miniPlugin.getServerGroupNames()).filter(serverGroupName -> !serverGroupName.equals(_miniPlugin._serverGroupName)).forEach(_miniPlugin::restartServerGroupYields);
-            _miniPlugin.restartServerGroupYields(_miniPlugin._serverGroupName);
+            _miniPlugin.restartServerGroupAsync("*");
             sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to all server groups.")));
             return;
         }
@@ -48,7 +47,7 @@ public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPort
 
             _miniPlugin._hexusPlugin.runAsync(() -> {
                 try {
-                    _miniPlugin.restartServerGroupYields(serverGroupData._name);
+                    _miniPlugin.restartServerGroupAsync(serverGroupData._name);
                 } catch (final JedisException ex) {
                     sender.sendMessage(F.fMain(this, F.fError("JedisException while restarting server group. Please try again later or contact dev-ops if this issue persists.")));
                     return;

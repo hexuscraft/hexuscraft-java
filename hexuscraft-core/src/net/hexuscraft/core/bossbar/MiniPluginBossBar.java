@@ -5,7 +5,9 @@ import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.entity.UtilEntity;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy;
+import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntity;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -15,8 +17,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
@@ -54,15 +54,15 @@ public final class MiniPluginBossBar extends MiniPlugin<HexusPlugin> {
                         otherPlayer -> ((CraftPlayer) otherPlayer).getHandle().playerConnection.sendPacket(
                                 new PacketPlayOutEntityDestroy(wither.getEntityId())));
             });
-        }, 0, 1);
+        }, 0, 20);
     }
 
     public BossBar registerBossBar(final BossBar bossBar) {
         if (!_witherMap.containsKey(bossBar._player)) {
+            final PacketPlayOutSpawnEntity packet = new PacketPlayOutSpawnEntity();
+
             final Wither wither =
                     (Wither) bossBar._player.getWorld().spawnEntity(bossBar._player.getLocation(), EntityType.WITHER);
-            wither.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false),
-                    true);
             wither.setMaxHealth(100);
             wither.setHealth(100);
             wither.setCustomNameVisible(false);
@@ -71,6 +71,7 @@ public final class MiniPluginBossBar extends MiniPlugin<HexusPlugin> {
             wither.setMaximumNoDamageTicks(Integer.MAX_VALUE);
             wither.setNoDamageTicks(Integer.MAX_VALUE);
             wither.setMetadata("BossBarNPC", new FixedMetadataValue(_hexusPlugin, true));
+            ((CraftEntity) wither).getHandle().setInvisible(true);
 
             final NBTTagCompound nbtTagCompound = UtilEntity.getNBTTagCompound(wither);
             nbtTagCompound.setByte("NoAI", (byte) 1);

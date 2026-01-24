@@ -18,8 +18,8 @@ public final class MiniPluginWorld extends MiniPlugin<Build> {
     public MiniPluginWorld(final Build plugin) {
         super(plugin, "World");
 
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SPAWN);
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_WORLD);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_SPAWN);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_WORLD);
         PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_WORLD_CREATE);
     }
 

@@ -7,11 +7,12 @@ import net.hexuscraft.core.HexusPlugin;
 
 public final class Arcade extends HexusPlugin {
 
-    @Override
-    public void load() {
-        require(new MiniPluginGame(this));
-        require(new MiniPluginGameLobby(this));
-        require(new MiniPluginHost(this));
+    public Arcade() {
+        super();
+
+        require(MiniPluginGame.class);
+        require(MiniPluginGameLobby.class);
+        require(MiniPluginHost.class);
     }
 
 }

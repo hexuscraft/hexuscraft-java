@@ -1,8 +1,8 @@
 package net.hexuscraft.common.database.data;
 
+import net.hexuscraft.common.database.messages.PunishmentAppliedMessage;
 import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.enums.PunishType;
-import net.hexuscraft.common.database.messages.PunishmentAppliedMessage;
 import redis.clients.jedis.UnifiedJedis;
 
 import java.util.HashMap;
@@ -11,14 +11,14 @@ import java.util.UUID;
 
 public final class PunishData {
 
-    public final UUID uniqueId; // part of the key name
+    public final UUID id; // part of the key name
     public final PunishType type;
     public final Boolean active;
     public final Long origin;
     public final Long length;
     public final String reason;
     public final String server;
-    public final UUID staffUniqueId;
+    public final UUID staffId;
     public final String staffServer;
 
     // these cannot be guaranteed to exist unless 'active' is false. ye be warned!
@@ -29,14 +29,14 @@ public final class PunishData {
     public final String removeStaffServer;
 
     public PunishData(final Map<String, String> rawData) {
-        uniqueId = UUID.fromString(rawData.get("id"));
+        id = UUID.fromString(rawData.get("id"));
         type = PunishType.valueOf(rawData.get("type"));
         active = rawData.get("active").equals("true");
         origin = Long.parseLong(rawData.get("origin"));
         length = Long.parseLong(rawData.get("length"));
         reason = rawData.get("reason");
         server = rawData.get("server");
-        staffUniqueId = UUID.fromString(rawData.get("staffId"));
+        staffId = UUID.fromString(rawData.get("staffId"));
         staffServer = rawData.get("staffServer");
 
         if (!active) { // we cannot guarantee these should exist unless 'active' is false
@@ -63,7 +63,7 @@ public final class PunishData {
         map.put("length", length.toString());
         map.put("reason", reason);
         map.put("server", server);
-        map.put("staffId", staffUniqueId.toString());
+        map.put("staffId", staffId.toString());
         map.put("staffServer", staffServer);
 
         if (!active) {
@@ -79,9 +79,9 @@ public final class PunishData {
 
     @Override
     public String toString() {
-        return "PunishData " + uniqueId.toString() + ":" + "\n- type: " + type.toString() + "\n- active: " + active +
+        return "PunishData " + id.toString() + ":" + "\n- type: " + type.toString() + "\n- active: " + active +
                 "\n- origin: " + origin + "\n- length: " + length + "\n- reason: " + reason + "\n- staffId: " +
-                staffUniqueId.toString() + "\n- server: " + server + "\n- removeOrigin: " + removeOrigin +
+                staffId.toString() + "\n- server: " + server + "\n- removeOrigin: " + removeOrigin +
                 "\n- removeReason: " + removeReason + "\n- removeStaffId: " + removeStaffId.toString() +
                 "\n- removeServer: " + removeServer;
     }
@@ -115,9 +115,9 @@ public final class PunishData {
     }
 
     public void publish(final UnifiedJedis jedis, final UUID targetUuid) {
-        jedis.hset(PunishQueries.PUNISHMENT(uniqueId), toMap());
-        jedis.sadd(PunishQueries.LIST(targetUuid), uniqueId.toString());
-        new PunishmentAppliedMessage(targetUuid, uniqueId).publish(jedis);
+        jedis.hset(PunishQueries.PUNISHMENT(id), toMap());
+        jedis.sadd(PunishQueries.LIST(targetUuid), id.toString());
+        new PunishmentAppliedMessage(targetUuid, id).publish(jedis);
     }
 
 }

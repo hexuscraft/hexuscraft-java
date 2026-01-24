@@ -12,7 +12,7 @@ public final class ServerData {
 
     public final String _address;
     public final int _capacity;
-    public final long _created;
+    public final long _createdMillis;
     public final String _group;
     public final String _motd;
     public final int _players;
@@ -26,7 +26,7 @@ public final class ServerData {
 
         _address = serverData.getOrDefault("address", "127.0.0.1");
         _capacity = Integer.parseInt(serverData.getOrDefault("capacity", "0"));
-        _created = Long.parseLong(serverData.getOrDefault("created", "0"));
+        _createdMillis = Long.parseLong(serverData.getOrDefault("createdMillis", "0"));
         _group = serverData.get("group");
         _motd = serverData.getOrDefault("motd", "");
         _players = Integer.parseInt(serverData.getOrDefault("players", "0"));
@@ -36,14 +36,14 @@ public final class ServerData {
         _updatedByMonitor = Boolean.parseBoolean(serverData.getOrDefault("updatedByMonitor", "false"));
     }
 
-    public ServerData(final String name, final String address, final int capacity, final long created,
+    public ServerData(final String name, final String address, final int capacity, final long createdMillis,
                       final String group, final String motd, final int players, final int port, final double tps,
                       final long updated, final boolean updatedByMonitor) {
         _name = name;
 
         _address = address;
         _capacity = capacity;
-        _created = created;
+        _createdMillis = createdMillis;
         _group = group;
         _motd = motd;
         _players = players;
@@ -57,7 +57,7 @@ public final class ServerData {
         final Map<String, String> map = new HashMap<>();
         map.put("address", _address);
         map.put("capacity", Integer.toString(_capacity));
-        map.put("created", Long.toString(_created));
+        map.put("createdMillis", Long.toString(_createdMillis));
         map.put("group", _group);
         map.put("motd", _motd);
         map.put("players", Integer.toString(_players));

@@ -40,7 +40,7 @@ public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
 
             final Set<String> groupNames;
             try {
-                groupNames = _miniPluginDatabase.getUnifiedJedis()
+                groupNames = _miniPluginDatabase.getJedis()
                         .smembers(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this,

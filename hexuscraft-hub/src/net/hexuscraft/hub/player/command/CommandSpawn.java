@@ -1,10 +1,11 @@
 package net.hexuscraft.hub.player.command;
 
-import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.hub.player.MiniPluginPlayer;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -56,9 +57,11 @@ public final class CommandSpawn extends BaseCommand<MiniPluginPlayer> {
         sender.sendMessage(F.fMain(this) + "Teleported " + F.fItem(target.getDisplayName()) + " to spawn.");
         _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(staff -> {
             if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) return;
-            staff.sendMessage(F.fStaff() + F.fMain(this,
+            staff.sendMessage(F.fStaff(this,
                     F.fItem(sender instanceof final Player player ? player.getDisplayName() : sender.getName()),
                     " teleported ", F.fItem(target.getDisplayName()), " to spawn."));
+            staff.playSound(staff.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+
         });
     }
 }

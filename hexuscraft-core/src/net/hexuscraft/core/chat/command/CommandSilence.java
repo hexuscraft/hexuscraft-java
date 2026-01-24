@@ -26,8 +26,8 @@ public final class CommandSilence extends BaseCommand<MiniPluginChat> {
                     if (!player.hasPermission(MiniPluginChat.PERM.COMMAND_SILENCE_SEE.name())) return;
 
                     JSONObject jsonObject = new JSONObject(Map.of("text",
-                            F.fStaff() + F.fMain(this, F.fSuccess(
-                                    F.fItem(sender instanceof final Player senderPlayer ? player.getDisplayName() :
+                            F.fStaff(this, F.fSuccess(
+                                    F.fItem(sender instanceof final Player senderPlayer ? senderPlayer.getDisplayName() :
                                             sender.getName()), " un-muted the global chat."))));
                     player.sendRawMessage(jsonObject.toString());
                 });
@@ -36,8 +36,8 @@ public final class CommandSilence extends BaseCommand<MiniPluginChat> {
             _miniPlugin.setMuted(true);
             _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
                 if (!player.hasPermission(MiniPluginChat.PERM.COMMAND_SILENCE_SEE.name())) return;
-                player.sendMessage(F.fStaff() + F.fMain(this, F.fError(
-                        F.fItem(sender instanceof final Player senderPlayer ? player.getDisplayName() : sender.getName()),
+                player.sendMessage(F.fStaff(this, F.fError(
+                        F.fItem(sender instanceof final Player senderPlayer ? senderPlayer.getDisplayName() : sender.getName()),
                         " muted the global chat")));
             });
 

@@ -1,4 +1,4 @@
-package net.hexuscraft.core.database;
+package net.hexuscraft.common.database;
 
 import java.util.Objects;
 

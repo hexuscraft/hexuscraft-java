@@ -38,7 +38,7 @@ public final class CommandAnnouncement extends BaseCommand<MiniPluginChat> {
         }
 
         // TODO: Async-ify
-        _miniPluginDatabase.getUnifiedJedis().publish((_miniPlugin).CHANNEL_ANNOUNCEMENT,
+        _miniPluginDatabase.getJedis().publish((_miniPlugin).CHANNEL_ANNOUNCEMENT,
                 sender.getName() + "," + permissionGroup.name() + "," +
                         String.join(" ", Arrays.stream(args).skip(1).toArray(String[]::new)));
         sender.sendMessage(F.fMain(this, "Message has been broadcast."));

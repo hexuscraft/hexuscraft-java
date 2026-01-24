@@ -8,14 +8,16 @@ import net.hexuscraft.common.utils.UtilCooldown;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.MiniPluginCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.item.UtilItem;
 import net.hexuscraft.core.permission.MiniPluginPermission;
 import net.hexuscraft.core.player.PlayerTabInfo;
 import net.hexuscraft.core.portal.MiniPluginPortal;
 import net.hexuscraft.hub.Hub;
 import net.hexuscraft.hub.player.command.CommandSpawn;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -40,21 +42,19 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
 
     private MiniPluginCommand _pluginCommand;
     private MiniPluginPortal _miniPluginPortal;
-    private MiniPluginDatabase _miniPluginDatabase;
     private MiniPluginPermission _miniPluginPermission;
     private BukkitTask _actionTextTask;
 
     public MiniPluginPlayer(final Hub hub) {
         super(hub, "Player");
 
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SPAWN);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_SPAWN);
     }
 
     @Override
     public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
         _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
-        _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
         _miniPluginPermission = (MiniPluginPermission) dependencies.get(MiniPluginPermission.class);
     }
 
@@ -159,16 +159,19 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
         if (!(event.getWhoClicked() instanceof final Player player)) return;
         if (player.getGameMode().equals(GameMode.CREATIVE)) return;
 
-        final Inventory clickedInventory = event.getClickedInventory();
-        if (clickedInventory == null) {
-            event.setCancelled(true);
-        } else if (clickedInventory.equals(player.getInventory())) {
-            event.setCancelled(true);
+        event.setCancelled(true);
 
+        final Inventory clickedInventory = event.getInventory();
+        logInfo(event.getInventory().getName() + " + " + event.getInventory().getTitle());
+
+        if (clickedInventory.equals(player.getInventory())) {
             final ItemStack currentItem = event.getCurrentItem();
-            if (currentItem != null && onItemInteract(player, currentItem)) return;
-        } else if (clickedInventory.getName().equals("Lobby Menu")) {
-            event.setCancelled(true);
+            if (currentItem == null) return;
+
+            onItemInteract(player, currentItem);
+            return;
+        }
+        if (ChatColor.stripColor(clickedInventory.getName()).equals("Lobby Menu")) {
             final ItemStack currentItem = event.getCurrentItem();
             if (currentItem.hasItemMeta()) {
                 final ItemMeta currentItemMeta = currentItem.getItemMeta();
@@ -181,9 +184,6 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
                 }
             }
         }
-
-        // Player has clicked an item (or empty space) in an inventory which does not return
-        player.playSound(player.getLocation(), Sound.ITEM_BREAK, Float.MAX_VALUE, 0.5F);
     }
 
     void openGameMenu(final Player player) {
@@ -207,9 +207,7 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
     }
 
     void openLobbyMenu(final Player player) {
-        final Server server = _hexusPlugin.getServer();
-
-        final Inventory lobbyMenu = server.createInventory(player, 54, "Lobby Menu");
+        final Inventory lobbyMenu = _hexusPlugin.getServer().createInventory(player, 54, "Lobby Menu");
 
         Arrays.stream(_miniPluginPortal.getServers("Lobby")).limit(54).forEach(serverData -> {
             final int lobbyId = Integer.parseInt(serverData._name.split(serverData._group + "-")[1]);
@@ -221,8 +219,8 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
             serverItem.setAmount(lobbyId);
 
             final ItemMeta serverItemMeta = serverItem.getItemMeta();
-            serverItemMeta.setDisplayName(C.cGreen + C.fBold + "Lobby-" + lobbyId);
-            serverItemMeta.setLore(List.of(C.cGray + (isCurrentServer ? "You are here" : "Click to join"), "", F.fItem(serverData._players + "/" + serverData._capacity + " Players")));
+            serverItemMeta.setDisplayName(C.cAqua + C.fBold + "Lobby-" + lobbyId);
+            serverItemMeta.setLore(List.of(C.cDAqua + serverData._players + "/" + serverData._capacity + " Players", "", C.cYellow + C.fBold + (isCurrentServer ? "YOU ARE HERE" : "CLICK TO CONNECT")));
 
             serverItem.setItemMeta(serverItemMeta);
             lobbyMenu.setItem(lobbyId - 1, serverItem);

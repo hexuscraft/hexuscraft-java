@@ -75,7 +75,7 @@ public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
         int port = free[ThreadLocalRandom.current().nextInt(free.length)];
         _miniPlugin._hexusPlugin.runAsync(() -> {
             try {
-                new ServerGroupData(serverGroupName, PermissionGroup.MEMBER.name(), port, port, 1, 0, "Arcade.jar", "Arcade.zip", 512, 100, false, 10000, new String[]{"SURVIVAL_GAMES"}, sender instanceof final Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(_miniPluginDatabase.getUnifiedJedis());
+                new ServerGroupData(serverGroupName, PermissionGroup.PLAYER.name(), port, port, 1, 0, "Arcade.jar", "Arcade.zip", 512, 100, false, 10000, new String[]{"SURVIVAL_GAMES"}, sender instanceof final Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(_miniPluginDatabase.getJedis());
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this, F.fError("There was an error creating your server. Please try again in a few moments or contact an administrator if this issue persists.")));
                 return;

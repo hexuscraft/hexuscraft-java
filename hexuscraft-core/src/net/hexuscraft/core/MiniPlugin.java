@@ -12,15 +12,14 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
     public final T _hexusPlugin;
     public final String _prefix;
 
-    protected MiniPlugin(final T plugin, final String prefix) {
+    public MiniPlugin(final T plugin, final String prefix) {
         final long start = System.currentTimeMillis();
         _hexusPlugin = plugin;
         _prefix = prefix;
         logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void load(
-            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap) {
+    public final void load(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap) {
         final long start = System.currentTimeMillis();
         logInfo("Loading...");
 
@@ -58,21 +57,28 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         return _prefix;
     }
 
-    public void logInfo(final String message) {
+    public final void logInfo(final String message) {
         _hexusPlugin.logInfo("[" + _prefix + "] " + message);
     }
 
-    public void logWarning(final String message) {
+    public final void logInfo(final Exception ex) {
+        logInfo("[" + ex.getClass().getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()), Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString)).toArray(String[]::new)));
+    }
+
+    public final void logWarning(final String message) {
         _hexusPlugin.logWarning("[" + _prefix + "] " + message);
     }
 
-    public void logSevere(final String message) {
+    public final void logWarning(final Exception ex) {
+        logWarning("[" + ex.getClass().getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()), Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString)).toArray(String[]::new)));
+    }
+
+    public final void logSevere(final String message) {
         _hexusPlugin.logSevere("[" + _prefix + "] " + message);
     }
 
-    public void logSevere(final Exception ex) {
-        logSevere("[" + ex.getClass().getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
-                Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString)).toArray(String[]::new)));
+    public final void logSevere(final Exception ex) {
+        logSevere("[" + ex.getClass().getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()), Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString)).toArray(String[]::new)));
     }
 
 }

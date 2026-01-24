@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Map;
@@ -24,8 +25,7 @@ public final class MiniPluginGameLobby extends MiniPlugin<Arcade> {
     }
 
     @Override
-    public void onLoad(
-            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _miniPluginGame = (MiniPluginGame) dependencies.get(MiniPluginGame.class);
     }
 
@@ -34,8 +34,7 @@ public final class MiniPluginGameLobby extends MiniPlugin<Arcade> {
         if (_miniPluginGame._gameState.equals(GameState.IN_PROGRESS)) return;
 
         final Player player = event.getPlayer();
-        player.teleport(
-                _hexusPlugin.getServer().getWorlds().getFirst().getSpawnLocation().add(new Vector(0.5, 0, 0.5)));
+        player.teleport(_hexusPlugin.getServer().getWorlds().getFirst().getSpawnLocation().add(new Vector(0.5, 0, 0.5)));
         player.resetPlayerTime();
         player.resetPlayerWeather();
         player.resetMaxHealth();
@@ -59,11 +58,19 @@ public final class MiniPluginGameLobby extends MiniPlugin<Arcade> {
     @EventHandler
     public void onEntityDamage(final EntityDamageEvent event) {
         if (_miniPluginGame._gameState.equals(GameState.IN_PROGRESS)) return;
+
         if (!(event.getEntity() instanceof final Player player)) return;
+
         event.setCancelled(true);
 
         if (!event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) return;
         player.teleport(new Location(player.getWorld(), 0, 100, 0, 0, 0));
+    }
+
+    @EventHandler
+    public void onWeatherChange(final WeatherChangeEvent event) {
+        if (_miniPluginGame._gameState.equals(GameState.IN_PROGRESS)) return;
+        event.setCancelled(true);
     }
 
 }

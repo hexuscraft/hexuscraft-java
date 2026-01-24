@@ -68,16 +68,16 @@ public final class MiniPluginHubScoreboard extends MiniPlugin<Hub> {
                 score.setScore(i);
                 sidebarScores.add(score);
             }
-        }, 0, 10));
+        }, 0, 20));
     }
 
     @EventHandler
     private void onPlayerQuit(final PlayerQuitEvent event) {
         final Player player = event.getPlayer();
-        if (_sidebarUpdateTasks.containsKey(player)) {
-            _sidebarUpdateTasks.get(player).cancel();
-            _sidebarUpdateTasks.remove(player);
-        }
+        if (!_sidebarUpdateTasks.containsKey(player)) return;
+
+        _sidebarUpdateTasks.get(player).cancel();
+        _sidebarUpdateTasks.remove(player);
     }
 
     private String[] generateSidebarLines(final Player player) {

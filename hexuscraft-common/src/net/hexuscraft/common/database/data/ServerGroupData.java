@@ -29,7 +29,7 @@ public final class ServerGroupData {
     public ServerGroupData(final String name, final Map<String, String> serverGroupData) {
         _name = name;
 
-        _requiredPermission = serverGroupData.getOrDefault("requiredPermission", "MEMBER");
+        _requiredPermission = serverGroupData.getOrDefault("requiredPermission", "PLAYER");
         _minPort = Integer.parseInt(serverGroupData.getOrDefault("minPort", "0"));
         _maxPort = Integer.parseInt(serverGroupData.getOrDefault("maxPort", "0"));
         _totalServers = Integer.parseInt(serverGroupData.getOrDefault("totalServers", "0"));
@@ -39,7 +39,7 @@ public final class ServerGroupData {
         _ram = Integer.parseInt(serverGroupData.getOrDefault("ram", "512"));
         _capacity = Integer.parseInt(serverGroupData.getOrDefault("capacity", "20"));
         _worldEdit = Boolean.parseBoolean(serverGroupData.getOrDefault("worldEdit", "FALSE"));
-        _timeoutMillis = Integer.parseInt(serverGroupData.getOrDefault("timeoutMillis", "10000"));
+        _timeoutMillis = Integer.parseInt(serverGroupData.getOrDefault("timeoutMillis", "30000"));
         _games = serverGroupData.getOrDefault("games", "").split(",");
         _hostUniqueId =
                 UUID.fromString(serverGroupData.getOrDefault("hostUniqueId", UtilUniqueId.EMPTY_UUID.toString()));

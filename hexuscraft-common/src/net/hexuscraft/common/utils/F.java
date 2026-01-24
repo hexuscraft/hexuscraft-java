@@ -170,12 +170,12 @@ public final class F {
             case KICK -> {
                 return C.cRed + C.fBold + "You were kicked from the server\n" + C.cWhite + punishData.reason +
                         C.cDGreen + "\nUnfairly removed? Let us know at " + C.cGreen + "www.hexuscraft.net\n\n" +
-                        C.cDGray + punishData.uniqueId.toString();
+                        C.cDGray + punishData.id.toString();
             }
             case BAN -> {
                 return C.cRed + C.fBold + "You are banned for " + F.fTime(punishData.getRemaining()) + "\n" + C.cWhite +
                         punishData.reason + C.cDGreen + "\nUnfairly banned? Appeal at " + C.cGreen +
-                        "www.hexuscraft.net\n\n" + C.cDGray + punishData.uniqueId.toString();
+                        "www.hexuscraft.net\n\n" + C.cDGray + punishData.id.toString();
             }
             case MUTE -> {
                 return F.fMain("Punish", "You are muted for ", F.fItem(F.fTime(punishData.length))) + "\n" +

@@ -5,23 +5,23 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.UUID;
 
-public final class PortalTeleportOtherMessage extends BaseMessage {
+public final class PortalTeleportStaffMessage extends BaseMessage {
 
-    public final static String CHANNEL_NAME = "portal.teleportOther";
+    public final static String CHANNEL_NAME = "portal.teleportStaff";
 
     public final UUID _targetUUID;
     public final String _serverName;
     public final UUID _senderUUID;
 
-    public PortalTeleportOtherMessage(final UUID targetUUID, final String serverName, final UUID senderUUID) {
+    public PortalTeleportStaffMessage(final UUID targetUUID, final String serverName, final UUID senderUUID) {
         this._targetUUID = targetUUID;
         this._serverName = serverName;
         this._senderUUID = senderUUID;
     }
 
-    public static PortalTeleportOtherMessage parse(final String jsonString) {
+    public static PortalTeleportStaffMessage parse(final String jsonString) {
         final JSONObject jsonObject = new JSONObject(jsonString);
-        return new PortalTeleportOtherMessage(UUID.fromString(jsonObject.getString("targetUUID")), jsonObject.getString("serverName"), UUID.fromString(jsonObject.getString("senderUUID")));
+        return new PortalTeleportStaffMessage(UUID.fromString(jsonObject.getString("targetUUID")), jsonObject.getString("serverName"), UUID.fromString(jsonObject.getString("senderUUID")));
     }
 
     public String stringify() {

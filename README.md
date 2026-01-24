@@ -25,20 +25,36 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 ### PermissionGroup
 
-> - MEMBER
+> - PLAYER *(default)*
 > - VIP
 > - MVP
 > - MEDIA
+>
+>
 > - BUILD_TEAM
 > - BUILD_LEAD
+>
+>
 > - DEV_TEAM
 > - DEV_LEAD
+>
+>
 > - EVENT_TEAM
 > - EVENT_LEAD
+>
+>
 > - MEDIA_TEAM
 > - MEDIA_LEAD
-> - QA_TEAM
-> - QA_LEAD
+>
+>
+> - QUALITY_ASSURANCE_TEAM
+> - QUALITY_ASSURANCE_LEAD
+>
+>
+> - STAFF_MANAGEMENT_TEAM
+> - STAFF_MANAGEMENT_LEAD
+>
+>
 > - TRAINEE
 > - MODERATOR
 > - SENIOR_MODERATOR
@@ -51,7 +67,14 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > - MUTE
 > - BAN
 
+### ServerType
+
+> - VELOCITY
+> - BUKKIT
+
 ## Redis Keys
+
+*`*` required*
 
 ### Server Groups
 
@@ -59,19 +82,19 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 >
 > | Field              | Type                                    |
 > |--------------------|-----------------------------------------|
-> | requiredPermission | **String** (PermissionGroup Enum)       |
-> | minPort            | **Integer**                             |
-> | maxPort            | **Integer**                             |
-> | totalServers       | **Integer**                             |
-> | joinableServers    | **Integer**                             |
-> | plugin             | **String**                              |
-> | worldZip           | **String**                              |
-> | ram                | **Integer**                             |
 > | capacity           | **Integer**                             |
-> | worldEdit          | **Boolean**                             |
-> | timeoutMillis      | **Integer**                             |
 > | games              | **String** (Game Enums split by commas) |
-> | hostUniqueId           | **String** (Player UUID)                |
+> | hostUniqueId       | **String** (Player UUID)                |
+> | joinableServers    | **Integer**                             |
+> | maxPort            | **Integer**                             |
+> | minPort            | **Integer**                             |
+> | plugin             | **String**                              |
+> | ram                | **Integer**                             |
+> | requiredPermission | **String** (PermissionGroup Enum)       |
+> | totalServers       | **Integer**                             |
+> | timeoutMillis      | **Integer**                             |
+> | worldEdit          | **Boolean**                             |
+> | worldZip           | **String**                              |
 
 ### Servers
 
@@ -81,7 +104,7 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > |------------------|-------------------|
 > | address          | **String** (IPv4) |
 > | capacity         | **Integer**       |
-> | created          | **Long**          |
+> | createdMillis    | **Long**          |
 > | group            | **String**        |
 > | motd             | **String**        |
 > | players          | **Integer**       |
@@ -100,11 +123,7 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 >
 > Refer to the PermissionGroup enum for a list of ranks.
 >
-> - Example: `/rank set USERNAME DEVELOPER`
-
-> **STRING** `user:(UUID):permission:primary`
->
-> - PermissionGroup Enum
+> - Example: `/rank add Notch ADMINISTRATOR`
 
 > **SET** `user:(UUID):permission:groups`
 >
@@ -114,23 +133,23 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 > **HASH** `punishment:(UUID)`
 >
-> *\* = required*
+> *`^` required if `active` is `false`*
 >
-> | Field             | Type                         |
-> |-------------------|------------------------------|
-> | type*             | **String** (PunishType Enum) |
-> | active*           | **Boolean**                  |
-> | origin*           | **Long**                     |
-> | length*           | **Long**                     |
-> | reason*           | **String**                   |
-> | server*           | **String**                   |
-> | staffId*          | **String** (UUID)            |
-> | staffServer*      | **String**                   |
-> | removeOrigin      | **Long**                     |
-> | removeReason      | **String**                   |
-> | removeServer      | **String**                   |
-> | removeStaffId     | **String** (UUID)            |
-> | removeStaffServer | **String**                   | 
+> | Field              | Type                         |
+> |--------------------|------------------------------|
+> | type*              | **String** (PunishType Enum) |
+> | active*            | **Boolean**                  |
+> | origin*            | **Long**                     |
+> | length*            | **Long**                     |
+> | reason*            | **String**                   |
+> | server*            | **String**                   |
+> | staffId*           | **String** (UUID)            |
+> | staffServer*       | **String**                   |
+> | removeOrigin^      | **Long**                     |
+> | removeReason^      | **String**                   |
+> | removeServer^      | **String**                   |
+> | removeStaffId^     | **String** (UUID)            |
+> | removeStaffServer^ | **String**                   | 
 
 > **SET** `user:(UUID):punishments`
 > - `(UUID)` of redis keys `punishment:(UUID)`

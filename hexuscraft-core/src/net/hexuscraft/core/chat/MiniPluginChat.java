@@ -1,11 +1,11 @@
 package net.hexuscraft.core.chat;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.utils.C;
-import net.hexuscraft.common.utils.F;
+import net.hexuscraft.common.database.messages.SupportMessage;
 import net.hexuscraft.common.database.queries.PermissionQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
-import net.hexuscraft.common.database.messages.SupportMessage;
+import net.hexuscraft.common.utils.C;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.chat.command.*;
@@ -42,8 +42,8 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
     public MiniPluginChat(final HexusPlugin plugin) {
         super(plugin, "Chat");
 
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_HELP);
-        PermissionGroup.MEMBER._permissions.add(PERM.COMMAND_SUPPORT);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_HELP);
+        PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_SUPPORT);
 
         PermissionGroup.VIP._permissions.add(PERM.CHAT_PREFIX);
 
@@ -78,7 +78,7 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
         _pluginCommand.register(new CommandSupportResponse(this, _miniPluginPermission));
         _pluginCommand.register(new CommandHelp(this));
 
-        _miniPluginDatabase.registerConsumer(CHANNEL_ANNOUNCEMENT, (_, _, message) -> {
+        _miniPluginDatabase._database.registerConsumer(CHANNEL_ANNOUNCEMENT, (_, _, message) -> {
             final String[] args = message.split(",", 3);
             String senderName = args[0];
             String groupName = args[1];
@@ -104,7 +104,7 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
             });
         });
 
-        _miniPluginDatabase.registerConsumer(SupportMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+        _miniPluginDatabase._database.registerConsumer(SupportMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
             final SupportMessage messageData = SupportMessage.fromString(rawMessage);
 
             final String senderName;
@@ -124,7 +124,7 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
             else {
                 final Set<PermissionGroup> permissionGroups = new HashSet<>();
                 try {
-                    PermissionQueries.getGroupNames(_miniPluginDatabase.getUnifiedJedis(),
+                    PermissionQueries.getGroupNames(_miniPluginDatabase.getJedis(),
                             messageData._senderUniqueId()).forEach(permissionGroupName -> {
                         try {
                             permissionGroups.add(PermissionGroup.valueOf(permissionGroupName));
@@ -135,7 +135,7 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
                 } catch (final JedisException ex) {
                     ex.printStackTrace();
                 }
-                if (permissionGroups.isEmpty()) permissionGroups.add(PermissionGroup.MEMBER);
+                if (permissionGroups.isEmpty()) permissionGroups.add(PermissionGroup.PLAYER);
                 senderPermissionGroups = permissionGroups.toArray(PermissionGroup[]::new);
             }
 

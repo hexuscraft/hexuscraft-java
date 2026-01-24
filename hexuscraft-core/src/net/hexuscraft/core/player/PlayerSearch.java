@@ -62,6 +62,7 @@ public final class PlayerSearch {
         return completions;
     }
 
+    @Deprecated(forRemoval = true, since = "2026-01-17")
     public static OfflinePlayer offlinePlayerSearch(final String searchName) {
         //noinspection deprecation
         return Bukkit.getOfflinePlayer(searchName);
@@ -92,7 +93,7 @@ public final class PlayerSearch {
         return targetOfflinePlayer;
     }
 
-    public static MojangSession fetchMojangSession(UUID uuid) throws IOException {
+    public static MojangSession fetchMojangSession(final UUID uuid) throws IOException {
         final URL url;
         try {
             url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replaceAll("-", "")).toURL();

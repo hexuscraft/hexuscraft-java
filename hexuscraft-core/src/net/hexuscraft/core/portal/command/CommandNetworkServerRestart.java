@@ -26,8 +26,7 @@ public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPor
 
         if (args[0].equals("*")) {
             sender.sendMessage(F.fMain(this, "Sending restart command to all servers..."));
-            Arrays.stream(_miniPlugin.getServerNames()).forEach(_miniPlugin::restartServerYields);
-            _miniPlugin.restartServerYields(_miniPlugin._serverName);
+            _miniPlugin.restartServerAsync("*");
             sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to all servers.")));
             return;
         }
@@ -48,7 +47,7 @@ public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPor
 
             _miniPlugin._hexusPlugin.runAsync(() -> {
                 try {
-                    _miniPlugin.restartServerYields(serverData._name);
+                    _miniPlugin.restartServerAsync(serverData._name);
                 } catch (final JedisException ex) {
                     sender.sendMessage(F.fMain(this, F.fError("JedisException while restarting server. Please try again later or contact dev-ops if this issue persists.")));
                     return;

@@ -61,7 +61,7 @@ public final class CommandRankAdd extends BaseCommand<MiniPluginPermission> {
             sender.sendMessage(F.fMain(this, "Adding sub-group ", F.fPermissionGroup(targetGroup), " to ",
                     F.fItem(offlinePlayer.getName()), "..."));
 
-            _miniPluginDatabase.getUnifiedJedis()
+            _miniPluginDatabase.getJedis()
                     .sadd(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()), targetGroup.name());
             sender.sendMessage(F.fMain(this, F.fSuccess("Added sub-group " + F.fPermissionGroup(targetGroup), " to ",
                     F.fItem(offlinePlayer.getName()), ".")));
