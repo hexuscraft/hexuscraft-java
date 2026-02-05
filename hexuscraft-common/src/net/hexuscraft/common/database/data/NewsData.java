@@ -36,6 +36,8 @@ public final class NewsData {
         new NewsUpdatedMessage(_id).publish(jedis);
     }
 
+    // TODO: /news delete
+    @SuppressWarnings("unused")
     public void delete(final UnifiedJedis jedis) {
         jedis.del(NewsQueries.NEWS(_id));
         new NewsDeletedMessage(_id).publish(jedis);
