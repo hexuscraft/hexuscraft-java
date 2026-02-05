@@ -1,1 +1,0 @@
-mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -DartifactId=craftbukkit -Dversion=1.8.8-R0.1-SNAPSHOT -Dpackaging=jar -DgeneratePom=true

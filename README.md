@@ -4,6 +4,20 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 > **hexuscraft-server-monitor** scripts: https://github.com/hexuscraft/hexuscraft-scripts
 
+## Building
+
+### Dependencies
+
+You must provide your own CraftBukkit jar. The easiest way to do this is compiling CraftBukkit using BuildTools
+available at https://www.spigotmc.org/wiki/buildtools/
+
+Remember to add the file as a library to your local project. You can usually do this in your IDE but I prefer using a
+maven goal command:
+
+```
+mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -DartifactId=craftbukkit -Dversion=1.8.8-R0.1-SNAPSHOT -Dpackaging=jar -DgeneratePom=true
+```
+
 ## Enums
 
 ### CheatSeverity
@@ -80,37 +94,37 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 > **HASH** `servergroup:(String)`
 >
-> | Field              | Type                                    |
-> |--------------------|-----------------------------------------|
-> | capacity           | **Integer**                             |
-> | games              | **String** (Game Enums split by commas) |
-> | hostUniqueId       | **String** (Player UUID)                |
-> | joinableServers    | **Integer**                             |
-> | maxPort            | **Integer**                             |
-> | minPort            | **Integer**                             |
-> | plugin             | **String**                              |
-> | ram                | **Integer**                             |
+> |              Field | Type                                    |
+> |-------------------:|:----------------------------------------|
+> |           capacity | **Integer**                             |
+> |              games | **String** (Game Enums split by commas) |
+> |       hostUniqueId | **String** (Player UUID)                |
+> |    joinableServers | **Integer**                             |
+> |            maxPort | **Integer**                             |
+> |            minPort | **Integer**                             |
+> |             plugin | **String**                              |
+> |                ram | **Integer**                             |
 > | requiredPermission | **String** (PermissionGroup Enum)       |
-> | totalServers       | **Integer**                             |
-> | timeoutMillis      | **Integer**                             |
-> | worldEdit          | **Boolean**                             |
-> | worldZip           | **String**                              |
+> |       totalServers | **Integer**                             |
+> |      timeoutMillis | **Integer**                             |
+> |          worldEdit | **Boolean**                             |
+> |           worldZip | **String**                              |
 
 ### Servers
 
 > **HASH** `server:(String)`
 >
-> | Field            | Type              |
-> |------------------|-------------------|
-> | address          | **String** (IPv4) |
-> | capacity         | **Integer**       |
-> | createdMillis    | **Long**          |
-> | group            | **String**        |
-> | motd             | **String**        |
-> | players          | **Integer**       |
-> | port             | **Integer**       |
-> | tps              | **Double**        |
-> | updated          | **Long**          |
+> |            Field | Type              |
+> |-----------------:|:------------------|
+> |          address | **String** (IPv4) |
+> |         capacity | **Integer**       |
+> |    createdMillis | **Long**          |
+> |            group | **String**        |
+> |             motd | **String**        |
+> |          players | **Integer**       |
+> |             port | **Integer**       |
+> |              tps | **Double**        |
+> |          updated | **Long**          |
 > | updatedByMonitor | **Boolean**       |
 
 ### Permissions
@@ -135,20 +149,20 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 >
 > *`^` required if `active` is `false`*
 >
-> | Field              | Type                         |
-> |--------------------|------------------------------|
-> | type*              | **String** (PunishType Enum) |
-> | active*            | **Boolean**                  |
-> | origin*            | **Long**                     |
-> | length*            | **Long**                     |
-> | reason*            | **String**                   |
-> | server*            | **String**                   |
-> | staffId*           | **String** (UUID)            |
-> | staffServer*       | **String**                   |
-> | removeOrigin^      | **Long**                     |
-> | removeReason^      | **String**                   |
-> | removeServer^      | **String**                   |
-> | removeStaffId^     | **String** (UUID)            |
+> |              Field | Type                         |
+> |-------------------:|:-----------------------------|
+> |              type* | **String** (PunishType Enum) |
+> |            active* | **Boolean**                  |
+> |            origin* | **Long**                     |
+> |            length* | **Long**                     |
+> |            reason* | **String**                   |
+> |            server* | **String**                   |
+> |           staffId* | **String** (UUID)            |
+> |       staffServer* | **String**                   |
+> |      removeOrigin^ | **Long**                     |
+> |      removeReason^ | **String**                   |
+> |      removeServer^ | **String**                   |
+> |     removeStaffId^ | **String** (UUID)            |
 > | removeStaffServer^ | **String**                   | 
 
 > **SET** `user:(UUID):punishments`
@@ -161,3 +175,13 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 > ```
 > §eMINI-GAMES, PRIVATE SERVERS, TOURNAMENTS
 > ```
+
+### News
+
+> **HASH** `news:(UUID)`
+>
+> |   Field | Type        |
+> |--------:|:------------|
+> |  active | **Boolean** |
+> |  weight | **Integer** |
+> | message | **String**  |
