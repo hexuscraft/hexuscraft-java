@@ -58,7 +58,7 @@ public final class PunishData {
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<>();
         map.put("type", type.name());
-        map.put("active", active ? "true" : "false");
+        map.put("active", Boolean.toString(active));
         map.put("origin", origin.toString());
         map.put("length", length.toString());
         map.put("reason", reason);
@@ -75,15 +75,6 @@ public final class PunishData {
         }
 
         return map;
-    }
-
-    @Override
-    public String toString() {
-        return "PunishData " + id.toString() + ":" + "\n- type: " + type.toString() + "\n- active: " + active +
-                "\n- origin: " + origin + "\n- length: " + length + "\n- reason: " + reason + "\n- staffId: " +
-                staffId.toString() + "\n- server: " + server + "\n- removeOrigin: " + removeOrigin +
-                "\n- removeReason: " + removeReason + "\n- removeStaffId: " + removeStaffId.toString() +
-                "\n- removeServer: " + removeServer;
     }
 
     public Long getRemaining(final Long now) {
