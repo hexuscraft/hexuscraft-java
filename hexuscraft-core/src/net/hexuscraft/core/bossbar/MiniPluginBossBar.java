@@ -32,19 +32,17 @@ public final class MiniPluginBossBar extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onEnable() {
-        _hexusPlugin.runAsyncTimer(() -> {
-            _bossBarMap.forEach((player, bossBars) -> {
-                if (bossBars.isEmpty()) return;
-                final BossBar activeBossBar =
-                        bossBars.stream().max(Comparator.comparing(bossBar -> bossBar.weight().get())).orElse(null);
+        _hexusPlugin.runAsyncTimer(() -> _bossBarMap.forEach((player, bossBars) -> {
+            if (bossBars.isEmpty()) return;
+            final BossBar activeBossBar =
+                    bossBars.stream().max(Comparator.comparing(bossBar -> bossBar.weight().get())).orElse(null);
 
-                final Wither wither = _witherMap.get(player);
-                wither.setCustomName(activeBossBar.message().get());
-                wither.getWorld().getPlayers().stream().filter(otherPlayer -> !player.equals(otherPlayer)).forEach(
-                        otherPlayer -> ((CraftPlayer) otherPlayer).getHandle().playerConnection.sendPacket(
-                                new PacketPlayOutEntityDestroy(wither.getEntityId())));
-            });
-        }, 0, 1);
+            final Wither wither = _witherMap.get(player);
+            wither.setCustomName(activeBossBar.message().get());
+            wither.getWorld().getPlayers().stream().filter(otherPlayer -> !player.equals(otherPlayer)).forEach(
+                    otherPlayer -> ((CraftPlayer) otherPlayer).getHandle().playerConnection.sendPacket(
+                            new PacketPlayOutEntityDestroy(wither.getEntityId())));
+        }), 0, 1);
     }
 
     public BossBar registerBossBar(final BossBar bossBar) {
