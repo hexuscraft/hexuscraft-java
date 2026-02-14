@@ -17,9 +17,11 @@ public final class PlayerTabInfo {
         PacketPlayOutPlayerListHeaderFooter packet = new PacketPlayOutPlayerListHeaderFooter(headerComponent);
 
         try {
-            Field field = packet.getClass().getDeclaredField("b");
+            Field field = packet.getClass()
+                    .getDeclaredField("b");
             field.setAccessible(true);
-            field.set(packet, footerComponent);
+            field.set(packet,
+                    footerComponent);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -29,7 +31,8 @@ public final class PlayerTabInfo {
 
     public static void sendActionText(Player player, String message) {
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(
-                new PacketPlayOutChat(new ChatComponentText(message), (byte) 2));
+                new PacketPlayOutChat(new ChatComponentText(message),
+                        (byte) 2));
     }
 
 }

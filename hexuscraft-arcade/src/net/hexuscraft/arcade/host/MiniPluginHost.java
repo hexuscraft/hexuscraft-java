@@ -28,7 +28,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class MiniPluginHost extends MiniPlugin<Arcade> {
 
     public final AtomicReference<OfflinePlayer> _hostOfflinePlayer;
-    private final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5).toMillis();
+    private final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5)
+            .toMillis();
     private final AtomicReference<BukkitTask> _hostAbandonedTask;
     private final AtomicLong _hostLastSeenMillis;
     private MiniPluginCommand _miniPluginCommand;
@@ -36,7 +37,8 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
     private MiniPluginPortal _miniPluginPortal;
 
     public MiniPluginHost(final Arcade arcade) {
-        super(arcade, "Server Host");
+        super(arcade,
+                "Server Host");
 
         _hostOfflinePlayer = new AtomicReference<>();
         _hostAbandonedTask = new AtomicReference<>();
@@ -67,32 +69,47 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
 
             // We want to wait a little bit before attempting to teleport the server host so the proxies and notchians have time to update their server cache
             _hexusPlugin.runAsyncLater(() -> {
-                if (_hostOfflinePlayer.get() == null) return;
-                _miniPluginPortal.teleportAsync(_hostOfflinePlayer.get().getUniqueId(), _miniPluginPortal._serverName);
-            }, 30L);
+                        if (_hostOfflinePlayer.get() == null) return;
+                        _miniPluginPortal.teleportAsync(_hostOfflinePlayer.get()
+                                        .getUniqueId(),
+                                _miniPluginPortal._serverName);
+                    },
+                    30L);
         });
 
         _hostAbandonedTask.set(_hexusPlugin.runSyncTimer(() -> {
-            // We want to run the host check even if the server was started with no host, as an admin can become the host of any existing server.
-            final OfflinePlayer host = _hostOfflinePlayer.get();
-            if (host == null) return;
-            if (host.isOnline()) return;
-            if ((System.currentTimeMillis() - _hostLastSeenMillis.get()) < MAX_HOST_LAST_SEEN_MILLIS) return;
+                    // We want to run the host check even if the server was started with no host, as an admin can become the host of any existing server.
+                    final OfflinePlayer host = _hostOfflinePlayer.get();
+                    if (host == null) return;
+                    if (host.isOnline()) return;
+                    if ((System.currentTimeMillis() - _hostLastSeenMillis.get()) < MAX_HOST_LAST_SEEN_MILLIS) return;
 
-            _hostAbandonedTask.get().cancel();
-            _hexusPlugin.getServer().broadcastMessage(F.fMain(this, "The host has abandoned their server. You will be sent back to a lobby. Thanks for playing!"));
-            _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
-                //noinspection deprecation
-                player.sendTitle(C.cYellow + "Server Abandoned", "Sending you back to a lobby...");
-                player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, Float.MAX_VALUE, 1);
-            });
-            _miniPluginDatabase.getJedis().del(ServerQueries.SERVERGROUP(_miniPluginPortal._serverGroupName));
-        }, 0, 20L));
+                    _hostAbandonedTask.get()
+                            .cancel();
+                    _hexusPlugin.getServer()
+                            .broadcastMessage(F.fMain(this,
+                                    "The host has abandoned their server. You will be sent back to a lobby. Thanks for playing!"));
+                    _hexusPlugin.getServer()
+                            .getOnlinePlayers()
+                            .forEach(player -> {
+                                //noinspection deprecation
+                                player.sendTitle(C.cYellow + "Server Abandoned",
+                                        "Sending you back to a lobby...");
+                                player.playSound(player.getLocation(),
+                                        Sound.ENDERDRAGON_GROWL,
+                                        Float.MAX_VALUE,
+                                        1);
+                            });
+                    _miniPluginDatabase._database._jedis.del(ServerQueries.SERVERGROUP(_miniPluginPortal._serverGroupName));
+                },
+                0,
+                20L));
     }
 
     @EventHandler
     public void onPlayerQuit(final PlayerQuitEvent event) {
-        if (!event.getPlayer().equals(_hostOfflinePlayer.get())) return;
+        if (!event.getPlayer()
+                .equals(_hostOfflinePlayer.get())) return;
         _hostLastSeenMillis.set(System.currentTimeMillis());
     }
 

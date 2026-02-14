@@ -16,11 +16,13 @@ public record PortalRestartServerMessage(String _serverName) {
     @Override
     @SuppressWarnings("NullableProblems")
     public String toString() {
-        return new JSONObject(Map.of("serverName", _serverName)).toString();
+        return new JSONObject(Map.of("serverName",
+                _serverName)).toString();
     }
 
     public void send(final UnifiedJedis jedis) {
-        jedis.publish(CHANNEL_NAME, toString());
+        jedis.publish(CHANNEL_NAME,
+                toString());
     }
 
 }

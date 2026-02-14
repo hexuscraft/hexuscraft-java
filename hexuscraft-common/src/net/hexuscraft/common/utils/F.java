@@ -8,7 +8,6 @@ import net.hexuscraft.common.enums.PermissionGroup;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 public final class F {
 
@@ -19,42 +18,31 @@ public final class F {
 
 
     private static String f(final String prefix, final String... text) {
-        return prefix + ">" + C.cGray + " " + String.join(C.cGray, text);
+        return prefix + ">" + C.cGray + " " + String.join(C.cGray,
+                text);
     }
 
     public static String fMain(final Object prefix, final String... text) {
-        return f(C.cBlue + prefix.toString(), text);
+        return f(C.cBlue + prefix.toString(),
+                text);
     }
 
     public static String fSub(final Object prefix, final String... text) {
-        return f(C.cDGray + prefix.toString(), text);
+        return f(C.cDGray + prefix.toString(),
+                text);
     }
 
     public static String fStaff(final Object prefix, final String... text) {
-        return f(C.cDAqua + prefix.toString(), text);
+        return f(C.cDAqua + prefix.toString(),
+                text);
     }
 
-
-    public static String fItem(final AtomicReference<?> atomicReference) {
-        return fItem(String.valueOf(atomicReference.get()));
-    }
-
-    public static String fItem(final String name) {
-        return C.cYellow + name;
-    }
 
     public static String fItem(final String... args) {
         if (args.length == 0) return "[]";
         if (args.length == 1) return C.cYellow + args[0];
-        return C.cGray + "[" + fItem(String.join(C.cGray + ", " + fItem(""), args)) + C.cGray + "]";
-    }
-
-    public static String fItem(final String name, final int count) {
-        return fItem(count + " " + name);
-    }
-
-    public static String fItem(final int... args) {
-        return fItem(Arrays.stream(args).mapToObj(Integer::toString).toArray(String[]::new));
+        return C.cGray + "[" + fItem(String.join(C.cGray + ", " + fItem(""),
+                args)) + C.cGray + "]";
     }
 
 
@@ -64,7 +52,10 @@ public final class F {
     }
 
     public static String fCurrency(final CurrencyType currencyType, final int amount) {
-        return fCurrency(currencyType._color, currencyType._nameSingular, currencyType._namePlural, amount);
+        return fCurrency(currencyType._color,
+                currencyType._nameSingular,
+                currencyType._namePlural,
+                amount);
     }
 
 
@@ -77,16 +68,25 @@ public final class F {
     public static String fCommand(final String alias, final String usage, final String description,
                                   final String prefix) {
         final StringBuilder builder = new StringBuilder();
-        builder.append(prefix).append("/").append(alias);
+        builder.append(prefix)
+                .append("/")
+                .append(alias);
         if (!usage.isEmpty()) {
-            builder.append(" ").append(usage);
+            builder.append(" ")
+                    .append(usage);
         }
-        builder.append(C.fReset).append(" ").append(C.cGray).append(description);
+        builder.append(C.fReset)
+                .append(" ")
+                .append(C.cGray)
+                .append(description);
         return builder.toString();
     }
 
     public static String fCommand(final String alias, final String usage, final String description) {
-        return fCommand(alias, usage, description, C.cWhite);
+        return fCommand(alias,
+                usage,
+                description,
+                C.cWhite);
     }
 
 
@@ -95,7 +95,9 @@ public final class F {
     }
 
     public static String fChat(final int level, final PermissionGroup permissionGroup) {
-        return C.cGray + level + " " + fPermissionGroup(permissionGroup, true, true) + C.cYellow + " %s" + C.fReset +
+        return C.cGray + level + " " + fPermissionGroup(permissionGroup,
+                true,
+                true) + C.cYellow + " %s" + C.fReset +
                 " " + "%s";
     }
 
@@ -121,29 +123,40 @@ public final class F {
     }
 
     public static String fPermissionGroup(final PermissionGroup group, final boolean uppercase) {
-        return fPermissionGroup(group, uppercase, false);
+        return fPermissionGroup(group,
+                uppercase,
+                false);
     }
 
     public static String fPermissionGroup(final PermissionGroup group) {
-        return fPermissionGroup(group, false, false);
+        return fPermissionGroup(group,
+                false,
+                false);
     }
 
     public static String fInsufficientPermissions() {
-        return fMain("Permissions", "You have insufficient permissions to do this.");
+        return fMain("Permissions",
+                "You have insufficient permissions to do this.");
     }
 
     public static String fInsufficientPermissions(final IPermission... requiredPermissions) {
         if (requiredPermissions.length > 0)
-            return fMain("Permissions", "You have insufficient permissions to do this.\n",
-                    F.fSub("", "Required permissions: ",
-                            F.fItem(Arrays.stream(requiredPermissions).map(IPermission::toString)
+            return fMain("Permissions",
+                    "You have insufficient permissions to do this.\n",
+                    F.fSub("",
+                            "Required permissions: ",
+                            F.fItem(Arrays.stream(requiredPermissions)
+                                    .map(IPermission::toString)
                                     .toArray(String[]::new))));
         return fInsufficientPermissions();
     }
 
     public static String fInsufficientPermissions(final String... messages) {
         if (messages.length > 0)
-            return fMain("Permissions", "You have insufficient permissions to ", F.fItem(F.fItem(messages)), ".");
+            return fMain("Permissions",
+                    "You have insufficient permissions to ",
+                    F.fItem(F.fItem(messages)),
+                    ".");
         return fInsufficientPermissions();
     }
 
@@ -153,19 +166,24 @@ public final class F {
     }
 
     public static String fSuccess(final String... text) {
-        return C.cGreen + String.join(C.cGreen, text);
+        return C.cGreen + String.join(C.cGreen,
+                text);
     }
 
     public static String fError(final String... text) {
-        return C.cRed + String.join(C.cRed, text);
+        return C.cRed + String.join(C.cRed,
+                text);
     }
 
 
     public static String fPunish(final PunishData punishData) {
         switch (punishData.type) {
             case WARNING -> {
-                return F.fMain("Punish", "You received a warning.") + "\n" +
-                        F.fMain("", "Reason: ", F.fItem(punishData.reason));
+                return F.fMain("Punish",
+                        "You received a warning.") + "\n" +
+                        F.fMain("",
+                                "Reason: ",
+                                F.fItem(punishData.reason));
             }
             case KICK -> {
                 return C.cRed + C.fBold + "You were kicked from the server\n" + C.cWhite + punishData.reason +
@@ -178,8 +196,12 @@ public final class F {
                         "www.hexuscraft.net\n\n" + C.cDGray + punishData.id.toString();
             }
             case MUTE -> {
-                return F.fMain("Punish", "You are muted for ", F.fItem(F.fTime(punishData.length))) + "\n" +
-                        F.fMain("", "Reason: ", F.fItem(punishData.reason));
+                return F.fMain("Punish",
+                        "You are muted for ",
+                        F.fItem(F.fTime(punishData.length))) + "\n" +
+                        F.fMain("",
+                                "Reason: ",
+                                F.fItem(punishData.reason));
             }
         }
         return "<unknown PunishData.type>";
@@ -188,13 +210,22 @@ public final class F {
 
     public static String fCheat(final String playerName, final CheatSeverity severity, final String reason) {
         return F.fStaff(severity._color) +
-                F.fMain("AC", F.fItem(playerName), " failed ", severity._color + reason + C.cGray, ".");
+                F.fMain("AC",
+                        F.fItem(playerName),
+                        " failed ",
+                        severity._color + reason + C.cGray,
+                        ".");
     }
 
     public static String fCheat(final String playerName, final CheatSeverity severity, final String reason,
                                 final String serverName) {
         return F.fStaff(severity._color) +
-                F.fMain("AC", F.fItem(playerName), " failed ", severity._color + reason + C.cGray, " in ", serverName,
+                F.fMain("AC",
+                        F.fItem(playerName),
+                        " failed ",
+                        severity._color + reason + C.cGray,
+                        " in ",
+                        serverName,
                         ".");
     }
 
@@ -207,13 +238,17 @@ public final class F {
         final String text;
         final double time;
         if (unit == TimeUnit.DAYS) {
-            text = (time = UtilMath.trim(millis / MILLIS_PER_DAY, trim)) + " Day";
+            text = (time = UtilMath.trim(millis / MILLIS_PER_DAY,
+                    trim)) + " Day";
         } else if (unit == TimeUnit.HOURS) {
-            text = (time = UtilMath.trim(millis / MILLIS_PER_HOUR, trim)) + " Hour";
+            text = (time = UtilMath.trim(millis / MILLIS_PER_HOUR,
+                    trim)) + " Hour";
         } else if (unit == TimeUnit.MINUTES) {
-            text = (time = UtilMath.trim(millis / MILLIS_PER_MINUTE, trim)) + " Minute";
+            text = (time = UtilMath.trim(millis / MILLIS_PER_MINUTE,
+                    trim)) + " Minute";
         } else if (unit == TimeUnit.SECONDS) {
-            text = (time = UtilMath.trim(millis / MILLIS_PER_SECOND, trim)) + " Second";
+            text = (time = UtilMath.trim(millis / MILLIS_PER_SECOND,
+                    trim)) + " Second";
         } else {
             text = (time = UtilMath.trim(millis)) + " Millisecond";
         }
@@ -227,19 +262,28 @@ public final class F {
 
     public static String fTime(final long millis, final int trim) {
         if (millis < MILLIS_PER_MINUTE) {
-            return fTime(millis, trim, TimeUnit.SECONDS);
+            return fTime(millis,
+                    trim,
+                    TimeUnit.SECONDS);
         }
         if (millis < MILLIS_PER_HOUR) {
-            return fTime(millis, trim, TimeUnit.MINUTES);
+            return fTime(millis,
+                    trim,
+                    TimeUnit.MINUTES);
         }
         if (millis < MILLIS_PER_DAY) {
-            return fTime(millis, trim, TimeUnit.HOURS);
+            return fTime(millis,
+                    trim,
+                    TimeUnit.HOURS);
         }
-        return fTime(millis, trim, TimeUnit.DAYS);
+        return fTime(millis,
+                trim,
+                TimeUnit.DAYS);
     }
 
     public static String fTime(final long millis) {
-        return fTime(millis, 1);
+        return fTime(millis,
+                1);
     }
 
     public static String fTabHeader(final String server) {
@@ -247,10 +291,14 @@ public final class F {
     }
 
     public static String fWelcomeMessage(final String playerName) {
-        return String.join("§r\n", " ", " §b§lWelcome " + playerName + " to Hexuscraft!",
+        return String.join("§r\n",
+                " ",
+                " §b§lWelcome " + playerName + " to Hexuscraft!",
                 "  §7A mini-game server inspired by the legacy Mineplex Network",
-                "   §7Type §e/help§7 to see available commands ", " ",
-                "  §7We are open source! Contribute to help improve our server", "   §e§nhttps://github.com/hexuscraft",
+                "   §7Type §e/help§7 to see available commands ",
+                " ",
+                "  §7We are open source! Contribute to help improve our server",
+                "   §e§nhttps://github.com/hexuscraft",
                 " ");
     }
 

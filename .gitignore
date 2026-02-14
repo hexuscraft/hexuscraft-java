@@ -1,7 +1,7 @@
 /*/target/
 /out/
-/.idea/
-# /lib/
+/.idea/*
+!/.idea/codeStyles
 
 ### Maven ###
 !.mvn/wrapper/maven-wrapper.jar

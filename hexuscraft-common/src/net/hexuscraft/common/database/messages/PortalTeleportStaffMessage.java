@@ -21,11 +21,18 @@ public final class PortalTeleportStaffMessage extends BaseMessage {
 
     public static PortalTeleportStaffMessage parse(final String jsonString) {
         final JSONObject jsonObject = new JSONObject(jsonString);
-        return new PortalTeleportStaffMessage(UUID.fromString(jsonObject.getString("targetUUID")), jsonObject.getString("serverName"), UUID.fromString(jsonObject.getString("senderUUID")));
+        return new PortalTeleportStaffMessage(UUID.fromString(jsonObject.getString("targetUUID")),
+                jsonObject.getString("serverName"),
+                UUID.fromString(jsonObject.getString("senderUUID")));
     }
 
     public String stringify() {
-        return new JSONObject(Map.ofEntries(Map.entry("targetUUID", _targetUUID.toString()), Map.entry("serverName", _serverName), Map.entry("senderUUID", _senderUUID.toString()))).toString();
+        return new JSONObject(Map.ofEntries(Map.entry("targetUUID",
+                        _targetUUID.toString()),
+                Map.entry("serverName",
+                        _serverName),
+                Map.entry("senderUUID",
+                        _senderUUID.toString()))).toString();
     }
 
 }

@@ -15,7 +15,12 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
 
     public BaseMultiCommand(final T miniPlugin, String name, String description, Set<String> aliases,
                             IPermission permission, Set<BaseCommand<T>> commands) {
-        super(miniPlugin, name, "", description, aliases, permission);
+        super(miniPlugin,
+                name,
+                "",
+                description,
+                aliases,
+                permission);
         _commands = commands;
     }
 
@@ -25,7 +30,11 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
             for (final BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands) {
                 if (!command.isAlias(args[0])) continue;
                 if (!command.testPermission(sender)) return;
-                command.run(sender, alias + " " + args[0], Arrays.copyOfRange(args, 1, args.length));
+                command.run(sender,
+                        alias + " " + args[0],
+                        Arrays.copyOfRange(args,
+                                1,
+                                args.length));
                 return;
             }
         }
@@ -33,11 +42,15 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
         final StringBuilder builder = new StringBuilder();
         builder.append(help(alias));
 
-        _commands.stream().sorted(Comparator.comparing(Command::getName)).forEach(command -> {
-            if (!command.testPermissionSilent(sender)) return;
-            builder.append("\n")
-                    .append(F.fCommand(alias + " " + command.getName(), command.getUsage(), command.getDescription()));
-        });
+        _commands.stream()
+                .sorted(Comparator.comparing(Command::getName))
+                .forEach(command -> {
+                    if (!command.testPermissionSilent(sender)) return;
+                    builder.append("\n")
+                            .append(F.fCommand(alias + " " + command.getName(),
+                                    command.getUsage(),
+                                    command.getDescription()));
+                });
 
         sender.sendMessage(builder.toString());
     }
@@ -46,10 +59,16 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
     public final List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         if (args.length > 1) {
             for (final BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands) {
-                if (!command.getName().equals(args[0]) && !command.getAliases().contains(args[0])) continue;
+                if (!command.getName()
+                        .equals(args[0]) && !command.getAliases()
+                        .contains(args[0])) continue;
                 if (!command.testPermissionSilent(sender)) break;
 
-                return command.tab(sender, args[0], Arrays.copyOfRange(args, 1, args.length));
+                return command.tab(sender,
+                        args[0],
+                        Arrays.copyOfRange(args,
+                                1,
+                                args.length));
             }
             return List.of();
         }

@@ -18,7 +18,8 @@ public final class MiniPluginCommand extends MiniPlugin<HexusPlugin> {
     private final AtomicReference<SimpleCommandMap> _commandMap;
 
     public MiniPluginCommand(final HexusPlugin plugin) {
-        super(plugin, "Command");
+        super(plugin,
+                "Command");
 
         _commands = new HashSet<>();
         _commandMap = new AtomicReference<>();
@@ -32,7 +33,9 @@ public final class MiniPluginCommand extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onEnable() {
-        _commandMap.get().getCommands().forEach(command -> command.setPermissionMessage(F.fInsufficientPermissions()));
+        _commandMap.get()
+                .getCommands()
+                .forEach(command -> command.setPermissionMessage(F.fInsufficientPermissions()));
     }
 
     @Override
@@ -43,7 +46,9 @@ public final class MiniPluginCommand extends MiniPlugin<HexusPlugin> {
 
     public void register(final Command command) {
         _commands.add(command);
-        _commandMap.get().register("", command);
+        _commandMap.get()
+                .register("",
+                        command);
     }
 
     public void unregister(final Command command) {

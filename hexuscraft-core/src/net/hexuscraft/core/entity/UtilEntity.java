@@ -8,12 +8,14 @@ public final class UtilEntity {
 
     public static NBTTagCompound getNBTTagCompound(final Entity entity) {
         final NBTTagCompound nbtTagCompound = new NBTTagCompound();
-        ((CraftEntity) entity).getHandle().c(nbtTagCompound);
+        ((CraftEntity) entity).getHandle()
+                .c(nbtTagCompound);
         return nbtTagCompound;
     }
 
     public static void saveNBTTagCompound(final Entity entity, final NBTTagCompound nbtTagCompound) {
-        ((CraftEntity) entity).getHandle().f(nbtTagCompound);
+        ((CraftEntity) entity).getHandle()
+                .f(nbtTagCompound);
     }
 
 }

@@ -15,7 +15,11 @@ import java.util.Set;
 public final class CommandGameMode extends BaseCommand<MiniPluginGameMode> {
 
     public CommandGameMode(final MiniPluginGameMode miniPluginGameMode) {
-        super(miniPluginGameMode, "gamemode", "<Players> [Toggle]", "Toggle creative mode.", Set.of("gm"),
+        super(miniPluginGameMode,
+                "gamemode",
+                "<Players> [Toggle]",
+                "Toggle creative mode.",
+                Set.of("gm"),
                 MiniPluginGameMode.PERM.COMMAND_GAMEMODE);
     }
 
@@ -29,13 +33,17 @@ public final class CommandGameMode extends BaseCommand<MiniPluginGameMode> {
         final Player[] targets;
 
         if (args.length > 0) {
-            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0],
-                    sender, matches -> matches.length == 0);
+            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
+                            .getOnlinePlayers(),
+                    args[0],
+                    sender,
+                    matches -> matches.length == 0);
             if (targets.length == 0) return;
         } else if (sender instanceof Player player) {
             targets = new Player[]{player};
         } else {
-            sender.sendMessage(F.fMain(this, F.fError("Only players can toggle their own creative mode.")));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("Only players can toggle their own creative mode.")));
             return;
         }
 
@@ -57,38 +65,54 @@ public final class CommandGameMode extends BaseCommand<MiniPluginGameMode> {
 
         if (targets.length > 1) {
             if (args.length == 1) {
-                sender.sendMessage(F.fMain(this, F.fError("Toggle argument must be provided with multiple targets.")));
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Toggle argument must be provided with multiple targets.")));
                 return;
             }
             newGameMode = getGameModeFromToggle(args[1]);
         } else {
-            newGameMode = getGameModeFromToggle(targets[0].getGameMode().equals(GameMode.CREATIVE) ? "false" : "true");
+            newGameMode = getGameModeFromToggle(targets[0].getGameMode()
+                    .equals(GameMode.CREATIVE) ? "false" : "true");
         }
 
         if (newGameMode == null) {
-            sender.sendMessage(F.fMain(this, F.fError("Invalid toggle argument: ", F.fItem(args[1]))));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("Invalid toggle argument: ",
+                            F.fItem(args[1]))));
             return;
         }
 
-        Arrays.stream(targets).forEach(target -> target.setGameMode(newGameMode));
+        Arrays.stream(targets)
+                .forEach(target -> target.setGameMode(newGameMode));
         sender.sendMessage(
-                F.fMain(this, F.fItem(Arrays.stream(targets).map(Player::getDisplayName).toArray(String[]::new)),
-                        " Creative Mode: ", F.fBoolean(newGameMode.equals(GameMode.CREATIVE))));
+                F.fMain(this,
+                        F.fItem(Arrays.stream(targets)
+                                .map(Player::getDisplayName)
+                                .toArray(String[]::new)),
+                        " Creative Mode: ",
+                        F.fBoolean(newGameMode.equals(GameMode.CREATIVE))));
     }
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         if (args.length == 1)
-            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender,
+            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer()
+                            .getOnlinePlayers(),
+                    sender,
                     true);
         return List.of();
     }
 
     private GameMode getGameModeFromToggle(final String toggle) {
-        if (Arrays.stream(new String[]{"0", "false"}).toList().contains(toggle.toLowerCase())) {
-            return _miniPlugin._hexusPlugin.getServer().getDefaultGameMode();
+        if (Arrays.stream(new String[]{"0", "false"})
+                .toList()
+                .contains(toggle.toLowerCase())) {
+            return _miniPlugin._hexusPlugin.getServer()
+                    .getDefaultGameMode();
         }
-        if (Arrays.stream(new String[]{"1", "true"}).toList().contains(toggle.toLowerCase())) {
+        if (Arrays.stream(new String[]{"1", "true"})
+                .toList()
+                .contains(toggle.toLowerCase())) {
             return GameMode.CREATIVE;
         }
         return null;

@@ -10,7 +10,11 @@ import java.util.Set;
 public final class CommandNetworkServerList extends BaseCommand<MiniPluginPortal> {
 
     CommandNetworkServerList(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "list", "", "List all servers.", Set.of("l"),
+        super(miniPluginPortal,
+                "list",
+                "",
+                "List all servers.",
+                Set.of("l"),
                 MiniPluginPortal.PERM.COMMAND_NETWORK_SERVER_LIST);
     }
 
@@ -21,7 +25,9 @@ public final class CommandNetworkServerList extends BaseCommand<MiniPluginPortal
             return;
         }
 
-        sender.sendMessage(F.fMain(this, "Servers: ", F.fItem(_miniPlugin.getServerNames())));
+        sender.sendMessage(F.fMain(this,
+                "Servers: ",
+                F.fItem(_miniPlugin.getServerNames())));
     }
 
 }

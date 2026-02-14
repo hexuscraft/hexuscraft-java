@@ -15,7 +15,13 @@ import java.util.Set;
 public final class CommandNpcList extends BaseCommand<MiniPluginNpc> {
 
     CommandNpcList(final MiniPluginNpc miniPluginNpc) {
-        super(miniPluginNpc, "list", "", "List all NPCs.", Set.of("ls", "l"), MiniPluginNpc.PERM.COMMAND_ENTITY_LIST);
+        super(miniPluginNpc,
+                "list",
+                "",
+                "List all NPCs.",
+                Set.of("ls",
+                        "l"),
+                MiniPluginNpc.PERM.COMMAND_ENTITY_LIST);
     }
 
     @Override
@@ -28,11 +34,21 @@ public final class CommandNpcList extends BaseCommand<MiniPluginNpc> {
         final Entity[] entities = _miniPlugin.list();
 
         final List<String> response = new ArrayList<>();
-        response.add(F.fMain(this, "Listing ", F.fItem(String.valueOf(entities.length)), " entities:"));
+        response.add(F.fMain(this,
+                "Listing ",
+                F.fItem(entities.length + " Entities")));
         response.addAll(Arrays.stream(entities)
-                .map(entity -> F.fMain("", F.fItem(entity.getCustomName()), " (", entity.getType().name(), ") (",
-                        FBukkit.fItem(entity.getLocation()), ")")).toList());
-        sender.sendMessage(String.join("\n", response));
+                .map(entity -> F.fMain("",
+                        F.fItem(entity.getCustomName()),
+                        " (",
+                        entity.getType()
+                                .name(),
+                        ") (",
+                        FBukkit.fItem(entity.getLocation()),
+                        ")"))
+                .toList());
+        sender.sendMessage(String.join("\n",
+                response));
     }
 
 }

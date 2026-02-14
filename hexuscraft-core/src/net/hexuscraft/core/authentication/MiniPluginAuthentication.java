@@ -10,14 +10,16 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public final class MiniPluginAuthentication extends MiniPlugin<HexusPlugin> {
 
     public MiniPluginAuthentication(final HexusPlugin plugin) {
-        super(plugin, "Authentication");
+        super(plugin,
+                "Authentication");
 
         PermissionGroup.TRAINEE._permissions.add(PERM.REQUIRE_AUTHENTICATION);
     }
 
     @EventHandler
     private void onPlayerJoin(final PlayerJoinEvent event) {
-        if (!event.getPlayer().hasPermission(PERM.REQUIRE_AUTHENTICATION.name())) {
+        if (!event.getPlayer()
+                .hasPermission(PERM.REQUIRE_AUTHENTICATION.name())) {
         }
         // TOOD: 2fa
     }

@@ -15,24 +15,33 @@ public final class CommandParse extends BaseCommand<MiniPluginParse> {
     private final Integer MINIMUM_RADIUS = 1;
 
     public CommandParse(final MiniPluginParse parse) {
-        super(parse, "parse", "<Radius>",
+        super(parse,
+                "parse",
+                "<Radius>",
                 "Parse your current world. The parse centers around chunk (0,0). The radius is the amount of chunks in each direction parsed.",
-                Set.of(), MiniPluginParse.PERM.COMMAND_PARSE);
+                Set.of(),
+                MiniPluginParse.PERM.COMMAND_PARSE);
     }
 
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
         try {
-            runLogic(sender, args);
+            runLogic(sender,
+                    args);
         } catch (final ExInvalidSender ex) {
-            sender.sendMessage(F.fMain(this, F.fError("Only players can execute this command.")));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("Only players can execute this command.")));
         } catch (final ExInvalidRadius ex) {
-            sender.sendMessage(F.fMain(this, F.fError("Invalid radius.")));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("Invalid radius.")));
         } catch (final ExRadiusTooSmall ex) {
-            sender.sendMessage(F.fMain(this, F.fError("Radius too small."), "Minimum radius: ",
+            sender.sendMessage(F.fMain(this,
+                    F.fError("Radius too small."),
+                    "Minimum radius: ",
                     F.fItem(Integer.toString(ex._minimumRadius))));
         } catch (final ExInvalidWorld ex) {
-            sender.sendMessage(F.fMain(this, F.fError("You cannot parse the default world.")));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("You cannot parse the default world.")));
         }
     }
 
@@ -54,11 +63,13 @@ public final class CommandParse extends BaseCommand<MiniPluginParse> {
         }
 
         final World world = player.getWorld();
-        if (world.getName().equals("world")) {
+        if (world.getName()
+                .equals("world")) {
             throw new ExInvalidWorld();
         }
 
-        _miniPlugin.parse(world, radius);
+        _miniPlugin.parse(world,
+                radius);
     }
 
     private static final class ExInvalidSender extends Exception {

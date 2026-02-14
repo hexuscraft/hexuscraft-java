@@ -25,14 +25,18 @@ public final class NewsData {
 
     public Map<String, String> toMap() {
         final Map<String, String> map = new HashMap<>();
-        map.put("active", Boolean.toString(_active));
-        map.put("weight", Integer.toString(_weight));
-        map.put("message", _message);
+        map.put("active",
+                Boolean.toString(_active));
+        map.put("weight",
+                Integer.toString(_weight));
+        map.put("message",
+                _message);
         return map;
     }
 
     public void publish(final UnifiedJedis jedis) {
-        jedis.hset(NewsQueries.NEWS(_id), toMap());
+        jedis.hset(NewsQueries.NEWS(_id),
+                toMap());
         new NewsUpdatedMessage(_id).publish(jedis);
     }
 

@@ -1,10 +1,10 @@
 package net.hexuscraft.core.anticheat;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.enums.CheatSeverity;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.enums.PunishType;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.portal.MiniPluginPortal;
@@ -27,7 +27,8 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
     private MiniPluginPunish _miniPluginPunish;
 
     public MiniPluginAntiCheat(final HexusPlugin plugin) {
-        super(plugin, "Anti Cheat");
+        super(plugin,
+                "Anti Cheat");
 
         _violations = new HashMap<>();
 
@@ -43,7 +44,10 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onEnable() {
-        _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> onPlayerJoin(new PlayerJoinEvent(player, null)));
+        _hexusPlugin.getServer()
+                .getOnlinePlayers()
+                .forEach(player -> onPlayerJoin(new PlayerJoinEvent(player,
+                        null)));
     }
 
     @Override
@@ -53,7 +57,8 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
 
     @EventHandler
     private void onPlayerJoin(final PlayerJoinEvent event) {
-        _violations.put(event.getPlayer(), new HashMap<>());
+        _violations.put(event.getPlayer(),
+                new HashMap<>());
     }
 
     @EventHandler
@@ -66,14 +71,22 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
         final Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.CREATIVE) return;
 
-        final double distance = player.getLocation().distance(event.getRightClicked().getLocation());
+        final double distance = player.getLocation()
+                .distance(event.getRightClicked()
+                        .getLocation());
         if (distance > 4) event.setCancelled(true);
         if (distance > 5.5) {
-            flag(player, "Reach", CheatSeverity.HIGH);
+            flag(player,
+                    "Reach",
+                    CheatSeverity.HIGH);
         } else if (distance > 5) {
-            flag(player, "Reach", CheatSeverity.MEDIUM);
+            flag(player,
+                    "Reach",
+                    CheatSeverity.MEDIUM);
         } else if (distance > 4.5) {
-            flag(player, "Reach", CheatSeverity.LOW);
+            flag(player,
+                    "Reach",
+                    CheatSeverity.LOW);
         }
     }
 
@@ -83,7 +96,10 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
             return;
         }
         Player player = ((Player) event.getDamager()).getPlayer();
-        double distance = event.getDamager().getLocation().distance(event.getEntity().getLocation());
+        double distance = event.getDamager()
+                .getLocation()
+                .distance(event.getEntity()
+                        .getLocation());
 
         if (distance > 4) {
             event.setCancelled(true);
@@ -94,23 +110,38 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
         }
 
         if (distance > 5.5) {
-            flag(player, "Reach", CheatSeverity.HIGH);
+            flag(player,
+                    "Reach",
+                    CheatSeverity.HIGH);
         } else if (distance > 5) {
-            flag(player, "Reach", CheatSeverity.MEDIUM);
+            flag(player,
+                    "Reach",
+                    CheatSeverity.MEDIUM);
         } else if (distance > 4.5) {
-            flag(player, "Reach", CheatSeverity.LOW);
+            flag(player,
+                    "Reach",
+                    CheatSeverity.LOW);
         }
     }
 
     public void alert(final Player player, final String reason, final CheatSeverity severity) {
-        _hexusPlugin.getServer().getOnlinePlayers().stream()
+        _hexusPlugin.getServer()
+                .getOnlinePlayers()
+                .stream()
                 .filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name()))
                 .forEach(staff -> staff.sendMessage(
-                        F.fCheat(player.getDisplayName(), severity, reason, _miniPluginPortal._serverName)));
+                        F.fCheat(player.getDisplayName(),
+                                severity,
+                                reason,
+                                _miniPluginPortal._serverName)));
     }
 
     public void kick(final Player player, final String reason) {
-        _miniPluginPunish.punishAsync(player.getUniqueId(), null, PunishType.KICK, 0, reason);
+        _miniPluginPunish.punishAsync(player.getUniqueId(),
+                null,
+                PunishType.KICK,
+                0,
+                reason);
     }
 
     public void flag(final Player player, final String reason, final CheatSeverity severity) {
@@ -119,14 +150,19 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
         final Map<String, Integer> playerViolations = _violations.get(player);
 
         if (!playerViolations.containsKey(keyName)) {
-            playerViolations.put(keyName, 0);
+            playerViolations.put(keyName,
+                    0);
         }
         final int newCount = playerViolations.get(keyName) + 1;
-        playerViolations.put(keyName, newCount);
+        playerViolations.put(keyName,
+                newCount);
 
-        alert(player, newCount + " " + reason, severity);
+        alert(player,
+                newCount + " " + reason,
+                severity);
         if (newCount == 10) {
-            kick(player, reason);
+            kick(player,
+                    reason);
         }
     }
 

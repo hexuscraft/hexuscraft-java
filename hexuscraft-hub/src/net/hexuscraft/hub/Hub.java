@@ -39,14 +39,27 @@ public final class Hub extends HexusPlugin {
     public void onWorldLoad(final WorldLoadEvent event) {
         final World world = event.getWorld();
         logInfo("WORLD NAME: '" + world.getName() + "'");
-        if (!world.getName().equals("world")) return;
+        if (!world.getName()
+                .equals("world")) return;
 
-        _spawn = new Location(world, 0, 100, 0, 0, 0);
+        _spawn = new Location(world,
+                0,
+                100,
+                0,
+                0,
+                0);
 
         try {
-            final Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_spawn.dat").toFile());
-            _spawn = new Location(event.getWorld(), scanner.nextDouble(), scanner.nextDouble(), scanner.nextDouble(),
-                    scanner.nextFloat(), scanner.nextFloat());
+            final Scanner scanner = new Scanner(Path.of(world.getWorldFolder()
+                                    .getPath(),
+                            "_spawn.dat")
+                    .toFile());
+            _spawn = new Location(event.getWorld(),
+                    scanner.nextDouble(),
+                    scanner.nextDouble(),
+                    scanner.nextDouble(),
+                    scanner.nextFloat(),
+                    scanner.nextFloat());
         } catch (FileNotFoundException ex) {
             logInfo("Could not locate _spawn.dat in world '" + world.getName() + "'");
         }

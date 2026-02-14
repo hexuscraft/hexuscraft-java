@@ -12,7 +12,11 @@ import java.util.Set;
 public final class CommandBuildVersion extends BaseCommand<MiniPluginBuildVersion> {
 
     public CommandBuildVersion(final MiniPluginBuildVersion plugin) {
-        super(plugin, "buildversion", "", "View information about the current plugin.", Set.of("bv"),
+        super(plugin,
+                "buildversion",
+                "",
+                "View information about the current plugin.",
+                Set.of("bv"),
                 MiniPluginBuildVersion.PERM.COMMAND_BUILDVERSION);
     }
 
@@ -27,15 +31,28 @@ public final class CommandBuildVersion extends BaseCommand<MiniPluginBuildVersio
         final PluginDescriptionFile description = plugin._hexusPlugin.getDescription();
         final long lastModified = plugin.getLastModifiedMillis();
 
-        final StringBuilder builder = new StringBuilder(F.fMain(this, "Plugin Information:\n"));
+        final StringBuilder builder = new StringBuilder(F.fMain(this,
+                "Plugin Information:\n"));
         Map.of(
-                "Name", description.getName(),
-                "Main", description.getMain(),
-                "Version", description.getVersion(),
-                "Load", description.getLoad().name(),
-                "Last Modified", F.fTime(System.currentTimeMillis() - lastModified) + " (" + lastModified + ")",
-                "File Size", plugin.getSizeBytes() + " (B)"
-        ).forEach((key, value) -> builder.append(F.fMain("", key, ": ", F.fItem(value), "\n")));
+                        "Name",
+                        description.getName(),
+                        "Main",
+                        description.getMain(),
+                        "Version",
+                        description.getVersion(),
+                        "Load",
+                        description.getLoad()
+                                .name(),
+                        "Last Modified",
+                        F.fTime(System.currentTimeMillis() - lastModified) + " (" + lastModified + ")",
+                        "File Size",
+                        plugin.getSizeBytes() + " (B)"
+                )
+                .forEach((key, value) -> builder.append(F.fMain("",
+                        key,
+                        ": ",
+                        F.fItem(value),
+                        "\n")));
         sender.sendMessage(builder.toString());
     }
 

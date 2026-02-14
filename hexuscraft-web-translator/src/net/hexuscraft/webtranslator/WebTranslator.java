@@ -30,14 +30,23 @@ public final class WebTranslator extends HexusPlugin {
     private void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
 
-        event.setJoinMessage(F.fSub("Join", player.getName()));
-        player.teleport(new Location(getServer().getWorlds().getFirst(), 0, 0, 0, 0, 0));
+        event.setJoinMessage(F.fSub("Join",
+                player.getName()));
+        player.teleport(new Location(getServer().getWorlds()
+                .getFirst(),
+                0,
+                0,
+                0,
+                0,
+                0));
         player.setGameMode(GameMode.SPECTATOR);
     }
 
     @EventHandler
     private void onPlayerQuit(final PlayerQuitEvent event) {
-        event.setQuitMessage(F.fSub("Quit", event.getPlayer().getName()));
+        event.setQuitMessage(F.fSub("Quit",
+                event.getPlayer()
+                        .getName()));
     }
 
     @EventHandler
@@ -48,7 +57,13 @@ public final class WebTranslator extends HexusPlugin {
 
     @EventHandler
     private void onPlayerMove(final PlayerMoveEvent event) {
-        event.setTo(new Location(getServer().getWorlds().getFirst(), 0, 0, 0, 0, 0));
+        event.setTo(new Location(getServer().getWorlds()
+                .getFirst(),
+                0,
+                0,
+                0,
+                0,
+                0));
     }
 
 }

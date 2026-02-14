@@ -12,15 +12,20 @@ public record SupportResponseMessage(UUID _senderUniqueId, UUID _targetUniqueId,
     public static SupportResponseMessage fromString(final String jsonString) {
         final JSONObject jsonObject = new JSONObject(jsonString);
         return new SupportResponseMessage(UUID.fromString(jsonObject.getString("senderUniqueId")),
-                UUID.fromString(jsonObject.getString("targetUniqueId")), jsonObject.getString("message"));
+                UUID.fromString(jsonObject.getString("targetUniqueId")),
+                jsonObject.getString("message"));
     }
 
     @Override
     @SuppressWarnings("NullableProblems")
     public String toString() {
         return new JSONObject(
-                Map.of("senderUniqueId", _senderUniqueId.toString(), "targetUniqueId", _targetUniqueId.toString(),
-                        "message", _message)).toString();
+                Map.of("senderUniqueId",
+                        _senderUniqueId.toString(),
+                        "targetUniqueId",
+                        _targetUniqueId.toString(),
+                        "message",
+                        _message)).toString();
     }
 
 }

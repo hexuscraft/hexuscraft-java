@@ -8,7 +8,11 @@ import java.util.Set;
 public final class CommandWorld extends BaseMultiCommand<MiniPluginWorld> {
 
     public CommandWorld(final MiniPluginWorld miniPluginWorld) {
-        super(miniPluginWorld, "world", "Create, edit and remove worlds.", Set.of(), MiniPluginWorld.PERM.COMMAND_WORLD,
+        super(miniPluginWorld,
+                "world",
+                "Create, edit and remove worlds.",
+                Set.of(),
+                MiniPluginWorld.PERM.COMMAND_WORLD,
                 Set.of(
                         new CommandWorldCreate(miniPluginWorld)
                 ));

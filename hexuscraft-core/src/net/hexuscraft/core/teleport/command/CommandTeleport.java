@@ -18,8 +18,11 @@ import java.util.Set;
 public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
 
     public CommandTeleport(final MiniPluginTeleport miniPluginTeleport) {
-        super(miniPluginTeleport, "teleport", "[Players] (<Player> / <X> <Y> <Z> [<Yaw> <Pitch>])",
-                "Teleport one or more players to a player or coordinates", Set.of("tp"),
+        super(miniPluginTeleport,
+                "teleport",
+                "[Players] (<Player> / <X> <Y> <Z> [<Yaw> <Pitch>])",
+                "Teleport one or more players to a player or coordinates",
+                Set.of("tp"),
                 MiniPluginTeleport.PERM.COMMAND_TELEPORT);
     }
 
@@ -31,14 +34,18 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
 
         if (args.length == 1) { // Teleport self to a player
             if (!(sender instanceof final Player player)) {
-                sender.sendMessage(F.fMain(this, F.fError("Only players can teleport themselves")));
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Only players can teleport themselves")));
                 return;
             }
             targets = new Player[]{player};
 
             final Player[] potentialDestinations =
-                    PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0],
-                            sender, players -> players.length != 1);
+                    PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
+                                    .getOnlinePlayers(),
+                            args[0],
+                            sender,
+                            players -> players.length != 1);
             if (potentialDestinations.length != 1) return;
             destination = potentialDestinations[0].getLocation();
             destinationName = F.fItem(potentialDestinations[0].getDisplayName());
@@ -48,13 +55,19 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                 return;
             }
 
-            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0],
-                    sender, players -> players.length == 0);
+            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
+                            .getOnlinePlayers(),
+                    args[0],
+                    sender,
+                    players -> players.length == 0);
             if (targets.length == 0) return;
 
             final Player[] potentialDestinations =
-                    PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[1],
-                            sender, players -> players.length != 1);
+                    PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
+                                    .getOnlinePlayers(),
+                            args[1],
+                            sender,
+                            players -> players.length != 1);
             if (potentialDestinations.length != 1) return;
 
             destination = potentialDestinations[0].getLocation();
@@ -66,7 +79,8 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
             }
 
             if (!(sender instanceof final Player player)) {
-                sender.sendMessage(F.fMain(this, F.fError("Only players can teleport themselves")));
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Only players can teleport themselves")));
                 return;
             }
             targets = new Player[]{player};
@@ -78,10 +92,19 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                 z = Double.parseDouble(args[2]);
             } catch (final NumberFormatException ex) {
                 sender.sendMessage(F.fMain(this,
-                        F.fError("Invalid coordinates ", F.fItem(args[0], args[1], args[2]), ".")));
+                        F.fError("Invalid coordinates ",
+                                F.fItem(args[0],
+                                        args[1],
+                                        args[2]),
+                                ".")));
                 return;
             }
-            destination = new Location(player.getWorld(), x, y, z, 0, 0);
+            destination = new Location(player.getWorld(),
+                    x,
+                    y,
+                    z,
+                    0,
+                    0);
             destinationName = FBukkit.fItem(destination);
         } else if (args.length == 4) { // Teleport targets to coords with yaw 0 pitch 0
             if (!sender.hasPermission(MiniPluginTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
@@ -93,14 +116,20 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                 return;
             }
 
-            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0],
-                    sender, players -> players.length == 0);
+            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
+                            .getOnlinePlayers(),
+                    args[0],
+                    sender,
+                    players -> players.length == 0);
             if (targets.length == 0) return;
 
             final World destinationWorld = sender instanceof Player player ? player.getWorld() :
-                    _miniPlugin._hexusPlugin.getServer().getWorlds().getFirst();
+                    _miniPlugin._hexusPlugin.getServer()
+                            .getWorlds()
+                            .getFirst();
             if (destinationWorld == null) {
-                sender.sendMessage(F.fMain(this, F.fError("Invalid destination world")));
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Invalid destination world")));
                 return;
             }
             final double x, y, z;
@@ -110,10 +139,19 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                 z = Double.parseDouble(args[3]);
             } catch (final NumberFormatException ex) {
                 sender.sendMessage(F.fMain(this,
-                        F.fError("Invalid coordinates ", F.fItem(args[1], args[2], args[3]), ".")));
+                        F.fError("Invalid coordinates ",
+                                F.fItem(args[1],
+                                        args[2],
+                                        args[3]),
+                                ".")));
                 return;
             }
-            destination = new Location(destinationWorld, x, y, z, 0, 0);
+            destination = new Location(destinationWorld,
+                    x,
+                    y,
+                    z,
+                    0,
+                    0);
             destinationName = FBukkit.fItem(destination);
         } else if (args.length == 5) { // Teleport self to coords with custom yaw-pitch
             if (!sender.hasPermission(MiniPluginTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
@@ -122,7 +160,8 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
             }
 
             if (!(sender instanceof final Player player)) {
-                sender.sendMessage(F.fMain(this, F.fError("Only players can teleport themselves")));
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Only players can teleport themselves")));
                 return;
             }
             targets = new Player[]{player};
@@ -136,12 +175,22 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                 yaw = Float.parseFloat(args[3]);
                 pitch = Float.parseFloat(args[4]);
             } catch (final NumberFormatException ex) {
-                sender.sendMessage(F.fMain(this, F.fError("Invalid coordinates ",
-                                F.fItem(args[0], args[1], args[2], F.fItem(args[3], args[4]))),
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Invalid coordinates ",
+                                F.fItem(args[0],
+                                        args[1],
+                                        args[2],
+                                        F.fItem(args[3],
+                                                args[4]))),
                         "."));
                 return;
             }
-            destination = new Location(player.getWorld(), x, y, z, yaw, pitch);
+            destination = new Location(player.getWorld(),
+                    x,
+                    y,
+                    z,
+                    yaw,
+                    pitch);
             destinationName = FBukkit.fItem(destination);
         } else if (args.length == 6) { // Teleport targets to coords with custom yaw-pitch
             if (!sender.hasPermission(MiniPluginTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
@@ -153,14 +202,20 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                 return;
             }
 
-            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0],
-                    sender, players -> players.length == 0);
+            targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
+                            .getOnlinePlayers(),
+                    args[0],
+                    sender,
+                    players -> players.length == 0);
             if (targets.length == 0) return;
 
             final World destinationWorld = sender instanceof Player player ? player.getWorld() :
-                    _miniPlugin._hexusPlugin.getServer().getWorlds().getFirst();
+                    _miniPlugin._hexusPlugin.getServer()
+                            .getWorlds()
+                            .getFirst();
             if (destinationWorld == null) {
-                sender.sendMessage(F.fMain(this, F.fError("Invalid destination world")));
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Invalid destination world")));
                 return;
             }
             final double x, y, z;
@@ -172,12 +227,22 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                 yaw = Float.parseFloat(args[4]);
                 pitch = Float.parseFloat(args[5]);
             } catch (final NumberFormatException ex) {
-                sender.sendMessage(F.fMain(this, F.fError("Invalid coordinates ",
-                                F.fItem(args[1], args[2], args[3], F.fItem(args[4], args[5]))),
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Invalid coordinates ",
+                                F.fItem(args[1],
+                                        args[2],
+                                        args[3],
+                                        F.fItem(args[4],
+                                                args[5]))),
                         "."));
                 return;
             }
-            destination = new Location(destinationWorld, x, y, z, yaw, pitch);
+            destination = new Location(destinationWorld,
+                    x,
+                    y,
+                    z,
+                    yaw,
+                    pitch);
             destinationName = FBukkit.fItem(destination);
         } else {
             sender.sendMessage(help(alias));
@@ -185,50 +250,78 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
         }
 
         if (destination == null) {
-            sender.sendMessage(F.fMain(this, F.fError("Invalid destination")));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("Invalid destination")));
             return;
         }
 
-        sender.sendMessage(F.fMain(this, "Teleporting ",
-                F.fItem(Arrays.stream(targets).map(Player::getDisplayName).toArray(String[]::new)), " to ",
-                destinationName, "."));
-        Arrays.stream(targets).forEach(target -> target.teleport(destination));
+        sender.sendMessage(F.fMain(this,
+                "Teleporting ",
+                F.fItem(Arrays.stream(targets)
+                        .map(Player::getDisplayName)
+                        .toArray(String[]::new)),
+                " to ",
+                destinationName,
+                "."));
+        Arrays.stream(targets)
+                .forEach(target -> target.teleport(destination));
     }
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         if (args.length == 1) {
-            final List<String> names = new ArrayList<>(List.of("*", "**"));
+            final List<String> names = new ArrayList<>(List.of("*",
+                    "**"));
             if (sender instanceof final Player player) {
                 names.add(".");
-                names.addAll(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream()
-                        .filter(target -> target.canSee(player)).map(Player::getName).toList());
+                names.addAll(_miniPlugin._hexusPlugin.getServer()
+                        .getOnlinePlayers()
+                        .stream()
+                        .filter(target -> target.canSee(player))
+                        .map(Player::getName)
+                        .toList());
                 return names;
             }
 
             names.addAll(
-                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
+                    _miniPlugin._hexusPlugin.getServer()
+                            .getOnlinePlayers()
+                            .stream()
+                            .map(Player::getName)
+                            .toList());
             return names;
         }
 
         if (args.length == 2) {
-            final List<String> names = new ArrayList<>(List.of("*", "**"));
+            final List<String> names = new ArrayList<>(List.of("*",
+                    "**"));
             if (sender instanceof final Player player) {
                 names.add(".");
-                names.add(Integer.toString(player.getLocation().getBlockZ()));
-                names.addAll(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream()
-                        .filter(target -> target.canSee(player)).map(Player::getName).toList());
+                names.add(Integer.toString(player.getLocation()
+                        .getBlockZ()));
+                names.addAll(_miniPlugin._hexusPlugin.getServer()
+                        .getOnlinePlayers()
+                        .stream()
+                        .filter(target -> target.canSee(player))
+                        .map(Player::getName)
+                        .toList());
                 return names;
             }
 
-            return _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+            return _miniPlugin._hexusPlugin.getServer()
+                    .getOnlinePlayers()
+                    .stream()
+                    .map(Player::getName)
+                    .toList();
         }
 
         if (args.length == 3 && sender instanceof final Player player)
-            return List.of(Integer.toString(player.getLocation().getBlockY()));
+            return List.of(Integer.toString(player.getLocation()
+                    .getBlockY()));
 
         if (args.length == 4 && sender instanceof final Player player)
-            return List.of(Integer.toString(player.getLocation().getBlockZ()));
+            return List.of(Integer.toString(player.getLocation()
+                    .getBlockZ()));
 
         return List.of();
     }

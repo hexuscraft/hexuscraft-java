@@ -33,14 +33,15 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
 
     public final String CHANNEL_ANNOUNCEMENT = "ChatAnnouncement";
     public final Set<CommandSender> _receivedTipSet;
-    private MiniPluginCommand _pluginCommand;
+    private MiniPluginCommand _miniPluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
     private MiniPluginPermission _miniPluginPermission;
     private MiniPluginPortal _miniPluginPortal;
     private boolean _chatMuted = false;
 
     public MiniPluginChat(final HexusPlugin plugin) {
-        super(plugin, "Chat");
+        super(plugin,
+                "Chat");
 
         PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_HELP);
         PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_SUPPORT);
@@ -62,7 +63,7 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
     @Override
     public void onLoad(
             final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
+        _miniPluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
         _miniPluginPermission = (MiniPluginPermission) dependencies.get(MiniPluginPermission.class);
         _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
         _miniPluginPortal = (MiniPluginPortal) dependencies.get(MiniPluginPortal.class);
@@ -70,84 +71,116 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onEnable() {
-        _pluginCommand.register(new CommandAnnouncement(this, _miniPluginDatabase));
-        _pluginCommand.register(new CommandBroadcast(this));
-        _pluginCommand.register(new CommandSilence(this));
-        _pluginCommand.register(
-                new CommandSupport(this, _miniPluginPermission, _miniPluginDatabase, _miniPluginPortal));
-        _pluginCommand.register(new CommandSupportResponse(this, _miniPluginPermission));
-        _pluginCommand.register(new CommandHelp(this));
+        _miniPluginCommand.register(new CommandAnnouncement(this,
+                _miniPluginDatabase));
+        _miniPluginCommand.register(new CommandBroadcast(this));
+        _miniPluginCommand.register(new CommandSilence(this));
+        _miniPluginCommand.register(
+                new CommandSupport(this,
+                        _miniPluginPermission,
+                        _miniPluginDatabase,
+                        _miniPluginPortal));
+        _miniPluginCommand.register(new CommandSupportResponse(this,
+                _miniPluginPermission));
+        _miniPluginCommand.register(new CommandHelp(this,
+                _miniPluginCommand));
 
-        _miniPluginDatabase._database.registerConsumer(CHANNEL_ANNOUNCEMENT, (_, _, message) -> {
-            final String[] args = message.split(",", 3);
-            String senderName = args[0];
-            String groupName = args[1];
-            String announcementMessage = ChatColor.translateAlternateColorCodes('&', args[2]);
+        _miniPluginDatabase._database.registerConsumer(CHANNEL_ANNOUNCEMENT,
+                (_, _, message) -> {
+                    final String[] args = message.split(",",
+                            3);
+                    String senderName = args[0];
+                    String groupName = args[1];
+                    String announcementMessage = ChatColor.translateAlternateColorCodes('&',
+                            args[2]);
 
-            PermissionGroup permissionGroup = PermissionGroup.valueOf(groupName);
+                    PermissionGroup permissionGroup = PermissionGroup.valueOf(groupName);
 
-            _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
-                if (player.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
-                    player.sendMessage(
-                            F.fSub("Staff", F.fItem(senderName), " broadcast to ", F.fPermissionGroup(permissionGroup),
-                                    "."));
-                }
+                    _hexusPlugin.getServer()
+                            .getOnlinePlayers()
+                            .forEach(player -> {
+                                if (player.hasPermission(PermissionGroup.ADMINISTRATOR.name())) {
+                                    player.sendMessage(
+                                            F.fSub("Staff",
+                                                    F.fItem(senderName),
+                                                    " broadcast to ",
+                                                    F.fPermissionGroup(permissionGroup),
+                                                    "."));
+                                }
 
-                if (!player.hasPermission(permissionGroup.name())) {
-                    return;
-                }
+                                if (!player.hasPermission(permissionGroup.name())) {
+                                    return;
+                                }
 
-                //noinspection deprecation
-                player.sendTitle(C.cYellow + "Announcement", announcementMessage);
-                player.sendMessage(F.fMain("Announcement", C.cAqua + announcementMessage));
-                player.playSound(player.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
-            });
-        });
+                                //noinspection deprecation
+                                player.sendTitle(C.cYellow + "Announcement",
+                                        announcementMessage);
+                                player.sendMessage(F.fMain("Announcement",
+                                        C.cAqua + announcementMessage));
+                                player.playSound(player.getLocation(),
+                                        Sound.LEVEL_UP,
+                                        Float.MAX_VALUE,
+                                        1);
+                            });
+                });
 
-        _miniPluginDatabase._database.registerConsumer(SupportMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
-            final SupportMessage messageData = SupportMessage.fromString(rawMessage);
+        _miniPluginDatabase._database.registerConsumer(SupportMessage.CHANNEL_NAME,
+                (_, _, rawMessage) -> {
+                    final SupportMessage messageData = SupportMessage.fromString(rawMessage);
 
-            final String senderName;
-            final PermissionGroup[] senderPermissionGroups;
+                    final String senderName;
+                    final PermissionGroup[] senderPermissionGroups;
 
-            try {
-                senderName = PlayerSearch.offlinePlayerSearch(messageData._senderUniqueId()).getName();
-            } catch (final IOException ex) {
-                logSevere(ex);
-                return;
-            }
+                    try {
+                        senderName = PlayerSearch.offlinePlayerSearch(messageData._senderUniqueId())
+                                .getName();
+                    } catch (final IOException ex) {
+                        logSevere(ex);
+                        return;
+                    }
 
-            final PermissionProfile[] permissionProfiles = _miniPluginPermission._permissionProfiles.keySet().stream()
-                    .filter(player -> player.getUniqueId().equals(messageData._senderUniqueId()))
-                    .map(_miniPluginPermission._permissionProfiles::get).toArray(PermissionProfile[]::new);
-            if (permissionProfiles.length == 1) senderPermissionGroups = permissionProfiles[0]._groups();
-            else {
-                final Set<PermissionGroup> permissionGroups = new HashSet<>();
-                try {
-                    PermissionQueries.getGroupNames(_miniPluginDatabase.getJedis(),
-                            messageData._senderUniqueId()).forEach(permissionGroupName -> {
+                    final PermissionProfile[] permissionProfiles = _miniPluginPermission._permissionProfiles.keySet()
+                            .stream()
+                            .filter(player -> player.getUniqueId()
+                                    .equals(messageData._senderUniqueId()))
+                            .map(_miniPluginPermission._permissionProfiles::get)
+                            .toArray(PermissionProfile[]::new);
+                    if (permissionProfiles.length == 1) senderPermissionGroups = permissionProfiles[0]._groups();
+                    else {
+                        final Set<PermissionGroup> permissionGroups = new HashSet<>();
                         try {
-                            permissionGroups.add(PermissionGroup.valueOf(permissionGroupName));
-                        } catch (final IllegalArgumentException ex) {
+                            PermissionQueries.getGroupNames(_miniPluginDatabase._database._jedis,
+                                            messageData._senderUniqueId())
+                                    .forEach(permissionGroupName -> {
+                                        try {
+                                            permissionGroups.add(PermissionGroup.valueOf(permissionGroupName));
+                                        } catch (final IllegalArgumentException ex) {
+                                            ex.printStackTrace();
+                                        }
+                                    });
+                        } catch (final JedisException ex) {
                             ex.printStackTrace();
                         }
-                    });
-                } catch (final JedisException ex) {
-                    ex.printStackTrace();
-                }
-                if (permissionGroups.isEmpty()) permissionGroups.add(PermissionGroup.PLAYER);
-                senderPermissionGroups = permissionGroups.toArray(PermissionGroup[]::new);
-            }
+                        if (permissionGroups.isEmpty()) permissionGroups.add(PermissionGroup.PLAYER);
+                        senderPermissionGroups = permissionGroups.toArray(PermissionGroup[]::new);
+                    }
 
-            _hexusPlugin.getServer().getOnlinePlayers().stream()
-                    .filter(player -> player.getUniqueId().equals(messageData._senderUniqueId()) ||
-                            player.hasPermission(PermissionGroup.TRAINEE.name())).forEach(player -> {
-                        player.sendMessage(C.cPurple + messageData._serverName() + " " +
-                                F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(senderPermissionGroups)) + " " +
-                                senderName + C.cPurple + " " + messageData._message());
-                        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-                    });
-        });
+                    _hexusPlugin.getServer()
+                            .getOnlinePlayers()
+                            .stream()
+                            .filter(player -> player.getUniqueId()
+                                    .equals(messageData._senderUniqueId()) ||
+                                    player.hasPermission(PermissionGroup.TRAINEE.name()))
+                            .forEach(player -> {
+                                player.sendMessage(C.cPurple + messageData._serverName() + " " +
+                                        F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(senderPermissionGroups)) + " " +
+                                        senderName + C.cPurple + " " + messageData._message());
+                                player.playSound(player.getLocation(),
+                                        Sound.NOTE_PLING,
+                                        Float.MAX_VALUE,
+                                        2);
+                            });
+                });
     }
 
     @Override
@@ -161,8 +194,9 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
 
     public void setMuted(boolean toggle) {
         _chatMuted = toggle;
-        _hexusPlugin.getServer().broadcastMessage(F.fMain(this,
-                toggle ? F.fError("The chat is now silenced.") : F.fSuccess("The chat is no longer silenced.")));
+        _hexusPlugin.getServer()
+                .broadcastMessage(F.fMain(this,
+                        toggle ? F.fError("The chat is now silenced.") : F.fSuccess("The chat is no longer silenced.")));
     }
 
     @EventHandler
@@ -170,15 +204,18 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
         final Player player = event.getPlayer();
 
         if (player.hasPermission(PERM.CHAT_PREFIX.name())) {
-            event.setFormat(F.fChat(0, PermissionGroup.getGroupWithHighestWeight(
-                    _miniPluginPermission._permissionProfiles.get(player)._groups())));
+            event.setFormat(F.fChat(0,
+                    PermissionGroup.getGroupWithHighestWeight(
+                            _miniPluginPermission._permissionProfiles.get(player)
+                                    ._groups())));
         } else {
             event.setFormat(F.fChat(0));
         }
 
         if (_chatMuted && !player.hasPermission(PERM.BYPASS_SILENCE.name())) {
             event.setCancelled(true);
-            player.sendMessage(F.fMain(this, F.fError("The chat is currently silenced.")));
+            player.sendMessage(F.fMain(this,
+                    F.fError("The chat is currently silenced.")));
         }
     }
 

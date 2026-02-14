@@ -1,7 +1,7 @@
 package net.hexuscraft.core.report.command;
 
-import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.report.MiniPluginReport;
@@ -18,7 +18,11 @@ import java.util.stream.Stream;
 public final class CommandReport extends BaseCommand<MiniPluginReport> {
 
     public CommandReport(MiniPluginReport miniPluginReport) {
-        super(miniPluginReport, "report", "<Player> <Reason>", "Report a player breaking rules.", Set.of(),
+        super(miniPluginReport,
+                "report",
+                "<Player> <Reason>",
+                "Report a player breaking rules.",
+                Set.of(),
                 MiniPluginReport.PERM.COMMAND_REPORT);
     }
 
@@ -34,25 +38,37 @@ public final class CommandReport extends BaseCommand<MiniPluginReport> {
             return;
         }
 
-        final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], player);
+        final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
+                player);
         if (offlinePlayer == null) {
-            sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+            sender.sendMessage(F.fMatches(new String[]{},
+                    args[0]));
             return;
         }
 
-        List<String> reasonArgs = new java.util.ArrayList<>(Arrays.stream(args).toList());
+        List<String> reasonArgs = new java.util.ArrayList<>(Arrays.stream(args)
+                .toList());
         reasonArgs.removeFirst();
-        String reason = String.join(" ", reasonArgs);
+        String reason = String.join(" ",
+                reasonArgs);
 
-        _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(onlinePlayer -> {
-            if (!onlinePlayer.hasPermission(PermissionGroup.TRAINEE.name())) return;
-            onlinePlayer.sendMessage(
-                    F.fMain(this, F.fItem(offlinePlayer.getName()), " reported by ", F.fItem(player.getDisplayName()),
-                            ":\n",
-                            F.fMain("", F.fItem(reason))));
-        });
+        _miniPlugin._hexusPlugin.getServer()
+                .getOnlinePlayers()
+                .forEach(onlinePlayer -> {
+                    if (!onlinePlayer.hasPermission(PermissionGroup.TRAINEE.name())) return;
+                    onlinePlayer.sendMessage(
+                            F.fMain(this,
+                                    F.fItem(offlinePlayer.getName()),
+                                    " reported by ",
+                                    F.fItem(player.getDisplayName()),
+                                    ":\n",
+                                    F.fMain("",
+                                            F.fItem(reason))));
+                });
 
-        sender.sendMessage(F.fMain(this, "Report against ", F.fItem(offlinePlayer.getName()),
+        sender.sendMessage(F.fMain(this,
+                "Report against ",
+                F.fItem(offlinePlayer.getName()),
                 " has been submitted for review. You will receive a response shortly."));
     }
 
@@ -63,11 +79,13 @@ public final class CommandReport extends BaseCommand<MiniPluginReport> {
 
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                    .getOnlinePlayers().stream();
+                    .getOnlinePlayers()
+                    .stream();
             if (sender instanceof final Player player)
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
 
-            names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
+            names.addAll(streamedOnlinePlayers.map(Player::getName)
+                    .toList());
         }
         return names;
     }

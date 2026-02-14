@@ -14,7 +14,14 @@ import java.util.Set;
 public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPortal> {
 
     public CommandNetworkServerRestart(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "restart", "<Server>", "The specified server will prevent new players from joining, send existing players to a Lobby, and then restart.", Set.of("r", "reboot", "rb"), MiniPluginPortal.PERM.COMMAND_NETWORK_SERVER_RESTART);
+        super(miniPluginPortal,
+                "restart",
+                "<Server>",
+                "The specified server will prevent new players from joining, send existing players to a Lobby, and then restart.",
+                Set.of("r",
+                        "reboot",
+                        "rb"),
+                MiniPluginPortal.PERM.COMMAND_NETWORK_SERVER_RESTART);
     }
 
     @Override
@@ -25,9 +32,11 @@ public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPor
         }
 
         if (args[0].equals("*")) {
-            sender.sendMessage(F.fMain(this, "Sending restart command to all servers..."));
+            sender.sendMessage(F.fMain(this,
+                    "Sending restart command to all servers..."));
             _miniPlugin.restartServerAsync("*");
-            sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to all servers.")));
+            sender.sendMessage(F.fMain(this,
+                    F.fSuccess("Successfully sent restart command to all servers.")));
             return;
         }
 
@@ -36,12 +45,16 @@ public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPor
             try {
                 serverData = _miniPlugin.getServer(args[0]);
             } catch (final JedisException ex) {
-                sender.sendMessage(F.fMain(this, F.fError("JedisException while fetching server punish. Please try again later or contact dev-ops if this issue persists.")));
+                sender.sendMessage(F.fMain(this,
+                        F.fError("JedisException while fetching server punish. Please try again later or contact dev-ops if this issue persists.")));
                 return;
             }
 
             if (serverData == null) {
-                sender.sendMessage(F.fMain(this, F.fError("Could not locate server with name ", F.fItem(args[0]), ".")));
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Could not locate server with name ",
+                                F.fItem(args[0]),
+                                ".")));
                 return;
             }
 
@@ -49,10 +62,14 @@ public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPor
                 try {
                     _miniPlugin.restartServerAsync(serverData._name);
                 } catch (final JedisException ex) {
-                    sender.sendMessage(F.fMain(this, F.fError("JedisException while restarting server. Please try again later or contact dev-ops if this issue persists.")));
+                    sender.sendMessage(F.fMain(this,
+                            F.fError("JedisException while restarting server. Please try again later or contact dev-ops if this issue persists.")));
                     return;
                 }
-                sender.sendMessage(F.fMain(this, "Restarting server ", F.fItem(serverData._name), "..."));
+                sender.sendMessage(F.fMain(this,
+                        "Restarting server ",
+                        F.fItem(serverData._name),
+                        "..."));
             });
         });
     }

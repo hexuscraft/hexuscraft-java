@@ -21,7 +21,8 @@ public final class MiniPluginGameLobby extends MiniPlugin<Arcade> {
     private MiniPluginGame _miniPluginGame;
 
     public MiniPluginGameLobby(final Arcade arcade) {
-        super(arcade, "Game Lobby");
+        super(arcade,
+                "Game Lobby");
     }
 
     @Override
@@ -34,7 +35,13 @@ public final class MiniPluginGameLobby extends MiniPlugin<Arcade> {
         if (_miniPluginGame._gameState.equals(GameState.IN_PROGRESS)) return;
 
         final Player player = event.getPlayer();
-        player.teleport(_hexusPlugin.getServer().getWorlds().getFirst().getSpawnLocation().add(new Vector(0.5, 0, 0.5)));
+        player.teleport(_hexusPlugin.getServer()
+                .getWorlds()
+                .getFirst()
+                .getSpawnLocation()
+                .add(new Vector(0.5,
+                        0,
+                        0.5)));
         player.resetPlayerTime();
         player.resetPlayerWeather();
         player.resetMaxHealth();
@@ -51,8 +58,10 @@ public final class MiniPluginGameLobby extends MiniPlugin<Arcade> {
         player.setExp(0);
         player.setCanPickupItems(false);
         player.setGameMode(GameMode.ADVENTURE);
-        player.getInventory().clear();
-        player.getInventory().setHeldItemSlot(0);
+        player.getInventory()
+                .clear();
+        player.getInventory()
+                .setHeldItemSlot(0);
     }
 
     @EventHandler
@@ -63,8 +72,14 @@ public final class MiniPluginGameLobby extends MiniPlugin<Arcade> {
 
         event.setCancelled(true);
 
-        if (!event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) return;
-        player.teleport(new Location(player.getWorld(), 0, 100, 0, 0, 0));
+        if (!event.getCause()
+                .equals(EntityDamageEvent.DamageCause.VOID)) return;
+        player.teleport(new Location(player.getWorld(),
+                0,
+                100,
+                0,
+                0,
+                0));
     }
 
     @EventHandler

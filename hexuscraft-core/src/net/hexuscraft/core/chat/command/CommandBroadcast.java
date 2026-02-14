@@ -13,8 +13,13 @@ import java.util.Set;
 public final class CommandBroadcast extends BaseCommand<MiniPluginChat> {
 
     public CommandBroadcast(final MiniPluginChat miniPluginChat) {
-        super(miniPluginChat, "s", "<Message>", "Broadcast a message to your current server.",
-                Set.of("broadcast", "bc"), MiniPluginChat.PERM.COMMAND_BROADCAST);
+        super(miniPluginChat,
+                "s",
+                "<Message>",
+                "Broadcast a message to your current server.",
+                Set.of("broadcast",
+                        "bc"),
+                MiniPluginChat.PERM.COMMAND_BROADCAST);
     }
 
     @Override
@@ -24,13 +29,22 @@ public final class CommandBroadcast extends BaseCommand<MiniPluginChat> {
             return;
         }
 
-        final String message = ChatColor.translateAlternateColorCodes('&', String.join(" ", args));
+        final String message = ChatColor.translateAlternateColorCodes('&',
+                String.join(" ",
+                        args));
 
-        _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
-            //noinspection deprecation
-            player.sendTitle(C.cYellow + "Broadcast", message);
-            player.sendMessage(F.fMain("Broadcast", C.cAqua + message));
-            player.playSound(player.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
-        });
+        _miniPlugin._hexusPlugin.getServer()
+                .getOnlinePlayers()
+                .forEach(player -> {
+                    //noinspection deprecation
+                    player.sendTitle(C.cYellow + "Broadcast",
+                            message);
+                    player.sendMessage(F.fMain("Broadcast",
+                            C.cAqua + message));
+                    player.playSound(player.getLocation(),
+                            Sound.LEVEL_UP,
+                            Float.MAX_VALUE,
+                            1);
+                });
     }
 }

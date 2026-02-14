@@ -11,8 +11,12 @@ interface TriConsumer<A, B, C> {
         Objects.requireNonNull(after);
 
         return (a, b, c) -> {
-            accept(a, b, c);
-            after.accept(a, b, c);
+            accept(a,
+                    b,
+                    c);
+            after.accept(a,
+                    b,
+                    c);
         };
     }
 }

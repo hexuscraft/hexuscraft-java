@@ -9,9 +9,15 @@ import java.util.Set;
 public final class CommandNews extends BaseMultiCommand<MiniPluginNews> {
 
     public CommandNews(final MiniPluginNews miniPluginNews, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginNews, "news", "Manage the hub news.", Set.of(), MiniPluginNews.PERM.COMMAND_NEWS, Set.of(
-                new CommandNewsAdd(miniPluginNews, miniPluginDatabase)
-        ));
+        super(miniPluginNews,
+                "news",
+                "Manage the hub news.",
+                Set.of(),
+                MiniPluginNews.PERM.COMMAND_NEWS,
+                Set.of(
+                        new CommandNewsAdd(miniPluginNews,
+                                miniPluginDatabase)
+                ));
     }
 
 }

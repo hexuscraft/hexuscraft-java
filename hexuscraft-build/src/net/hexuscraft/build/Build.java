@@ -25,18 +25,25 @@ public final class Build extends HexusPlugin {
     }
 
     public Location getSpawn() {
-        return getServer().getWorlds().getFirst().getSpawnLocation();
+        return getServer().getWorlds()
+                .getFirst()
+                .getSpawnLocation();
     }
 
     @EventHandler
     public void onWorldLoad(final WorldLoadEvent event) {
-        event.getWorld().setSpawnLocation(0, 100, 0);
+        event.getWorld()
+                .setSpawnLocation(0,
+                        100,
+                        0);
     }
 
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        event.getPlayer().teleport(getSpawn());
-        event.getPlayer().setGameMode(GameMode.CREATIVE);
+        event.getPlayer()
+                .teleport(getSpawn());
+        event.getPlayer()
+                .setGameMode(GameMode.CREATIVE);
     }
 
 }

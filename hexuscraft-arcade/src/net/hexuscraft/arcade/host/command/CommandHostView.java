@@ -10,7 +10,11 @@ import java.util.Set;
 
 public class CommandHostView extends BaseCommand<MiniPluginHost> {
     public CommandHostView(final MiniPluginHost miniPluginHost) {
-        super(miniPluginHost, "view", "", "View the current server host.", Set.of("v"),
+        super(miniPluginHost,
+                "view",
+                "",
+                "View the current server host.",
+                Set.of("v"),
                 MiniPluginHost.PERM.COMMAND_HOST_SET);
     }
 
@@ -23,10 +27,14 @@ public class CommandHostView extends BaseCommand<MiniPluginHost> {
 
         final OfflinePlayer host = _miniPlugin._hostOfflinePlayer.get();
         if (host == null) {
-            sender.sendMessage(F.fMain(this, "There is currently no server host."));
+            sender.sendMessage(F.fMain(this,
+                    "There is currently no server host."));
             return;
         }
 
-        sender.sendMessage(F.fMain(this, "The current server host is ", F.fItem(host.isOnline() ? host.getPlayer().getDisplayName() : host.getName())));
+        sender.sendMessage(F.fMain(this,
+                "The current server host is ",
+                F.fItem(host.isOnline() ? host.getPlayer()
+                        .getDisplayName() : host.getName())));
     }
 }

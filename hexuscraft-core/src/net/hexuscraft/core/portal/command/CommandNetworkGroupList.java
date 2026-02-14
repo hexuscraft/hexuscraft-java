@@ -10,7 +10,11 @@ import java.util.Set;
 public final class CommandNetworkGroupList extends BaseCommand<MiniPluginPortal> {
 
     CommandNetworkGroupList(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "list", "", "List all server groups.", Set.of("l"),
+        super(miniPluginPortal,
+                "list",
+                "",
+                "List all server groups.",
+                Set.of("l"),
                 MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_LIST);
     }
 
@@ -21,7 +25,9 @@ public final class CommandNetworkGroupList extends BaseCommand<MiniPluginPortal>
             return;
         }
 
-        sender.sendMessage(F.fMain(this, "Server Groups: ", F.fItem(_miniPlugin.getServerGroupNames())));
+        sender.sendMessage(F.fMain(this,
+                "Server Groups: ",
+                F.fItem(_miniPlugin.getServerGroupNames())));
     }
 
 }

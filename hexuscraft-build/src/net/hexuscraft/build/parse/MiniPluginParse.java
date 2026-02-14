@@ -16,7 +16,8 @@ public final class MiniPluginParse extends MiniPlugin<Build> {
     private MiniPluginCommand _command;
 
     public MiniPluginParse(final Build build) {
-        super(build, "Parse");
+        super(build,
+                "Parse");
 
         PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_PARSE);
     }

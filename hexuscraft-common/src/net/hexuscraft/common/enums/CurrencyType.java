@@ -4,8 +4,12 @@ import net.hexuscraft.common.utils.C;
 
 public enum CurrencyType {
 
-    COIN("Coin", "Coins", C.cGold),
-    XP("XP", "XP", C.cGold);
+    COIN("Coin",
+            "Coins",
+            C.cGold),
+    XP("XP",
+            "XP",
+            C.cGold);
 
     public final String _nameSingular;
     public final String _namePlural;

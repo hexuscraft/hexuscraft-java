@@ -1,8 +1,8 @@
 package net.hexuscraft.core.permission.command;
 
-import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.database.queries.PermissionQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.permission.MiniPluginPermission;
@@ -19,7 +19,11 @@ public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
     final MiniPluginDatabase _miniPluginDatabase;
 
     CommandRankInfo(final MiniPluginPermission miniPluginPermission, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPermission, "info", "<Player>", "List the groups of a player.", Set.of("i"),
+        super(miniPluginPermission,
+                "info",
+                "<Player>",
+                "List the groups of a player.",
+                Set.of("i"),
                 MiniPluginPermission.PERM.COMMAND_RANK_INFO);
         _miniPluginDatabase = miniPluginDatabase;
     }
@@ -32,26 +36,33 @@ public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
         }
 
         _miniPlugin._hexusPlugin.runAsync(() -> {
-            final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+            final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
+                    sender);
             if (offlinePlayer == null) {
-                sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+                sender.sendMessage(F.fMatches(new String[]{},
+                        args[0]));
                 return;
             }
 
             final Set<String> groupNames;
             try {
-                groupNames = _miniPluginDatabase.getJedis()
+                groupNames = _miniPluginDatabase._database._jedis
                         .smembers(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this,
                         F.fError("An exception occurred while fetching the permission groups of ",
-                                F.fItem(offlinePlayer.getName()), ". Please try again later.")));
+                                F.fItem(offlinePlayer.getName()),
+                                ". Please try again later.")));
                 return;
             }
 
 
-            sender.sendMessage(F.fMain(this, F.fItem(offlinePlayer.getName()), " Permission Groups: ",
-                    F.fItem(groupNames.stream().map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s))).distinct()
+            sender.sendMessage(F.fMain(this,
+                    F.fItem(offlinePlayer.getName()),
+                    " Permission Groups: ",
+                    F.fItem(groupNames.stream()
+                            .map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s)))
+                            .distinct()
                             .toArray(String[]::new))));
         });
 
@@ -60,7 +71,9 @@ public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         if (args.length == 1)
-            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender,
+            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer()
+                            .getOnlinePlayers(),
+                    sender,
                     false);
         return List.of();
     }

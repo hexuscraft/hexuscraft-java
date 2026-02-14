@@ -1,7 +1,7 @@
 package net.hexuscraft.core.portal.command;
 
-import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.database.queries.ServerQueries;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.MiniPluginDatabase;
 import net.hexuscraft.core.portal.MiniPluginPortal;
@@ -16,7 +16,12 @@ public final class CommandNetworkGroupDelete extends BaseCommand<MiniPluginPorta
     private final MiniPluginDatabase _miniPluginDatabase;
 
     CommandNetworkGroupDelete(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal, "delete", "<Name>", "Delete a server group.", Set.of("del", "d"),
+        super(miniPluginPortal,
+                "delete",
+                "<Name>",
+                "Delete a server group.",
+                Set.of("del",
+                        "d"),
                 MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_DELETE);
         _miniPluginDatabase = miniPluginDatabase;
     }
@@ -29,8 +34,10 @@ public final class CommandNetworkGroupDelete extends BaseCommand<MiniPluginPorta
         }
 
         final String key = ServerQueries.SERVERGROUP(args[0]);
-        _miniPluginDatabase.getJedis().del(key);
-        sender.sendMessage(F.fMain(this, "Deleted ", F.fItem(key)));
+        _miniPluginDatabase._database._jedis.del(key);
+        sender.sendMessage(F.fMain(this,
+                "Deleted ",
+                F.fItem(key)));
     }
 
     @Override

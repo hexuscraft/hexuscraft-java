@@ -95,7 +95,8 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
 
         _miniPluginClasses.forEach(aClass -> {
             try {
-                _miniPlugins.put(aClass, (MiniPlugin<? extends HexusPlugin>) aClass.getConstructors()[0].newInstance(this));
+                _miniPlugins.put(aClass,
+                        (MiniPlugin<? extends HexusPlugin>) aClass.getConstructors()[0].newInstance(this));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
                 throw new RuntimeException(ex);
             }
@@ -107,7 +108,8 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         logInfo("Loading...");
 
         load();
-        _miniPlugins.values().forEach(miniPlugin -> miniPlugin.load(_miniPlugins));
+        _miniPlugins.values()
+                .forEach(miniPlugin -> miniPlugin.load(_miniPlugins));
 
         logInfo("Loaded in " + (System.currentTimeMillis() - start.get()) + "ms.");
     }
@@ -117,9 +119,11 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         long start = System.currentTimeMillis();
         logInfo("Enabling...");
 
-        _pluginManager.registerEvents(this, this);
+        _pluginManager.registerEvents(this,
+                this);
         enable();
-        _miniPlugins.values().forEach(MiniPlugin::enable);
+        _miniPlugins.values()
+                .forEach(MiniPlugin::enable);
 
         logInfo("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
@@ -130,7 +134,8 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         logInfo("Disabling...");
 
         disable();
-        _miniPlugins.values().forEach(MiniPlugin::disable);
+        _miniPlugins.values()
+                .forEach(MiniPlugin::disable);
         _miniPlugins.clear();
 
         logInfo("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
@@ -141,27 +146,45 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     public final void logInfo(final String message) {
-        _logger.log(Level.INFO, message);
+        _logger.log(Level.INFO,
+                message);
     }
 
     public final void logInfo(final Exception ex) {
-        logInfo("[" + ex.getClass().getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()), Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString)).toArray(String[]::new)));
+        logInfo("[" + ex.getClass()
+                .getName() + "] " + String.join("\n",
+                Stream.concat(Stream.of(ex.getMessage()),
+                                Arrays.stream(ex.getStackTrace())
+                                        .map(StackTraceElement::toString))
+                        .toArray(String[]::new)));
     }
 
     public final void logWarning(final String message) {
-        _logger.log(Level.WARNING, message);
+        _logger.log(Level.WARNING,
+                message);
     }
 
     public final void logWarning(final Exception ex) {
-        logWarning("[" + ex.getClass().getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()), Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString)).toArray(String[]::new)));
+        logWarning("[" + ex.getClass()
+                .getName() + "] " + String.join("\n",
+                Stream.concat(Stream.of(ex.getMessage()),
+                                Arrays.stream(ex.getStackTrace())
+                                        .map(StackTraceElement::toString))
+                        .toArray(String[]::new)));
     }
 
     public final void logSevere(final String message) {
-        _logger.log(Level.SEVERE, message);
+        _logger.log(Level.SEVERE,
+                message);
     }
 
     public final void logSevere(final Exception ex) {
-        logSevere("[" + ex.getClass().getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()), Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString)).toArray(String[]::new)));
+        logSevere("[" + ex.getClass()
+                .getName() + "] " + String.join("\n",
+                Stream.concat(Stream.of(ex.getMessage()),
+                                Arrays.stream(ex.getStackTrace())
+                                        .map(StackTraceElement::toString))
+                        .toArray(String[]::new)));
     }
 
     public final File getFile() {
@@ -174,27 +197,39 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     public final BukkitTask runSync(final Runnable runnable) {
-        return _scheduler.runTask(this, runnable);
+        return _scheduler.runTask(this,
+                runnable);
     }
 
     public final BukkitTask runSyncLater(final Runnable runnable, final long delayTicks) {
-        return _scheduler.runTaskLater(this, runnable, delayTicks);
+        return _scheduler.runTaskLater(this,
+                runnable,
+                delayTicks);
     }
 
     public final BukkitTask runSyncTimer(final Runnable runnable, final long initialDelayTicks, final long repeatEveryTicks) {
-        return _scheduler.runTaskTimer(this, runnable, initialDelayTicks, repeatEveryTicks);
+        return _scheduler.runTaskTimer(this,
+                runnable,
+                initialDelayTicks,
+                repeatEveryTicks);
     }
 
     public final BukkitTask runAsync(final Runnable runnable) {
-        return _scheduler.runTaskAsynchronously(this, runnable);
+        return _scheduler.runTaskAsynchronously(this,
+                runnable);
     }
 
     public final BukkitTask runAsyncLater(final Runnable runnable, final long delayTicks) {
-        return _scheduler.runTaskLaterAsynchronously(this, runnable, delayTicks);
+        return _scheduler.runTaskLaterAsynchronously(this,
+                runnable,
+                delayTicks);
     }
 
     public final BukkitTask runAsyncTimer(final Runnable runnable, final long initialDelayTicks, final long repeatEveryTicks) {
-        return _scheduler.runTaskTimerAsynchronously(this, runnable, initialDelayTicks, repeatEveryTicks);
+        return _scheduler.runTaskTimerAsynchronously(this,
+                runnable,
+                initialDelayTicks,
+                repeatEveryTicks);
     }
 
 }

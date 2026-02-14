@@ -15,7 +15,8 @@ public final class MiniPluginItem extends MiniPlugin<HexusPlugin> {
     MiniPluginCommand _pluginCommand;
 
     public MiniPluginItem(final HexusPlugin plugin) {
-        super(plugin, "Item");
+        super(plugin,
+                "Item");
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GIVE);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_CLEAR);

@@ -17,7 +17,13 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
     private final MiniPluginDatabase _miniPluginDatabase;
 
     public CommandServer(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal, "server", "[Name]", "View your current server or teleport to a server.", Set.of("sv", "portal"), MiniPluginPortal.PERM.COMMAND_SERVER);
+        super(miniPluginPortal,
+                "server",
+                "[Name]",
+                "View your current server or teleport to a server.",
+                Set.of("sv",
+                        "portal"),
+                MiniPluginPortal.PERM.COMMAND_SERVER);
         _miniPluginDatabase = miniPluginDatabase;
     }
 
@@ -32,15 +38,21 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
 
             final ServerData serverData = _miniPlugin.getServer(serverName);
             if (serverData == null) {
-                sender.sendMessage(F.fMain(this) + F.fError("Could not locate server with name ", F.fItem(serverName), "."));
+                sender.sendMessage(F.fMain(this) + F.fError("Could not locate server with name ",
+                        F.fItem(serverName),
+                        "."));
                 return;
             }
 
-            _miniPlugin.teleport(player, serverData._name);
+            _miniPlugin.teleport(player,
+                    serverData._name);
             return;
         }
         if (args.length == 0) {
-            sender.sendMessage(F.fMain(this, "You are connected to ", F.fItem(_miniPlugin._serverName), "."));
+            sender.sendMessage(F.fMain(this,
+                    "You are connected to ",
+                    F.fItem(_miniPlugin._serverName),
+                    "."));
             return;
         }
         sender.sendMessage(help(alias));
@@ -49,7 +61,9 @@ public final class CommandServer extends BaseCommand<MiniPluginPortal> {
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         if (args.length == 1)
-            return Arrays.stream(_miniPlugin.getServers()).map(serverData -> serverData._name).toList();
+            return Arrays.stream(_miniPlugin.getServers())
+                    .map(serverData -> serverData._name)
+                    .toList();
         return List.of();
     }
 }

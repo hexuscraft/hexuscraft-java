@@ -15,7 +15,12 @@ import java.util.Set;
 public final class CommandSend extends BaseCommand<MiniPluginPortal> {
 
     public CommandSend(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "send", "<Player> <Name>", "Teleport a player to a server.", Set.of(), MiniPluginPortal.PERM.COMMAND_SEND);
+        super(miniPluginPortal,
+                "send",
+                "<Player> <Name>",
+                "Teleport a player to a server.",
+                Set.of(),
+                MiniPluginPortal.PERM.COMMAND_SEND);
     }
 
     @Override
@@ -28,26 +33,36 @@ public final class CommandSend extends BaseCommand<MiniPluginPortal> {
         final String targetName = args[0];
         final String serverName = args[1];
 
-        final OfflinePlayer targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(targetName, sender);
+        final OfflinePlayer targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(targetName,
+                sender);
         if (targetOfflinePlayer == null) return;
 
         if (_miniPlugin.getServer(serverName) == null) {
-            sender.sendMessage(F.fMain(this, F.fError("Could not locate server with name ", F.fItem(serverName), ".")));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("Could not locate server with name ",
+                            F.fItem(serverName),
+                            ".")));
             return;
         }
 
         if (sender instanceof final Player player) {
-            _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(), serverName, player.getUniqueId()));
+            _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(),
+                    serverName,
+                    player.getUniqueId()));
             return;
         }
 
-        _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(), serverName));
+        _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(),
+                serverName));
     }
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
         if (args.length == 1)
-            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender, false);
+            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer()
+                            .getOnlinePlayers(),
+                    sender,
+                    false);
         if (args.length == 2)
             return Arrays.asList(_miniPlugin.getServerNames());
         return List.of();

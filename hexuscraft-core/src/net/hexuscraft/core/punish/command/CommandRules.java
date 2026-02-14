@@ -10,7 +10,12 @@ import java.util.Set;
 public final class CommandRules extends BaseCommand<MiniPluginPunish> {
 
     public CommandRules(final MiniPluginPunish plugin) {
-        super(plugin, "rules", "", "View our server rules.", Set.of(), MiniPluginPunish.PERM.COMMAND_RULES);
+        super(plugin,
+                "rules",
+                "",
+                "View our server rules.",
+                Set.of(),
+                MiniPluginPunish.PERM.COMMAND_RULES);
     }
 
     @Override
@@ -20,9 +25,12 @@ public final class CommandRules extends BaseCommand<MiniPluginPunish> {
             return;
         }
 
-        sender.sendMessage(F.fMain(this, "Server Rules:") + "\n" +
-                F.fMain("", "1. Don't use gameplay-affecting client modifications") + "\n" +
-                F.fMain("", "2. Be respectful, civil, and kind to all players"));
+        sender.sendMessage(F.fMain(this,
+                "Server Rules:") + "\n" +
+                F.fMain("",
+                        "1. Don't use gameplay-affecting client modifications") + "\n" +
+                F.fMain("",
+                        "2. Be respectful, civil, and kind to all players"));
     }
 
 }

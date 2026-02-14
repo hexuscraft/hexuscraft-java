@@ -26,7 +26,8 @@ public final class MiniPluginHubScoreboard extends MiniPlugin<Hub> {
     private MiniPluginPermission _miniPluginPermission;
 
     public MiniPluginHubScoreboard(final Hub hub) {
-        super(hub, "Hub Scoreboard");
+        super(hub,
+                "Hub Scoreboard");
 
         _sidebarUpdateTasks = new HashMap<>();
     }
@@ -39,12 +40,18 @@ public final class MiniPluginHubScoreboard extends MiniPlugin<Hub> {
 
     @Override
     public void onEnable() {
-        _hexusPlugin.getServer().getOnlinePlayers().stream().map(player -> new PlayerJoinEvent(player, null)).forEach(this::onPlayerJoin);
+        _hexusPlugin.getServer()
+                .getOnlinePlayers()
+                .stream()
+                .map(player -> new PlayerJoinEvent(player,
+                        null))
+                .forEach(this::onPlayerJoin);
     }
 
     @Override
     public void onDisable() {
-        _sidebarUpdateTasks.values().forEach(BukkitTask::cancel);
+        _sidebarUpdateTasks.values()
+                .forEach(BukkitTask::cancel);
         _sidebarUpdateTasks.clear();
     }
 
@@ -53,22 +60,28 @@ public final class MiniPluginHubScoreboard extends MiniPlugin<Hub> {
         final Player player = event.getPlayer();
         final Scoreboard scoreboard = player.getScoreboard(); // Player's scoreboard is set by core MiniPluginScoreboard
 
-        final Objective sidebarObjective = scoreboard.registerNewObjective("§6§lHEXUSCRAFT", "dummy");
+        final Objective sidebarObjective = scoreboard.registerNewObjective("§6§lHEXUSCRAFT",
+                "dummy");
         sidebarObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         final List<Score> sidebarScores = new ArrayList<>();
-        _sidebarUpdateTasks.put(player, _hexusPlugin.runSyncTimer(() -> {
-            sidebarScores.stream().map(Score::getEntry).forEach(scoreboard::resetScores);
-            sidebarScores.clear();
+        _sidebarUpdateTasks.put(player,
+                _hexusPlugin.runSyncTimer(() -> {
+                            sidebarScores.stream()
+                                    .map(Score::getEntry)
+                                    .forEach(scoreboard::resetScores);
+                            sidebarScores.clear();
 
-            final String[] lines = generateSidebarLines(player);
-            for (int i = 0; i < lines.length; i++) {
-                final String line = lines[lines.length - i - 1];
-                final Score score = sidebarObjective.getScore(C.hexMap.get(i) + C.fReset + line);
-                score.setScore(i);
-                sidebarScores.add(score);
-            }
-        }, 0, 20));
+                            final String[] lines = generateSidebarLines(player);
+                            for (int i = 0; i < lines.length; i++) {
+                                final String line = lines[lines.length - i - 1];
+                                final Score score = sidebarObjective.getScore(C.hexMap.get(i) + C.fReset + line);
+                                score.setScore(i);
+                                sidebarScores.add(score);
+                            }
+                        },
+                        0,
+                        20));
     }
 
     @EventHandler
@@ -76,12 +89,16 @@ public final class MiniPluginHubScoreboard extends MiniPlugin<Hub> {
         final Player player = event.getPlayer();
         if (!_sidebarUpdateTasks.containsKey(player)) return;
 
-        _sidebarUpdateTasks.get(player).cancel();
+        _sidebarUpdateTasks.get(player)
+                .cancel();
         _sidebarUpdateTasks.remove(player);
     }
 
     private String[] generateSidebarLines(final Player player) {
-        return new String[]{C.cAqua + C.fBold + "Server", _miniPluginPortal._serverName, "", C.cGreen + C.fBold + "Players", "" + Arrays.stream(_miniPluginPortal.getServers()).mapToInt(s -> s._players).sum(), "", C.cYellow + C.fBold + "Coins", "0", "", C.cGold + C.fBold + "Rank", PermissionGroup.getGroupWithHighestWeight(_miniPluginPermission._permissionProfiles.get(player)._groups())._prefix, "", C.cRed + C.fBold + "Website", "www.hexuscraft.net"};
+        return new String[]{C.cAqua + C.fBold + "Server", _miniPluginPortal._serverName, "", C.cGreen + C.fBold + "Players", "" + Arrays.stream(_miniPluginPortal.getServers())
+                .mapToInt(s -> s._players)
+                .sum(), "", C.cYellow + C.fBold + "Coins", "0", "", C.cGold + C.fBold + "Rank", PermissionGroup.getGroupWithHighestWeight(_miniPluginPermission._permissionProfiles.get(player)
+                ._groups())._prefix, "", C.cRed + C.fBold + "Website", "www.hexuscraft.net"};
     }
 
 }

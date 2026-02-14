@@ -18,7 +18,12 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
 
     public BaseCommand(final T miniPlugin, final String name, final String usage, final String description,
                        final Set<String> aliases, final IPermission permission) {
-        super(name.toLowerCase(), description, usage, aliases.stream().map(String::toLowerCase).toList());
+        super(name.toLowerCase(),
+                description,
+                usage,
+                aliases.stream()
+                        .map(String::toLowerCase)
+                        .toList());
 
         setPermission(permission.toString());
         setPermissionMessage(F.fInsufficientPermissions());
@@ -27,12 +32,19 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
     }
 
     public String help(final String alias) {
-        return F.fMain(this, "Command Usage:\n", F.fCommand(alias, getUsage(), getDescription()));
+        return F.fMain(this,
+                "Command Usage:\n",
+                F.fCommand(alias,
+                        getUsage(),
+                        getDescription()));
     }
 
     public final boolean isAlias(final String alias) {
         return getName().equalsIgnoreCase(alias) ||
-                getAliases().stream().map(String::toLowerCase).toList().contains(alias.toLowerCase());
+                getAliases().stream()
+                        .map(String::toLowerCase)
+                        .toList()
+                        .contains(alias.toLowerCase());
     }
 
     public void run(final CommandSender sender, final String alias, final String[] args) {
@@ -55,12 +67,17 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
             return true;
         }
         try {
-            run(sender, alias, args);
+            run(sender,
+                    alias,
+                    args);
         } catch (final Exception ex) {
             _miniPlugin.logInfo(
                     "An exception occurred while CommandSender '" + sender.getName() + "' executing BaseCommand '" +
-                            alias + " " + String.join(" ", args) + "':" + ex.getMessage() + "\n> " + String.join("\n",
-                            Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)));
+                            alias + " " + String.join(" ",
+                            args) + "':" + ex.getMessage() + "\n> " + String.join("\n",
+                            Arrays.stream(ex.getStackTrace())
+                                    .map(StackTraceElement::toString)
+                                    .toArray(String[]::new)));
             sender.sendMessage(F.fMain(this,
                     F.fError("An unknown error occurred while executing this command. Please try again later.")));
         }
@@ -71,8 +88,12 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
     public final List<String> tabComplete(final CommandSender sender, final String alias, final String[] args) {
         if (!testPermission(sender)) return List.of();
 
-        return tab(sender, alias, args).stream().filter(Objects::nonNull)
-                .filter(completion -> completion.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
+        return tab(sender,
+                alias,
+                args).stream()
+                .filter(Objects::nonNull)
+                .filter(completion -> completion.toLowerCase()
+                        .startsWith(args[args.length - 1].toLowerCase()))
                 .toList();
     }
 

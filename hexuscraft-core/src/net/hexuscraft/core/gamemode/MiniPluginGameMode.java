@@ -14,7 +14,8 @@ public final class MiniPluginGameMode extends MiniPlugin<HexusPlugin> {
     MiniPluginCommand _pluginCommand;
 
     public MiniPluginGameMode(final HexusPlugin plugin) {
-        super(plugin, "Game Mode");
+        super(plugin,
+                "Game Mode");
 
         PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_GAMEMODE);
 

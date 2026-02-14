@@ -9,7 +9,10 @@ import java.util.UUID;
 public final class PermissionQueries {
 
     public static String GROUPS(final UUID uuid) {
-        return Database.buildQuery("user", uuid.toString(), "permission", "groups");
+        return Database.buildQuery("user",
+                uuid.toString(),
+                "permission",
+                "groups");
     }
 
     public static Set<String> getGroupNames(final UnifiedJedis jedis, final UUID uuid) {

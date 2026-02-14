@@ -1,8 +1,8 @@
 package net.hexuscraft.core.npc;
 
 import net.hexuscraft.common.IPermission;
-import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.C;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.MiniPluginCommand;
@@ -33,7 +33,8 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
     private MiniPluginCommand _pluginCommand;
 
     public MiniPluginNpc(final HexusPlugin plugin) {
-        super(plugin, "NPC");
+        super(plugin,
+                "NPC");
 
         PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_ENTITY);
         PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_ENTITY_LIST);
@@ -53,58 +54,84 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
         _pluginCommand.register(new CommandNpc(this));
 
         final Server server = _hexusPlugin.getServer();
-        server.getWorlds().forEach(this::refreshNPCs);
+        server.getWorlds()
+                .forEach(this::refreshNPCs);
     }
 
     @Override
     public void onDisable() {
-        _hexusPlugin.getServer().getWorlds().forEach(this::removeNPCs);
+        _hexusPlugin.getServer()
+                .getWorlds()
+                .forEach(this::removeNPCs);
     }
 
     public void createEntity(final World world, final double x, final double y, final double z, final float yaw,
                              final float pitch, final String[] data) {
-        final Location location = new Location(world, x, y, z, yaw, pitch);
+        final Location location = new Location(world,
+                x,
+                y,
+                z,
+                yaw,
+                pitch);
 
         final List<Entity> spawnedEntities = new ArrayList<>();
         switch (data[0]) {
             case "REWARDS" -> {
-                final Creeper creeper = world.spawn(location, Creeper.class);
+                final Creeper creeper = world.spawn(location,
+                        Creeper.class);
                 spawnedEntities.add(creeper);
                 creeper.setPowered(true);
                 creeper.teleport(location);
 
                 final NBTTagCompound creperNBT = UtilEntity.getNBTTagCompound(creeper);
-                creperNBT.setByte("NoAI", (byte) 1);
-                creperNBT.setByte("Silent", (byte) 1);
-                creperNBT.setByte("Invulnerable", (byte) 1);
-                UtilEntity.saveNBTTagCompound(creeper, creperNBT);
+                creperNBT.setByte("NoAI",
+                        (byte) 1);
+                creperNBT.setByte("Silent",
+                        (byte) 1);
+                creperNBT.setByte("Invulnerable",
+                        (byte) 1);
+                UtilEntity.saveNBTTagCompound(creeper,
+                        creperNBT);
 
-                final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
+                final ArmorStand armorStand = world.spawn(location,
+                        ArmorStand.class);
                 spawnedEntities.add(armorStand);
                 armorStand.setCustomName(C.cGreen + C.fBold + "Server Rewards");
                 armorStand.setCustomNameVisible(true);
                 armorStand.setGravity(false);
                 armorStand.setMarker(true);
-                armorStand.teleport(creeper.getEyeLocation().add(new Vector(0, 0.25, 0)));
+                armorStand.teleport(creeper.getEyeLocation()
+                        .add(new Vector(0,
+                                0.25,
+                                0)));
 
                 final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
-                armorStandNBT.setByte("Invisible", (byte) 1);
-                armorStandNBT.setByte("NoGravity", (byte) 1);
-                armorStandNBT.setByte("Marker", (byte) 1);
-                UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
+                armorStandNBT.setByte("Invisible",
+                        (byte) 1);
+                armorStandNBT.setByte("NoGravity",
+                        (byte) 1);
+                armorStandNBT.setByte("Marker",
+                        (byte) 1);
+                UtilEntity.saveNBTTagCompound(armorStand,
+                        armorStandNBT);
             }
             case "GAME" -> {
                 switch (data[1]) {
                     case "CLANS" -> {
-                        final Skeleton skeleton = world.spawn(location, Skeleton.class);
+                        final Skeleton skeleton = world.spawn(location,
+                                Skeleton.class);
                         spawnedEntities.add(skeleton);
                         skeleton.teleport(location);
 
                         final NBTTagCompound skeletonNBT = UtilEntity.getNBTTagCompound(skeleton);
-                        skeletonNBT.setByte("NoAI", (byte) 1);
-                        skeletonNBT.setByte("Silent", (byte) 1);
-                        skeletonNBT.setByte("Invulnerable", (byte) 1);
-                        UtilEntity.saveNBTTagCompound(skeleton, skeletonNBT);
+                        skeletonNBT.setByte("NoAI",
+                                (byte) 1);
+                        skeletonNBT.setByte("Silent",
+                                (byte) 1);
+                        skeletonNBT.setByte("Invulnerable",
+                                (byte) 1);
+                        UtilEntity.saveNBTTagCompound(skeleton,
+                                skeletonNBT);
 
                         final EntityEquipment equipment = skeleton.getEquipment();
                         equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
@@ -113,37 +140,50 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
                         equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
                         equipment.setItemInHand(new ItemStack(Material.BED));
 
-                        final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
+                        final ArmorStand armorStand = world.spawn(location,
+                                ArmorStand.class);
                         spawnedEntities.add(armorStand);
                         armorStand.setCustomName(C.cGreen + C.fBold + "Clans");
                         armorStand.setCustomNameVisible(true);
                         armorStand.setGravity(false);
                         armorStand.setMarker(true);
-                        armorStand.teleport(skeleton.getEyeLocation().add(new Vector(0, 0.25, 0)));
+                        armorStand.teleport(skeleton.getEyeLocation()
+                                .add(new Vector(0,
+                                        0.25,
+                                        0)));
 
                         final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
-                        armorStandNBT.setByte("Invisible", (byte) 1);
-                        armorStandNBT.setByte("NoGravity", (byte) 1);
-                        armorStandNBT.setByte("Marker", (byte) 1);
-                        UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
+                        armorStandNBT.setByte("Invisible",
+                                (byte) 1);
+                        armorStandNBT.setByte("NoGravity",
+                                (byte) 1);
+                        armorStandNBT.setByte("Marker",
+                                (byte) 1);
+                        UtilEntity.saveNBTTagCompound(armorStand,
+                                armorStandNBT);
                     }
                 }
             }
         }
 
         if (spawnedEntities.isEmpty()) {
-            logInfo("Attempted to create npc with unknown punish types: " + String.join(",", data));
+            logInfo("Attempted to create npc with unknown punish types: " + String.join(",",
+                    data));
             return;
         }
 
-        spawnedEntities.forEach(entity -> entity.setMetadata("NPC", new FixedMetadataValue(_hexusPlugin, data)));
+        spawnedEntities.forEach(entity -> entity.setMetadata("NPC",
+                new FixedMetadataValue(_hexusPlugin,
+                        data)));
     }
 
     public void removeNPCs(final World world) {
-        world.getEntities().forEach(entity -> {
-            if (entity.getMetadata("NPC").isEmpty()) return;
-            entity.remove();
-        });
+        world.getEntities()
+                .forEach(entity -> {
+                    if (entity.getMetadata("NPC")
+                            .isEmpty()) return;
+                    entity.remove();
+                });
     }
 
     public void refreshNPCs(final World world) {
@@ -152,7 +192,10 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
         final List<String> npcStrings = new ArrayList<>();
 
         try {
-            final Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_npcs.dat").toFile());
+            final Scanner scanner = new Scanner(Path.of(world.getWorldFolder()
+                                    .getPath(),
+                            "_npcs.dat")
+                    .toFile());
             while (scanner.hasNextLine()) {
                 npcStrings.add(scanner.nextLine());
             }
@@ -168,8 +211,16 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
             final float yaw = Float.parseFloat(npc[3]);
             final float pitch = Float.parseFloat(npc[4]);
 
-            final String[] data = Arrays.copyOfRange(npc, 5, npc.length);
-            createEntity(world, x, y, z, yaw, pitch, data);
+            final String[] data = Arrays.copyOfRange(npc,
+                    5,
+                    npc.length);
+            createEntity(world,
+                    x,
+                    y,
+                    z,
+                    yaw,
+                    pitch,
+                    data);
         });
     }
 
@@ -180,8 +231,13 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
 
     public Entity[] list() {
         final List<Entity> npcs = new ArrayList<>();
-        _hexusPlugin.getServer().getWorlds().forEach(world -> npcs.addAll(
-                world.getEntities().stream().filter(entity -> entity.hasMetadata("NPC")).toList()));
+        _hexusPlugin.getServer()
+                .getWorlds()
+                .forEach(world -> npcs.addAll(
+                        world.getEntities()
+                                .stream()
+                                .filter(entity -> entity.hasMetadata("NPC"))
+                                .toList()));
         return npcs.toArray(Entity[]::new);
     }
 

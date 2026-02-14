@@ -11,12 +11,20 @@ import java.util.Set;
 public final class CommandLocateServer extends BaseCommand<MiniPluginPortal> {
 
     public CommandLocateServer(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "server", "<Name>", "List all players in a specific server.", Set.of("srv", "s"), MiniPluginPortal.PERM.COMMAND_LOCATE_SERVER);
+        super(miniPluginPortal,
+                "server",
+                "<Name>",
+                "List all players in a specific server.",
+                Set.of("srv",
+                        "s"),
+                MiniPluginPortal.PERM.COMMAND_LOCATE_SERVER);
     }
 
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
-        super.run(sender, alias, args);
+        super.run(sender,
+                alias,
+                args);
     }
 
     @Override

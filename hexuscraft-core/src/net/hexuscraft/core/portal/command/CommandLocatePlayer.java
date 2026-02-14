@@ -9,7 +9,13 @@ import java.util.Set;
 public final class CommandLocatePlayer extends BaseCommand<MiniPluginPortal> {
 
     public CommandLocatePlayer(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "player", "<Name>", "Locate a specific player's server.", Set.of("plr", "p"), MiniPluginPortal.PERM.COMMAND_LOCATE_PLAYER);
+        super(miniPluginPortal,
+                "player",
+                "<Name>",
+                "Locate a specific player's server.",
+                Set.of("plr",
+                        "p"),
+                MiniPluginPortal.PERM.COMMAND_LOCATE_PLAYER);
     }
 
     @Override

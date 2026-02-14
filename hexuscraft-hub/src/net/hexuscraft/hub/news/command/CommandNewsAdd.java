@@ -17,13 +17,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class CommandNewsAdd extends BaseCommand<MiniPluginNews> {
 
-    private final Set<String> POSITIVES = Set.of("true", "yes", "1");
-    private final Set<String> NEGATIVES = Set.of("false", "no", "0");
+    private final Set<String> POSITIVES = Set.of("true",
+            "yes",
+            "1");
+    private final Set<String> NEGATIVES = Set.of("false",
+            "no",
+            "0");
 
     private final MiniPluginDatabase _miniPluginDatabase;
 
     public CommandNewsAdd(final MiniPluginNews miniPluginNews, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginNews, "add", "<Active TRUE/FALSE> <Weight #> <Message>", "Add a news line.", Set.of("a"), MiniPluginNews.PERM.COMMAND_NEWS_ADD);
+        super(miniPluginNews,
+                "add",
+                "<Active TRUE/FALSE> <Weight #> <Message>",
+                "Add a news line.",
+                Set.of("a"),
+                MiniPluginNews.PERM.COMMAND_NEWS_ADD);
         _miniPluginDatabase = miniPluginDatabase;
     }
 
@@ -45,18 +54,34 @@ public final class CommandNewsAdd extends BaseCommand<MiniPluginNews> {
         try {
             weight.set(Integer.parseInt(args[1]));
         } catch (final NumberFormatException ex) {
-            sender.sendMessage(F.fMain(this, F.fError("There was an error while parsing weight ", F.fItem(args[1]), ". Defaulting to ", F.fItem(weight.get()), ".")));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("There was an error while parsing weight ",
+                            F.fItem(args[1]),
+                            ". Defaulting to ",
+                            F.fItem(String.valueOf(weight.get())),
+                            ".")));
         }
 
-        final String message = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
+        final String message = String.join(" ",
+                Arrays.copyOfRange(args,
+                        2,
+                        args.length));
 
-        final NewsData newsData = new NewsData(UUID.randomUUID(), Map.ofEntries(Map.entry("active", Boolean.toString(active.get())), Map.entry("weight", Integer.toString(weight.get())), Map.entry("message", message)));
+        final NewsData newsData = new NewsData(UUID.randomUUID(),
+                Map.ofEntries(Map.entry("active",
+                                Boolean.toString(active.get())),
+                        Map.entry("weight",
+                                Integer.toString(weight.get())),
+                        Map.entry("message",
+                                message)));
 
         try {
             newsData.publish(_miniPluginDatabase._database._jedis);
-            sender.sendMessage(F.fMain(this, F.fSuccess("Successfully added news line.")));
+            sender.sendMessage(F.fMain(this,
+                    F.fSuccess("Successfully added news line.")));
         } catch (final JedisException ex) {
-            sender.sendMessage(F.fMain(this, F.fError("There was an error while publishing news. Please try again later or contact an administrator if this issue persists.")));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("There was an error while publishing news. Please try again later or contact an administrator if this issue persists.")));
         }
     }
 }

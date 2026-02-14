@@ -8,10 +8,18 @@ import java.util.Set;
 public final class CommandLocate extends BaseMultiCommand<MiniPluginPortal> {
 
     public CommandLocate(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "list", "Find players across the network.", Set.of("glist", "locate", "find", "where"), MiniPluginPortal.PERM.COMMAND_LOCATE, Set.of(
-                new CommandLocatePlayer(miniPluginPortal),
-                new CommandLocateServer(miniPluginPortal)
-        ));
+        super(miniPluginPortal,
+                "list",
+                "Find players across the network.",
+                Set.of("glist",
+                        "locate",
+                        "find",
+                        "where"),
+                MiniPluginPortal.PERM.COMMAND_LOCATE,
+                Set.of(
+                        new CommandLocatePlayer(miniPluginPortal),
+                        new CommandLocateServer(miniPluginPortal)
+                ));
     }
 
 }

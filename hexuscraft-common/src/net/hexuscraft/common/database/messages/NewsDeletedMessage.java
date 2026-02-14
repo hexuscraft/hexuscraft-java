@@ -21,7 +21,8 @@ public final class NewsDeletedMessage extends BaseMessage {
     }
 
     public String stringify() {
-        return new JSONObject(Map.ofEntries(Map.entry("id", _id.toString()))).toString();
+        return new JSONObject(Map.ofEntries(Map.entry("id",
+                _id.toString()))).toString();
     }
 
 }

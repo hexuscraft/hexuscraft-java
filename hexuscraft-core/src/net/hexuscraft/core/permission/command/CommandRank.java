@@ -9,14 +9,25 @@ import java.util.Set;
 public final class CommandRank extends BaseMultiCommand<MiniPluginPermission> {
 
     public CommandRank(final MiniPluginPermission miniPluginPermission, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPermission, "rank", "Manage permission groups of players.",
-                Set.of("ranks", "perm", "perms", "permission", "permissions"), MiniPluginPermission.PERM.COMMAND_RANK,
+        super(miniPluginPermission,
+                "rank",
+                "Manage permission groups of players.",
+                Set.of("ranks",
+                        "perm",
+                        "perms",
+                        "permission",
+                        "permissions"),
+                MiniPluginPermission.PERM.COMMAND_RANK,
                 Set.of(
-                        new CommandRankAdd(miniPluginPermission, miniPluginDatabase),
-                        new CommandRankClear(miniPluginPermission, miniPluginDatabase),
-                        new CommandRankInfo(miniPluginPermission, miniPluginDatabase),
+                        new CommandRankAdd(miniPluginPermission,
+                                miniPluginDatabase),
+                        new CommandRankClear(miniPluginPermission,
+                                miniPluginDatabase),
+                        new CommandRankInfo(miniPluginPermission,
+                                miniPluginDatabase),
                         new CommandRankList(miniPluginPermission),
-                        new CommandRankRemove(miniPluginPermission, miniPluginDatabase)
+                        new CommandRankRemove(miniPluginPermission,
+                                miniPluginDatabase)
                 ));
     }
 

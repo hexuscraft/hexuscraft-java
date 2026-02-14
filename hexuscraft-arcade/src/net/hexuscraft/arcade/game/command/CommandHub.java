@@ -14,7 +14,11 @@ public final class CommandHub extends BaseCommand<MiniPluginGame> {
     private final MiniPluginPortal _miniPluginPortal;
 
     public CommandHub(final MiniPluginGame miniPluginGame, final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginGame, "hub", "", "Teleport back to a lobby server.", Set.of("lobby"),
+        super(miniPluginGame,
+                "hub",
+                "",
+                "Teleport back to a lobby server.",
+                Set.of("lobby"),
                 MiniPluginGame.PERM.COMMAND_HUB);
         _miniPluginPortal = miniPluginPortal;
     }
@@ -22,11 +26,13 @@ public final class CommandHub extends BaseCommand<MiniPluginGame> {
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
         if (!(sender instanceof final Player player)) {
-            sender.sendMessage(F.fMain(this, "Only players can execute this command."));
+            sender.sendMessage(F.fMain(this,
+                    "Only players can execute this command."));
             return;
         }
 
-        _miniPlugin._hexusPlugin.runAsync(() -> _miniPluginPortal.teleportPlayerToRandomServer(player, "Lobby"));
+        _miniPlugin._hexusPlugin.runAsync(() -> _miniPluginPortal.teleportPlayerToRandomServer(player,
+                "Lobby"));
     }
 
 }

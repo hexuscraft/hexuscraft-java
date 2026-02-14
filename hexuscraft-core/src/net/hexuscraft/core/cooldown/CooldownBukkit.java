@@ -11,16 +11,26 @@ public class CooldownBukkit {
     }
 
     public boolean use(final Object parent, final String name, final Long delayMs, final CommandSender sender) {
-        if (UtilCooldown.use(parent, name, delayMs)) return true;
+        if (UtilCooldown.use(parent,
+                name,
+                delayMs)) return true;
 
-        final UtilCooldown.Cooldown cooldown = UtilCooldown.getCooldown(parent, name);
+        final UtilCooldown.Cooldown cooldown = UtilCooldown.getCooldown(parent,
+                name);
         if (cooldown == null) {
-            sender.sendMessage(F.fMain(this, "Please wait before trying to use ", F.fItem(name), " again."));
+            sender.sendMessage(F.fMain(this,
+                    "Please wait before trying to use ",
+                    F.fItem(name),
+                    " again."));
             return false;
         }
 
-        sender.sendMessage(F.fMain(this, "You cannot use ", F.fItem(name), " for another ",
-                F.fTime(calculateRemaining(System.currentTimeMillis(), cooldown._started(),
+        sender.sendMessage(F.fMain(this,
+                "You cannot use ",
+                F.fItem(name),
+                " for another ",
+                F.fTime(calculateRemaining(System.currentTimeMillis(),
+                        cooldown._started(),
                         cooldown._delayMs()))));
         return false;
     }

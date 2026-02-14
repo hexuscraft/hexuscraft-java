@@ -15,7 +15,8 @@ public final class MiniPluginBuildVersion extends MiniPlugin<HexusPlugin> {
     private MiniPluginCommand _pluginCommand;
 
     public MiniPluginBuildVersion(final HexusPlugin plugin) {
-        super(plugin, "Build Version");
+        super(plugin,
+                "Build Version");
     }
 
     @Override
@@ -30,12 +31,14 @@ public final class MiniPluginBuildVersion extends MiniPlugin<HexusPlugin> {
     }
 
     public long getLastModifiedMillis() {
-        return _hexusPlugin.getFile().lastModified();
+        return _hexusPlugin.getFile()
+                .lastModified();
     }
 
     public long getSizeBytes() {
         try {
-            return Files.size(_hexusPlugin.getFile().toPath());
+            return Files.size(_hexusPlugin.getFile()
+                    .toPath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

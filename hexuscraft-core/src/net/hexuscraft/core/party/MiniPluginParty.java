@@ -14,7 +14,8 @@ public final class MiniPluginParty extends MiniPlugin<HexusPlugin> {
     MiniPluginCommand _pluginCommand;
 
     public MiniPluginParty(final HexusPlugin plugin) {
-        super(plugin, "Party");
+        super(plugin,
+                "Party");
 
         PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_PARTY);
     }

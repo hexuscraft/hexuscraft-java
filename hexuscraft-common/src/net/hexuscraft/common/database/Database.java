@@ -24,7 +24,11 @@ public final class Database {
 
     public Database(final String host, final int port, final String username, final String password, final String clientName) throws Exception {
         _consumers = new HashMap<>();
-        _jedis = buildUnifiedJedis(host, port, username, password, clientName);
+        _jedis = buildUnifiedJedis(host,
+                port,
+                username,
+                password,
+                clientName);
     }
 
     public Database() {
@@ -57,22 +61,35 @@ public final class Database {
         try (final Scanner scanner = new Scanner(nameFile)) {
             clientName.set(scanner.nextLine());
         } catch (final FileNotFoundException ex) {
-            clientName.set(new Random().ints(16, 0, 36).mapToObj("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"::charAt).map(String::valueOf).collect(Collectors.joining()));
+            clientName.set(new Random().ints(16,
+                            0,
+                            36)
+                    .mapToObj("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"::charAt)
+                    .map(String::valueOf)
+                    .collect(Collectors.joining()));
             System.out.println("WARNING: Could not locate '" + nameFile.getName() + "'. Using random client name '" + clientName.get() + "'.");
         }
 
         _consumers = new HashMap<>();
-        _jedis = buildUnifiedJedis(atomicHost.get(), atomicPort.get(), atomicUsername.get(), atomicPassword.get(), clientName.get());
-        java.security.Security.setProperty("networkaddress.cache.ttl", "0");
-        java.security.Security.setProperty("networkaddress.cache.negative.ttl", "0");
+        _jedis = buildUnifiedJedis(atomicHost.get(),
+                atomicPort.get(),
+                atomicUsername.get(),
+                atomicPassword.get(),
+                clientName.get());
+        java.security.Security.setProperty("networkaddress.cache.ttl",
+                "0");
+        java.security.Security.setProperty("networkaddress.cache.negative.ttl",
+                "0");
     }
 
     public static String buildQuery(final String... args) {
-        return String.join(KEY_DELIMITER, args);
+        return String.join(KEY_DELIMITER,
+                args);
     }
 
     private UnifiedJedis buildUnifiedJedis(final String host, final int port, final String username, final String password, final String clientName) {
-        final HostAndPort hostAndPort = new HostAndPort(host, port);
+        final HostAndPort hostAndPort = new HostAndPort(host,
+                port);
 
         final ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
         connectionPoolConfig.setMaxTotal(32);
@@ -83,9 +100,18 @@ public final class Database {
         connectionPoolConfig.setTestWhileIdle(true);
         connectionPoolConfig.setTimeBetweenEvictionRuns(Duration.ofSeconds(1));
 
-        final JedisClientConfig jedisClientConfig = DefaultJedisClientConfig.builder().clientName(clientName).database(0).user(username).password(password).build();
+        final JedisClientConfig jedisClientConfig = DefaultJedisClientConfig.builder()
+                .clientName(clientName)
+                .database(0)
+                .user(username)
+                .password(password)
+                .build();
 
-        return RedisClient.builder().clientConfig(jedisClientConfig).hostAndPort(hostAndPort).poolConfig(connectionPoolConfig).build();
+        return RedisClient.builder()
+                .clientConfig(jedisClientConfig)
+                .hostAndPort(hostAndPort)
+                .poolConfig(connectionPoolConfig)
+                .build();
     }
 
     public void registerConsumer(final String pattern, final PubSubConsumer consumer) {
@@ -93,18 +119,23 @@ public final class Database {
         if (_consumers.containsKey(pattern)) consumerMap = _consumers.get(pattern);
         else {
             consumerMap = new HashMap<>();
-            _consumers.put(pattern, consumerMap);
+            _consumers.put(pattern,
+                    consumerMap);
         }
 
         final JedisPubSub jedisPubSub = new JedisPubSub() {
             @Override
             public void onPMessage(final String pattern, final String channelName, final String message) {
-                consumer.accept(pattern, channelName, message);
+                consumer.accept(pattern,
+                        channelName,
+                        message);
             }
         };
 
-        consumerMap.put(consumer, jedisPubSub);
-        new Thread(() -> _jedis.psubscribe(jedisPubSub, pattern)).start();
+        consumerMap.put(consumer,
+                jedisPubSub);
+        new Thread(() -> _jedis.psubscribe(jedisPubSub,
+                pattern)).start();
     }
 
     public void unregisterConsumer(final PubSubConsumer consumer) {

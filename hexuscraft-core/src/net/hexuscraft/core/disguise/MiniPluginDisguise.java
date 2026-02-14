@@ -15,7 +15,8 @@ public final class MiniPluginDisguise extends MiniPlugin<HexusPlugin> {
     private MiniPluginCommand _miniPluginCommand;
 
     public MiniPluginDisguise(final HexusPlugin plugin) {
-        super(plugin, "Disguise");
+        super(plugin,
+                "Disguise");
     }
 
     @Override
@@ -32,8 +33,12 @@ public final class MiniPluginDisguise extends MiniPlugin<HexusPlugin> {
     public void disguise(final Player targetPlayer, final OfflinePlayer disguiseOfflinePlayer) {
         targetPlayer.setDisplayName(disguiseOfflinePlayer.getName());
         targetPlayer.setCustomName(disguiseOfflinePlayer.getName());
-        _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> player.hidePlayer(targetPlayer));
-        _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> player.showPlayer(targetPlayer));
+        _hexusPlugin.getServer()
+                .getOnlinePlayers()
+                .forEach(player -> player.hidePlayer(targetPlayer));
+        _hexusPlugin.getServer()
+                .getOnlinePlayers()
+                .forEach(player -> player.showPlayer(targetPlayer));
     }
 
     public enum PERM implements IPermission {

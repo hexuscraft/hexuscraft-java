@@ -13,7 +13,8 @@ import java.util.function.Predicate;
 public final class ItemSearch {
 
     public static boolean isMaterialAnItem(final Material material) {
-        final Inventory inventory = Bukkit.createInventory(null, 9);
+        final Inventory inventory = Bukkit.createInventory(null,
+                9);
         inventory.addItem(new ItemStack(material));
         return inventory.contains(material);
     }
@@ -21,12 +22,16 @@ public final class ItemSearch {
     public static Material[] itemSearch(final String searchName) {
         if (searchName.equals("*")) return Material.values();
 
-        final Material[] matches = Arrays.stream(Material.values()).filter(ItemSearch::isMaterialAnItem)
-                .filter(material -> material.name().toLowerCase().contains(searchName.toLowerCase()))
+        final Material[] matches = Arrays.stream(Material.values())
+                .filter(ItemSearch::isMaterialAnItem)
+                .filter(material -> material.name()
+                        .toLowerCase()
+                        .contains(searchName.toLowerCase()))
                 .toArray(Material[]::new);
 
         for (final Material match : matches)
-            if (match.name().equalsIgnoreCase(searchName)) return new Material[]{match};
+            if (match.name()
+                    .equalsIgnoreCase(searchName)) return new Material[]{match};
 
         try {
             //noinspection deprecation
@@ -41,7 +46,10 @@ public final class ItemSearch {
                                         final Predicate<Material[]> shouldSendMatches) {
         final Material[] matches = itemSearch(searchName);
         if (shouldSendMatches.test(matches)) sender.sendMessage(F.fMain("Item Search",
-                F.fMatches(Arrays.stream(matches).map(Material::name).toArray(String[]::new), searchName)));
+                F.fMatches(Arrays.stream(matches)
+                                .map(Material::name)
+                                .toArray(String[]::new),
+                        searchName)));
         return matches;
     }
 

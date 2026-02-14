@@ -13,17 +13,21 @@ public final class PunishmentAppliedMessage extends BaseMessage {
     public final UUID _punishmentUUID;
 
     public PunishmentAppliedMessage(final UUID targetUUID, final UUID punishmentUUID) {
-        this._targetUUID = targetUUID;
-        this._punishmentUUID = punishmentUUID;
+        _targetUUID = targetUUID;
+        _punishmentUUID = punishmentUUID;
     }
 
     public static PunishmentAppliedMessage parse(final String jsonString) {
         final JSONObject jsonObject = new JSONObject(jsonString);
-        return new PunishmentAppliedMessage(UUID.fromString(jsonObject.getString("targetUUID")), UUID.fromString(jsonObject.getString("punishmentUUID")));
+        return new PunishmentAppliedMessage(UUID.fromString(jsonObject.getString("targetUUID")),
+                UUID.fromString(jsonObject.getString("punishmentUUID")));
     }
 
     public String stringify() {
-        return new JSONObject(Map.ofEntries(Map.entry("targetUUID", _targetUUID.toString()), Map.entry("punishmentUUID", _punishmentUUID.toString()))).toString();
+        return new JSONObject(Map.ofEntries(Map.entry("targetUUID",
+                        _targetUUID.toString()),
+                Map.entry("punishmentUUID",
+                        _punishmentUUID.toString()))).toString();
     }
 
 }

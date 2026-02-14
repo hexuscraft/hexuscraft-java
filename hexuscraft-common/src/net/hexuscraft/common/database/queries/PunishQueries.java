@@ -7,11 +7,14 @@ import java.util.UUID;
 public final class PunishQueries {
 
     public static String LIST(final UUID uniqueId) {
-        return Database.buildQuery("user", uniqueId.toString(), "punishments");
+        return Database.buildQuery("user",
+                uniqueId.toString(),
+                "punishments");
     }
 
     public static String PUNISHMENT(final UUID uniqueId) {
-        return Database.buildQuery("punishment", uniqueId.toString());
+        return Database.buildQuery("punishment",
+                uniqueId.toString());
     }
 
 }

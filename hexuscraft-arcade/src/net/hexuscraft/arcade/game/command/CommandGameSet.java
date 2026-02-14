@@ -8,7 +8,12 @@ import java.util.Set;
 public final class CommandGameSet extends BaseCommand<MiniPluginGame> {
 
     CommandGameSet(final MiniPluginGame miniPluginGame) {
-        super(miniPluginGame, "set", "<Name> [Map]", "Change the active game.", Set.of("change", "c"),
+        super(miniPluginGame,
+                "set",
+                "<Name> [Map]",
+                "Change the active game.",
+                Set.of("change",
+                        "c"),
                 MiniPluginGame.PERM.COMMAND_GAME_SET);
     }
 

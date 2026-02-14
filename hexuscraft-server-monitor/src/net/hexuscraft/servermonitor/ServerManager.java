@@ -29,7 +29,8 @@ public final class ServerManager {
                                         final String reason) {
         final ServerData[] existingServers;
         try {
-            existingServers = ServerQueries.getServers(jedis, serverGroupData);
+            existingServers = ServerQueries.getServers(jedis,
+                    serverGroupData);
         } catch (final JedisException ex) {
             _monitor.log(
                     "JedisException while getting servers for startServer(" + serverGroupData._name + ": " + reason +
@@ -39,7 +40,8 @@ public final class ServerManager {
 
         final Map<Integer, ServerData> serverDataIdMap = new HashMap<>();
         for (ServerData existingServer : existingServers) {
-            serverDataIdMap.put(existingServer._port - serverGroupData._minPort + 1, existingServer);
+            serverDataIdMap.put(existingServer._port - serverGroupData._minPort + 1,
+                    existingServer);
         }
 
         final AtomicInteger lowestId = new AtomicInteger(0);
@@ -60,8 +62,17 @@ public final class ServerManager {
         final int serverPort = serverGroupData._minPort + lowestId.get() - 1;
 
         try {
-            new ServerData(serverName, "", serverGroupData._capacity, System.currentTimeMillis(), serverGroupData._name,
-                    "", 0, serverPort, 20, System.currentTimeMillis(), true).update(jedis);
+            new ServerData(serverName,
+                    "",
+                    serverGroupData._capacity,
+                    System.currentTimeMillis(),
+                    serverGroupData._name,
+                    "",
+                    0,
+                    serverPort,
+                    20,
+                    System.currentTimeMillis(),
+                    true).update(jedis);
         } catch (final JedisException ex) {
             _monitor.log("JedisException while creating template server punish for startServer(" + serverGroupData._name +
                     ": " + reason + "): " + ex.getMessage());
@@ -70,12 +81,18 @@ public final class ServerManager {
 
         try {
             final Process process =
-                    new ProcessBuilder(_path + "/Scripts/StartServer.cmd", serverGroupData._name + "-" + lowestId,
-                            serverGroupData._name, Integer.toString(serverPort), Integer.toString(serverGroupData._ram),
-                            Integer.toString(serverGroupData._capacity), serverGroupData._plugin,
-                            serverGroupData._worldZip, Boolean.toString(serverGroupData._worldEdit)).start();
+                    new ProcessBuilder(_path + "/Scripts/StartServer.cmd",
+                            serverGroupData._name + "-" + lowestId,
+                            serverGroupData._name,
+                            Integer.toString(serverPort),
+                            Integer.toString(serverGroupData._ram),
+                            Integer.toString(serverGroupData._capacity),
+                            serverGroupData._plugin,
+                            serverGroupData._worldZip,
+                            Boolean.toString(serverGroupData._worldEdit)).start();
 
-            final boolean finished = process.waitFor(serverGroupData._timeoutMillis, TimeUnit.MILLISECONDS);
+            final boolean finished = process.waitFor(serverGroupData._timeoutMillis,
+                    TimeUnit.MILLISECONDS);
 
             if (!finished) {
                 process.destroy();
@@ -106,10 +123,14 @@ public final class ServerManager {
                 final long startMs = System.currentTimeMillis();
                 while (true) {
                     if ((System.currentTimeMillis() - startMs) > 30000L) {
-                        killServer(jedis, serverName, serverGroupData._name, "Slow Start-up");
+                        killServer(jedis,
+                                serverName,
+                                serverGroupData._name,
+                                "Slow Start-up");
                         break;
                     }
-                    final ServerData serverData = ServerQueries.getServer(jedis, serverName);
+                    final ServerData serverData = ServerQueries.getServer(jedis,
+                            serverName);
                     if (serverData != null && !serverData._updatedByMonitor) break;
 
                     //noinspection BusyWait
@@ -130,8 +151,11 @@ public final class ServerManager {
 
         try {
             final Process process =
-                    new ProcessBuilder(_path + "/scripts/killServer.cmd", serverName, serverGroupName).start();
-            final boolean finished = process.waitFor(10, TimeUnit.SECONDS);
+                    new ProcessBuilder(_path + "/scripts/killServer.cmd",
+                            serverName,
+                            serverGroupName).start();
+            final boolean finished = process.waitFor(10,
+                    TimeUnit.SECONDS);
 
             if (!finished) {
                 process.destroy();

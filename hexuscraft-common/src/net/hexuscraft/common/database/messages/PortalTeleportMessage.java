@@ -19,11 +19,15 @@ public final class PortalTeleportMessage extends BaseMessage {
 
     public static PortalTeleportMessage parse(final String jsonString) {
         final JSONObject jsonObject = new JSONObject(jsonString);
-        return new PortalTeleportMessage(UUID.fromString(jsonObject.getString("targetUUID")), jsonObject.getString("serverName"));
+        return new PortalTeleportMessage(UUID.fromString(jsonObject.getString("targetUUID")),
+                jsonObject.getString("serverName"));
     }
 
     public String stringify() {
-        return new JSONObject(Map.ofEntries(Map.entry("targetUUID", _targetUUID.toString()), Map.entry("serverName", _serverName))).toString();
+        return new JSONObject(Map.ofEntries(Map.entry("targetUUID",
+                        _targetUUID.toString()),
+                Map.entry("serverName",
+                        _serverName))).toString();
     }
 
 }

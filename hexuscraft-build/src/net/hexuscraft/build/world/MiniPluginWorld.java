@@ -16,7 +16,8 @@ public final class MiniPluginWorld extends MiniPlugin<Build> {
     private MiniPluginCommand _miniPluginCommand = null;
 
     public MiniPluginWorld(final Build plugin) {
-        super(plugin, "World");
+        super(plugin,
+                "World");
 
         PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_SPAWN);
         PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_WORLD);

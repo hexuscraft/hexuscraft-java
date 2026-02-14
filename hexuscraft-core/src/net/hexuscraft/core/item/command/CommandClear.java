@@ -15,7 +15,11 @@ import java.util.Set;
 public final class CommandClear extends BaseCommand<MiniPluginItem> {
 
     public CommandClear(final MiniPluginItem miniPluginItem) {
-        super(miniPluginItem, "clear", "[Players]", "Clear the inventory of targets.", Set.of("clearinventory"),
+        super(miniPluginItem,
+                "clear",
+                "[Players]",
+                "Clear the inventory of targets.",
+                Set.of("clearinventory"),
                 MiniPluginItem.PERM.COMMAND_CLEAR);
     }
 
@@ -27,20 +31,33 @@ public final class CommandClear extends BaseCommand<MiniPluginItem> {
         }
 
         final Player[] targets =
-                PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0],
-                        sender, matches -> matches.length == 0);
+                PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
+                                .getOnlinePlayers(),
+                        args[0],
+                        sender,
+                        matches -> matches.length == 0);
         if (targets.length == 0) return;
 
-        Arrays.stream(targets).forEach(target -> target.getInventory().clear());
+        Arrays.stream(targets)
+                .forEach(target -> target.getInventory()
+                        .clear());
         sender.sendMessage(F.fMain(this) + "Cleared the inventories of " +
-                F.fItem(Arrays.stream(targets).map(Player::getName).toArray(String[]::new)) + ".");
+                F.fItem(Arrays.stream(targets)
+                        .map(Player::getName)
+                        .toArray(String[]::new)) + ".");
     }
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        final List<String> completions = new ArrayList<>(List.of("*", "**", "."));
+        final List<String> completions = new ArrayList<>(List.of("*",
+                "**",
+                "."));
         completions.addAll(
-                _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
+                _miniPlugin._hexusPlugin.getServer()
+                        .getOnlinePlayers()
+                        .stream()
+                        .map(Player::getName)
+                        .toList());
         return completions;
     }
 }

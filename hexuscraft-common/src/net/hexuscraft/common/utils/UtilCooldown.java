@@ -14,7 +14,8 @@ public final class UtilCooldown {
 
         if (!_cooldownMap.containsKey(parent)) return null;
         for (final Cooldown cooldown : _cooldownMap.get(parent)) {
-            if (!cooldown._name().equals(name)) continue;
+            if (!cooldown._name()
+                    .equals(name)) continue;
             return cooldown;
         }
         return null;
@@ -23,7 +24,8 @@ public final class UtilCooldown {
     private static void addCooldown(final Object rawParent, final Cooldown cooldown) {
         final Object parent = rawParent == null ? UtilCooldown.class : rawParent;
 
-        if (!_cooldownMap.containsKey(parent)) _cooldownMap.put(parent, new HashSet<>());
+        if (!_cooldownMap.containsKey(parent)) _cooldownMap.put(parent,
+                new HashSet<>());
 
         final Set<Cooldown> parentList = _cooldownMap.get(parent);
         parentList.add(cooldown);
@@ -38,10 +40,14 @@ public final class UtilCooldown {
     }
 
     public static boolean use(final Object parent, final String name, final Long delayMs) {
-        final Cooldown cooldown = getCooldown(parent, name);
+        final Cooldown cooldown = getCooldown(parent,
+                name);
         if (cooldown != null) return false;
 
-        addCooldown(parent, new Cooldown(name, System.currentTimeMillis(), delayMs));
+        addCooldown(parent,
+                new Cooldown(name,
+                        System.currentTimeMillis(),
+                        delayMs));
         return true;
     }
 

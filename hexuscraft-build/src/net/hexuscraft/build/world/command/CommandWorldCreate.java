@@ -16,7 +16,11 @@ import java.util.Set;
 public final class CommandWorldCreate extends BaseCommand<MiniPluginWorld> {
 
     public CommandWorldCreate(final MiniPluginWorld miniPluginWorld) {
-        super(miniPluginWorld, "create", "<Name>", "Create a new void world.", Set.of("c"),
+        super(miniPluginWorld,
+                "create",
+                "<Name>",
+                "Create a new void world.",
+                Set.of("c"),
                 MiniPluginWorld.PERM.COMMAND_WORLD_CREATE);
     }
 
@@ -34,8 +38,11 @@ public final class CommandWorldCreate extends BaseCommand<MiniPluginWorld> {
         worldCreator.generatorSettings("3;0");
         worldCreator.generator("3;0");
 
-        final World world = _miniPlugin._hexusPlugin.getServer().createWorld(worldCreator);
-        world.setSpawnLocation(0, 100, 0);
+        final World world = _miniPlugin._hexusPlugin.getServer()
+                .createWorld(worldCreator);
+        world.setSpawnLocation(0,
+                100,
+                0);
         world.setDifficulty(Difficulty.NORMAL);
         world.setAutoSave(false);
         world.setAmbientSpawnLimit(0);
@@ -44,14 +51,22 @@ public final class CommandWorldCreate extends BaseCommand<MiniPluginWorld> {
         world.setPVP(false);
         world.setWaterAnimalSpawnLimit(0);
         Map.of(
-                "doDaylightCycle", "false",
-                "doEntityDrops", "false",
-                "doFireTick", "false",
-                "mobGriefing", "false"
-        ).forEach(world::setGameRuleValue);
+                        "doDaylightCycle",
+                        "false",
+                        "doEntityDrops",
+                        "false",
+                        "doFireTick",
+                        "false",
+                        "mobGriefing",
+                        "false"
+                )
+                .forEach(world::setGameRuleValue);
         world.save();
 
-        sender.sendMessage(F.fMain(this, "Created world ", F.fItem(world.getName()), "."));
+        sender.sendMessage(F.fMain(this,
+                "Created world ",
+                F.fItem(world.getName()),
+                "."));
 
         if (!(sender instanceof Player player)) return;
         player.teleport(world.getSpawnLocation());

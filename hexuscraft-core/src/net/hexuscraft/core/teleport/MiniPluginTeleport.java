@@ -14,7 +14,8 @@ public final class MiniPluginTeleport extends MiniPlugin<HexusPlugin> {
     private MiniPluginCommand _pluginCommand;
 
     public MiniPluginTeleport(final HexusPlugin plugin) {
-        super(plugin, "Teleport");
+        super(plugin,
+                "Teleport");
 
         PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_TELEPORT);
         PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_TELEPORT_COORDINATES);

@@ -8,7 +8,11 @@ import java.util.Set;
 public final class CommandGameStop extends BaseCommand<MiniPluginGame> {
 
     CommandGameStop(final MiniPluginGame miniPluginGame) {
-        super(miniPluginGame, "stop", "", "Stop the currently active game.", Set.of(),
+        super(miniPluginGame,
+                "stop",
+                "",
+                "Stop the currently active game.",
+                Set.of(),
                 MiniPluginGame.PERM.COMMAND_GAME_STOP);
     }
 

@@ -29,10 +29,12 @@ public final class MiniPluginNews extends MiniPlugin<Hub> {
     private MiniPluginDatabase _miniPluginDatabase;
     private Map<Player, BossBar> _bossBars;
     private List<NewsData> _newsDatas;
+    private List<NewsData> _activeNews;
     private AtomicInteger _activeNewsIndex;
 
     public MiniPluginNews(final Hub hub) {
-        super(hub, "News");
+        super(hub,
+                "News");
     }
 
     @Override
@@ -42,28 +44,32 @@ public final class MiniPluginNews extends MiniPlugin<Hub> {
         _miniPluginDatabase = (MiniPluginDatabase) dependencies.get(MiniPluginDatabase.class);
         _bossBars = new HashMap<>();
         _newsDatas = new ArrayList<>();
+        _activeNews = new ArrayList<>();
         _activeNewsIndex = new AtomicInteger();
     }
 
     @Override
     public void onEnable() {
-        _miniPluginDatabase._database.registerConsumer(NewsUpdatedMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
-            final NewsUpdatedMessage parsedMessage = NewsUpdatedMessage.parse(rawMessage);
+        _miniPluginDatabase._database.registerConsumer(NewsUpdatedMessage.CHANNEL_NAME,
+                (_, _, rawMessage) -> {
+                    final NewsUpdatedMessage parsedMessage = NewsUpdatedMessage.parse(rawMessage);
 
-            _hexusPlugin.runAsync(() -> {
-                final NewsData newNewsData = NewsQueries.getNews(_miniPluginDatabase._database._jedis, parsedMessage._id);
-                if (newNewsData == null) return; // silences the linter
+                    _hexusPlugin.runAsync(() -> {
+                        final NewsData newNewsData = NewsQueries.getNews(_miniPluginDatabase._database._jedis,
+                                parsedMessage._id);
+                        if (newNewsData == null) return; // silences the linter
 
-                _newsDatas.removeIf(newsData -> newsData._id.equals(newNewsData._id));
-                _newsDatas.add(newNewsData);
-                _newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
-            });
-        });
+                        _newsDatas.removeIf(newsData -> newsData._id.equals(newNewsData._id));
+                        _newsDatas.add(newNewsData);
+                        _newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
+                    });
+                });
 
-        _miniPluginDatabase._database.registerConsumer(NewsDeletedMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
-            final NewsDeletedMessage parsedMessage = NewsDeletedMessage.parse(rawMessage);
-            _newsDatas.removeIf(newsData -> newsData._id.equals(parsedMessage._id));
-        });
+        _miniPluginDatabase._database.registerConsumer(NewsDeletedMessage.CHANNEL_NAME,
+                (_, _, rawMessage) -> {
+                    final NewsDeletedMessage parsedMessage = NewsDeletedMessage.parse(rawMessage);
+                    _newsDatas.removeIf(newsData -> newsData._id.equals(parsedMessage._id));
+                });
 
         _hexusPlugin.runAsync(() -> {
             final NewsData[] news = NewsQueries.getNews(_miniPluginDatabase._database._jedis);
@@ -73,25 +79,38 @@ public final class MiniPluginNews extends MiniPlugin<Hub> {
         });
 
         _hexusPlugin.runAsyncTimer(() -> {
-            final List<NewsData> activeNews = _newsDatas.stream().filter(newsData -> newsData._active).toList();
+                    _activeNews.clear();
+                    _activeNews.addAll(_newsDatas.stream()
+                            .filter(newsData -> newsData._active)
+                            .toList());
 
-            if (activeNews.isEmpty()) {
-                _bossBars.values().forEach(bossBar -> bossBar.message().set(C.cGold + C.fBold + "HEXUSCRAFT"));
-                return;
-            }
+                    if (_activeNews.isEmpty()) {
+                        _bossBars.values()
+                                .forEach(bossBar -> bossBar.message()
+                                        .set(C.cGold + C.fBold + "HEXUSCRAFT"));
+                        return;
+                    }
 
-            if (_activeNewsIndex.incrementAndGet() >= activeNews.size()) _activeNewsIndex.set(0);
+                    if (_activeNewsIndex.incrementAndGet() >= _activeNews.size()) _activeNewsIndex.set(0);
 
-            _bossBars.values().forEach(bossBar -> bossBar.message().set(activeNews.get(_activeNewsIndex.get())._message));
-        }, 0, 100); // 5 seconds
+                    _bossBars.values()
+                            .forEach(bossBar -> bossBar.message()
+                                    .set(_activeNews.get(_activeNewsIndex.get())._message));
+                },
+                0,
+                100); // 5 seconds
 
-        _miniPluginCommand.register(new CommandNews(this, _miniPluginDatabase));
+        _miniPluginCommand.register(new CommandNews(this,
+                _miniPluginDatabase));
     }
 
     @EventHandler
     private void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        _bossBars.put(player, _miniPluginBossBar.registerBossBar(new BossBar(player, 0, "<news loading>")));
+        _bossBars.put(player,
+                _miniPluginBossBar.registerBossBar(new BossBar(player,
+                        0,
+                        "<news loading>")));
     }
 
     @EventHandler

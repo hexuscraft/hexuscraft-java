@@ -19,7 +19,8 @@ public final class MiniPluginGame extends MiniPlugin<Arcade> {
     private MiniPluginPortal _miniPluginPortal;
 
     public MiniPluginGame(final Arcade arcade) {
-        super(arcade, "Game");
+        super(arcade,
+                "Game");
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME);
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME_SET);
@@ -36,7 +37,8 @@ public final class MiniPluginGame extends MiniPlugin<Arcade> {
     @Override
     public void onEnable() {
         _miniPluginCommand.register(new CommandGame(this));
-        _miniPluginCommand.register(new CommandHub(this, _miniPluginPortal));
+        _miniPluginCommand.register(new CommandHub(this,
+                _miniPluginPortal));
     }
 
     public enum PERM implements IPermission {

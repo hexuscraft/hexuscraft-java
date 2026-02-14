@@ -3,26 +3,20 @@ package net.hexuscraft.core.database;
 import net.hexuscraft.common.database.Database;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import redis.clients.jedis.UnifiedJedis;
 
 public final class MiniPluginDatabase extends MiniPlugin<HexusPlugin> {
 
     public final Database _database;
 
     public MiniPluginDatabase(final HexusPlugin plugin) {
-        super(plugin, "Database");
-
+        super(plugin,
+                "Database");
         _database = new Database();
     }
 
     @Override
     public void onDisable() {
         _database.unregisterConsumers();
-    }
-
-    @Deprecated(since = "2026-01-12")
-    public UnifiedJedis getJedis() {
-        return _database._jedis;
     }
 
 }

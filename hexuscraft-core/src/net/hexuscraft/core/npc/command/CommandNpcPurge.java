@@ -11,7 +11,15 @@ import java.util.Set;
 public final class CommandNpcPurge extends BaseCommand<MiniPluginNpc> {
 
     CommandNpcPurge(final MiniPluginNpc miniPluginNpc) {
-        super(miniPluginNpc, "purge", "", "Temporarily purge all NPCs.", Set.of("p", "kill", "k", "destroy", "d"),
+        super(miniPluginNpc,
+                "purge",
+                "",
+                "Temporarily purge all NPCs.",
+                Set.of("p",
+                        "kill",
+                        "k",
+                        "destroy",
+                        "d"),
                 MiniPluginNpc.PERM.COMMAND_ENTITY_PURGE);
     }
 
@@ -23,12 +31,14 @@ public final class CommandNpcPurge extends BaseCommand<MiniPluginNpc> {
         }
 
         if (!(sender instanceof final Player player)) {
-            sender.sendMessage(F.fMain(this, F.fError("Only players can purge NPCs in their current world.")));
+            sender.sendMessage(F.fMain(this,
+                    F.fError("Only players can purge NPCs in their current world.")));
             return;
         }
 
         _miniPlugin.removeNPCs(player.getWorld());
-        sender.sendMessage(F.fMain(this, "Purged all NPCs in your world."));
+        sender.sendMessage(F.fMain(this,
+                "Purged all NPCs in your world."));
     }
 
 }

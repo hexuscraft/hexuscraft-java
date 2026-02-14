@@ -14,7 +14,14 @@ import java.util.Set;
 public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPortal> {
 
     public CommandNetworkGroupRestart(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal, "restart", "<Server Group>", "Restart all servers of a group.", Set.of("r", "reboot", "rb"), MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_RESTART);
+        super(miniPluginPortal,
+                "restart",
+                "<Server Group>",
+                "Restart all servers of a group.",
+                Set.of("r",
+                        "reboot",
+                        "rb"),
+                MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_RESTART);
     }
 
     @Override
@@ -25,9 +32,11 @@ public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPort
         }
 
         if (args[0].equals("*")) {
-            sender.sendMessage(F.fMain(this, "Sending restart command to all server groups..."));
+            sender.sendMessage(F.fMain(this,
+                    "Sending restart command to all server groups..."));
             _miniPlugin.restartServerGroupAsync("*");
-            sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to all server groups.")));
+            sender.sendMessage(F.fMain(this,
+                    F.fSuccess("Successfully sent restart command to all server groups.")));
             return;
         }
 
@@ -36,12 +45,16 @@ public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPort
             try {
                 serverGroupData = _miniPlugin.getServerGroup(args[0]);
             } catch (final JedisException ex) {
-                sender.sendMessage(F.fMain(this, F.fError("JedisException while fetching server group punish. Please try again later or contact dev-ops if this issue persists.")));
+                sender.sendMessage(F.fMain(this,
+                        F.fError("JedisException while fetching server group punish. Please try again later or contact dev-ops if this issue persists.")));
                 return;
             }
 
             if (serverGroupData == null) {
-                sender.sendMessage(F.fMain(this, F.fError("Could not locate server group with name ", F.fItem(args[0]), ".")));
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Could not locate server group with name ",
+                                F.fItem(args[0]),
+                                ".")));
                 return;
             }
 
@@ -49,10 +62,14 @@ public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPort
                 try {
                     _miniPlugin.restartServerGroupAsync(serverGroupData._name);
                 } catch (final JedisException ex) {
-                    sender.sendMessage(F.fMain(this, F.fError("JedisException while restarting server group. Please try again later or contact dev-ops if this issue persists.")));
+                    sender.sendMessage(F.fMain(this,
+                            F.fError("JedisException while restarting server group. Please try again later or contact dev-ops if this issue persists.")));
                     return;
                 }
-                sender.sendMessage(F.fMain(this, "Restarting server group ", F.fItem(serverGroupData._name), "..."));
+                sender.sendMessage(F.fMain(this,
+                        "Restarting server group ",
+                        F.fItem(serverGroupData._name),
+                        "..."));
             });
         });
     }
