@@ -125,10 +125,10 @@ public final class Database {
 
         final JedisPubSub jedisPubSub = new JedisPubSub() {
             @Override
-            public void onPMessage(final String pattern, final String channelName, final String message) {
+            public void onPMessage(final String pattern, final String channelName, final String rawMessage) {
                 consumer.accept(pattern,
                         channelName,
-                        message);
+                        rawMessage);
             }
         };
 

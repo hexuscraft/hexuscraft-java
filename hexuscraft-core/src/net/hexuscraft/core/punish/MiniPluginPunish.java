@@ -1,7 +1,5 @@
 package net.hexuscraft.core.punish;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import net.hexuscraft.common.IPermission;
 import net.hexuscraft.common.database.data.PunishData;
 import net.hexuscraft.common.database.messages.PunishmentAppliedMessage;
@@ -112,18 +110,6 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
                                             Sound.CAT_MEOW,
                                             Float.MAX_VALUE,
                                             0.6F);
-
-                                    if (punishData.type == PunishType.BAN) {
-                                        // TODO: Change from bungeecord channels to redis channels. Implement behaviour on proxy.
-                                        //noinspection UnstableApiUsage
-                                        final ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                                        out.writeUTF("KickPlayer");
-                                        out.writeUTF(targetPlayer.getName());
-                                        out.writeUTF(punishMessage);
-                                        targetPlayer.sendPluginMessage(_hexusPlugin,
-                                                "BungeeCord",
-                                                out.toByteArray());
-                                    }
                                 });
 
                         _hexusPlugin.getServer()
