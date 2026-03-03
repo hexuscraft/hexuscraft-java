@@ -11,6 +11,8 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 You must provide your own CraftBukkit jar. The easiest way to do this is compiling CraftBukkit using BuildTools
 available at https://www.spigotmc.org/wiki/buildtools/
 
+Make sure to specify compilation of CraftBukkit 1.8.8
+
 Remember to add the file as a library to your local project. You can usually do this in your IDE but I prefer using a
 maven goal command:
 
