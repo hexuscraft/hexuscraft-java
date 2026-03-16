@@ -13,6 +13,10 @@ import java.util.Map;
 
 public final class MiniPluginParse extends MiniPlugin<Build> {
 
+    public enum PERM implements IPermission {
+        COMMAND_PARSE
+    }
+
     private MiniPluginCommand _command;
 
     public MiniPluginParse(final Build build) {
@@ -34,10 +38,6 @@ public final class MiniPluginParse extends MiniPlugin<Build> {
     }
 
     public void parse(final World world, final int radius) {
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_PARSE
     }
 
 }

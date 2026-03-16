@@ -11,6 +11,12 @@ import java.util.Map;
 
 public final class MiniPluginTeleport extends MiniPlugin<HexusPlugin> {
 
+    public enum PERM implements IPermission {
+        COMMAND_TELEPORT,
+        COMMAND_TELEPORT_COORDINATES,
+        COMMAND_TELEPORT_OTHERS
+    }
+
     private MiniPluginCommand _pluginCommand;
 
     public MiniPluginTeleport(final HexusPlugin plugin) {
@@ -31,12 +37,6 @@ public final class MiniPluginTeleport extends MiniPlugin<HexusPlugin> {
     @Override
     public void onEnable() {
         _pluginCommand.register(new CommandTeleport(this));
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_TELEPORT,
-        COMMAND_TELEPORT_COORDINATES,
-        COMMAND_TELEPORT_OTHERS
     }
 
 }

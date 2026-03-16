@@ -24,6 +24,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class MiniPluginNews extends MiniPlugin<Hub> {
 
+    public enum PERM implements IPermission {
+        COMMAND_NEWS,
+        COMMAND_NEWS_ADD,
+        COMMAND_NEWS_REMOVE,
+        COMMAND_NEWS_LIST,
+        COMMAND_NEWS_MODIFY,
+        COMMAND_NEWS_SET,
+        COMMAND_NEWS_SET_ACTIVE,
+        COMMAND_NEWS_SET_WEIGHT,
+        COMMAND_NEWS_SET_MESSAGE,
+    }
+
     private MiniPluginBossBar _miniPluginBossBar;
     private MiniPluginCommand _miniPluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
@@ -119,18 +131,6 @@ public final class MiniPluginNews extends MiniPlugin<Hub> {
         if (!_bossBars.containsKey(player)) return;
         _miniPluginBossBar.unregisterBossBar(_bossBars.get(player));
         _bossBars.remove(player);
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_NEWS,
-        COMMAND_NEWS_ADD,
-        COMMAND_NEWS_REMOVE,
-        COMMAND_NEWS_LIST,
-        COMMAND_NEWS_MODIFY,
-        COMMAND_NEWS_SET,
-        COMMAND_NEWS_SET_ACTIVE,
-        COMMAND_NEWS_SET_WEIGHT,
-        COMMAND_NEWS_SET_MESSAGE,
     }
 
 }

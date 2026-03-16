@@ -9,8 +9,10 @@ import net.hexuscraft.core.permission.MiniPluginPermission;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import redis.clients.jedis.exceptions.JedisException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -19,11 +21,7 @@ public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
     final MiniPluginDatabase _miniPluginDatabase;
 
     CommandRankInfo(final MiniPluginPermission miniPluginPermission, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPermission,
-                "info",
-                "<Player>",
-                "List the groups of a player.",
-                Set.of("i"),
+        super(miniPluginPermission, "info", "<Player>", "List the groups of a player.", Set.of("i"),
                 MiniPluginPermission.PERM.COMMAND_RANK_INFO);
         _miniPluginDatabase = miniPluginDatabase;
     }
@@ -36,45 +34,47 @@ public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
         }
 
         _miniPlugin._hexusPlugin.runAsync(() -> {
-            final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
-                    sender);
+            final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
             if (offlinePlayer == null) {
-                sender.sendMessage(F.fMatches(new String[]{},
-                        args[0]));
+                sender.sendMessage(F.fMatches(new String[]{}, args[0]));
                 return;
+            }
+
+            if (offlinePlayer.isOnline()) {
+                final Player player = offlinePlayer.getPlayer();
+                if (_miniPlugin._permissionProfiles.containsKey(player)) {
+                    sender.sendMessage(F.fMain(this, F.fItem(offlinePlayer.getName()), " Permission Groups: ",
+                            F.fItem(Arrays.stream(_miniPlugin._permissionProfiles.get(player)
+                                            ._groups())
+                                    .map(F::fPermissionGroup)
+                                    .toArray(String[]::new))));
+                    return;
+                }
             }
 
             final Set<String> groupNames;
             try {
-                groupNames = _miniPluginDatabase._database._jedis
-                        .smembers(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
+                groupNames = _miniPluginDatabase._database._jedis.smembers(
+                        PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this,
                         F.fError("An exception occurred while fetching the permission groups of ",
-                                F.fItem(offlinePlayer.getName()),
-                                ". Please try again later.")));
+                                F.fItem(offlinePlayer.getName()), ". Please try again later.")));
                 return;
             }
 
-
-            sender.sendMessage(F.fMain(this,
-                    F.fItem(offlinePlayer.getName()),
-                    " Permission Groups: ",
+            sender.sendMessage(F.fMain(this, F.fItem(offlinePlayer.getName()), " Permission Groups: ",
                     F.fItem(groupNames.stream()
                             .map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s)))
                             .distinct()
                             .toArray(String[]::new))));
         });
-
     }
 
     @Override
     public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length == 1)
-            return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer()
-                            .getOnlinePlayers(),
-                    sender,
-                    false);
+        if (args.length == 1) return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer()
+                .getOnlinePlayers(), sender, false);
         return List.of();
     }
 

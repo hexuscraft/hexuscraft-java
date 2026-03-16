@@ -43,6 +43,12 @@ import java.util.stream.Collectors;
 
 public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
 
+    public enum PERM implements IPermission {
+        COMMAND_PUNISH,
+        COMMAND_PUNISH_HISTORY,
+        COMMAND_RULES
+    }
+
     private static final Logger log = LoggerFactory.getLogger(MiniPluginPunish.class);
     private MiniPluginCommand _pluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
@@ -75,7 +81,8 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
                 (_, _, message) -> {
                     final PunishmentAppliedMessage punishmentAppliedMessage = PunishmentAppliedMessage.parse(message);
                     _hexusPlugin.runAsync(() -> {
-                        final Map<String, String> rawData = new HashMap<>(_miniPluginDatabase._database._jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentAppliedMessage._punishmentUUID)));
+                        final Map<String, String> rawData = new HashMap<>(_miniPluginDatabase._database._jedis.hgetAll(
+                                PunishQueries.PUNISHMENT(punishmentAppliedMessage._punishmentUUID)));
                         rawData.put("id",
                                 punishmentAppliedMessage._punishmentUUID.toString());
 
@@ -83,9 +90,11 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
 
                         final OfflinePlayer targetOfflinePlayer;
                         try {
-                            targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(punishmentAppliedMessage._targetUUID);
+                            targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(
+                                    punishmentAppliedMessage._targetUUID);
                         } catch (final IOException ex) {
-                            logWarning("Could not fetch offline player for punish target '" + punishmentAppliedMessage._targetUUID + "': " + ex.getMessage());
+                            logWarning(
+                                    "Could not fetch offline player for punish target '" + punishmentAppliedMessage._targetUUID + "': " + ex.getMessage());
                             return;
                         }
                         if (targetOfflinePlayer == null) return;
@@ -115,7 +124,8 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
                         _hexusPlugin.getServer()
                                 .getOnlinePlayers()
                                 .stream()
-                                .filter((final Player onlineStaffPlayer) -> onlineStaffPlayer.hasPermission(PermissionGroup.TRAINEE.name()))
+                                .filter((final Player onlineStaffPlayer) -> onlineStaffPlayer.hasPermission(
+                                        PermissionGroup.TRAINEE.name()))
                                 .forEach((final Player onlineStaffPlayer) -> {
                                     switch (punishData.type) {
                                         case PunishType.WARNING -> onlineStaffPlayer.sendMessage(F.fMain(this,
@@ -177,7 +187,8 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
 
             for (final UUID punishmentUniqueId : punishmentIds) {
                 try {
-                    final Map<String, String> rawData = new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
+                    final Map<String, String> rawData = new HashMap<>(
+                            jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
                     rawData.put("id",
                             punishmentUniqueId.toString());
 
@@ -399,7 +410,8 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
         } catch (final IOException ex) {
             logSevere(ex);
             clicker.sendMessage(F.fMain(this,
-                    F.fError("IOException while fetching OfflinePlayer. Please try again later or contact dev-ops if this issue persists.")));
+                    F.fError(
+                            "IOException while fetching OfflinePlayer. Please try again later or contact dev-ops if this issue persists.")));
             return;
         }
 
@@ -409,10 +421,6 @@ public final class MiniPluginPunish extends MiniPlugin<HexusPlugin> {
                 punishLengthMillis,
                 ChatColor.stripColor(skullLore.get(2)));
         clicker.closeInventory();
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_PUNISH, COMMAND_PUNISH_HISTORY, COMMAND_RULES
     }
 
 }

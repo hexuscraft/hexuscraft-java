@@ -75,14 +75,17 @@ public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
                         false,
                         10000,
                         new String[]{"SURVIVAL_GAMES"},
-                        sender instanceof final Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(_miniPluginDatabase._database._jedis);
+                        sender instanceof final Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(
+                        _miniPluginDatabase._database._jedis);
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this,
-                        F.fError("There was an error creating your server. Please try again in a few moments or contact an administrator if this issue persists.")));
+                        F.fError(
+                                "There was an error creating your server. Please try again in a few moments or contact an administrator if this issue persists.")));
                 return;
             }
             sender.sendMessage(F.fMain(this,
-                    F.fSuccess("Successfully created your server. You will be automatically teleported once your server has started. This may take up to 30 seconds.")));
+                    F.fSuccess(
+                            "Successfully created your server. You will be automatically teleported once your server has started. This may take up to 30 seconds.")));
         });
     }
 }

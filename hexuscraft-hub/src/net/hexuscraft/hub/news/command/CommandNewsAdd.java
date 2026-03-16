@@ -81,7 +81,8 @@ public final class CommandNewsAdd extends BaseCommand<MiniPluginNews> {
                     F.fSuccess("Successfully added news line.")));
         } catch (final JedisException ex) {
             sender.sendMessage(F.fMain(this,
-                    F.fError("There was an error while publishing news. Please try again later or contact an administrator if this issue persists.")));
+                    F.fError(
+                            "There was an error while publishing news. Please try again later or contact an administrator if this issue persists.")));
         }
     }
 }

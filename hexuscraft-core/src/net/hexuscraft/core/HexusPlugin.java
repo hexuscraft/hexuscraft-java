@@ -27,8 +27,9 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,17 +41,17 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     public final BukkitScheduler _scheduler;
     public final Logger _logger;
     private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPlugins;
-    private final Set<Class<? extends MiniPlugin<? extends HexusPlugin>>> _miniPluginClasses;
 
     public HexusPlugin() {
+        final long start = System.currentTimeMillis();
         final Server server = getServer();
         _pluginManager = server.getPluginManager();
         _scheduler = server.getScheduler();
         _logger = getLogger();
 
         _miniPlugins = new HashMap<>();
-        _miniPluginClasses = new HashSet<>();
         requireCorePlugins();
+        logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public HexusPlugin(final boolean shouldRequireCorePlugins) {
@@ -60,51 +61,35 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         _logger = getLogger();
 
         _miniPlugins = new HashMap<>();
-        _miniPluginClasses = new HashSet<>();
 
-        if (shouldRequireCorePlugins)
-            requireCorePlugins();
+        if (shouldRequireCorePlugins) requireCorePlugins();
     }
 
     public final void requireCorePlugins() {
-        require(MiniPluginAntiCheat.class);
-        require(MiniPluginAuthentication.class);
-        require(MiniPluginBossBar.class);
-        require(MiniPluginBuildVersion.class);
-        require(MiniPluginChat.class);
-        require(MiniPluginCombat.class);
-        require(MiniPluginCommand.class);
-        require(MiniPluginDatabase.class);
-        require(MiniPluginDisguise.class);
-        require(MiniPluginGameMode.class);
-        require(MiniPluginItem.class);
-        require(MiniPluginNpc.class);
-        require(MiniPluginParty.class);
-        require(MiniPluginPermission.class);
-        require(MiniPluginPortal.class);
-        require(MiniPluginPunish.class);
-        require(MiniPluginReport.class);
-        require(MiniPluginScoreboard.class);
-        require(MiniPluginTeleport.class);
+        require(new MiniPluginAntiCheat(this));
+        require(new MiniPluginAuthentication(this));
+        require(new MiniPluginBossBar(this));
+        require(new MiniPluginBuildVersion(this));
+        require(new MiniPluginChat(this));
+        require(new MiniPluginCombat(this));
+        require(new MiniPluginCommand(this));
+        require(new MiniPluginDatabase(this));
+        require(new MiniPluginDisguise(this));
+        require(new MiniPluginGameMode(this));
+        require(new MiniPluginItem(this));
+        require(new MiniPluginNpc(this));
+        require(new MiniPluginParty(this));
+        require(new MiniPluginPermission(this));
+        require(new MiniPluginPortal(this));
+        require(new MiniPluginPunish(this));
+        require(new MiniPluginReport(this));
+        require(new MiniPluginScoreboard(this));
+        require(new MiniPluginTeleport(this));
     }
 
     @Override
     public final void onLoad() {
         final AtomicLong start = new AtomicLong(System.currentTimeMillis());
-        logInfo("Instantiating...");
-
-        _miniPluginClasses.forEach(aClass -> {
-            try {
-                _miniPlugins.put(aClass,
-                        (MiniPlugin<? extends HexusPlugin>) aClass.getConstructors()[0].newInstance(this));
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-
-        logInfo("Instantiated in " + (System.currentTimeMillis() - start.get()) + "ms.");
-
-        start.set(System.currentTimeMillis());
         logInfo("Loading...");
 
         load();
@@ -119,8 +104,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         long start = System.currentTimeMillis();
         logInfo("Enabling...");
 
-        _pluginManager.registerEvents(this,
-                this);
+        _pluginManager.registerEvents(this, this);
         enable();
         _miniPlugins.values()
                 .forEach(MiniPlugin::enable);
@@ -141,50 +125,45 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         logInfo("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void require(final Class<? extends MiniPlugin<? extends HexusPlugin>> miniPluginClazz) {
-        _miniPluginClasses.add(miniPluginClazz);
+    public final void require(final MiniPlugin<? extends HexusPlugin> miniPlugin) {
+        //noinspection unchecked
+        _miniPlugins.put((Class<? extends MiniPlugin<? extends HexusPlugin>>) miniPlugin.getClass(), miniPlugin);
     }
 
     public final void logInfo(final String message) {
-        _logger.log(Level.INFO,
-                message);
+        _logger.log(Level.INFO, message);
     }
 
     public final void logInfo(final Exception ex) {
         logInfo("[" + ex.getClass()
-                .getName() + "] " + String.join("\n",
-                Stream.concat(Stream.of(ex.getMessage()),
-                                Arrays.stream(ex.getStackTrace())
-                                        .map(StackTraceElement::toString))
-                        .toArray(String[]::new)));
+                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
+                        Arrays.stream(ex.getStackTrace())
+                                .map(StackTraceElement::toString))
+                .toArray(String[]::new)));
     }
 
     public final void logWarning(final String message) {
-        _logger.log(Level.WARNING,
-                message);
+        _logger.log(Level.WARNING, message);
     }
 
     public final void logWarning(final Exception ex) {
         logWarning("[" + ex.getClass()
-                .getName() + "] " + String.join("\n",
-                Stream.concat(Stream.of(ex.getMessage()),
-                                Arrays.stream(ex.getStackTrace())
-                                        .map(StackTraceElement::toString))
-                        .toArray(String[]::new)));
+                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
+                        Arrays.stream(ex.getStackTrace())
+                                .map(StackTraceElement::toString))
+                .toArray(String[]::new)));
     }
 
     public final void logSevere(final String message) {
-        _logger.log(Level.SEVERE,
-                message);
+        _logger.log(Level.SEVERE, message);
     }
 
     public final void logSevere(final Exception ex) {
         logSevere("[" + ex.getClass()
-                .getName() + "] " + String.join("\n",
-                Stream.concat(Stream.of(ex.getMessage()),
-                                Arrays.stream(ex.getStackTrace())
-                                        .map(StackTraceElement::toString))
-                        .toArray(String[]::new)));
+                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
+                        Arrays.stream(ex.getStackTrace())
+                                .map(StackTraceElement::toString))
+                .toArray(String[]::new)));
     }
 
     public final File getFile() {
@@ -197,39 +176,27 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     public final BukkitTask runSync(final Runnable runnable) {
-        return _scheduler.runTask(this,
-                runnable);
+        return _scheduler.runTask(this, runnable);
     }
 
     public final BukkitTask runSyncLater(final Runnable runnable, final long delayTicks) {
-        return _scheduler.runTaskLater(this,
-                runnable,
-                delayTicks);
+        return _scheduler.runTaskLater(this, runnable, delayTicks);
     }
 
     public final BukkitTask runSyncTimer(final Runnable runnable, final long initialDelayTicks, final long repeatEveryTicks) {
-        return _scheduler.runTaskTimer(this,
-                runnable,
-                initialDelayTicks,
-                repeatEveryTicks);
+        return _scheduler.runTaskTimer(this, runnable, initialDelayTicks, repeatEveryTicks);
     }
 
     public final BukkitTask runAsync(final Runnable runnable) {
-        return _scheduler.runTaskAsynchronously(this,
-                runnable);
+        return _scheduler.runTaskAsynchronously(this, runnable);
     }
 
     public final BukkitTask runAsyncLater(final Runnable runnable, final long delayTicks) {
-        return _scheduler.runTaskLaterAsynchronously(this,
-                runnable,
-                delayTicks);
+        return _scheduler.runTaskLaterAsynchronously(this, runnable, delayTicks);
     }
 
     public final BukkitTask runAsyncTimer(final Runnable runnable, final long initialDelayTicks, final long repeatEveryTicks) {
-        return _scheduler.runTaskTimerAsynchronously(this,
-                runnable,
-                initialDelayTicks,
-                repeatEveryTicks);
+        return _scheduler.runTaskTimerAsynchronously(this, runnable, initialDelayTicks, repeatEveryTicks);
     }
 
 }

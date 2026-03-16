@@ -43,16 +43,48 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements PluginMessageListener {
 
+    public enum PERM implements IPermission {
+        COMMAND_SEND,
+        COMMAND_SERVER,
+        COMMAND_MOTD,
+        COMMAND_MOTD_VIEW,
+        COMMAND_MOTD_SET,
+        COMMAND_HOSTSERVER,
+        COMMAND_HOSTEVENT,
+        COMMAND_PERFORMANCE,
+
+        COMMAND_NETWORK,
+        COMMAND_NETWORK_GROUP,
+        COMMAND_NETWORK_GROUP_CREATE,
+        COMMAND_NETWORK_GROUP_DELETE,
+        COMMAND_NETWORK_GROUP_LIST,
+        COMMAND_NETWORK_GROUP_RESTART,
+
+        COMMAND_NETWORK_SERVER,
+        COMMAND_NETWORK_SERVER_RESTART,
+        COMMAND_NETWORK_SERVER_LIST,
+
+        COMMAND_NETWORK_SPY,
+
+        COMMAND_NETWORK_DATABASE,
+        COMMAND_NETWORK_DATABASE_SPY,
+
+        COMMAND_LOCATE,
+        COMMAND_LOCATE_SERVER,
+        COMMAND_LOCATE_PLAYER,
+
+        BYPASS_FULL_PLAYER,
+        BYPASS_FULL_STAFF
+    }
+
     public static final String PROXY_CHANNEL = "BungeeCord";
     public static final int MIN_PORT_PRIVATE_SERVERS = 39900;
     public static final int MAX_PORT_PRIVATE_SERVERS = 39999;
     public static final int EVENT_SERVER_PORT = 30003;
-
     public final Set<CommandSender> _networkChannelSpies;
     public final long _createdMillis;
     public final String _serverName;
     public final String _serverGroupName;
-
     private final Messenger _messenger;
     private final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
     private final Set<ServerGroupData> _serverGroupCache;
@@ -63,8 +95,7 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
     private BukkitTask _updateServerCacheTask;
 
     public MiniPluginPortal(final HexusPlugin plugin) {
-        super(plugin,
-                "Portal");
+        super(plugin, "Portal");
 
         _createdMillis = System.currentTimeMillis();
         _callbacks = new HashMap<>();
@@ -81,32 +112,21 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
 
         _messenger = _hexusPlugin.getServer()
                 .getMessenger();
-        _messenger.registerOutgoingPluginChannel(_hexusPlugin,
-                PROXY_CHANNEL);
-        _messenger.registerIncomingPluginChannel(_hexusPlugin,
-                PROXY_CHANNEL,
-                this);
+        _messenger.registerOutgoingPluginChannel(_hexusPlugin, PROXY_CHANNEL);
+        _messenger.registerIncomingPluginChannel(_hexusPlugin, PROXY_CHANNEL, this);
 
-        PermissionGroup.PLAYER._permissions.addAll(List.of(PERM.COMMAND_SERVER,
-                PERM.COMMAND_PERFORMANCE,
-                PERM.COMMAND_MOTD,
-                PERM.COMMAND_MOTD_VIEW));
+        PermissionGroup.PLAYER._permissions.addAll(
+                List.of(PERM.COMMAND_SERVER, PERM.COMMAND_PERFORMANCE, PERM.COMMAND_MOTD, PERM.COMMAND_MOTD_VIEW));
         PermissionGroup.VIP._permissions.add(PERM.BYPASS_FULL_PLAYER);
         PermissionGroup.MVP._permissions.add(PERM.COMMAND_HOSTSERVER);
         PermissionGroup.TRAINEE._permissions.add(PERM.BYPASS_FULL_STAFF);
         PermissionGroup.EVENT_LEAD._permissions.add(PERM.COMMAND_HOSTEVENT);
-        PermissionGroup.ADMINISTRATOR._permissions.addAll(List.of(PERM.COMMAND_SEND,
-                PERM.COMMAND_MOTD_SET,
-                PERM.COMMAND_NETWORK,
-                PERM.COMMAND_NETWORK_SPY,
-                PERM.COMMAND_NETWORK_GROUP,
-                PERM.COMMAND_NETWORK_GROUP_CREATE,
-                PERM.COMMAND_NETWORK_GROUP_DELETE,
-                PERM.COMMAND_NETWORK_GROUP_LIST,
-                PERM.COMMAND_NETWORK_GROUP_RESTART,
-                PERM.COMMAND_NETWORK_SERVER,
-                PERM.COMMAND_NETWORK_SERVER_RESTART,
-                PERM.COMMAND_NETWORK_SERVER_RESTART));
+        PermissionGroup.ADMINISTRATOR._permissions.addAll(
+                List.of(PERM.COMMAND_SEND, PERM.COMMAND_MOTD_SET, PERM.COMMAND_NETWORK, PERM.COMMAND_NETWORK_SPY,
+                        PERM.COMMAND_NETWORK_GROUP, PERM.COMMAND_NETWORK_GROUP_CREATE,
+                        PERM.COMMAND_NETWORK_GROUP_DELETE, PERM.COMMAND_NETWORK_GROUP_LIST,
+                        PERM.COMMAND_NETWORK_GROUP_RESTART, PERM.COMMAND_NETWORK_SERVER,
+                        PERM.COMMAND_NETWORK_SERVER_RESTART, PERM.COMMAND_NETWORK_SERVER_RESTART));
     }
 
     @Override
@@ -121,19 +141,14 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
 
     @Override
     public void onEnable() {
-        _miniPluginCommand.register(new CommandServer(this,
-                _miniPluginDatabase));
+        _miniPluginCommand.register(new CommandServer(this, _miniPluginDatabase));
         _miniPluginCommand.register(new CommandSend(this));
-        _miniPluginCommand.register(new CommandHostEvent(this,
-                _miniPluginDatabase));
-        _miniPluginCommand.register(new CommandHostServer(this,
-                _miniPluginDatabase));
-        _miniPluginCommand.register(new CommandNetwork(this,
-                _miniPluginDatabase));
+        _miniPluginCommand.register(new CommandHostEvent(this, _miniPluginDatabase));
+        _miniPluginCommand.register(new CommandHostServer(this, _miniPluginDatabase));
+        _miniPluginCommand.register(new CommandNetwork(this, _miniPluginDatabase));
 
-        _miniPluginDatabase._database.registerConsumer("*",
-                (_, channelName, message) -> _networkChannelSpies.forEach(commandSender -> commandSender.sendMessage(F.fSub(channelName,
-                        message))));
+        _miniPluginDatabase._database.registerConsumer("*", (_, channelName, message) -> _networkChannelSpies.forEach(
+                commandSender -> commandSender.sendMessage(F.fSub(channelName, message))));
 
         _miniPluginDatabase._database.registerConsumer(PortalTeleportMessage.CHANNEL_NAME,
                 (_, _, rawMessage) -> _hexusPlugin.runAsync(() -> {
@@ -144,8 +159,7 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
                             .stream()
                             .filter(player -> player.getUniqueId()
                                     .equals(message._targetUUID))
-                            .forEach(targetPlayer -> teleport(targetPlayer,
-                                    message._serverName));
+                            .forEach(targetPlayer -> teleport(targetPlayer, message._serverName));
                 }));
 
         _miniPluginDatabase._database.registerConsumer(PortalTeleportStaffMessage.CHANNEL_NAME,
@@ -161,8 +175,7 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
                                 if (targetPlayer.getUniqueId()
                                         .equals(message._targetUUID)) {
                                     targetName.set(targetPlayer.getName());
-                                    teleport(targetPlayer,
-                                            message._serverName);
+                                    teleport(targetPlayer, message._serverName);
                                 }
                                 if (targetPlayer.getUniqueId()
                                         .equals(message._senderUUID)) senderName.set(targetPlayer.getName());
@@ -174,7 +187,8 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
                         targetName.set(PlayerSearch.offlinePlayerSearch(message._targetUUID)
                                 .getName());
                     } catch (final IOException ex) {
-                        logWarning("IOException while fetching unique id of portal teleport target '" + message._targetUUID + "': " + ex.getMessage());
+                        logWarning(
+                                "IOException while fetching unique id of portal teleport target '" + message._targetUUID + "': " + ex.getMessage());
                         return;
                     }
 
@@ -182,7 +196,8 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
                         senderName.set(PlayerSearch.offlinePlayerSearch(message._senderUUID)
                                 .getName());
                     } catch (final IOException ex) {
-                        logWarning("IOException while fetching unique id of portal teleport sender '" + message._senderUUID + "': " + ex.getMessage());
+                        logWarning(
+                                "IOException while fetching unique id of portal teleport sender '" + message._senderUUID + "': " + ex.getMessage());
                         return;
                     }
 
@@ -191,33 +206,26 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
                             .stream()
                             .filter(player -> player.hasPermission(PermissionGroup.TRAINEE.name()))
                             .forEach(player -> {
-                                player.sendMessage(F.fStaff(this,
-                                        F.fItem(senderName.get()),
-                                        " sent ",
-                                        F.fItem(targetName.get()),
-                                        " to ",
-                                        F.fItem(message._serverName),
-                                        "."));
-                                player.playSound(player.getLocation(),
-                                        Sound.NOTE_PLING,
-                                        Float.MAX_VALUE,
-                                        2);
+                                player.sendMessage(
+                                        F.fStaff(this, F.fItem(senderName.get()), " sent ", F.fItem(targetName.get()),
+                                                " to ", F.fItem(message._serverName), "."));
+                                player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
                             });
                 }));
 
-        _miniPluginDatabase._database.registerConsumer(PortalRestartServerMessage.CHANNEL_NAME,
-                (_, _, rawMessage) -> {
-                    final PortalRestartServerMessage message = PortalRestartServerMessage.fromString(rawMessage);
-                    if (!message._serverName()
-                            .equals(_serverName) && !message._serverName()
-                            .equals("*")) return;
-                    _hexusPlugin.getServer()
-                            .shutdown();
-                });
+        _miniPluginDatabase._database.registerConsumer(PortalRestartServerMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+            final PortalRestartServerMessage message = PortalRestartServerMessage.fromString(rawMessage);
+            if (!message._serverName()
+                    .equals(_serverName) && !message._serverName()
+                    .equals("*")) return;
+            _hexusPlugin.getServer()
+                    .shutdown();
+        });
 
         _miniPluginDatabase._database.registerConsumer(PortalRestartServerGroupMessage.CHANNEL_NAME,
                 (_, _, rawMessage) -> {
-                    final PortalRestartServerGroupMessage message = PortalRestartServerGroupMessage.fromString(rawMessage);
+                    final PortalRestartServerGroupMessage message = PortalRestartServerGroupMessage.fromString(
+                            rawMessage);
                     if (!message._groupName()
                             .equals(_serverGroupName) && !message._groupName()
                             .equals("*")) return;
@@ -225,27 +233,21 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
                             .shutdown();
                 });
 
-        _updateServerDataTask = _hexusPlugin.runAsyncTimer(this::updateServerData,
-                0,
-                20);
+        _updateServerDataTask = _hexusPlugin.runAsyncTimer(this::updateServerData, 0, 20);
 
         _updateServerCacheTask = _hexusPlugin.runAsyncTimer(() -> {
-                    try {
-                        updateServerCache();
-                    } catch (final JedisException ex) {
-                        logSevere(ex);
-                    }
-                },
-                0,
-                20);
+            try {
+                updateServerCache();
+            } catch (final JedisException ex) {
+                logSevere(ex);
+            }
+        }, 0, 20);
     }
 
     @Override
     public void onDisable() {
-        _messenger.unregisterOutgoingPluginChannel(_hexusPlugin,
-                PROXY_CHANNEL);
-        _messenger.unregisterIncomingPluginChannel(_hexusPlugin,
-                PROXY_CHANNEL);
+        _messenger.unregisterOutgoingPluginChannel(_hexusPlugin, PROXY_CHANNEL);
+        _messenger.unregisterIncomingPluginChannel(_hexusPlugin, PROXY_CHANNEL);
 
         _callbacks.clear();
 
@@ -254,53 +256,34 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
 
         final Server server = _hexusPlugin.getServer();
 
-        final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
-                server.getPort()).getAddress(),
-                server.getMotd(),
+        final ServerListPingEvent ping = new ServerListPingEvent(
+                new InetSocketAddress(server.getIp(), server.getPort()).getAddress(), server.getMotd(),
                 server.getOnlinePlayers()
-                        .size(),
-                server.getMaxPlayers());
+                        .size(), server.getMaxPlayers());
         server.getPluginManager()
                 .callEvent(ping);
 
-        new ServerData(_serverName,
-                server.getIp(),
-                ping.getMaxPlayers(),
-                _createdMillis,
-                _serverGroupName,
-                "DEAD",
-                ping.getNumPlayers(),
-                server.getPort(),
-                20,
-                System.currentTimeMillis(),
-                false).update(_miniPluginDatabase._database._jedis);
+        new ServerData(_serverName, server.getIp(), ping.getMaxPlayers(), _createdMillis, _serverGroupName, "DEAD",
+                ping.getNumPlayers(), server.getPort(), 20, System.currentTimeMillis(), false).update(
+                _miniPluginDatabase._database._jedis);
     }
 
     public void updateServerData() {
         final Server server = _hexusPlugin.getServer();
 
-        final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
-                server.getPort()).getAddress(),
-                server.getMotd(),
+        final ServerListPingEvent ping = new ServerListPingEvent(
+                new InetSocketAddress(server.getIp(), server.getPort()).getAddress(), server.getMotd(),
                 server.getOnlinePlayers()
-                        .size(),
-                server.getMaxPlayers());
+                        .size(), server.getMaxPlayers());
         server.getPluginManager()
                 .callEvent(ping);
 
-        final OptionalDouble averageTps = OptionalDouble.of(20); //Arrays.stream(MinecraftServer.getServer().recentTps).average();
+        final OptionalDouble averageTps = OptionalDouble.of(
+                20); //Arrays.stream(MinecraftServer.getServer().recentTps).average();
 
-        new ServerData(_serverName,
-                server.getIp(),
-                server.getMaxPlayers(),
-                _createdMillis,
-                _serverGroupName,
-                ping.getMotd(),
-                ping.getNumPlayers(),
-                server.getPort(),
-                averageTps.orElse(2D),
-                System.currentTimeMillis(),
-                false).update(_miniPluginDatabase._database._jedis);
+        new ServerData(_serverName, server.getIp(), server.getMaxPlayers(), _createdMillis, _serverGroupName,
+                ping.getMotd(), ping.getNumPlayers(), server.getPort(), averageTps.orElse(2D),
+                System.currentTimeMillis(), false).update(_miniPluginDatabase._database._jedis);
     }
 
     public void updateServerCache() {
@@ -332,41 +315,31 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
 
     public void teleport(final Player player, final String serverName) {
         if (serverName.equals(_serverName)) {
-            player.sendMessage(F.fMain(this,
-                    F.fError("You are already connected to ",
-                            F.fItem(serverName),
-                            ".")));
+            player.sendMessage(F.fMain(this, F.fError("You are already connected to ", F.fItem(serverName), ".")));
             return;
         }
 
-        player.sendMessage(F.fMain(this,
-                "You were sent from ",
-                F.fItem(_serverName),
-                " to ",
-                F.fItem(serverName),
-                "."));
+        player.sendMessage(
+                F.fMain(this, "You were sent from ", F.fItem(_serverName), " to ", F.fItem(serverName), "."));
 
         // TODO: Change from bungeecord channels to redis channels. Implement behaviour on proxy.
         //noinspection UnstableApiUsage
         final ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
         out.writeUTF(serverName);
-        player.sendPluginMessage(_hexusPlugin,
-                PROXY_CHANNEL,
-                out.toByteArray());
+        player.sendPluginMessage(_hexusPlugin, PROXY_CHANNEL, out.toByteArray());
     }
 
     public BukkitTask teleportAsync(final UUID targetUUID, final String serverName) {
-        return _hexusPlugin.runAsync(() -> _miniPluginDatabase._database._jedis.publish(PortalTeleportMessage.CHANNEL_NAME,
-                new PortalTeleportMessage(targetUUID,
-                        serverName).stringify()));
+        return _hexusPlugin.runAsync(
+                () -> _miniPluginDatabase._database._jedis.publish(PortalTeleportMessage.CHANNEL_NAME,
+                        new PortalTeleportMessage(targetUUID, serverName).stringify()));
     }
 
     public BukkitTask teleportAsync(final UUID targetUUID, final String serverName, final UUID senderUUID) {
-        return _hexusPlugin.runAsync(() -> _miniPluginDatabase._database._jedis.publish(PortalTeleportStaffMessage.CHANNEL_NAME,
-                new PortalTeleportStaffMessage(targetUUID,
-                        serverName,
-                        senderUUID).stringify()));
+        return _hexusPlugin.runAsync(
+                () -> _miniPluginDatabase._database._jedis.publish(PortalTeleportStaffMessage.CHANNEL_NAME,
+                        new PortalTeleportStaffMessage(targetUUID, serverName, senderUUID).stringify()));
     }
 
     public void teleportPlayerToRandomServer(final Player player, final String serverGroupName) {
@@ -376,15 +349,12 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
                 .filter(serverData -> !serverData._name.equals(_serverName))
                 .toArray(ServerData[]::new);
         if (availableServers.length == 0) {
-            player.sendMessage(F.fMain(this,
-                    F.fError("Sorry, we were unable to locate a ",
-                            F.fItem(serverGroupName),
-                            " server. Please try again in a few moments or contact an administrator if this issue persists.")));
+            player.sendMessage(F.fMain(this, F.fError("Sorry, we were unable to locate a ", F.fItem(serverGroupName),
+                    " server. Please try again in a few moments or contact an administrator if this issue persists.")));
             return;
         }
 
-        teleport(player,
-                availableServers[new Random().nextInt(availableServers.length)]._name);
+        teleport(player, availableServers[new Random().nextInt(availableServers.length)]._name);
     }
 
     public ServerData[] getServers() {
@@ -438,13 +408,15 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
     }
 
     public BukkitTask restartServerAsync(final String serverName) {
-        return _hexusPlugin.runAsync(() -> _miniPluginDatabase._database._jedis.publish(PortalRestartServerMessage.CHANNEL_NAME,
-                new PortalRestartServerMessage(serverName).toString()));
+        return _hexusPlugin.runAsync(
+                () -> _miniPluginDatabase._database._jedis.publish(PortalRestartServerMessage.CHANNEL_NAME,
+                        new PortalRestartServerMessage(serverName).toString()));
     }
 
     public BukkitTask restartServerGroupAsync(final String groupName) {
-        return _hexusPlugin.runAsync(() -> _miniPluginDatabase._database._jedis.publish(PortalRestartServerGroupMessage.CHANNEL_NAME,
-                new PortalRestartServerGroupMessage(groupName).toString()));
+        return _hexusPlugin.runAsync(
+                () -> _miniPluginDatabase._database._jedis.publish(PortalRestartServerGroupMessage.CHANNEL_NAME,
+                        new PortalRestartServerGroupMessage(groupName).toString()));
     }
 
     public String read(File file) throws FileNotFoundException {
@@ -458,9 +430,7 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
         outServer.writeUTF("PlayerCount");
         outServer.writeUTF(name);
         _hexusPlugin.getServer()
-                .sendPluginMessage(_hexusPlugin,
-                        PROXY_CHANNEL,
-                        outServer.toByteArray());
+                .sendPluginMessage(_hexusPlugin, PROXY_CHANNEL, outServer.toByteArray());
 
         return 0;
     }
@@ -468,12 +438,10 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
     public UUID registerCallback(final String channelName, final ByteArrayDataInputRunnable callback) {
         final UUID id = UUID.randomUUID();
         if (!_callbacks.containsKey(channelName)) {
-            _callbacks.put(channelName,
-                    new HashMap<>());
+            _callbacks.put(channelName, new HashMap<>());
         }
         _callbacks.get(channelName)
-                .put(id,
-                        callback);
+                .put(id, callback);
         return id;
     }
 
@@ -492,9 +460,7 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
             outServer.writeUTF(s);
         }
         _hexusPlugin.getServer()
-                .sendPluginMessage(_hexusPlugin,
-                        PROXY_CHANNEL,
-                        outServer.toByteArray());
+                .sendPluginMessage(_hexusPlugin, PROXY_CHANNEL, outServer.toByteArray());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -509,24 +475,6 @@ public final class MiniPluginPortal extends MiniPlugin<HexusPlugin> implements P
     @EventHandler
     private void onPlayerQuit(final PlayerQuitEvent event) {
         _networkChannelSpies.remove(event.getPlayer());
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_SEND, COMMAND_SERVER, COMMAND_MOTD, COMMAND_MOTD_VIEW, COMMAND_MOTD_SET, COMMAND_HOSTSERVER, COMMAND_HOSTEVENT, COMMAND_PERFORMANCE,
-
-        COMMAND_NETWORK, COMMAND_NETWORK_GROUP, COMMAND_NETWORK_GROUP_CREATE, COMMAND_NETWORK_GROUP_DELETE, COMMAND_NETWORK_GROUP_LIST, COMMAND_NETWORK_GROUP_RESTART,
-
-        COMMAND_NETWORK_SERVER, COMMAND_NETWORK_SERVER_RESTART, COMMAND_NETWORK_SERVER_LIST,
-
-        COMMAND_NETWORK_SPY,
-
-        COMMAND_NETWORK_DATABASE, COMMAND_NETWORK_DATABASE_SPY,
-
-        COMMAND_LOCATE,
-        COMMAND_LOCATE_SERVER,
-        COMMAND_LOCATE_PLAYER,
-
-        BYPASS_FULL_PLAYER, BYPASS_FULL_STAFF
     }
 
 }

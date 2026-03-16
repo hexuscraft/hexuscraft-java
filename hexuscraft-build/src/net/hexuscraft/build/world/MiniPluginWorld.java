@@ -13,6 +13,12 @@ import java.util.Map;
 
 public final class MiniPluginWorld extends MiniPlugin<Build> {
 
+    public enum PERM implements IPermission {
+        COMMAND_SPAWN,
+        COMMAND_WORLD,
+        COMMAND_WORLD_CREATE
+    }
+
     private MiniPluginCommand _miniPluginCommand = null;
 
     public MiniPluginWorld(final Build plugin) {
@@ -34,12 +40,6 @@ public final class MiniPluginWorld extends MiniPlugin<Build> {
     public void onEnable() {
         _miniPluginCommand.register(new CommandSpawn(this));
         _miniPluginCommand.register(new CommandWorld(this));
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_SPAWN,
-        COMMAND_WORLD,
-        COMMAND_WORLD_CREATE
     }
 
 }

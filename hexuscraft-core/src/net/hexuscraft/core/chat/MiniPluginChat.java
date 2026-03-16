@@ -31,6 +31,20 @@ import java.util.Set;
 
 public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
 
+    public enum PERM implements IPermission {
+        COMMAND_ANNOUNCEMENT,
+        COMMAND_BROADCAST,
+        COMMAND_HELP,
+        COMMAND_SILENCE,
+        COMMAND_SILENCE_SEE,
+        COMMAND_SUPPORT,
+        COMMAND_SUPPORT_STAFF,
+
+        CHAT_PREFIX,
+
+        BYPASS_SILENCE
+    }
+
     public final String CHANNEL_ANNOUNCEMENT = "ChatAnnouncement";
     public final Set<CommandSender> _receivedTipSet;
     private MiniPluginCommand _miniPluginCommand;
@@ -173,7 +187,8 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
                                     player.hasPermission(PermissionGroup.TRAINEE.name()))
                             .forEach(player -> {
                                 player.sendMessage(C.cPurple + messageData._serverName() + " " +
-                                        F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(senderPermissionGroups)) + " " +
+                                        F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(
+                                                senderPermissionGroups)) + " " +
                                         senderName + C.cPurple + " " + messageData._message());
                                 player.playSound(player.getLocation(),
                                         Sound.NOTE_PLING,
@@ -196,7 +211,8 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
         _chatMuted = toggle;
         _hexusPlugin.getServer()
                 .broadcastMessage(F.fMain(this,
-                        toggle ? F.fError("The chat is now silenced.") : F.fSuccess("The chat is no longer silenced.")));
+                        toggle ? F.fError("The chat is now silenced.") : F.fSuccess(
+                                "The chat is no longer silenced.")));
     }
 
     @EventHandler
@@ -222,14 +238,6 @@ public final class MiniPluginChat extends MiniPlugin<HexusPlugin> {
     @EventHandler
     private void onPlayerQuit(final PlayerQuitEvent event) {
         _receivedTipSet.remove(event.getPlayer());
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_ANNOUNCEMENT, COMMAND_BROADCAST, COMMAND_HELP, COMMAND_SILENCE, COMMAND_SILENCE_SEE, COMMAND_SUPPORT, COMMAND_SUPPORT_STAFF,
-
-        CHAT_PREFIX,
-
-        BYPASS_SILENCE
     }
 
 }

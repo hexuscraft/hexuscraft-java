@@ -12,6 +12,10 @@ import java.util.Map;
 
 public final class MiniPluginDisguise extends MiniPlugin<HexusPlugin> {
 
+    public enum PERM implements IPermission {
+        COMMAND_DISGUISE
+    }
+
     private MiniPluginCommand _miniPluginCommand;
 
     public MiniPluginDisguise(final HexusPlugin plugin) {
@@ -39,9 +43,5 @@ public final class MiniPluginDisguise extends MiniPlugin<HexusPlugin> {
         _hexusPlugin.getServer()
                 .getOnlinePlayers()
                 .forEach(player -> player.showPlayer(targetPlayer));
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_DISGUISE
     }
 }

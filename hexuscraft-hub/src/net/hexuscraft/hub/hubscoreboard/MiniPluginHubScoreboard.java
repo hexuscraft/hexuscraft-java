@@ -95,10 +95,12 @@ public final class MiniPluginHubScoreboard extends MiniPlugin<Hub> {
     }
 
     private String[] generateSidebarLines(final Player player) {
-        return new String[]{C.cAqua + C.fBold + "Server", _miniPluginPortal._serverName, "", C.cGreen + C.fBold + "Players", "" + Arrays.stream(_miniPluginPortal.getServers())
+        return new String[]{C.cAqua + C.fBold + "Server", _miniPluginPortal._serverName, "", C.cGreen + C.fBold + "Players", "" + Arrays.stream(
+                        _miniPluginPortal.getServers())
                 .mapToInt(s -> s._players)
-                .sum(), "", C.cYellow + C.fBold + "Coins", "0", "", C.cGold + C.fBold + "Rank", PermissionGroup.getGroupWithHighestWeight(_miniPluginPermission._permissionProfiles.get(player)
-                ._groups())._prefix, "", C.cRed + C.fBold + "Website", "www.hexuscraft.net"};
+                .sum(), "", C.cYellow + C.fBold + "Coins", "0", "", C.cGold + C.fBold + "Rank", PermissionGroup.getGroupWithHighestWeight(
+                _miniPluginPermission._permissionProfiles.get(player)
+                        ._groups())._prefix, "", C.cRed + C.fBold + "Website", "www.hexuscraft.net"};
     }
 
 }

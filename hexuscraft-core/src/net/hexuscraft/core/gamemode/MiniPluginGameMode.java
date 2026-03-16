@@ -11,11 +11,15 @@ import java.util.Map;
 
 public final class MiniPluginGameMode extends MiniPlugin<HexusPlugin> {
 
-    MiniPluginCommand _pluginCommand;
+    public enum PERM implements IPermission {
+        COMMAND_GAMEMODE,
+        COMMAND_GAMEMODE_OTHERS
+    }
+
+    private MiniPluginCommand _miniPluginCommand;
 
     public MiniPluginGameMode(final HexusPlugin plugin) {
-        super(plugin,
-                "Game Mode");
+        super(plugin, "Game Mode");
 
         PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_GAMEMODE);
 
@@ -23,19 +27,13 @@ public final class MiniPluginGameMode extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(
-            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+        _miniPluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
     }
 
     @Override
     public void onEnable() {
-        _pluginCommand.register(new CommandGameMode(this));
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_GAMEMODE,
-        COMMAND_GAMEMODE_OTHERS
+        _miniPluginCommand.register(new CommandGameMode(this));
     }
 
 }

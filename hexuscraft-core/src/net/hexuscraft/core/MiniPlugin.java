@@ -34,8 +34,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
 
         _hexusPlugin.getServer()
                 .getPluginManager()
-                .registerEvents(this,
-                        _hexusPlugin);
+                .registerEvents(this, _hexusPlugin);
         onEnable();
 
         long finish = System.currentTimeMillis();
@@ -66,11 +65,10 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
 
     public final void logInfo(final Exception ex) {
         logInfo("[" + ex.getClass()
-                .getName() + "] " + String.join("\n",
-                Stream.concat(Stream.of(ex.getMessage()),
-                                Arrays.stream(ex.getStackTrace())
-                                        .map(StackTraceElement::toString))
-                        .toArray(String[]::new)));
+                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
+                        Arrays.stream(ex.getStackTrace())
+                                .map(StackTraceElement::toString))
+                .toArray(String[]::new)));
     }
 
     public final void logWarning(final String message) {
@@ -79,11 +77,10 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
 
     public final void logWarning(final Exception ex) {
         logWarning("[" + ex.getClass()
-                .getName() + "] " + String.join("\n",
-                Stream.concat(Stream.of(ex.getMessage()),
-                                Arrays.stream(ex.getStackTrace())
-                                        .map(StackTraceElement::toString))
-                        .toArray(String[]::new)));
+                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
+                        Arrays.stream(ex.getStackTrace())
+                                .map(StackTraceElement::toString))
+                .toArray(String[]::new)));
     }
 
     public final void logSevere(final String message) {
@@ -92,11 +89,10 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
 
     public final void logSevere(final Exception ex) {
         logSevere("[" + ex.getClass()
-                .getName() + "] " + String.join("\n",
-                Stream.concat(Stream.of(ex.getMessage()),
-                                Arrays.stream(ex.getStackTrace())
-                                        .map(StackTraceElement::toString))
-                        .toArray(String[]::new)));
+                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
+                        Arrays.stream(ex.getStackTrace())
+                                .map(StackTraceElement::toString))
+                .toArray(String[]::new)));
     }
 
 }

@@ -20,8 +20,8 @@ public final class Build extends HexusPlugin {
         PermissionGroup.BUILD_TEAM._permissions.add(MiniPluginTeleport.PERM.COMMAND_TELEPORT_COORDINATES);
         PermissionGroup.BUILD_LEAD._permissions.add(MiniPluginTeleport.PERM.COMMAND_TELEPORT_OTHERS);
 
-        require(MiniPluginParse.class);
-        require(MiniPluginWorld.class);
+        require(new MiniPluginParse(this));
+        require(new MiniPluginWorld(this));
     }
 
     public Location getSpawn() {

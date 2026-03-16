@@ -11,6 +11,10 @@ import java.util.Map;
 
 public final class MiniPluginParty extends MiniPlugin<HexusPlugin> {
 
+    public enum PERM implements IPermission {
+        COMMAND_PARTY
+    }
+
     MiniPluginCommand _pluginCommand;
 
     public MiniPluginParty(final HexusPlugin plugin) {
@@ -29,9 +33,5 @@ public final class MiniPluginParty extends MiniPlugin<HexusPlugin> {
     @Override
     public void onEnable() {
         _pluginCommand.register(new CommandParty(this));
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_PARTY
     }
 }

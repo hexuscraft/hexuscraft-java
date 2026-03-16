@@ -14,9 +14,9 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -30,11 +30,17 @@ import java.util.*;
 
 public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
 
+    public enum PERM implements IPermission {
+        COMMAND_ENTITY,
+        COMMAND_ENTITY_LIST,
+        COMMAND_ENTITY_PURGE,
+        COMMAND_ENTITY_REFRESH
+    }
+
     private MiniPluginCommand _pluginCommand;
 
     public MiniPluginNpc(final HexusPlugin plugin) {
-        super(plugin,
-                "NPC");
+        super(plugin, "NPC");
 
         PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_ENTITY);
         PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_ENTITY_LIST);
@@ -44,8 +50,7 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(
-            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (MiniPluginCommand) dependencies.get(MiniPluginCommand.class);
     }
 
@@ -65,73 +70,132 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
                 .forEach(this::removeNPCs);
     }
 
-    public void createEntity(final World world, final double x, final double y, final double z, final float yaw,
-                             final float pitch, final String[] data) {
-        final Location location = new Location(world,
-                x,
-                y,
-                z,
-                yaw,
-                pitch);
+    public void createEntity(final World world, final double x, final double y, final double z, final float yaw, final float pitch, final String[] data) {
+        final Location location = new Location(world, x, y, z, yaw, pitch);
 
         final List<Entity> spawnedEntities = new ArrayList<>();
         switch (data[0]) {
-            case "REWARDS" -> {
-                final Creeper creeper = world.spawn(location,
-                        Creeper.class);
-                spawnedEntities.add(creeper);
-                creeper.setPowered(true);
-                creeper.teleport(location);
+            case "PLAYER_SERVERS" -> {
+                final Villager villager = world.spawn(location, Villager.class);
+                spawnedEntities.add(villager);
+                villager.setProfession(Villager.Profession.LIBRARIAN);
+                villager.teleport(location);
 
-                final NBTTagCompound creperNBT = UtilEntity.getNBTTagCompound(creeper);
-                creperNBT.setByte("NoAI",
-                        (byte) 1);
-                creperNBT.setByte("Silent",
-                        (byte) 1);
-                creperNBT.setByte("Invulnerable",
-                        (byte) 1);
-                UtilEntity.saveNBTTagCompound(creeper,
-                        creperNBT);
+                final NBTTagCompound creperNBT = UtilEntity.getNBTTagCompound(villager);
+                creperNBT.setByte("NoAI", (byte) 1);
+                creperNBT.setByte("Silent", (byte) 1);
+                creperNBT.setByte("Invulnerable", (byte) 1);
+                UtilEntity.saveNBTTagCompound(villager, creperNBT);
 
-                final ArmorStand armorStand = world.spawn(location,
-                        ArmorStand.class);
+                final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
                 spawnedEntities.add(armorStand);
-                armorStand.setCustomName(C.cGreen + C.fBold + "Server Rewards");
+                armorStand.setCustomName(C.cGreen + C.fBold + "Player Servers");
                 armorStand.setCustomNameVisible(true);
                 armorStand.setGravity(false);
                 armorStand.setMarker(true);
-                armorStand.teleport(creeper.getEyeLocation()
-                        .add(new Vector(0,
-                                0.25,
-                                0)));
+                armorStand.teleport(villager.getEyeLocation()
+                        .add(new Vector(0, 0.25, 0)));
 
                 final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
-                armorStandNBT.setByte("Invisible",
-                        (byte) 1);
-                armorStandNBT.setByte("NoGravity",
-                        (byte) 1);
-                armorStandNBT.setByte("Marker",
-                        (byte) 1);
-                UtilEntity.saveNBTTagCompound(armorStand,
-                        armorStandNBT);
+                armorStandNBT.setByte("Invisible", (byte) 1);
+                armorStandNBT.setByte("NoGravity", (byte) 1);
+                armorStandNBT.setByte("Marker", (byte) 1);
+                UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
+            }
+            case "REWARDS" -> {
+                final Villager villager = world.spawn(location, Villager.class);
+                spawnedEntities.add(villager);
+                villager.setProfession(Villager.Profession.PRIEST);
+                villager.teleport(location);
+
+                final NBTTagCompound creperNBT = UtilEntity.getNBTTagCompound(villager);
+                creperNBT.setByte("NoAI", (byte) 1);
+                creperNBT.setByte("Silent", (byte) 1);
+                creperNBT.setByte("Invulnerable", (byte) 1);
+                UtilEntity.saveNBTTagCompound(villager, creperNBT);
+
+                final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
+                spawnedEntities.add(armorStand);
+                armorStand.setCustomName(C.cGreen + C.fBold + "Rewards");
+                armorStand.setCustomNameVisible(true);
+                armorStand.setGravity(false);
+                armorStand.setMarker(true);
+                armorStand.teleport(villager.getEyeLocation()
+                        .add(new Vector(0, 0.25, 0)));
+
+                final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
+                armorStandNBT.setByte("Invisible", (byte) 1);
+                armorStandNBT.setByte("NoGravity", (byte) 1);
+                armorStandNBT.setByte("Marker", (byte) 1);
+                UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
+            }
+            case "TUTORIAL" -> {
+                final Villager villager = world.spawn(location, Villager.class);
+                spawnedEntities.add(villager);
+                villager.setProfession(Villager.Profession.BLACKSMITH);
+                villager.teleport(location);
+
+                final NBTTagCompound creperNBT = UtilEntity.getNBTTagCompound(villager);
+                creperNBT.setByte("NoAI", (byte) 1);
+                creperNBT.setByte("Silent", (byte) 1);
+                creperNBT.setByte("Invulnerable", (byte) 1);
+                UtilEntity.saveNBTTagCompound(villager, creperNBT);
+
+                final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
+                spawnedEntities.add(armorStand);
+                armorStand.setCustomName(C.cGreen + C.fBold + "Tutorial");
+                armorStand.setCustomNameVisible(true);
+                armorStand.setGravity(false);
+                armorStand.setMarker(true);
+                armorStand.teleport(villager.getEyeLocation()
+                        .add(new Vector(0, 0.25, 0)));
+
+                final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
+                armorStandNBT.setByte("Invisible", (byte) 1);
+                armorStandNBT.setByte("NoGravity", (byte) 1);
+                armorStandNBT.setByte("Marker", (byte) 1);
+                UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
+            }
+            case "SHOP" -> {
+                final Villager villager = world.spawn(location, Villager.class);
+                spawnedEntities.add(villager);
+                villager.setProfession(Villager.Profession.FARMER);
+                villager.teleport(location);
+
+                final NBTTagCompound creperNBT = UtilEntity.getNBTTagCompound(villager);
+                creperNBT.setByte("NoAI", (byte) 1);
+                creperNBT.setByte("Silent", (byte) 1);
+                creperNBT.setByte("Invulnerable", (byte) 1);
+                UtilEntity.saveNBTTagCompound(villager, creperNBT);
+
+                final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
+                spawnedEntities.add(armorStand);
+                armorStand.setCustomName(C.cGreen + C.fBold + "Shop");
+                armorStand.setCustomNameVisible(true);
+                armorStand.setGravity(false);
+                armorStand.setMarker(true);
+                armorStand.teleport(villager.getEyeLocation()
+                        .add(new Vector(0, 0.25, 0)));
+
+                final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
+                armorStandNBT.setByte("Invisible", (byte) 1);
+                armorStandNBT.setByte("NoGravity", (byte) 1);
+                armorStandNBT.setByte("Marker", (byte) 1);
+                UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
             }
             case "GAME" -> {
                 switch (data[1]) {
                     case "CLANS" -> {
-                        final Skeleton skeleton = world.spawn(location,
-                                Skeleton.class);
+                        final Skeleton skeleton = world.spawn(location, Skeleton.class);
                         spawnedEntities.add(skeleton);
+                        skeleton.setSkeletonType(Skeleton.SkeletonType.WITHER);
                         skeleton.teleport(location);
 
                         final NBTTagCompound skeletonNBT = UtilEntity.getNBTTagCompound(skeleton);
-                        skeletonNBT.setByte("NoAI",
-                                (byte) 1);
-                        skeletonNBT.setByte("Silent",
-                                (byte) 1);
-                        skeletonNBT.setByte("Invulnerable",
-                                (byte) 1);
-                        UtilEntity.saveNBTTagCompound(skeleton,
-                                skeletonNBT);
+                        skeletonNBT.setByte("NoAI", (byte) 1);
+                        skeletonNBT.setByte("Silent", (byte) 1);
+                        skeletonNBT.setByte("Invulnerable", (byte) 1);
+                        UtilEntity.saveNBTTagCompound(skeleton, skeletonNBT);
 
                         final EntityEquipment equipment = skeleton.getEquipment();
                         equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
@@ -140,41 +204,124 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
                         equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
                         equipment.setItemInHand(new ItemStack(Material.BED));
 
-                        final ArmorStand armorStand = world.spawn(location,
-                                ArmorStand.class);
+                        final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
                         spawnedEntities.add(armorStand);
                         armorStand.setCustomName(C.cGreen + C.fBold + "Clans");
                         armorStand.setCustomNameVisible(true);
                         armorStand.setGravity(false);
                         armorStand.setMarker(true);
                         armorStand.teleport(skeleton.getEyeLocation()
-                                .add(new Vector(0,
-                                        0.25,
-                                        0)));
+                                .add(new Vector(0, 0.25, 0)));
 
                         final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
-                        armorStandNBT.setByte("Invisible",
-                                (byte) 1);
-                        armorStandNBT.setByte("NoGravity",
-                                (byte) 1);
-                        armorStandNBT.setByte("Marker",
-                                (byte) 1);
-                        UtilEntity.saveNBTTagCompound(armorStand,
-                                armorStandNBT);
+                        armorStandNBT.setByte("Invisible", (byte) 1);
+                        armorStandNBT.setByte("NoGravity", (byte) 1);
+                        armorStandNBT.setByte("Marker", (byte) 1);
+                        UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
+                    }
+                    case "SURVIVAL_GAMES" -> {
+                        final Skeleton skeleton = world.spawn(location, Skeleton.class);
+                        spawnedEntities.add(skeleton);
+                        skeleton.setSkeletonType(Skeleton.SkeletonType.WITHER);
+                        skeleton.teleport(location);
+
+                        final NBTTagCompound skeletonNBT = UtilEntity.getNBTTagCompound(skeleton);
+                        skeletonNBT.setByte("NoAI", (byte) 1);
+                        skeletonNBT.setByte("Silent", (byte) 1);
+                        skeletonNBT.setByte("Invulnerable", (byte) 1);
+                        UtilEntity.saveNBTTagCompound(skeleton, skeletonNBT);
+
+                        final EntityEquipment equipment = skeleton.getEquipment();
+                        equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
+                        equipment.setItemInHand(new ItemStack(Material.IRON_SWORD));
+
+                        final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
+                        spawnedEntities.add(armorStand);
+                        armorStand.setCustomName(C.cGreen + C.fBold + "Survival Games");
+                        armorStand.setCustomNameVisible(true);
+                        armorStand.setGravity(false);
+                        armorStand.setMarker(true);
+                        armorStand.teleport(skeleton.getEyeLocation()
+                                .add(new Vector(0, 0.25, 0)));
+
+                        final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
+                        armorStandNBT.setByte("Invisible", (byte) 1);
+                        armorStandNBT.setByte("NoGravity", (byte) 1);
+                        armorStandNBT.setByte("Marker", (byte) 1);
+                        UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
+                    }
+                    case "SKYWARS" -> {
+                        final Skeleton skeleton = world.spawn(location, Skeleton.class);
+                        spawnedEntities.add(skeleton);
+                        skeleton.setSkeletonType(Skeleton.SkeletonType.WITHER);
+                        skeleton.teleport(location);
+
+                        final NBTTagCompound skeletonNBT = UtilEntity.getNBTTagCompound(skeleton);
+                        skeletonNBT.setByte("NoAI", (byte) 1);
+                        skeletonNBT.setByte("Silent", (byte) 1);
+                        skeletonNBT.setByte("Invulnerable", (byte) 1);
+                        UtilEntity.saveNBTTagCompound(skeleton, skeletonNBT);
+
+                        final EntityEquipment equipment = skeleton.getEquipment();
+                        equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
+                        equipment.setItemInHand(new ItemStack(Material.BOW));
+
+                        final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
+                        spawnedEntities.add(armorStand);
+                        armorStand.setCustomName(C.cGreen + C.fBold + "Skywars");
+                        armorStand.setCustomNameVisible(true);
+                        armorStand.setGravity(false);
+                        armorStand.setMarker(true);
+                        armorStand.teleport(skeleton.getEyeLocation()
+                                .add(new Vector(0, 0.25, 0)));
+
+                        final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
+                        armorStandNBT.setByte("Invisible", (byte) 1);
+                        armorStandNBT.setByte("NoGravity", (byte) 1);
+                        armorStandNBT.setByte("Marker", (byte) 1);
+                        UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
+                    }
+                    case "MICRO_BATTLES" -> {
+                        final Skeleton skeleton = world.spawn(location, Skeleton.class);
+                        spawnedEntities.add(skeleton);
+                        skeleton.setSkeletonType(Skeleton.SkeletonType.WITHER);
+                        skeleton.teleport(location);
+
+                        final NBTTagCompound skeletonNBT = UtilEntity.getNBTTagCompound(skeleton);
+                        skeletonNBT.setByte("NoAI", (byte) 1);
+                        skeletonNBT.setByte("Silent", (byte) 1);
+                        skeletonNBT.setByte("Invulnerable", (byte) 1);
+                        UtilEntity.saveNBTTagCompound(skeleton, skeletonNBT);
+
+                        final EntityEquipment equipment = skeleton.getEquipment();
+                        equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
+                        equipment.setItemInHand(new ItemStack(Material.STONE_SPADE));
+
+                        final ArmorStand armorStand = world.spawn(location, ArmorStand.class);
+                        spawnedEntities.add(armorStand);
+                        armorStand.setCustomName(C.cGreen + C.fBold + "Micro Battles");
+                        armorStand.setCustomNameVisible(true);
+                        armorStand.setGravity(false);
+                        armorStand.setMarker(true);
+                        armorStand.teleport(skeleton.getEyeLocation()
+                                .add(new Vector(0, 0.25, 0)));
+
+                        final NBTTagCompound armorStandNBT = UtilEntity.getNBTTagCompound(armorStand);
+                        armorStandNBT.setByte("Invisible", (byte) 1);
+                        armorStandNBT.setByte("NoGravity", (byte) 1);
+                        armorStandNBT.setByte("Marker", (byte) 1);
+                        UtilEntity.saveNBTTagCompound(armorStand, armorStandNBT);
                     }
                 }
             }
         }
 
         if (spawnedEntities.isEmpty()) {
-            logInfo("Attempted to create npc with unknown punish types: " + String.join(",",
-                    data));
+            logInfo("Attempted to create npc with unknown punish types: " + String.join(",", data));
             return;
         }
 
-        spawnedEntities.forEach(entity -> entity.setMetadata("NPC",
-                new FixedMetadataValue(_hexusPlugin,
-                        data)));
+        spawnedEntities.forEach(entity -> entity.setMetadata("NPC", new FixedMetadataValue(_hexusPlugin, data)));
     }
 
     public void removeNPCs(final World world) {
@@ -193,8 +340,7 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
 
         try {
             final Scanner scanner = new Scanner(Path.of(world.getWorldFolder()
-                                    .getPath(),
-                            "_npcs.dat")
+                            .getPath(), "_npcs.dat")
                     .toFile());
             while (scanner.hasNextLine()) {
                 npcStrings.add(scanner.nextLine());
@@ -211,16 +357,8 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
             final float yaw = Float.parseFloat(npc[3]);
             final float pitch = Float.parseFloat(npc[4]);
 
-            final String[] data = Arrays.copyOfRange(npc,
-                    5,
-                    npc.length);
-            createEntity(world,
-                    x,
-                    y,
-                    z,
-                    yaw,
-                    pitch,
-                    data);
+            final String[] data = Arrays.copyOfRange(npc, 5, npc.length);
+            createEntity(world, x, y, z, yaw, pitch, data);
         });
     }
 
@@ -233,16 +371,11 @@ public final class MiniPluginNpc extends MiniPlugin<HexusPlugin> {
         final List<Entity> npcs = new ArrayList<>();
         _hexusPlugin.getServer()
                 .getWorlds()
-                .forEach(world -> npcs.addAll(
-                        world.getEntities()
-                                .stream()
-                                .filter(entity -> entity.hasMetadata("NPC"))
-                                .toList()));
+                .forEach(world -> npcs.addAll(world.getEntities()
+                        .stream()
+                        .filter(entity -> entity.hasMetadata("NPC"))
+                        .toList()));
         return npcs.toArray(Entity[]::new);
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_ENTITY, COMMAND_ENTITY_LIST, COMMAND_ENTITY_PURGE, COMMAND_ENTITY_REFRESH
     }
 
 }

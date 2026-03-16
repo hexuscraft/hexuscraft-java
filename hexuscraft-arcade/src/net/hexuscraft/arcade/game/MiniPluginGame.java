@@ -14,6 +14,14 @@ import java.util.Map;
 
 public final class MiniPluginGame extends MiniPlugin<Arcade> {
 
+    public enum PERM implements IPermission {
+        COMMAND_GAME,
+        COMMAND_GAME_SET,
+        COMMAND_GAME_START,
+        COMMAND_GAME_STOP,
+        COMMAND_HUB
+    }
+
     public GameState _gameState = GameState.LOADING_MAP;
     private MiniPluginCommand _miniPluginCommand;
     private MiniPluginPortal _miniPluginPortal;
@@ -39,14 +47,6 @@ public final class MiniPluginGame extends MiniPlugin<Arcade> {
         _miniPluginCommand.register(new CommandGame(this));
         _miniPluginCommand.register(new CommandHub(this,
                 _miniPluginPortal));
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_GAME,
-        COMMAND_GAME_SET,
-        COMMAND_GAME_START,
-        COMMAND_GAME_STOP,
-        COMMAND_HUB
     }
 
 }

@@ -20,10 +20,10 @@ public final class WebTranslator extends HexusPlugin {
     public WebTranslator() {
         super(false);
 
-        require(MiniPluginCommand.class);
-        require(MiniPluginDatabase.class);
-        require(MiniPluginPermission.class);
-        require(MiniPluginPortal.class);
+        require(new MiniPluginCommand(this));
+        require(new MiniPluginDatabase(this));
+        require(new MiniPluginPermission(this));
+        require(new MiniPluginPortal(this));
     }
 
     @EventHandler

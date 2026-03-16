@@ -53,7 +53,8 @@ public final class Database {
                 atomicPassword.set(scanner.nextLine());
             }).run();
         } catch (final FileNotFoundException ex) {
-            System.out.println("WARNING: Could not locate '" + redisFile.getName() + "'. Using default credentials '" + atomicUsername.get() + ":" + atomicPassword.get() + "@" + atomicHost.get() + ":" + atomicPort.get() + "'.");
+            System.out.println(
+                    "WARNING: Could not locate '" + redisFile.getName() + "'. Using default credentials '" + atomicUsername.get() + ":" + atomicPassword.get() + "@" + atomicHost.get() + ":" + atomicPort.get() + "'.");
         }
 
         final AtomicReference<String> clientName = new AtomicReference<>();
@@ -67,7 +68,8 @@ public final class Database {
                     .mapToObj("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"::charAt)
                     .map(String::valueOf)
                     .collect(Collectors.joining()));
-            System.out.println("WARNING: Could not locate '" + nameFile.getName() + "'. Using random client name '" + clientName.get() + "'.");
+            System.out.println(
+                    "WARNING: Could not locate '" + nameFile.getName() + "'. Using random client name '" + clientName.get() + "'.");
         }
 
         _consumers = new HashMap<>();

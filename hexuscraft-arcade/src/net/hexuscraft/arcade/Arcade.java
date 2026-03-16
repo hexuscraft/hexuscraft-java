@@ -10,9 +10,9 @@ public final class Arcade extends HexusPlugin {
     public Arcade() {
         super();
 
-        require(MiniPluginGame.class);
-        require(MiniPluginGameLobby.class);
-        require(MiniPluginHost.class);
+        require(new MiniPluginGame(this));
+        require(new MiniPluginGameLobby(this));
+        require(new MiniPluginHost(this));
     }
 
 }

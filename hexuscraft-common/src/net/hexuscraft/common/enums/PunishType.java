@@ -2,6 +2,9 @@ package net.hexuscraft.common.enums;
 
 public enum PunishType {
 
-    WARNING, KICK, MUTE, BAN,
+    WARNING,
+    KICK,
+    MUTE,
+    BAN,
 
 }

@@ -23,11 +23,11 @@ public final class Hub extends HexusPlugin {
     public Hub() {
         super();
 
-        require(MiniPluginDoubleJump.class);
-        require(MiniPluginHubScoreboard.class);
-        require(MiniPluginNews.class);
-        require(MiniPluginPlayer.class);
-        require(MiniPluginTeam.class);
+        require(new MiniPluginDoubleJump(this));
+        require(new MiniPluginHubScoreboard(this));
+        require(new MiniPluginNews(this));
+        require(new MiniPluginPlayer(this));
+        require(new MiniPluginTeam(this));
     }
 
     @Override
@@ -42,24 +42,14 @@ public final class Hub extends HexusPlugin {
         if (!world.getName()
                 .equals("world")) return;
 
-        _spawn = new Location(world,
-                0,
-                100,
-                0,
-                0,
-                0);
+        _spawn = new Location(world, 0, 100, 0, 0, 0);
 
         try {
             final Scanner scanner = new Scanner(Path.of(world.getWorldFolder()
-                                    .getPath(),
-                            "_spawn.dat")
+                            .getPath(), "_spawn.dat")
                     .toFile());
-            _spawn = new Location(event.getWorld(),
-                    scanner.nextDouble(),
-                    scanner.nextDouble(),
-                    scanner.nextDouble(),
-                    scanner.nextFloat(),
-                    scanner.nextFloat());
+            _spawn = new Location(event.getWorld(), scanner.nextDouble(), scanner.nextDouble(), scanner.nextDouble(),
+                    scanner.nextFloat(), scanner.nextFloat());
         } catch (FileNotFoundException ex) {
             logInfo("Could not locate _spawn.dat in world '" + world.getName() + "'");
         }

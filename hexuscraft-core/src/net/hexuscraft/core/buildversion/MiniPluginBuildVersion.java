@@ -12,6 +12,10 @@ import java.util.Map;
 
 public final class MiniPluginBuildVersion extends MiniPlugin<HexusPlugin> {
 
+    public enum PERM implements IPermission {
+        COMMAND_BUILDVERSION
+    }
+
     private MiniPluginCommand _pluginCommand;
 
     public MiniPluginBuildVersion(final HexusPlugin plugin) {
@@ -42,10 +46,6 @@ public final class MiniPluginBuildVersion extends MiniPlugin<HexusPlugin> {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_BUILDVERSION
     }
 
 }

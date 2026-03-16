@@ -21,6 +21,17 @@ import java.util.*;
 
 public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
+    public enum PERM implements IPermission {
+        COMMAND_RANK,
+        COMMAND_RANK_ADD,
+        COMMAND_RANK_INFO,
+        COMMAND_RANK_LIST,
+        COMMAND_RANK_REMOVE,
+        COMMAND_RANK_CLEAR,
+
+        OPERATOR
+    }
+
     public final HashMap<Player, PermissionProfile> _permissionProfiles;
     private MiniPluginCommand _miniPluginCommand;
     private MiniPluginDatabase _miniPluginDatabase;
@@ -70,11 +81,13 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
         final Set<String> permissionGroupNames;
         try {
-            permissionGroupNames = _miniPluginDatabase._database._jedis.smembers(PermissionQueries.GROUPS(player.getUniqueId()));
+            permissionGroupNames = _miniPluginDatabase._database._jedis.smembers(
+                    PermissionQueries.GROUPS(player.getUniqueId()));
         } catch (final JedisException ex) {
             logSevere(ex);
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
-            event.setKickMessage("There was an error while fetching your permission groups. Please try again later or contact an administrator if this issue persists.");
+            event.setKickMessage(
+                    "There was an error while fetching your permission groups. Please try again later or contact an administrator if this issue persists.");
             return;
         }
 
@@ -111,7 +124,8 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
         final PermissionProfile profile = _permissionProfiles.get(player);
         if (profile == null) {
-            logWarning("Unable to grant permissions for player '" + player.getName() + "' as they have no permission profile.");
+            logWarning(
+                    "Unable to grant permissions for player '" + player.getName() + "' as they have no permission profile.");
             return;
         }
 
@@ -129,7 +143,8 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
 
         final PermissionProfile profile = _permissionProfiles.get(player);
         if (profile == null) {
-            logWarning("Unable to clear permissions for player '" + player.getName() + "' as they have no permission profile.");
+            logWarning(
+                    "Unable to clear permissions for player '" + player.getName() + "' as they have no permission profile.");
             return;
         }
 
@@ -161,15 +176,10 @@ public final class MiniPluginPermission extends MiniPlugin<HexusPlugin> {
                 .forEach(parentGroup -> {
                     grantPermissions(attachment,
                             parentGroup);
-                    parentGroup._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(),
-                            true));
+                    parentGroup._permissions.forEach(
+                            basePermission -> attachment.setPermission(basePermission.toString(),
+                                    true));
                 });
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_RANK, COMMAND_RANK_ADD, COMMAND_RANK_INFO, COMMAND_RANK_LIST, COMMAND_RANK_REMOVE, COMMAND_RANK_CLEAR,
-
-        OPERATOR
     }
 
 }

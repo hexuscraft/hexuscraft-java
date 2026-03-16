@@ -40,14 +40,17 @@ import java.util.Map;
 
 public final class MiniPluginPlayer extends MiniPlugin<Hub> {
 
+    public enum PERM implements IPermission {
+        COMMAND_SPAWN
+    }
+
     private MiniPluginCommand _pluginCommand;
     private MiniPluginPortal _miniPluginPortal;
     private MiniPluginPermission _miniPluginPermission;
     private BukkitTask _actionTextTask;
 
     public MiniPluginPlayer(final Hub hub) {
-        super(hub,
-                "Player");
+        super(hub, "Player");
 
         PermissionGroup.PLAYER._permissions.add(PERM.COMMAND_SPAWN);
     }
@@ -64,13 +67,10 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
         _pluginCommand.register(new CommandSpawn(this));
         _actionTextTask = _hexusPlugin.getServer()
                 .getScheduler()
-                .runTaskTimer(_hexusPlugin,
-                        () -> _hexusPlugin.getServer()
-                                .getOnlinePlayers()
-                                .forEach(player -> PlayerTabInfo.sendActionText(player,
-                                        C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET")),
-                        0,
-                        40);
+                .runTaskTimer(_hexusPlugin, () -> _hexusPlugin.getServer()
+                        .getOnlinePlayers()
+                        .forEach(player -> PlayerTabInfo.sendActionText(player,
+                                C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET")), 0, 40);
     }
 
     @Override
@@ -80,9 +80,8 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
 
     @EventHandler
     private void onPlayerJoin(final PlayerJoinEvent event) {
-        event.setJoinMessage(F.fSub("Join",
-                event.getPlayer()
-                        .getDisplayName()));
+        event.setJoinMessage(F.fSub("Join", event.getPlayer()
+                .getDisplayName()));
 
         final Player player = event.getPlayer();
         player.setFallDistance(0);
@@ -105,54 +104,42 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
 
         refreshInventory(player);
 
-        PlayerTabInfo.setHeaderFooter(player,
-                F.fTabHeader(_miniPluginPortal._serverName),
-                " ");
+        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_miniPluginPortal._serverName), " ");
 
         player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
-        player.setPlayerListName(F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(_miniPluginPermission._permissionProfiles.get(player)
-                        ._groups()),
-                true,
-                true) + C.fReset + " " + player.getDisplayName());
+        /*
+        player.setPlayerListName(F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(
+                _miniPluginPermission._permissionProfiles.get(player)
+                        ._groups()), true, true) + C.fReset + " " + player.getDisplayName());
+                        */
     }
 
     @EventHandler
     void onPlayerQuit(final PlayerQuitEvent event) {
-        event.setQuitMessage(F.fSub("Quit",
-                event.getPlayer()
-                        .getDisplayName()));
+        event.setQuitMessage(F.fSub("Quit", event.getPlayer()
+                .getDisplayName()));
     }
 
     private void refreshInventory(Player player) {
         final PlayerInventory inventory = player.getInventory();
 
-        final ItemStack gameCompass = UtilItem.createItem(Material.COMPASS,
-                C.cGreen + C.fBold + "Game Menu",
+        final ItemStack gameCompass = UtilItem.createItem(Material.COMPASS, C.cGreen + C.fBold + "Game Menu",
                 "Click to open the Game Menu");
-        final ItemStack profileSkull = UtilItem.createItemSkull(player.getName(),
-                C.cGreen + C.fBold + player.getName(),
+        final ItemStack profileSkull = UtilItem.createItemSkull(player.getName(), C.cGreen + C.fBold + player.getName(),
                 "Click to open the Profile Menu");
-        final ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST,
-                C.cGreen + C.fBold + "Cosmetics Menu",
+        final ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST, C.cGreen + C.fBold + "Cosmetics Menu",
                 "Click to open the Cosmetics Menu");
-        final ItemStack shopEmerald = UtilItem.createItem(Material.EMERALD,
-                C.cGreen + C.fBold + "Shop Menu",
+        final ItemStack shopEmerald = UtilItem.createItem(Material.EMERALD, C.cGreen + C.fBold + "Shop Menu",
                 "Click to open the Shop Menu");
-        final ItemStack lobbyClock = UtilItem.createItem(Material.WATCH,
-                C.cGreen + C.fBold + "Lobby Menu",
+        final ItemStack lobbyClock = UtilItem.createItem(Material.WATCH, C.cGreen + C.fBold + "Lobby Menu",
                 "Click to open the Lobby Menu");
 
         inventory.clear();
-        inventory.setItem(0,
-                gameCompass);
-        inventory.setItem(1,
-                profileSkull);
-        inventory.setItem(4,
-                cosmeticsChest);
-        inventory.setItem(7,
-                shopEmerald);
-        inventory.setItem(8,
-                lobbyClock);
+        inventory.setItem(0, gameCompass);
+        inventory.setItem(1, profileSkull);
+        inventory.setItem(4, cosmeticsChest);
+        inventory.setItem(7, shopEmerald);
+        inventory.setItem(8, lobbyClock);
         inventory.setHeldItemSlot(0);
     }
 
@@ -205,8 +192,7 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
             final ItemStack currentItem = event.getCurrentItem();
             if (currentItem == null) return;
 
-            onItemInteract(player,
-                    currentItem);
+            onItemInteract(player, currentItem);
             return;
         }
         if (ChatColor.stripColor(clickedInventory.getName())
@@ -215,63 +201,39 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
             if (currentItem.hasItemMeta()) {
                 final ItemMeta currentItemMeta = currentItem.getItemMeta();
                 if (currentItemMeta.hasDisplayName()) {
-                    if (!UtilCooldown.use(player,
-                            "Lobby Server Teleport",
-                            1000L)) return;
+                    if (!UtilCooldown.use(player, "Lobby Server Teleport", 1000L)) return;
 
                     final String targetServerName = ChatColor.stripColor(currentItemMeta.getDisplayName());
-                    _miniPluginPortal.teleport(player,
-                            targetServerName);
-                    player.playSound(player.getLocation(),
-                            Sound.NOTE_PLING,
-                            Float.MAX_VALUE,
-                            2);
+                    _miniPluginPortal.teleport(player, targetServerName);
+                    player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
                 }
             }
         }
     }
 
     void openGameMenu(final Player player) {
-        player.sendMessage(F.fMain("Games",
-                "This feature is currently work in progress. Please try again later!"));
-        player.playSound(player.getLocation(),
-                Sound.NOTE_PLING,
-                Float.MAX_VALUE,
-                2);
+        player.sendMessage(F.fMain("Games", "This feature is currently work in progress. Please try again later!"));
+        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     void openProfileMenu(final Player player) {
-        player.sendMessage(F.fMain("Profile",
-                "This feature is currently work in progress. Please try again later!"));
-        player.playSound(player.getLocation(),
-                Sound.NOTE_PLING,
-                Float.MAX_VALUE,
-                2);
+        player.sendMessage(F.fMain("Profile", "This feature is currently work in progress. Please try again later!"));
+        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     void openCosmeticsMenu(final Player player) {
-        player.sendMessage(F.fMain("Cosmetics",
-                "This feature is currently work in progress. Please try again later!"));
-        player.playSound(player.getLocation(),
-                Sound.NOTE_PLING,
-                Float.MAX_VALUE,
-                2);
+        player.sendMessage(F.fMain("Cosmetics", "This feature is currently work in progress. Please try again later!"));
+        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     void openShopMenu(final Player player) {
-        player.sendMessage(F.fMain("Shop",
-                "This feature is currently work in progress. Please try again later!"));
-        player.playSound(player.getLocation(),
-                Sound.NOTE_PLING,
-                Float.MAX_VALUE,
-                2);
+        player.sendMessage(F.fMain("Shop", "This feature is currently work in progress. Please try again later!"));
+        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     void openLobbyMenu(final Player player) {
         final Inventory lobbyMenu = _hexusPlugin.getServer()
-                .createInventory(player,
-                        54,
-                        "Lobby Menu");
+                .createInventory(player, 54, "Lobby Menu");
 
         Arrays.stream(_miniPluginPortal.getServers("Lobby"))
                 .limit(54)
@@ -281,24 +243,21 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
 
                     final boolean isCurrentServer = serverData._name.equals(_miniPluginPortal._serverName);
 
-                    final ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
+                    final ItemStack serverItem = new ItemStack(
+                            isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
                     serverItem.setAmount(lobbyId);
 
                     final ItemMeta serverItemMeta = serverItem.getItemMeta();
                     serverItemMeta.setDisplayName(C.cAqua + C.fBold + "Lobby-" + lobbyId);
-                    serverItemMeta.setLore(List.of(C.cDAqua + serverData._players + "/" + serverData._capacity + " Players",
-                            "",
-                            C.cYellow + C.fBold + (isCurrentServer ? "YOU ARE HERE" : "CLICK TO CONNECT")));
+                    serverItemMeta.setLore(
+                            List.of(C.cDAqua + serverData._players + "/" + serverData._capacity + " Players", "",
+                                    C.cYellow + C.fBold + (isCurrentServer ? "YOU ARE HERE" : "CLICK TO CONNECT")));
 
                     serverItem.setItemMeta(serverItemMeta);
-                    lobbyMenu.setItem(lobbyId - 1,
-                            serverItem);
+                    lobbyMenu.setItem(lobbyId - 1, serverItem);
                 });
         player.openInventory(lobbyMenu);
-        player.playSound(player.getLocation(),
-                Sound.NOTE_PLING,
-                Float.MAX_VALUE,
-                2);
+        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     @EventHandler
@@ -338,8 +297,7 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
         final ItemStack itemStack = droppedItem.getItemStack();
         if (itemStack == null) return;
 
-        onItemInteract(player,
-                itemStack);
+        onItemInteract(player, itemStack);
     }
 
     @EventHandler
@@ -361,18 +319,13 @@ public final class MiniPluginPlayer extends MiniPlugin<Hub> {
         final ItemStack currentItem = player.getItemInHand();
         if (currentItem == null) return;
 
-        onItemInteract(player,
-                currentItem);
+        onItemInteract(player, currentItem);
     }
 
     @EventHandler
     public void onEntityTargetLivingEntity(final EntityTargetLivingEntityEvent event) {
         if (!(event.getTarget() instanceof Player)) return;
         event.setCancelled(true);
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_SPAWN
     }
 
 }

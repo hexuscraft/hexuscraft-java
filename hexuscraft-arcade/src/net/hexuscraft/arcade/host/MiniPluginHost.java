@@ -27,6 +27,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MiniPluginHost extends MiniPlugin<Arcade> {
 
+    public enum PERM implements IPermission {
+        COMMAND_HOST,
+        COMMAND_HOST_SET,
+        COMMAND_HOST_VIEW
+    }
+
     public final AtomicReference<OfflinePlayer> _hostOfflinePlayer;
     private final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5)
             .toMillis();
@@ -62,7 +68,8 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
 
         _hexusPlugin.runAsync(() -> {
             try {
-                _hostOfflinePlayer.set(PlayerSearch.offlinePlayerSearch(_miniPluginPortal.getServerGroup(_miniPluginPortal._serverGroupName)._hostUniqueId));
+                _hostOfflinePlayer.set(PlayerSearch.offlinePlayerSearch(
+                        _miniPluginPortal.getServerGroup(_miniPluginPortal._serverGroupName)._hostUniqueId));
             } catch (final IOException ex) {
                 logSevere(ex);
             }
@@ -111,10 +118,6 @@ public class MiniPluginHost extends MiniPlugin<Arcade> {
         if (!event.getPlayer()
                 .equals(_hostOfflinePlayer.get())) return;
         _hostLastSeenMillis.set(System.currentTimeMillis());
-    }
-
-    public enum PERM implements IPermission {
-        COMMAND_HOST, COMMAND_HOST_SET, COMMAND_HOST_VIEW
     }
 
 }

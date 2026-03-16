@@ -86,7 +86,8 @@ public final class CommandRankAdd extends BaseCommand<MiniPluginPermission> {
                             .getPlayer(offlinePlayer.getName());
                     if (player == null) return;
 
-                    player.sendMessage(F.fMain(this) + "You now have sub-group " + F.fPermissionGroup(targetGroup) + ".");
+                    player.sendMessage(
+                            F.fMain(this) + "You now have sub-group " + F.fPermissionGroup(targetGroup) + ".");
                     _miniPlugin.refreshPermissions(player);
                 });
 

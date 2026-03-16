@@ -74,8 +74,9 @@ public final class ServerManager {
                     System.currentTimeMillis(),
                     true).update(jedis);
         } catch (final JedisException ex) {
-            _monitor.log("JedisException while creating template server punish for startServer(" + serverGroupData._name +
-                    ": " + reason + "): " + ex.getMessage());
+            _monitor.log(
+                    "JedisException while creating template server punish for startServer(" + serverGroupData._name +
+                            ": " + reason + "): " + ex.getMessage());
             return Optional.empty();
         }
 

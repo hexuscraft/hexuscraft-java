@@ -22,6 +22,10 @@ import java.util.Map;
 
 public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
 
+    public enum PERM implements IPermission {
+        CHEAT_ALERTS
+    }
+
     private final Map<Player, Map<String, Integer>> _violations;
     private MiniPluginPortal _miniPluginPortal;
     private MiniPluginPunish _miniPluginPunish;
@@ -164,10 +168,6 @@ public final class MiniPluginAntiCheat extends MiniPlugin<HexusPlugin> {
             kick(player,
                     reason);
         }
-    }
-
-    public enum PERM implements IPermission {
-        CHEAT_ALERTS
     }
 
 }

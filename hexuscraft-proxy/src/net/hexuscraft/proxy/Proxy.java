@@ -86,12 +86,14 @@ public final class Proxy {
 
         _database.registerConsumer(PunishmentAppliedMessage.CHANNEL_NAME,
                 (_, _, rawMessage) -> {
-                    final PunishmentAppliedMessage punishmentAppliedMessage = PunishmentAppliedMessage.parse(rawMessage);
+                    final PunishmentAppliedMessage punishmentAppliedMessage = PunishmentAppliedMessage.parse(
+                            rawMessage);
                     final Optional<Player> optionalPlayer = _server.getPlayer(punishmentAppliedMessage._targetUUID);
                     optionalPlayer.ifPresent(player -> _server.getScheduler()
                             .buildTask(this,
                                     () -> {
-                                        final Map<String, String> rawData = new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentAppliedMessage._punishmentUUID)));
+                                        final Map<String, String> rawData = new HashMap<>(_database._jedis.hgetAll(
+                                                PunishQueries.PUNISHMENT(punishmentAppliedMessage._punishmentUUID)));
                                         rawData.put("id",
                                                 punishmentAppliedMessage._punishmentUUID.toString());
                                         final PunishData punishData = new PunishData(rawData);
@@ -226,7 +228,8 @@ public final class Proxy {
 
             for (final UUID punishmentUniqueId : punishmentIds) {
                 try {
-                    final Map<String, String> rawData = new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
+                    final Map<String, String> rawData = new HashMap<>(
+                            jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
                     rawData.put("id",
                             punishmentUniqueId.toString());
 

@@ -9,6 +9,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public final class MiniPluginAuthentication extends MiniPlugin<HexusPlugin> {
 
+    public enum PERM implements IPermission {
+        REQUIRE_AUTHENTICATION
+    }
+
     public MiniPluginAuthentication(final HexusPlugin plugin) {
         super(plugin,
                 "Authentication");
@@ -22,10 +26,6 @@ public final class MiniPluginAuthentication extends MiniPlugin<HexusPlugin> {
                 .hasPermission(PERM.REQUIRE_AUTHENTICATION.name())) {
         }
         // TOOD: 2fa
-    }
-
-    public enum PERM implements IPermission {
-        REQUIRE_AUTHENTICATION
     }
 
 }
