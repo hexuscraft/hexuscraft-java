@@ -2,21 +2,21 @@ package net.hexuscraft.core.npc.command;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.npc.MiniPluginNpc;
+import net.hexuscraft.core.npc.CoreNpc;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandNpcRefresh extends BaseCommand<MiniPluginNpc> {
+public final class CommandNpcRefresh extends BaseCommand<CoreNpc> {
 
-    CommandNpcRefresh(final MiniPluginNpc miniPluginNpc) {
-        super(miniPluginNpc,
+    CommandNpcRefresh(final CoreNpc coreNpc) {
+        super(coreNpc,
                 "refresh",
                 "",
                 "Refresh all NPCs.",
                 Set.of("ref",
                         "r"),
-                MiniPluginNpc.PERM.COMMAND_ENTITY_REFRESH);
+                CoreNpc.PERM.COMMAND_ENTITY_REFRESH);
     }
 
     @Override

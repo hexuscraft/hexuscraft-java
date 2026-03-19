@@ -1,6 +1,6 @@
 package net.hexuscraft.build.parse.command;
 
-import net.hexuscraft.build.parse.MiniPluginParse;
+import net.hexuscraft.build.parse.BuildParse;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.World;
@@ -9,18 +9,18 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandParse extends BaseCommand<MiniPluginParse> {
+public final class CommandParse extends BaseCommand<BuildParse> {
 
     @SuppressWarnings("FieldCanBeLocal")
     private final Integer MINIMUM_RADIUS = 1;
 
-    public CommandParse(final MiniPluginParse parse) {
+    public CommandParse(final BuildParse parse) {
         super(parse,
                 "parse",
                 "<Radius>",
                 "Parse your current world. The parse centers around chunk (0,0). The radius is the amount of chunks in each direction parsed.",
                 Set.of(),
-                MiniPluginParse.PERM.COMMAND_PARSE);
+                BuildParse.PERM.COMMAND_PARSE);
     }
 
     @Override

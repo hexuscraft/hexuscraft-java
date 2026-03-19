@@ -5,8 +5,8 @@ import net.hexuscraft.common.enums.GameType;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.exceptions.JedisException;
 
@@ -14,22 +14,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal> {
 
     private final String[] DISALLOWED_CHARACTERS = new String[]{":", "//", "\\\\", ".."};
 
-    private final MiniPluginDatabase _miniPluginDatabase;
+    private final CoreDatabase _coreDatabase;
 
-    CommandNetworkGroupCreate(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal,
+    CommandNetworkGroupCreate(final CorePortal corePortal, final CoreDatabase coreDatabase) {
+        super(corePortal,
                 "create",
                 "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout (ms) #> [Games]",
                 "Create a server group.",
                 Set.of("c",
                         "add",
                         "a"),
-                MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
-        _miniPluginDatabase = miniPluginDatabase;
+                CorePortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
+        _coreDatabase = coreDatabase;
     }
 
     @Override
@@ -221,7 +221,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<MiniPluginPorta
                         timeoutMillis,
                         games,
                         null).update(
-                        _miniPluginDatabase._database._jedis);
+                        _coreDatabase._database._jedis);
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this,
                         F.fError(

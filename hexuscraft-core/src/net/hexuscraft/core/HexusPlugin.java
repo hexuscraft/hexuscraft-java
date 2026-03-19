@@ -1,24 +1,25 @@
 package net.hexuscraft.core;
 
-import net.hexuscraft.core.anticheat.MiniPluginAntiCheat;
-import net.hexuscraft.core.authentication.MiniPluginAuthentication;
-import net.hexuscraft.core.bossbar.MiniPluginBossBar;
-import net.hexuscraft.core.buildversion.MiniPluginBuildVersion;
-import net.hexuscraft.core.chat.MiniPluginChat;
-import net.hexuscraft.core.combat.MiniPluginCombat;
-import net.hexuscraft.core.command.MiniPluginCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.disguise.MiniPluginDisguise;
-import net.hexuscraft.core.gamemode.MiniPluginGameMode;
-import net.hexuscraft.core.item.MiniPluginItem;
-import net.hexuscraft.core.npc.MiniPluginNpc;
-import net.hexuscraft.core.party.MiniPluginParty;
-import net.hexuscraft.core.permission.MiniPluginPermission;
-import net.hexuscraft.core.portal.MiniPluginPortal;
-import net.hexuscraft.core.punish.MiniPluginPunish;
-import net.hexuscraft.core.report.MiniPluginReport;
-import net.hexuscraft.core.scoreboard.MiniPluginScoreboard;
-import net.hexuscraft.core.teleport.MiniPluginTeleport;
+import net.hexuscraft.core.anticheat.CoreAntiCheat;
+import net.hexuscraft.core.authentication.CoreAuthentication;
+import net.hexuscraft.core.bossbar.CoreBossBar;
+import net.hexuscraft.core.buildversion.CoreBuildVersion;
+import net.hexuscraft.core.chat.CoreChat;
+import net.hexuscraft.core.combat.CoreCombat;
+import net.hexuscraft.core.command.CoreCommand;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.disguise.CoreDisguise;
+import net.hexuscraft.core.featureflags.CoreFeatureFlags;
+import net.hexuscraft.core.gamemode.CoreGameMode;
+import net.hexuscraft.core.item.CoreItem;
+import net.hexuscraft.core.npc.CoreNpc;
+import net.hexuscraft.core.party.CoreParty;
+import net.hexuscraft.core.permission.CorePermission;
+import net.hexuscraft.core.portal.CorePortal;
+import net.hexuscraft.core.punish.CorePunish;
+import net.hexuscraft.core.report.CoreReport;
+import net.hexuscraft.core.scoreboard.CoreScoreboard;
+import net.hexuscraft.core.teleport.CoreTeleport;
 import org.bukkit.Server;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
@@ -66,25 +67,26 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     public final void requireCorePlugins() {
-        require(new MiniPluginAntiCheat(this));
-        require(new MiniPluginAuthentication(this));
-        require(new MiniPluginBossBar(this));
-        require(new MiniPluginBuildVersion(this));
-        require(new MiniPluginChat(this));
-        require(new MiniPluginCombat(this));
-        require(new MiniPluginCommand(this));
-        require(new MiniPluginDatabase(this));
-        require(new MiniPluginDisguise(this));
-        require(new MiniPluginGameMode(this));
-        require(new MiniPluginItem(this));
-        require(new MiniPluginNpc(this));
-        require(new MiniPluginParty(this));
-        require(new MiniPluginPermission(this));
-        require(new MiniPluginPortal(this));
-        require(new MiniPluginPunish(this));
-        require(new MiniPluginReport(this));
-        require(new MiniPluginScoreboard(this));
-        require(new MiniPluginTeleport(this));
+        require(new CoreAntiCheat(this));
+        require(new CoreAuthentication(this));
+        require(new CoreBossBar(this));
+        require(new CoreBuildVersion(this));
+        require(new CoreChat(this));
+        require(new CoreCombat(this));
+        require(new CoreCommand(this));
+        require(new CoreDatabase(this));
+        require(new CoreDisguise(this));
+        require(new CoreFeatureFlags(this));
+        require(new CoreGameMode(this));
+        require(new CoreItem(this));
+        require(new CoreNpc(this));
+        require(new CoreParty(this));
+        require(new CorePermission(this));
+        require(new CorePortal(this));
+        require(new CorePunish(this));
+        require(new CoreReport(this));
+        require(new CoreScoreboard(this));
+        require(new CoreTeleport(this));
     }
 
     @Override

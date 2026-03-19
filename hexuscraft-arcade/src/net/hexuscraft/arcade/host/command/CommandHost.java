@@ -1,21 +1,21 @@
 package net.hexuscraft.arcade.host.command;
 
-import net.hexuscraft.arcade.host.MiniPluginHost;
+import net.hexuscraft.arcade.host.ArcadeHost;
 import net.hexuscraft.core.command.BaseMultiCommand;
 
 import java.util.Set;
 
-public class CommandHost extends BaseMultiCommand<MiniPluginHost> {
-    public CommandHost(final MiniPluginHost miniPluginHost) {
-        super(miniPluginHost,
+public class CommandHost extends BaseMultiCommand<ArcadeHost> {
+    public CommandHost(final ArcadeHost arcadeHost) {
+        super(arcadeHost,
                 "host",
                 "View or modify the server host.",
                 Set.of("serverhost",
                         "sh"),
-                MiniPluginHost.PERM.COMMAND_HOST,
+                ArcadeHost.PERM.COMMAND_HOST,
                 Set.of(
-                        new CommandHostSet(miniPluginHost),
-                        new CommandHostView(miniPluginHost)
+                        new CommandHostSet(arcadeHost),
+                        new CommandHostView(arcadeHost)
                 ));
     }
 }

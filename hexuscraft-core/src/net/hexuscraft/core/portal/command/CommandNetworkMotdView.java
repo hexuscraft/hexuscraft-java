@@ -4,26 +4,26 @@ import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandNetworkMotdView extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkMotdView extends BaseCommand<CorePortal> {
 
-    private final MiniPluginDatabase _miniPluginDatabase;
+    private final CoreDatabase _coreDatabase;
 
-    CommandNetworkMotdView(MiniPluginPortal miniPluginPortal, MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal,
+    CommandNetworkMotdView(CorePortal corePortal, CoreDatabase coreDatabase) {
+        super(corePortal,
                 "view",
                 "",
                 "View the current MOTD.",
                 Set.of("v"),
-                MiniPluginPortal.PERM.COMMAND_MOTD_VIEW);
+                CorePortal.PERM.COMMAND_MOTD_VIEW);
 
-        _miniPluginDatabase = miniPluginDatabase;
+        _coreDatabase = coreDatabase;
     }
 
     @Override
@@ -33,7 +33,7 @@ public final class CommandNetworkMotdView extends BaseCommand<MiniPluginPortal> 
                 F.fSub("",
                         C.fReset +
                                 ChatColor.translateAlternateColorCodes('&',
-                                        ServerQueries.getMotd(_miniPluginDatabase._database._jedis)))));
+                                        ServerQueries.getMotd(_coreDatabase._database._jedis)))));
     }
 
 }

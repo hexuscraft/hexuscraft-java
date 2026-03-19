@@ -6,20 +6,20 @@ import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.Set;
 
-public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
+public final class CommandHostEvent extends BaseCommand<CorePortal> {
 
-    private final MiniPluginDatabase _miniPluginDatabase;
+    private final CoreDatabase _coreDatabase;
 
-    public CommandHostEvent(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal,
+    public CommandHostEvent(final CorePortal corePortal, final CoreDatabase coreDatabase) {
+        super(corePortal,
                 "hostevent",
                 "",
                 "Start the event server or teleport to the existing event server.",
@@ -27,9 +27,9 @@ public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
                         "mes",
                         "hosthes",
                         "hostmes"),
-                MiniPluginPortal.PERM.COMMAND_HOSTSERVER);
+                CorePortal.PERM.COMMAND_HOSTSERVER);
 
-        _miniPluginDatabase = miniPluginDatabase;
+        _coreDatabase = coreDatabase;
     }
 
     @Override
@@ -63,9 +63,9 @@ public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
         _miniPlugin._hexusPlugin.runAsync(() -> {
             try {
                 new ServerGroupData(serverGroupName,
-                        PermissionGroup.PLAYER.name(),
-                        MiniPluginPortal.EVENT_SERVER_PORT,
-                        MiniPluginPortal.EVENT_SERVER_PORT,
+                        PermissionGroup._PLAYER.name(),
+                        CorePortal.EVENT_SERVER_PORT,
+                        CorePortal.EVENT_SERVER_PORT,
                         1,
                         0,
                         "Arcade.jar",
@@ -76,7 +76,7 @@ public final class CommandHostEvent extends BaseCommand<MiniPluginPortal> {
                         10000,
                         new String[]{"SURVIVAL_GAMES"},
                         sender instanceof final Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(
-                        _miniPluginDatabase._database._jedis);
+                        _coreDatabase._database._jedis);
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this,
                         F.fError(

@@ -3,8 +3,8 @@ package net.hexuscraft.core.permission.command;
 import net.hexuscraft.common.database.queries.PermissionQueries;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.permission.MiniPluginPermission;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.permission.CorePermission;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -15,18 +15,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public final class CommandRankClear extends BaseCommand<MiniPluginPermission> {
+public final class CommandRankClear extends BaseCommand<CorePermission> {
 
-    private final MiniPluginDatabase _miniPluginDatabase;
+    private final CoreDatabase _coreDatabase;
 
-    public CommandRankClear(final MiniPluginPermission permission, final MiniPluginDatabase database) {
+    public CommandRankClear(final CorePermission permission, final CoreDatabase database) {
         super(permission,
                 "clear",
                 "<Player>",
                 "Clears a player's additional groups.",
                 Set.of(),
-                MiniPluginPermission.PERM.COMMAND_RANK_CLEAR);
-        _miniPluginDatabase = database;
+                CorePermission.PERM.COMMAND_RANK_CLEAR);
+        _coreDatabase = database;
     }
 
     @Override
@@ -49,7 +49,7 @@ public final class CommandRankClear extends BaseCommand<MiniPluginPermission> {
                     F.fItem(offlinePlayer.getName()),
                     "..."));
 
-            _miniPluginDatabase._database._jedis.del(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
+            _coreDatabase._database._jedis.del(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
             sender.sendMessage(
                     F.fMain(this,
                             F.fSuccess("Cleared sub-groups of ",

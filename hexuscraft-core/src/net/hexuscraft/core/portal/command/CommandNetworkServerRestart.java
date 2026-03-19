@@ -3,7 +3,7 @@ package net.hexuscraft.core.portal.command;
 import net.hexuscraft.common.database.data.ServerData;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.exceptions.JedisException;
 
@@ -11,17 +11,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandNetworkServerRestart extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkServerRestart extends BaseCommand<CorePortal> {
 
-    public CommandNetworkServerRestart(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal,
+    public CommandNetworkServerRestart(final CorePortal corePortal) {
+        super(corePortal,
                 "restart",
                 "<Server>",
                 "The specified server will prevent new players from joining, send existing players to a Lobby, and then restart.",
                 Set.of("r",
                         "reboot",
                         "rb"),
-                MiniPluginPortal.PERM.COMMAND_NETWORK_SERVER_RESTART);
+                CorePortal.PERM.COMMAND_NETWORK_SERVER_RESTART);
     }
 
     @Override

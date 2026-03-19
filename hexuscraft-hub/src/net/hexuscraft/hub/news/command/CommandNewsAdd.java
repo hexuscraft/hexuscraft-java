@@ -3,8 +3,8 @@ package net.hexuscraft.hub.news.command;
 import net.hexuscraft.common.database.data.NewsData;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.hub.news.MiniPluginNews;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.hub.news.HubNews;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.exceptions.JedisException;
 
@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class CommandNewsAdd extends BaseCommand<MiniPluginNews> {
+public final class CommandNewsAdd extends BaseCommand<HubNews> {
 
     private final Set<String> POSITIVES = Set.of("true",
             "yes",
@@ -24,16 +24,16 @@ public final class CommandNewsAdd extends BaseCommand<MiniPluginNews> {
             "no",
             "0");
 
-    private final MiniPluginDatabase _miniPluginDatabase;
+    private final CoreDatabase _coreDatabase;
 
-    public CommandNewsAdd(final MiniPluginNews miniPluginNews, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginNews,
+    public CommandNewsAdd(final HubNews hubNews, final CoreDatabase coreDatabase) {
+        super(hubNews,
                 "add",
                 "<Active TRUE/FALSE> <Weight #> <Message>",
                 "Add a news line.",
                 Set.of("a"),
-                MiniPluginNews.PERM.COMMAND_NEWS_ADD);
-        _miniPluginDatabase = miniPluginDatabase;
+                HubNews.PERM.COMMAND_NEWS_ADD);
+        _coreDatabase = coreDatabase;
     }
 
     @Override
@@ -76,7 +76,7 @@ public final class CommandNewsAdd extends BaseCommand<MiniPluginNews> {
                                 message)));
 
         try {
-            newsData.publish(_miniPluginDatabase._database._jedis);
+            newsData.publish(_coreDatabase._database._jedis);
             sender.sendMessage(F.fMain(this,
                     F.fSuccess("Successfully added news line.")));
         } catch (final JedisException ex) {

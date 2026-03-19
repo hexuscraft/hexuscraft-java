@@ -1,22 +1,22 @@
 package net.hexuscraft.hub.news.command;
 
 import net.hexuscraft.core.command.BaseMultiCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.hub.news.MiniPluginNews;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.hub.news.HubNews;
 
 import java.util.Set;
 
-public final class CommandNews extends BaseMultiCommand<MiniPluginNews> {
+public final class CommandNews extends BaseMultiCommand<HubNews> {
 
-    public CommandNews(final MiniPluginNews miniPluginNews, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginNews,
+    public CommandNews(final HubNews hubNews, final CoreDatabase coreDatabase) {
+        super(hubNews,
                 "news",
                 "Manage the hub news.",
                 Set.of(),
-                MiniPluginNews.PERM.COMMAND_NEWS,
+                HubNews.PERM.COMMAND_NEWS,
                 Set.of(
-                        new CommandNewsAdd(miniPluginNews,
-                                miniPluginDatabase)
+                        new CommandNewsAdd(hubNews,
+                                coreDatabase)
                 ));
     }
 

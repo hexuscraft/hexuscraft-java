@@ -4,8 +4,8 @@ import net.hexuscraft.common.database.queries.PermissionQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.permission.MiniPluginPermission;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.permission.CorePermission;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -16,14 +16,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
+public final class CommandRankInfo extends BaseCommand<CorePermission> {
 
-    final MiniPluginDatabase _miniPluginDatabase;
+    final CoreDatabase _coreDatabase;
 
-    CommandRankInfo(final MiniPluginPermission miniPluginPermission, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPermission, "info", "<Player>", "List the groups of a player.", Set.of("i"),
-                MiniPluginPermission.PERM.COMMAND_RANK_INFO);
-        _miniPluginDatabase = miniPluginDatabase;
+    CommandRankInfo(final CorePermission corePermission, final CoreDatabase coreDatabase) {
+        super(corePermission, "info", "<Player>", "List the groups of a player.", Set.of("i"),
+                CorePermission.PERM.COMMAND_RANK_INFO);
+        _coreDatabase = coreDatabase;
     }
 
     @Override
@@ -54,7 +54,7 @@ public final class CommandRankInfo extends BaseCommand<MiniPluginPermission> {
 
             final Set<String> groupNames;
             try {
-                groupNames = _miniPluginDatabase._database._jedis.smembers(
+                groupNames = _coreDatabase._database._jedis.smembers(
                         PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this,

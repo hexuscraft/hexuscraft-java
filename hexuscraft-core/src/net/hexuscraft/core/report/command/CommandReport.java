@@ -4,7 +4,7 @@ import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.report.MiniPluginReport;
+import net.hexuscraft.core.report.CoreReport;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public final class CommandReport extends BaseCommand<MiniPluginReport> {
+public final class CommandReport extends BaseCommand<CoreReport> {
 
-    public CommandReport(MiniPluginReport miniPluginReport) {
-        super(miniPluginReport,
+    public CommandReport(CoreReport coreReport) {
+        super(coreReport,
                 "report",
                 "<Player> <Reason>",
                 "Report a player breaking rules.",
                 Set.of(),
-                MiniPluginReport.PERM.COMMAND_REPORT);
+                CoreReport.PERM.COMMAND_REPORT);
     }
 
     @Override

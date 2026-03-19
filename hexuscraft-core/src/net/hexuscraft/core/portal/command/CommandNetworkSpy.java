@@ -2,20 +2,20 @@ package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandNetworkSpy extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkSpy extends BaseCommand<CorePortal> {
 
-    CommandNetworkSpy(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal,
+    CommandNetworkSpy(final CorePortal corePortal) {
+        super(corePortal,
                 "spy",
                 "",
                 "Receive event logs from ServerMonitor.",
                 Set.of(),
-                MiniPluginPortal.PERM.COMMAND_NETWORK_SPY);
+                CorePortal.PERM.COMMAND_NETWORK_SPY);
     }
 
     @Override

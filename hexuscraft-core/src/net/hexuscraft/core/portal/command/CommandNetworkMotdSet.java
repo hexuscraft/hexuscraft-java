@@ -4,26 +4,26 @@ import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandNetworkMotdSet extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkMotdSet extends BaseCommand<CorePortal> {
 
-    private final MiniPluginDatabase _miniPluginDatabase;
+    private final CoreDatabase _coreDatabase;
 
-    CommandNetworkMotdSet(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal,
+    CommandNetworkMotdSet(final CorePortal corePortal, final CoreDatabase coreDatabase) {
+        super(corePortal,
                 "set",
                 "<Message>",
                 "Set the current MOTD.",
                 Set.of("s"),
-                MiniPluginPortal.PERM.COMMAND_MOTD_SET);
+                CorePortal.PERM.COMMAND_MOTD_SET);
 
-        _miniPluginDatabase = miniPluginDatabase;
+        _coreDatabase = coreDatabase;
     }
 
     @Override
@@ -36,7 +36,7 @@ public final class CommandNetworkMotdSet extends BaseCommand<MiniPluginPortal> {
                 C.fReset + message));
 
         _miniPlugin._hexusPlugin.runAsync(() -> {
-            ServerQueries.setMotd(_miniPluginDatabase._database._jedis,
+            ServerQueries.setMotd(_coreDatabase._database._jedis,
                     message);
             _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(
                     F.fMain(this,

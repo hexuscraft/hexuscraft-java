@@ -3,7 +3,7 @@ package net.hexuscraft.core.portal.command;
 import net.hexuscraft.common.database.data.ServerGroupData;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.command.CommandSender;
 import redis.clients.jedis.exceptions.JedisException;
 
@@ -11,17 +11,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandNetworkGroupRestart extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkGroupRestart extends BaseCommand<CorePortal> {
 
-    public CommandNetworkGroupRestart(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal,
+    public CommandNetworkGroupRestart(final CorePortal corePortal) {
+        super(corePortal,
                 "restart",
                 "<Server Group>",
                 "Restart all servers of a group.",
                 Set.of("r",
                         "reboot",
                         "rb"),
-                MiniPluginPortal.PERM.COMMAND_NETWORK_GROUP_RESTART);
+                CorePortal.PERM.COMMAND_NETWORK_GROUP_RESTART);
     }
 
     @Override

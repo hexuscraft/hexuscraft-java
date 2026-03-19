@@ -1,6 +1,6 @@
 package net.hexuscraft.build.world.command;
 
-import net.hexuscraft.build.world.MiniPluginWorld;
+import net.hexuscraft.build.world.BuildWorld;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.Difficulty;
@@ -13,15 +13,15 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.Set;
 
-public final class CommandWorldCreate extends BaseCommand<MiniPluginWorld> {
+public final class CommandWorldCreate extends BaseCommand<BuildWorld> {
 
-    public CommandWorldCreate(final MiniPluginWorld miniPluginWorld) {
-        super(miniPluginWorld,
+    public CommandWorldCreate(final BuildWorld buildWorld) {
+        super(buildWorld,
                 "create",
                 "<Name>",
                 "Create a new void world.",
                 Set.of("c"),
-                MiniPluginWorld.PERM.COMMAND_WORLD_CREATE);
+                BuildWorld.PERM.COMMAND_WORLD_CREATE);
     }
 
     @Override

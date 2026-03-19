@@ -1,6 +1,6 @@
 package net.hexuscraft.common.database.data;
 
-import net.hexuscraft.common.database.messages.PunishmentAppliedMessage;
+import net.hexuscraft.common.database.messages.PunishPunishmentAppliedMessage;
 import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.enums.PunishType;
 import redis.clients.jedis.UnifiedJedis;
@@ -124,7 +124,7 @@ public final class PunishData {
                 toMap());
         jedis.sadd(PunishQueries.LIST(targetUuid),
                 id.toString());
-        new PunishmentAppliedMessage(targetUuid,
+        new PunishPunishmentAppliedMessage(targetUuid,
                 id).publish(jedis);
     }
 

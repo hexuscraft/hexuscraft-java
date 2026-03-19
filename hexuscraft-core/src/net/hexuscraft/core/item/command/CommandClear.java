@@ -2,7 +2,7 @@ package net.hexuscraft.core.item.command;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.item.MiniPluginItem;
+import net.hexuscraft.core.item.CoreItem;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -12,15 +12,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandClear extends BaseCommand<MiniPluginItem> {
+public final class CommandClear extends BaseCommand<CoreItem> {
 
-    public CommandClear(final MiniPluginItem miniPluginItem) {
-        super(miniPluginItem,
+    public CommandClear(final CoreItem coreItem) {
+        super(coreItem,
                 "clear",
                 "[Players]",
                 "Clear the inventory of targets.",
                 Set.of("clearinventory"),
-                MiniPluginItem.PERM.COMMAND_CLEAR);
+                CoreItem.PERM.COMMAND_CLEAR);
     }
 
     @Override

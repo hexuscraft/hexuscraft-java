@@ -4,8 +4,8 @@ import net.hexuscraft.common.database.queries.PermissionQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.permission.MiniPluginPermission;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.permission.CorePermission;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -17,18 +17,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public final class CommandRankRemove extends BaseCommand<MiniPluginPermission> {
+public final class CommandRankRemove extends BaseCommand<CorePermission> {
 
-    private final MiniPluginDatabase _miniPluginDatabase;
+    private final CoreDatabase _coreDatabase;
 
-    CommandRankRemove(final MiniPluginPermission miniPluginPermission, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPermission,
+    CommandRankRemove(final CorePermission corePermission, final CoreDatabase coreDatabase) {
+        super(corePermission,
                 "remove",
                 "<Player> <Permission Group>",
                 "Take a group from a player.",
                 Set.of("r"),
-                MiniPluginPermission.PERM.COMMAND_RANK_REMOVE);
-        _miniPluginDatabase = miniPluginDatabase;
+                CorePermission.PERM.COMMAND_RANK_REMOVE);
+        _coreDatabase = coreDatabase;
     }
 
     @Override
@@ -70,7 +70,7 @@ public final class CommandRankRemove extends BaseCommand<MiniPluginPermission> {
                 return;
             }
 
-            _miniPluginDatabase._database._jedis
+            _coreDatabase._database._jedis
                     .srem(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()),
                             targetGroup.name());
             sender.sendMessage(F.fMain(this,

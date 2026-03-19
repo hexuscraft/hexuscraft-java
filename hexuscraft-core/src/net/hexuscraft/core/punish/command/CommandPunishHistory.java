@@ -6,7 +6,7 @@ import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.item.UtilItem;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.punish.MiniPluginPunish;
+import net.hexuscraft.core.punish.CorePunish;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -19,16 +19,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public final class CommandPunishHistory extends BaseCommand<MiniPluginPunish> {
+public final class CommandPunishHistory extends BaseCommand<CorePunish> {
 
-    public CommandPunishHistory(MiniPluginPunish miniPluginPunish) {
-        super(miniPluginPunish,
+    public CommandPunishHistory(CorePunish corePunish) {
+        super(corePunish,
                 "punishmenthistory",
                 "[Player]",
                 "View the history of punishments.",
                 Set.of("punishhistory",
                         "xh"),
-                MiniPluginPunish.PERM.COMMAND_PUNISH_HISTORY);
+                CorePunish.PERM.COMMAND_PUNISH_HISTORY);
     }
 
     @Override

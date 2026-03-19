@@ -2,7 +2,7 @@ package net.hexuscraft.core.disguise.command;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.disguise.MiniPluginDisguise;
+import net.hexuscraft.core.disguise.CoreDisguise;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -12,15 +12,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandDisguise extends BaseCommand<MiniPluginDisguise> {
+public final class CommandDisguise extends BaseCommand<CoreDisguise> {
 
-    public CommandDisguise(final MiniPluginDisguise miniPluginDisguise) {
-        super(miniPluginDisguise,
+    public CommandDisguise(final CoreDisguise coreDisguise) {
+        super(coreDisguise,
                 "disguise",
                 "[Target] [Username]",
                 "Disguise yourself, or force another player to disguise, as another player.",
                 Set.of("nick"),
-                MiniPluginDisguise.PERM.COMMAND_DISGUISE);
+                CoreDisguise.PERM.COMMAND_DISGUISE);
     }
 
     @Override

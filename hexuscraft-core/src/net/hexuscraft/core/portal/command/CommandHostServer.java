@@ -6,8 +6,8 @@ import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.exceptions.JedisException;
@@ -18,12 +18,12 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
+public final class CommandHostServer extends BaseCommand<CorePortal> {
 
-    private final MiniPluginDatabase _miniPluginDatabase;
+    private final CoreDatabase _coreDatabase;
 
-    public CommandHostServer(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal,
+    public CommandHostServer(final CorePortal corePortal, final CoreDatabase coreDatabase) {
+        super(corePortal,
                 "hostserver",
                 "",
                 "Start a private server or teleport to your existing server.",
@@ -31,9 +31,9 @@ public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
                         "mps",
                         "hosthps",
                         "hostmps"),
-                MiniPluginPortal.PERM.COMMAND_HOSTSERVER);
+                CorePortal.PERM.COMMAND_HOSTSERVER);
 
-        _miniPluginDatabase = miniPluginDatabase;
+        _coreDatabase = coreDatabase;
     }
 
     @Override
@@ -68,22 +68,22 @@ public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
                 .filter(serverGroupData -> serverGroupData._name.startsWith("_"))
                 .map(serverGroupData -> serverGroupData._minPort)
                 .collect(Collectors.toUnmodifiableSet());
-        if (portsInUse.size() > MiniPluginPortal.MAX_PORT_PRIVATE_SERVERS - MiniPluginPortal.MIN_PORT_PRIVATE_SERVERS) {
+        if (portsInUse.size() > CorePortal.MAX_PORT_PRIVATE_SERVERS - CorePortal.MIN_PORT_PRIVATE_SERVERS) {
             sender.sendMessage(F.fMain(this,
                     "Sorry, but we are currently at maximum capacity for private servers. Please try again later."));
             return;
         }
 
-        int portRange = MiniPluginPortal.MAX_PORT_PRIVATE_SERVERS - MiniPluginPortal.MIN_PORT_PRIVATE_SERVERS + 1;
+        int portRange = CorePortal.MAX_PORT_PRIVATE_SERVERS - CorePortal.MIN_PORT_PRIVATE_SERVERS + 1;
         boolean[] used = new boolean[portRange];
         for (int p : portsInUse) {
-            if (p >= MiniPluginPortal.MIN_PORT_PRIVATE_SERVERS && p <= MiniPluginPortal.MAX_PORT_PRIVATE_SERVERS)
-                used[p - MiniPluginPortal.MIN_PORT_PRIVATE_SERVERS] = true;
+            if (p >= CorePortal.MIN_PORT_PRIVATE_SERVERS && p <= CorePortal.MAX_PORT_PRIVATE_SERVERS)
+                used[p - CorePortal.MIN_PORT_PRIVATE_SERVERS] = true;
         }
         int[] free = IntStream.range(0,
                         portRange)
                 .filter(i -> !used[i])
-                .map(i -> MiniPluginPortal.MIN_PORT_PRIVATE_SERVERS + i)
+                .map(i -> CorePortal.MIN_PORT_PRIVATE_SERVERS + i)
                 .toArray();
 
         if (free.length == 0) {
@@ -97,7 +97,7 @@ public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
         _miniPlugin._hexusPlugin.runAsync(() -> {
             try {
                 new ServerGroupData(serverGroupName,
-                        PermissionGroup.PLAYER.name(),
+                        PermissionGroup._PLAYER.name(),
                         port,
                         port,
                         1,
@@ -110,7 +110,7 @@ public final class CommandHostServer extends BaseCommand<MiniPluginPortal> {
                         10000,
                         new String[]{"SURVIVAL_GAMES"},
                         sender instanceof final Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(
-                        _miniPluginDatabase._database._jedis);
+                        _coreDatabase._database._jedis);
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this,
                         F.fError(

@@ -2,16 +2,16 @@ package net.hexuscraft.core.npc.command;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.npc.MiniPluginNpc;
+import net.hexuscraft.core.npc.CoreNpc;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandNpcPurge extends BaseCommand<MiniPluginNpc> {
+public final class CommandNpcPurge extends BaseCommand<CoreNpc> {
 
-    CommandNpcPurge(final MiniPluginNpc miniPluginNpc) {
-        super(miniPluginNpc,
+    CommandNpcPurge(final CoreNpc coreNpc) {
+        super(coreNpc,
                 "purge",
                 "",
                 "Temporarily purge all NPCs.",
@@ -20,7 +20,7 @@ public final class CommandNpcPurge extends BaseCommand<MiniPluginNpc> {
                         "k",
                         "destroy",
                         "d"),
-                MiniPluginNpc.PERM.COMMAND_ENTITY_PURGE);
+                CoreNpc.PERM.COMMAND_ENTITY_PURGE);
     }
 
     @Override

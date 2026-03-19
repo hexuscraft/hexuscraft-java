@@ -1,15 +1,15 @@
 package net.hexuscraft.core.permission.command;
 
 import net.hexuscraft.core.command.BaseMultiCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.permission.MiniPluginPermission;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.permission.CorePermission;
 
 import java.util.Set;
 
-public final class CommandRank extends BaseMultiCommand<MiniPluginPermission> {
+public final class CommandRank extends BaseMultiCommand<CorePermission> {
 
-    public CommandRank(final MiniPluginPermission miniPluginPermission, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPermission,
+    public CommandRank(final CorePermission corePermission, final CoreDatabase coreDatabase) {
+        super(corePermission,
                 "rank",
                 "Manage permission groups of players.",
                 Set.of("ranks",
@@ -17,17 +17,17 @@ public final class CommandRank extends BaseMultiCommand<MiniPluginPermission> {
                         "perms",
                         "permission",
                         "permissions"),
-                MiniPluginPermission.PERM.COMMAND_RANK,
+                CorePermission.PERM.COMMAND_RANK,
                 Set.of(
-                        new CommandRankAdd(miniPluginPermission,
-                                miniPluginDatabase),
-                        new CommandRankClear(miniPluginPermission,
-                                miniPluginDatabase),
-                        new CommandRankInfo(miniPluginPermission,
-                                miniPluginDatabase),
-                        new CommandRankList(miniPluginPermission),
-                        new CommandRankRemove(miniPluginPermission,
-                                miniPluginDatabase)
+                        new CommandRankAdd(corePermission,
+                                coreDatabase),
+                        new CommandRankClear(corePermission,
+                                coreDatabase),
+                        new CommandRankInfo(corePermission,
+                                coreDatabase),
+                        new CommandRankList(corePermission),
+                        new CommandRankRemove(corePermission,
+                                coreDatabase)
                 ));
     }
 

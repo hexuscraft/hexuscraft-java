@@ -1,6 +1,6 @@
 package net.hexuscraft.build.world.command;
 
-import net.hexuscraft.build.world.MiniPluginWorld;
+import net.hexuscraft.build.world.BuildWorld;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.command.CommandSender;
@@ -8,15 +8,15 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandSpawn extends BaseCommand<MiniPluginWorld> {
+public final class CommandSpawn extends BaseCommand<BuildWorld> {
 
-    public CommandSpawn(final MiniPluginWorld miniPluginWorld) {
-        super(miniPluginWorld,
+    public CommandSpawn(final BuildWorld buildWorld) {
+        super(buildWorld,
                 "spawn",
                 "",
                 "Teleport to the spawn location",
                 Set.of(),
-                MiniPluginWorld.PERM.COMMAND_SPAWN);
+                BuildWorld.PERM.COMMAND_SPAWN);
     }
 
     @Override

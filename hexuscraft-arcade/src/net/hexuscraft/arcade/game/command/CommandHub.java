@@ -1,26 +1,26 @@
 package net.hexuscraft.arcade.game.command;
 
-import net.hexuscraft.arcade.game.MiniPluginGame;
+import net.hexuscraft.arcade.game.ArcadeGame;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandHub extends BaseCommand<MiniPluginGame> {
+public final class CommandHub extends BaseCommand<ArcadeGame> {
 
-    private final MiniPluginPortal _miniPluginPortal;
+    private final CorePortal _corePortal;
 
-    public CommandHub(final MiniPluginGame miniPluginGame, final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginGame,
+    public CommandHub(final ArcadeGame arcadeGame, final CorePortal corePortal) {
+        super(arcadeGame,
                 "hub",
                 "",
                 "Teleport back to a lobby server.",
                 Set.of("lobby"),
-                MiniPluginGame.PERM.COMMAND_HUB);
-        _miniPluginPortal = miniPluginPortal;
+                ArcadeGame.PERM.COMMAND_HUB);
+        _corePortal = corePortal;
     }
 
     @Override
@@ -31,7 +31,7 @@ public final class CommandHub extends BaseCommand<MiniPluginGame> {
             return;
         }
 
-        _miniPlugin._hexusPlugin.runAsync(() -> _miniPluginPortal.teleportPlayerToRandomServer(player,
+        _miniPlugin._hexusPlugin.runAsync(() -> _corePortal.teleportPlayerToRandomServer(player,
                 "Lobby"));
     }
 

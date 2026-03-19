@@ -1,28 +1,31 @@
 package net.hexuscraft.core.chat.command;
 
+import net.hexuscraft.common.database.messages.ChatAnnouncementMessage;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
-import net.hexuscraft.core.chat.MiniPluginChat;
+import net.hexuscraft.common.utils.UtilUniqueId;
+import net.hexuscraft.core.chat.CoreChat;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
+import net.hexuscraft.core.database.CoreDatabase;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandAnnouncement extends BaseCommand<MiniPluginChat> {
+public final class CommandAnnouncement extends BaseCommand<CoreChat> {
 
-    final MiniPluginDatabase _miniPluginDatabase;
+    final CoreDatabase _coreDatabase;
 
-    public CommandAnnouncement(final MiniPluginChat miniPluginChat, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginChat,
+    public CommandAnnouncement(final CoreChat coreChat, final CoreDatabase coreDatabase) {
+        super(coreChat,
                 "announce",
                 "<Permission Group> <Message>",
                 "Broadcast a message to the entire network.",
                 Set.of("announcement"),
-                MiniPluginChat.PERM.COMMAND_ANNOUNCEMENT);
-        _miniPluginDatabase = miniPluginDatabase;
+                CoreChat.PERM.COMMAND_ANNOUNCEMENT);
+        _coreDatabase = coreDatabase;
     }
 
     @Override
@@ -43,15 +46,14 @@ public final class CommandAnnouncement extends BaseCommand<MiniPluginChat> {
             return;
         }
 
-        // TODO: Async-ify
-        _miniPluginDatabase._database._jedis.publish((_miniPlugin).CHANNEL_ANNOUNCEMENT,
-                sender.getName() + "," + permissionGroup.name() + "," +
-                        String.join(" ",
-                                Arrays.stream(args)
-                                        .skip(1)
-                                        .toArray(String[]::new)));
+        _coreDatabase._database._jedis.publish(ChatAnnouncementMessage.CHANNEL_NAME, new ChatAnnouncementMessage(
+                sender instanceof Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID, String.join(" ",
+                Arrays.stream(args)
+                        .skip(1)
+                        .toArray(String[]::new)), permissionGroup).toString());
+
         sender.sendMessage(F.fMain(this,
-                "Message has been broadcast."));
+                "Message has been announced."));
     }
 
     @Override

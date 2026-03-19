@@ -20,7 +20,7 @@ import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.util.Favicon;
 import net.hexuscraft.common.database.Database;
 import net.hexuscraft.common.database.data.PunishData;
-import net.hexuscraft.common.database.messages.PunishmentAppliedMessage;
+import net.hexuscraft.common.database.messages.PunishPunishmentAppliedMessage;
 import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.enums.PunishType;
@@ -84,18 +84,20 @@ public final class Proxy {
                 .delay(Duration.ofSeconds(0))
                 .schedule();
 
-        _database.registerConsumer(PunishmentAppliedMessage.CHANNEL_NAME,
+        _database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME,
                 (_, _, rawMessage) -> {
-                    final PunishmentAppliedMessage punishmentAppliedMessage = PunishmentAppliedMessage.parse(
+                    final PunishPunishmentAppliedMessage punishPunishmentAppliedMessage = PunishPunishmentAppliedMessage.parse(
                             rawMessage);
-                    final Optional<Player> optionalPlayer = _server.getPlayer(punishmentAppliedMessage._targetUUID);
+                    final Optional<Player> optionalPlayer = _server.getPlayer(
+                            punishPunishmentAppliedMessage._targetUUID);
                     optionalPlayer.ifPresent(player -> _server.getScheduler()
                             .buildTask(this,
                                     () -> {
                                         final Map<String, String> rawData = new HashMap<>(_database._jedis.hgetAll(
-                                                PunishQueries.PUNISHMENT(punishmentAppliedMessage._punishmentUUID)));
+                                                PunishQueries.PUNISHMENT(
+                                                        punishPunishmentAppliedMessage._punishmentUUID)));
                                         rawData.put("id",
-                                                punishmentAppliedMessage._punishmentUUID.toString());
+                                                punishPunishmentAppliedMessage._punishmentUUID.toString());
                                         final PunishData punishData = new PunishData(rawData);
                                         if (punishData.type != PunishType.BAN) return;
                                         player.disconnect(Component.text(F.fPunish(punishData)));

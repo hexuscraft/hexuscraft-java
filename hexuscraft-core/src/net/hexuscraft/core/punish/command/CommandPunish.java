@@ -5,7 +5,7 @@ import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.item.UtilItem;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.punish.MiniPluginPunish;
+import net.hexuscraft.core.punish.CorePunish;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -20,16 +20,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public final class CommandPunish extends BaseCommand<MiniPluginPunish> {
+public final class CommandPunish extends BaseCommand<CorePunish> {
 
-    public CommandPunish(MiniPluginPunish miniPluginPunish) {
-        super(miniPluginPunish,
+    public CommandPunish(CorePunish corePunish) {
+        super(corePunish,
                 "punishment",
                 "<Player> <Reason>",
                 "Open the punishment panel.",
                 Set.of("punish",
                         "x"),
-                MiniPluginPunish.PERM.COMMAND_PUNISH);
+                CorePunish.PERM.COMMAND_PUNISH);
     }
 
     @Override

@@ -2,20 +2,20 @@ package net.hexuscraft.core.punish.command;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.punish.MiniPluginPunish;
+import net.hexuscraft.core.punish.CorePunish;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandRules extends BaseCommand<MiniPluginPunish> {
+public final class CommandRules extends BaseCommand<CorePunish> {
 
-    public CommandRules(final MiniPluginPunish plugin) {
+    public CommandRules(final CorePunish plugin) {
         super(plugin,
                 "rules",
                 "",
                 "View our server rules.",
                 Set.of(),
-                MiniPluginPunish.PERM.COMMAND_RULES);
+                CorePunish.PERM.COMMAND_RULES);
     }
 
     @Override

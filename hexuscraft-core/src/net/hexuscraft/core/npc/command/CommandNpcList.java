@@ -3,7 +3,7 @@ package net.hexuscraft.core.npc.command;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.chat.FBukkit;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.npc.MiniPluginNpc;
+import net.hexuscraft.core.npc.CoreNpc;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
@@ -12,16 +12,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandNpcList extends BaseCommand<MiniPluginNpc> {
+public final class CommandNpcList extends BaseCommand<CoreNpc> {
 
-    CommandNpcList(final MiniPluginNpc miniPluginNpc) {
-        super(miniPluginNpc,
+    CommandNpcList(final CoreNpc coreNpc) {
+        super(coreNpc,
                 "list",
                 "",
                 "List all NPCs.",
                 Set.of("ls",
                         "l"),
-                MiniPluginNpc.PERM.COMMAND_ENTITY_LIST);
+                CoreNpc.PERM.COMMAND_ENTITY_LIST);
     }
 
     @Override

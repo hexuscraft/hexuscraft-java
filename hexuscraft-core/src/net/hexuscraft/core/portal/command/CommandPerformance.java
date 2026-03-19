@@ -1,21 +1,21 @@
 package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.portal.CorePortal;
 
 import java.util.Set;
 
-public final class CommandPerformance extends BaseCommand<MiniPluginPortal> {
+public final class CommandPerformance extends BaseCommand<CorePortal> {
 
-    public CommandPerformance(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal,
+    public CommandPerformance(final CorePortal corePortal) {
+        super(corePortal,
                 "performance",
                 "",
                 "View the server and your player performance stats.",
                 Set.of("perf",
                         "lag",
                         "tps"),
-                MiniPluginPortal.PERM.COMMAND_PERFORMANCE);
+                CorePortal.PERM.COMMAND_PERFORMANCE);
     }
 
 }

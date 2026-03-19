@@ -1,23 +1,23 @@
 package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandLocateServer extends BaseCommand<MiniPluginPortal> {
+public final class CommandLocateServer extends BaseCommand<CorePortal> {
 
-    public CommandLocateServer(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal,
+    public CommandLocateServer(final CorePortal corePortal) {
+        super(corePortal,
                 "server",
                 "<Name>",
                 "List all players in a specific server.",
                 Set.of("srv",
                         "s"),
-                MiniPluginPortal.PERM.COMMAND_LOCATE_SERVER);
+                CorePortal.PERM.COMMAND_LOCATE_SERVER);
     }
 
     @Override

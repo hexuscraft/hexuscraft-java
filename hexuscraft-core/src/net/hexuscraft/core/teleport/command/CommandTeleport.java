@@ -4,7 +4,7 @@ import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.chat.FBukkit;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.teleport.MiniPluginTeleport;
+import net.hexuscraft.core.teleport.CoreTeleport;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -15,15 +15,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
+public final class CommandTeleport extends BaseCommand<CoreTeleport> {
 
-    public CommandTeleport(final MiniPluginTeleport miniPluginTeleport) {
-        super(miniPluginTeleport,
+    public CommandTeleport(final CoreTeleport coreTeleport) {
+        super(coreTeleport,
                 "teleport",
                 "[Players] (<Player> / <X> <Y> <Z> [<Yaw> <Pitch>])",
                 "Teleport one or more players to a player or coordinates",
                 Set.of("tp"),
-                MiniPluginTeleport.PERM.COMMAND_TELEPORT);
+                CoreTeleport.PERM.COMMAND_TELEPORT);
     }
 
     @Override
@@ -50,7 +50,7 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
             destination = potentialDestinations[0].getLocation();
             destinationName = F.fItem(potentialDestinations[0].getDisplayName());
         } else if (args.length == 2) { // Teleport targets to a player
-            if (!sender.hasPermission(MiniPluginTeleport.PERM.COMMAND_TELEPORT_OTHERS.name())) {
+            if (!sender.hasPermission(CoreTeleport.PERM.COMMAND_TELEPORT_OTHERS.name())) {
                 sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
@@ -73,7 +73,7 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
             destination = potentialDestinations[0].getLocation();
             destinationName = F.fItem(potentialDestinations[0].getDisplayName());
         } else if (args.length == 3) { // Teleport self to coords with yaw 0 pitch 0
-            if (!sender.hasPermission(MiniPluginTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
+            if (!sender.hasPermission(CoreTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
                 sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
@@ -107,11 +107,11 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                     0);
             destinationName = FBukkit.fItem(destination);
         } else if (args.length == 4) { // Teleport targets to coords with yaw 0 pitch 0
-            if (!sender.hasPermission(MiniPluginTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
+            if (!sender.hasPermission(CoreTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
                 sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
-            if (!sender.hasPermission(MiniPluginTeleport.PERM.COMMAND_TELEPORT_OTHERS.name())) {
+            if (!sender.hasPermission(CoreTeleport.PERM.COMMAND_TELEPORT_OTHERS.name())) {
                 sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
@@ -154,7 +154,7 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                     0);
             destinationName = FBukkit.fItem(destination);
         } else if (args.length == 5) { // Teleport self to coords with custom yaw-pitch
-            if (!sender.hasPermission(MiniPluginTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
+            if (!sender.hasPermission(CoreTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
                 sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
@@ -193,11 +193,11 @@ public final class CommandTeleport extends BaseCommand<MiniPluginTeleport> {
                     pitch);
             destinationName = FBukkit.fItem(destination);
         } else if (args.length == 6) { // Teleport targets to coords with custom yaw-pitch
-            if (!sender.hasPermission(MiniPluginTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
+            if (!sender.hasPermission(CoreTeleport.PERM.COMMAND_TELEPORT_COORDINATES.name())) {
                 sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
-            if (!sender.hasPermission(MiniPluginTeleport.PERM.COMMAND_TELEPORT_OTHERS.name())) {
+            if (!sender.hasPermission(CoreTeleport.PERM.COMMAND_TELEPORT_OTHERS.name())) {
                 sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }

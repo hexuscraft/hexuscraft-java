@@ -3,21 +3,21 @@ package net.hexuscraft.core.permission.command;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.permission.MiniPluginPermission;
+import net.hexuscraft.core.permission.CorePermission;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Set;
 
-public final class CommandRankList extends BaseCommand<MiniPluginPermission> {
+public final class CommandRankList extends BaseCommand<CorePermission> {
 
-    CommandRankList(MiniPluginPermission miniPluginPermission) {
-        super(miniPluginPermission,
+    CommandRankList(CorePermission corePermission) {
+        super(corePermission,
                 "list",
                 "",
                 "List all permission groups.",
                 Set.of("l"),
-                MiniPluginPermission.PERM.COMMAND_RANK_LIST);
+                CorePermission.PERM.COMMAND_RANK_LIST);
     }
 
     @Override

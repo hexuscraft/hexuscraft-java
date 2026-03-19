@@ -2,20 +2,20 @@ package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandNetworkServerList extends BaseCommand<MiniPluginPortal> {
+public final class CommandNetworkServerList extends BaseCommand<CorePortal> {
 
-    CommandNetworkServerList(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal,
+    CommandNetworkServerList(final CorePortal corePortal) {
+        super(corePortal,
                 "list",
                 "",
                 "List all servers.",
                 Set.of("l"),
-                MiniPluginPortal.PERM.COMMAND_NETWORK_SERVER_LIST);
+                CorePortal.PERM.COMMAND_NETWORK_SERVER_LIST);
     }
 
     @Override

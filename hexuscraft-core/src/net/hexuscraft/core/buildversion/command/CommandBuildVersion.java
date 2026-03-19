@@ -1,7 +1,7 @@
 package net.hexuscraft.core.buildversion.command;
 
 import net.hexuscraft.common.utils.F;
-import net.hexuscraft.core.buildversion.MiniPluginBuildVersion;
+import net.hexuscraft.core.buildversion.CoreBuildVersion;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -9,15 +9,15 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import java.util.Map;
 import java.util.Set;
 
-public final class CommandBuildVersion extends BaseCommand<MiniPluginBuildVersion> {
+public final class CommandBuildVersion extends BaseCommand<CoreBuildVersion> {
 
-    public CommandBuildVersion(final MiniPluginBuildVersion plugin) {
+    public CommandBuildVersion(final CoreBuildVersion plugin) {
         super(plugin,
                 "buildversion",
                 "",
                 "View information about the current plugin.",
                 Set.of("bv"),
-                MiniPluginBuildVersion.PERM.COMMAND_BUILDVERSION);
+                CoreBuildVersion.PERM.COMMAND_BUILDVERSION);
     }
 
     @Override
@@ -27,7 +27,7 @@ public final class CommandBuildVersion extends BaseCommand<MiniPluginBuildVersio
             return;
         }
 
-        final MiniPluginBuildVersion plugin = _miniPlugin;
+        final CoreBuildVersion plugin = _miniPlugin;
         final PluginDescriptionFile description = plugin._hexusPlugin.getDescription();
         final long lastModified = plugin.getLastModifiedMillis();
 

@@ -3,8 +3,8 @@ package net.hexuscraft.core.portal.command;
 import net.hexuscraft.common.database.data.ServerData;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.database.MiniPluginDatabase;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -12,19 +12,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandServer extends BaseCommand<MiniPluginPortal> {
+public final class CommandServer extends BaseCommand<CorePortal> {
 
-    private final MiniPluginDatabase _miniPluginDatabase;
+    private final CoreDatabase _coreDatabase;
 
-    public CommandServer(final MiniPluginPortal miniPluginPortal, final MiniPluginDatabase miniPluginDatabase) {
-        super(miniPluginPortal,
+    public CommandServer(final CorePortal corePortal, final CoreDatabase coreDatabase) {
+        super(corePortal,
                 "server",
                 "[Name]",
                 "View your current server or teleport to a server.",
                 Set.of("sv",
                         "portal"),
-                MiniPluginPortal.PERM.COMMAND_SERVER);
-        _miniPluginDatabase = miniPluginDatabase;
+                CorePortal.PERM.COMMAND_SERVER);
+        _coreDatabase = coreDatabase;
     }
 
     @Override

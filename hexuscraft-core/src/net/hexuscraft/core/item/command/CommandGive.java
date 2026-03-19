@@ -2,8 +2,8 @@ package net.hexuscraft.core.item.command;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
+import net.hexuscraft.core.item.CoreItem;
 import net.hexuscraft.core.item.ItemSearch;
-import net.hexuscraft.core.item.MiniPluginItem;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -16,9 +16,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-public final class CommandGive extends BaseCommand<MiniPluginItem> {
+public final class CommandGive extends BaseCommand<CoreItem> {
 
-    public CommandGive(final MiniPluginItem itemCenter) {
+    public CommandGive(final CoreItem itemCenter) {
         super(itemCenter,
                 "give",
                 "<Players> <Item> [Amount] [Enchantment:Level Enchantment:Level ...]",
@@ -26,7 +26,7 @@ public final class CommandGive extends BaseCommand<MiniPluginItem> {
                 Set.of("g",
                         "item",
                         "i"),
-                MiniPluginItem.PERM.COMMAND_GIVE);
+                CoreItem.PERM.COMMAND_GIVE);
     }
 
     @Override

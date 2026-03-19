@@ -3,9 +3,9 @@ package net.hexuscraft.core.chat.command;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
-import net.hexuscraft.core.chat.MiniPluginChat;
+import net.hexuscraft.core.chat.CoreChat;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.permission.MiniPluginPermission;
+import net.hexuscraft.core.permission.CorePermission;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -15,20 +15,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandSupportResponse extends BaseCommand<MiniPluginChat> {
+public final class CommandSupportResponse extends BaseCommand<CoreChat> {
 
-    final MiniPluginPermission _miniPluginPermission;
+    final CorePermission _corePermission;
 
-    public CommandSupportResponse(final MiniPluginChat miniPluginChat,
-                                  final MiniPluginPermission miniPluginPermission) {
-        super(miniPluginChat,
+    public CommandSupportResponse(final CoreChat coreChat,
+                                  final CorePermission corePermission) {
+        super(coreChat,
                 "supportresponse",
                 "<Player> <Message>",
                 "Respond to a help request.",
                 Set.of("ma",
                         "sr"),
-                MiniPluginChat.PERM.COMMAND_SUPPORT_STAFF);
-        _miniPluginPermission = miniPluginPermission;
+                CoreChat.PERM.COMMAND_SUPPORT_STAFF);
+        _corePermission = corePermission;
     }
 
     @Override
@@ -44,7 +44,7 @@ public final class CommandSupportResponse extends BaseCommand<MiniPluginChat> {
 
             final PermissionGroup permissionGroup = sender instanceof Player ?
                     PermissionGroup.getGroupWithHighestWeight(
-                            _miniPluginPermission._permissionProfiles.get((Player) sender)
+                            _corePermission._permissionProfiles.get((Player) sender)
                                     ._groups()) : null;
 
             for (Player player : _miniPlugin._hexusPlugin.getServer()
@@ -52,7 +52,7 @@ public final class CommandSupportResponse extends BaseCommand<MiniPluginChat> {
                 if (player.equals(sender) || player.equals(target) ||
                         player.hasPermission(PermissionGroup.TRAINEE.name())) {
                     final PermissionGroup targetGroup = PermissionGroup.getGroupWithHighestWeight(
-                            _miniPluginPermission._permissionProfiles.get(player)
+                            _corePermission._permissionProfiles.get(player)
                                     ._groups());
 
                     final String sourceStr = F.fPermissionGroup(permissionGroup) + " " + sender.getName();

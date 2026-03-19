@@ -3,7 +3,7 @@ package net.hexuscraft.core.portal.command;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.core.portal.MiniPluginPortal;
+import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -12,15 +12,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandSend extends BaseCommand<MiniPluginPortal> {
+public final class CommandSend extends BaseCommand<CorePortal> {
 
-    public CommandSend(final MiniPluginPortal miniPluginPortal) {
-        super(miniPluginPortal,
+    public CommandSend(final CorePortal corePortal) {
+        super(corePortal,
                 "send",
                 "<Player> <Name>",
                 "Teleport a player to a server.",
                 Set.of(),
-                MiniPluginPortal.PERM.COMMAND_SEND);
+                CorePortal.PERM.COMMAND_SEND);
     }
 
     @Override

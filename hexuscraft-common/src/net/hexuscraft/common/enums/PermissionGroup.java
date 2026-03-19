@@ -12,8 +12,8 @@ public enum PermissionGroup {
 
 //    Base Ranks
 
-    PLAYER("Player", C.cWhite, 1, "A normal Hexian player. Thanks for playing our server!"),
-    VIP("VIP", C.cGreen, 2, "The first purchasable rank, available at store.hexuscraft.net.", PLAYER),
+    _PLAYER("Player", C.cWhite, 1, "A normal Hexian player. Thanks for playing our server!"),
+    VIP("VIP", C.cGreen, 2, "The first purchasable rank, available at store.hexuscraft.net.", _PLAYER),
     MVP("MVP", C.cAqua, 3, "The second purchasable rank, available at store.hexuscraft.net.", VIP),
     MEDIA("Media", C.cDPurple, 4, "Content creators and influencers who create Minecraft gameplay videos.", MVP),
 

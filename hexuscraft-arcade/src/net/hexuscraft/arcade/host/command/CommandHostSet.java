@@ -1,6 +1,6 @@
 package net.hexuscraft.arcade.host.command;
 
-import net.hexuscraft.arcade.host.MiniPluginHost;
+import net.hexuscraft.arcade.host.ArcadeHost;
 import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class CommandHostSet extends BaseCommand<MiniPluginHost> {
-    public CommandHostSet(final MiniPluginHost miniPluginHost) {
-        super(miniPluginHost,
+public class CommandHostSet extends BaseCommand<ArcadeHost> {
+    public CommandHostSet(final ArcadeHost arcadeHost) {
+        super(arcadeHost,
                 "set",
                 "[Player]",
                 "View or set the host of this server.",
                 Set.of("s"),
-                MiniPluginHost.PERM.COMMAND_HOST_SET);
+                ArcadeHost.PERM.COMMAND_HOST_SET);
     }
 
     @Override

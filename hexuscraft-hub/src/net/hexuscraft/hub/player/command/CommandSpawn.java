@@ -4,24 +4,24 @@ import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
-import net.hexuscraft.hub.player.MiniPluginPlayer;
+import net.hexuscraft.hub.player.HubPlayer;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandSpawn extends BaseCommand<MiniPluginPlayer> {
+public final class CommandSpawn extends BaseCommand<HubPlayer> {
 
-    public CommandSpawn(final MiniPluginPlayer miniPluginPlayer) {
-        super(miniPluginPlayer,
+    public CommandSpawn(final HubPlayer hubPlayer) {
+        super(hubPlayer,
                 "spawn",
                 "[Player]",
                 "Warp to spawn.",
                 Set.of("stuck",
                         "hub",
                         "lobby"),
-                MiniPluginPlayer.PERM.COMMAND_SPAWN);
+                HubPlayer.PERM.COMMAND_SPAWN);
     }
 
     @Override

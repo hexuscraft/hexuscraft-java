@@ -2,7 +2,7 @@ package net.hexuscraft.core.gamemode.command;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.gamemode.MiniPluginGameMode;
+import net.hexuscraft.core.gamemode.CoreGameMode;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
@@ -12,15 +12,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandGameMode extends BaseCommand<MiniPluginGameMode> {
+public final class CommandGameMode extends BaseCommand<CoreGameMode> {
 
-    public CommandGameMode(final MiniPluginGameMode miniPluginGameMode) {
-        super(miniPluginGameMode,
+    public CommandGameMode(final CoreGameMode coreGameMode) {
+        super(coreGameMode,
                 "gamemode",
                 "<Players> [Toggle]",
                 "Toggle creative mode.",
                 Set.of("gm"),
-                MiniPluginGameMode.PERM.COMMAND_GAMEMODE);
+                CoreGameMode.PERM.COMMAND_GAMEMODE);
     }
 
     @Override
@@ -48,15 +48,15 @@ public final class CommandGameMode extends BaseCommand<MiniPluginGameMode> {
         }
 
         // Require the COMMAND_GAMEMODE_OTHERS permission to toggle Creative Mode of other players
-        if (!sender.hasPermission(MiniPluginGameMode.PERM.COMMAND_GAMEMODE_OTHERS.name())) {
+        if (!sender.hasPermission(CoreGameMode.PERM.COMMAND_GAMEMODE_OTHERS.name())) {
             if (targets.length > 1) {
-                sender.sendMessage(F.fInsufficientPermissions(MiniPluginGameMode.PERM.COMMAND_GAMEMODE_OTHERS));
+                sender.sendMessage(F.fInsufficientPermissions(CoreGameMode.PERM.COMMAND_GAMEMODE_OTHERS));
                 return;
             }
 
             for (final Player target : targets) {
                 if (target.equals(sender)) continue;
-                sender.sendMessage(F.fInsufficientPermissions(MiniPluginGameMode.PERM.COMMAND_GAMEMODE_OTHERS));
+                sender.sendMessage(F.fInsufficientPermissions(CoreGameMode.PERM.COMMAND_GAMEMODE_OTHERS));
                 return;
             }
         }

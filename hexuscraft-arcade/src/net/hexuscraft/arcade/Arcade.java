@@ -1,8 +1,8 @@
 package net.hexuscraft.arcade;
 
-import net.hexuscraft.arcade.game.MiniPluginGame;
-import net.hexuscraft.arcade.gamelobby.MiniPluginGameLobby;
-import net.hexuscraft.arcade.host.MiniPluginHost;
+import net.hexuscraft.arcade.game.ArcadeGame;
+import net.hexuscraft.arcade.gamelobby.ArcadeGameLobby;
+import net.hexuscraft.arcade.host.ArcadeHost;
 import net.hexuscraft.core.HexusPlugin;
 
 public final class Arcade extends HexusPlugin {
@@ -10,9 +10,9 @@ public final class Arcade extends HexusPlugin {
     public Arcade() {
         super();
 
-        require(new MiniPluginGame(this));
-        require(new MiniPluginGameLobby(this));
-        require(new MiniPluginHost(this));
+        require(new ArcadeGame(this));
+        require(new ArcadeGameLobby(this));
+        require(new ArcadeHost(this));
     }
 
 }

@@ -2,9 +2,9 @@ package net.hexuscraft.core.chat.command;
 
 import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
-import net.hexuscraft.core.chat.MiniPluginChat;
+import net.hexuscraft.core.chat.CoreChat;
 import net.hexuscraft.core.command.BaseCommand;
-import net.hexuscraft.core.command.MiniPluginCommand;
+import net.hexuscraft.core.command.CoreCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
@@ -12,18 +12,18 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import java.util.Comparator;
 import java.util.Set;
 
-public final class CommandHelp extends BaseCommand<MiniPluginChat> {
+public final class CommandHelp extends BaseCommand<CoreChat> {
 
-    private final MiniPluginCommand _miniPluginCommand;
+    private final CoreCommand _coreCommand;
 
-    public CommandHelp(final MiniPluginChat miniPluginChat, final MiniPluginCommand miniPluginCommand) {
-        super(miniPluginChat,
+    public CommandHelp(final CoreChat coreChat, final CoreCommand coreCommand) {
+        super(coreChat,
                 "help",
                 "",
                 "Need some help? We got you covered.",
                 Set.of("?"),
-                MiniPluginChat.PERM.COMMAND_HELP);
-        _miniPluginCommand = miniPluginCommand;
+                CoreChat.PERM.COMMAND_HELP);
+        _coreCommand = coreCommand;
     }
 
     @Override
