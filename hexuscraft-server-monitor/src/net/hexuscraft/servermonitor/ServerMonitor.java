@@ -172,7 +172,7 @@ public final class ServerMonitor implements Runnable {
         while (true) {
             try {
                 tick();
-            } catch (final Exception ex) {
+            } catch (final Throwable ex) {
                 //noinspection CallToPrintStackTrace
                 ex.printStackTrace();
             }

@@ -37,14 +37,12 @@ public final class NewsData {
     public void publish(final UnifiedJedis jedis) {
         jedis.hset(NewsQueries.NEWS(_id),
                 toMap());
-        new NewsUpdatedMessage(_id).publish(jedis);
+        jedis.publish(NewsUpdatedMessage.CHANNEL_NAME, new NewsUpdatedMessage(_id).stringify());
     }
 
-    // TODO: /news delete
-    @SuppressWarnings("unused")
     public void delete(final UnifiedJedis jedis) {
         jedis.del(NewsQueries.NEWS(_id));
-        new NewsDeletedMessage(_id).publish(jedis);
+        jedis.publish(NewsDeletedMessage.CHANNEL_NAME, new NewsDeletedMessage(_id).stringify());
     }
 
 }

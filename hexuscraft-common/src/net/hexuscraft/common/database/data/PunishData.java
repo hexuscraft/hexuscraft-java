@@ -58,34 +58,21 @@ public final class PunishData {
 
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<>();
-        map.put("type",
-                type.name());
-        map.put("active",
-                Boolean.toString(active));
-        map.put("origin",
-                origin.toString());
-        map.put("length",
-                length.toString());
-        map.put("reason",
-                reason);
-        map.put("server",
-                server);
-        map.put("staffId",
-                staffId.toString());
-        map.put("staffServer",
-                staffServer);
+        map.put("type", type.name());
+        map.put("active", Boolean.toString(active));
+        map.put("origin", origin.toString());
+        map.put("length", length.toString());
+        map.put("reason", reason);
+        map.put("server", server);
+        map.put("staffId", staffId.toString());
+        map.put("staffServer", staffServer);
 
         if (!active) {
-            map.put("removeOrigin",
-                    removeOrigin.toString());
-            map.put("removeReason",
-                    removeReason);
-            map.put("removeServer",
-                    removeServer);
-            map.put("removeStaffId",
-                    removeStaffId.toString());
-            map.put("removeStaffServer",
-                    removeStaffServer);
+            map.put("removeOrigin", removeOrigin.toString());
+            map.put("removeReason", removeReason);
+            map.put("removeServer", removeServer);
+            map.put("removeStaffId", removeStaffId.toString());
+            map.put("removeStaffServer", removeStaffServer);
         }
 
         return map;
@@ -120,12 +107,10 @@ public final class PunishData {
     }
 
     public void publish(final UnifiedJedis jedis, final UUID targetUuid) {
-        jedis.hset(PunishQueries.PUNISHMENT(id),
-                toMap());
-        jedis.sadd(PunishQueries.LIST(targetUuid),
-                id.toString());
-        new PunishPunishmentAppliedMessage(targetUuid,
-                id).publish(jedis);
+        jedis.hset(PunishQueries.PUNISHMENT(id), toMap());
+        jedis.sadd(PunishQueries.LIST(targetUuid), id.toString());
+        jedis.publish(PunishPunishmentAppliedMessage.CHANNEL_NAME,
+                new PunishPunishmentAppliedMessage(targetUuid, id).toString());
     }
 
 }

@@ -70,7 +70,7 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
             run(sender,
                     alias,
                     args);
-        } catch (final Exception ex) {
+        } catch (final Throwable ex) {
             _miniPlugin.logInfo(
                     "An exception occurred while CommandSender '" + sender.getName() + "' executing BaseCommand '" +
                             alias + " " + String.join(" ",

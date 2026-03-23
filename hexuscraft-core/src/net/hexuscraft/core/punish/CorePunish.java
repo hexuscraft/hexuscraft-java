@@ -13,15 +13,13 @@ import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.CoreCommand;
 import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.item.UtilItem;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.portal.CorePortal;
 import net.hexuscraft.core.punish.command.CommandPunish;
 import net.hexuscraft.core.punish.command.CommandPunishHistory;
 import net.hexuscraft.core.punish.command.CommandRules;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
-import org.bukkit.entity.HumanEntity;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -38,25 +36,32 @@ import redis.clients.jedis.exceptions.JedisException;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class CorePunish extends MiniPlugin<HexusPlugin> {
 
     public enum PERM implements IPermission {
         COMMAND_PUNISH,
+        COMMAND_PUNISH_SEVERITY_1,
+        COMMAND_PUNISH_SEVERITY_2,
+        COMMAND_PUNISH_SEVERITY_3,
+        COMMAND_PUNISH_SEVERITY_4,
         COMMAND_PUNISH_HISTORY,
-        COMMAND_RULES
+        COMMAND_RULES,
+        PUNISH_ALERTS,
     }
 
     private static final Logger log = LoggerFactory.getLogger(CorePunish.class);
+    private final long ONE_DAY_MILLIS = 86400000;
     private CoreCommand _pluginCommand;
     private CoreDatabase _coreDatabase;
     private CorePortal _corePortal;
 
     public CorePunish(final HexusPlugin plugin) {
-        super(plugin,
-                "Punish");
+        super(plugin, "Punish");
     }
 
     @Override
@@ -69,6 +74,13 @@ public final class CorePunish extends MiniPlugin<HexusPlugin> {
         PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_RULES);
 
         PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_PUNISH);
+        PermissionGroup.TRAINEE._permissions.add(PERM.PUNISH_ALERTS);
+        PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_PUNISH_SEVERITY_1);
+
+        PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_PUNISH_SEVERITY_2);
+        PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_PUNISH_SEVERITY_3);
+
+        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_PUNISH_SEVERITY_4);
     }
 
     @Override
@@ -77,95 +89,71 @@ public final class CorePunish extends MiniPlugin<HexusPlugin> {
         _pluginCommand.register(new CommandPunish(this));
         _pluginCommand.register(new CommandPunishHistory(this));
 
-        _coreDatabase._database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME,
-                (_, _, message) -> {
-                    final PunishPunishmentAppliedMessage punishPunishmentAppliedMessage = PunishPunishmentAppliedMessage.parse(
-                            message);
-                    _hexusPlugin.runAsync(() -> {
-                        final Map<String, String> rawData = new HashMap<>(_coreDatabase._database._jedis.hgetAll(
-                                PunishQueries.PUNISHMENT(punishPunishmentAppliedMessage._punishmentUUID)));
-                        rawData.put("id",
-                                punishPunishmentAppliedMessage._punishmentUUID.toString());
+        _coreDatabase._database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+            final PunishPunishmentAppliedMessage parsedMessage = PunishPunishmentAppliedMessage.fromString(rawMessage);
 
-                        final PunishData punishData = new PunishData(rawData);
+            _hexusPlugin.runAsync(() -> {
+                final Map<String, String> rawData = new HashMap<>(_coreDatabase._database._jedis.hgetAll(
+                        PunishQueries.PUNISHMENT(parsedMessage._punishmentUUID())));
+                rawData.put("id", parsedMessage._punishmentUUID()
+                        .toString());
 
-                        final OfflinePlayer targetOfflinePlayer;
-                        try {
-                            targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(
-                                    punishPunishmentAppliedMessage._targetUUID);
-                        } catch (final IOException ex) {
-                            logWarning(
-                                    "Could not fetch offline player for punish target '" + punishPunishmentAppliedMessage._targetUUID + "': " + ex.getMessage());
-                            return;
-                        }
-                        if (targetOfflinePlayer == null) return;
+                final PunishData punishData = new PunishData(rawData);
 
-                        final AtomicReference<String> staffName = new AtomicReference<>();
-                        if (punishData.staffId.equals(UtilUniqueId.EMPTY_UUID)) staffName.set(_hexusPlugin.getServer()
-                                .getConsoleSender()
-                                .getName());
-                        else try {
-                            staffName.set(Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(punishData.staffId))
-                                    .getName());
-                        } catch (final IOException | NullPointerException ex) {
-                            logSevere(ex);
-                            staffName.set("<unknown>");
-                        }
+                final OfflinePlayer target;
+                try {
+                    target = PlayerSearch.offlinePlayerSearch(parsedMessage._targetUUID());
+                    assert (target != null);
+                } catch (final IOException | AssertionError ex) {
+                    logWarning(
+                            "Could not fetch offline player for punish target '" + parsedMessage._targetUUID() + "': " + ex.getMessage());
+                    return;
+                }
 
-                        Optional.ofNullable(targetOfflinePlayer.getPlayer())
-                                .ifPresent((final Player targetPlayer) -> {
-                                    final String punishMessage = F.fPunish(punishData);
-                                    targetPlayer.sendMessage(punishMessage);
-                                    targetPlayer.playSound(targetPlayer.getLocation(),
-                                            Sound.CAT_MEOW,
-                                            Float.MAX_VALUE,
-                                            0.6F);
-                                });
+                final AtomicReference<String> staffName = new AtomicReference<>();
+                if (punishData.staffId.equals(UtilUniqueId.EMPTY_UUID)) staffName.set(_hexusPlugin.getServer()
+                        .getConsoleSender()
+                        .getName());
+                else try {
+                    staffName.set(Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(punishData.staffId))
+                            .getName());
+                } catch (final IOException | NullPointerException ex) {
+                    logSevere(ex);
+                    return;
+                }
 
-                        _hexusPlugin.getServer()
-                                .getOnlinePlayers()
-                                .stream()
-                                .filter((final Player onlineStaffPlayer) -> onlineStaffPlayer.hasPermission(
-                                        PermissionGroup.TRAINEE.name()))
-                                .forEach((final Player onlineStaffPlayer) -> {
-                                    switch (punishData.type) {
-                                        case PunishType.WARNING -> onlineStaffPlayer.sendMessage(F.fMain(this,
-                                                F.fItem(staffName.get()),
-                                                " warned ",
-                                                F.fItem(targetOfflinePlayer.getName()),
-                                                ".\n",
-                                                F.fMain("",
-                                                        "Reason: ",
-                                                        C.cWhite + punishData.reason)));
-                                        case PunishType.MUTE -> onlineStaffPlayer.sendMessage(F.fMain(this,
-                                                F.fItem(staffName.get()),
-                                                " muted ",
-                                                F.fItem(targetOfflinePlayer.getName()),
-                                                ".\n",
-                                                F.fMain("",
-                                                        "Duration: ",
-                                                        C.cWhite + F.fTime(punishData.length)),
-                                                "\n",
-                                                F.fMain("",
-                                                        "Reason: ",
-                                                        C.cWhite + punishData.reason)));
-                                        case PunishType.BAN -> onlineStaffPlayer.sendMessage(F.fMain(this,
-                                                F.fItem(staffName.get()),
-                                                " banned ",
-                                                F.fItem(targetOfflinePlayer.getName()),
-                                                ".\n",
-                                                F.fMain("",
-                                                        "Duration: ",
-                                                        C.cWhite + F.fTime(punishData.length)),
-                                                "\n",
-                                                F.fMain("",
-                                                        "Reason: ",
-                                                        C.cWhite + punishData.reason)));
-                                        default -> logWarning("Unknown punishment type: " + punishData.type);
-                                    }
-                                });
-                    });
-                });
+                Optional.ofNullable(target.getPlayer())
+                        .ifPresent((final Player targetPlayer) -> {
+                            final String punishMessage = F.fPunish(punishData);
+                            targetPlayer.sendMessage(punishMessage);
+                            targetPlayer.playSound(targetPlayer.getLocation(), Sound.CAT_MEOW, Float.MAX_VALUE, 0.6F);
+                        });
+
+                _hexusPlugin.getServer()
+                        .getOnlinePlayers()
+                        .stream()
+                        .filter((final Player staff) -> staff.hasPermission(PERM.PUNISH_ALERTS.name()))
+                        .forEach((final Player staff) -> {
+                            switch (punishData.type) {
+                                case PunishType.WARNING -> staff.sendMessage(
+                                        F.fStaff(this, F.fItem(staffName.get()), " warned ", F.fItem(target.getName()),
+                                                ".\n", F.fMain("", "Reason: ", C.cWhite + punishData.reason)));
+                                case PunishType.KICK -> staff.sendMessage(
+                                        F.fStaff(this, F.fItem(staffName.get()), " kicked ", F.fItem(target.getName()),
+                                                ".\n", F.fMain("", "Reason: ", C.cWhite + punishData.reason)));
+                                case PunishType.MUTE -> staff.sendMessage(
+                                        F.fStaff(this, F.fItem(staffName.get()), " muted ", F.fItem(target.getName()),
+                                                ".\n", F.fMain("", "Duration: ", C.cWhite + F.fTime(punishData.length)),
+                                                "\n", F.fMain("", "Reason: ", C.cWhite + punishData.reason)));
+                                case PunishType.BAN -> staff.sendMessage(
+                                        F.fStaff(this, F.fItem(staffName.get()), " banned ", F.fItem(target.getName()),
+                                                ".\n", F.fMain("", "Duration: ", C.cWhite + F.fTime(punishData.length)),
+                                                "\n", F.fMain("", "Reason: ", C.cWhite + punishData.reason)));
+                            }
+                            staff.playSound(staff.getLocation(), Sound.CAT_MEOW, Float.MAX_VALUE, 0.6F);
+                        });
+            });
+        });
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -190,8 +178,7 @@ public final class CorePunish extends MiniPlugin<HexusPlugin> {
                 try {
                     final Map<String, String> rawData = new HashMap<>(
                             jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
-                    rawData.put("id",
-                            punishmentUniqueId.toString());
+                    rawData.put("id", punishmentUniqueId.toString());
 
                     final PunishData punishData = new PunishData(rawData);
                     if (!punishData.active) continue;
@@ -205,17 +192,9 @@ public final class CorePunish extends MiniPlugin<HexusPlugin> {
                     final long remaining = punishData.getRemaining();
                     if (remaining <= 0) {
                         _coreDatabase._database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
-                                Map.of("active",
-                                        "false",
-                                        "removeOrigin",
-                                        Long.toString(System.currentTimeMillis()),
-                                        "removeReason",
-                                        "EXPIRED",
-                                        "removeServer",
-                                        _corePortal._serverName,
-                                        "removeStaffId",
-                                        UtilUniqueId.EMPTY_UUID.toString(),
-                                        "removeStaffServer",
+                                Map.of("active", "false", "removeOrigin", Long.toString(System.currentTimeMillis()),
+                                        "removeReason", "EXPIRED", "removeServer", _corePortal._serverName,
+                                        "removeStaffId", UtilUniqueId.EMPTY_UUID.toString(), "removeStaffServer",
                                         _corePortal._serverName));
                         continue;
                     }
@@ -243,185 +222,260 @@ public final class CorePunish extends MiniPlugin<HexusPlugin> {
                         .next());
             }
 
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED,
-                    F.fPunish(punishData.get()));
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, F.fPunish(punishData.get()));
         } catch (final JedisException ex) {
             logWarning("Error while fetching punishment punish for '" + event.getName() + "': " + ex.getMessage());
         }
     }
 
     public BukkitTask punishAsync(final UUID targetUUID, final UUID staffUUID, final PunishType punishType, final long lengthMillis, final String reason) {
-        return _hexusPlugin.runAsync(() -> new PunishData(Map.ofEntries(Map.entry("id",
-                        UUID.randomUUID()
-                                .toString()),
-                Map.entry("type",
-                        punishType.name()),
-                Map.entry("active",
-                        "true"),
-                Map.entry("origin",
-                        Long.toString(System.currentTimeMillis())),
-                Map.entry("length",
-                        Long.toString(lengthMillis)),
-                Map.entry("reason",
-                        reason),
-                Map.entry("server",
-                        _corePortal._serverName),
-                Map.entry("staffId",
-                        (staffUUID == null ? UtilUniqueId.EMPTY_UUID : staffUUID).toString()),
-                Map.entry("staffServer",
-                        _corePortal._serverName))).publish(_coreDatabase._database._jedis,
-                targetUUID));
+        return punishAsync(targetUUID, staffUUID, punishType, lengthMillis, reason, null);
+    }
+
+    public BukkitTask punishAsync(final UUID targetUUID, final UUID staffUUID, final PunishType punishType, final long lengthMillis, final String reason, final Consumer<PunishData> callback) {
+        final PunishData punishData = new PunishData(Map.ofEntries(Map.entry("id", UUID.randomUUID()
+                        .toString()), Map.entry("type", punishType.name()), Map.entry("active", "true"),
+                Map.entry("origin", Long.toString(System.currentTimeMillis())),
+                Map.entry("length", Long.toString(lengthMillis)), Map.entry("reason", reason),
+                Map.entry("server", _corePortal._serverName),
+                Map.entry("staffId", (staffUUID == null ? UtilUniqueId.EMPTY_UUID : staffUUID).toString()),
+                Map.entry("staffServer", _corePortal._serverName)));
+        return _hexusPlugin.runAsync(() -> {
+            punishData.publish(_coreDatabase._database._jedis, targetUUID);
+            if (callback != null) callback.accept(punishData);
+        });
     }
 
     @EventHandler
     private void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof final Player staff)) return;
+
         final Inventory inventory = event.getInventory();
-        if (!inventory.getName()
-                .contains("Punish ")) return;
+        final String inventoryName = inventory.getName();
 
-        event.setCancelled(true);
+        if (inventory.getName()
+                .contains("Punish ")) {
+            event.setCancelled(true);
 
-        if (!event.getClick()
-                .isLeftClick()) return;
+            final ItemStack currentItem = event.getCurrentItem();
+            if (currentItem == null) return;
+            if (!currentItem.hasItemMeta()) return;
 
-        final HumanEntity clicker = event.getWhoClicked();
-        if (!(clicker instanceof Player)) return;
+            final ItemMeta itemMeta = currentItem.getItemMeta();
+            if (!itemMeta.hasDisplayName()) return;
 
-        final ItemStack currentItem = event.getCurrentItem();
-        if (currentItem == null) return;
-        if (!currentItem.hasItemMeta()) return;
+            final List<String> skullLore = inventory.getItem(4)
+                    .getItemMeta()
+                    .getLore();
 
-        final ItemMeta itemMeta = currentItem.getItemMeta();
-        if (!itemMeta.hasDisplayName()) return;
-
-        final String displayName = itemMeta.getDisplayName();
-
-        final PunishType punishType;
-        final long punishLengthMillis;
-
-        if (displayName.contains("Warning")) {
-            if (!clicker.hasPermission(PermissionGroup.TRAINEE.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
+            final OfflinePlayer target;
+            try {
+                target = PlayerSearch.offlinePlayerSearch(UUID.fromString(ChatColor.stripColor(skullLore.getFirst())),
+                        staff);
+                assert (target != null);
+            } catch (final IOException | AssertionError ex) {
+                logSevere(ex);
+                staff.sendMessage(F.fMain(this, F.fError(
+                        "There was an error while fetching your punishment target. Please try again later or contact an administrator if this issue persists.")));
                 return;
             }
-            punishType = PunishType.WARNING;
-            punishLengthMillis = -1;
 
-        } else if (displayName.contains("1 Day Mute")) {
-            if (!clicker.hasPermission(PermissionGroup.TRAINEE.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
+            final AtomicReference<PunishType> punishType = new AtomicReference<>();
+            final AtomicLong punishLengthMillis = new AtomicLong(-1);
+            switch (ChatColor.stripColor(itemMeta.getDisplayName())) {
+                case "Punishment History" -> {
+                    openHistoryGui(staff, target);
+                    return;
+                }
+                case "Friendly Warning" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) return;
+                    punishType.set(PunishType.WARNING);
+                }
+                case "Chat Severity 1" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) return;
+                    punishType.set(PunishType.MUTE);
+                    punishLengthMillis.set(ONE_DAY_MILLIS);
+                }
+                case "Gameplay Severity 1" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) return;
+                    punishType.set(PunishType.BAN);
+                    punishLengthMillis.set(ONE_DAY_MILLIS);
+                }
+                case "Client Severity 1" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) return;
+                    punishType.set(PunishType.BAN);
+                    punishLengthMillis.set(ONE_DAY_MILLIS * 7);
+                }
+                case "Chat Severity 2" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name())) return;
+                    punishType.set(PunishType.MUTE);
+                    punishLengthMillis.set(ONE_DAY_MILLIS * 3);
+                }
+                case "Gameplay Severity 2" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name())) return;
+                    punishType.set(PunishType.BAN);
+                    punishLengthMillis.set(ONE_DAY_MILLIS * 3);
+                }
+                case "Client Severity 2" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name())) return;
+                    punishType.set(PunishType.BAN);
+                    punishLengthMillis.set(ONE_DAY_MILLIS * 14);
+                }
+                case "Chat Severity 3" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name())) return;
+                    punishType.set(PunishType.MUTE);
+                    punishLengthMillis.set(ONE_DAY_MILLIS * 5);
+                }
+                case "Gameplay Severity 3" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name())) return;
+                    punishType.set(PunishType.BAN);
+                    punishLengthMillis.set(ONE_DAY_MILLIS * 5);
+                }
+                case "Client Severity 3" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name())) return;
+                    punishType.set(PunishType.BAN);
+                    punishLengthMillis.set(ONE_DAY_MILLIS * 28);
+                }
+                case "Permanent Mute" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name())) return;
+                    punishType.set(PunishType.MUTE);
+                }
+                case "Permanent Ban" -> {
+                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name())) return;
+                    punishType.set(PunishType.BAN);
+                }
             }
-            punishType = PunishType.MUTE;
-            punishLengthMillis = (long) 24 * 60 * 60 * 1000;
 
-        } else if (displayName.contains("3 Days Mute")) {
-            if (!clicker.hasPermission(PermissionGroup.TRAINEE.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
+            if (punishType.get() == null) return;
+
+            punishAsync(target.getUniqueId(), staff.getUniqueId(), punishType.get(), punishLengthMillis.get(),
+                    ChatColor.stripColor(skullLore.get(2)));
+            staff.closeInventory();
+        } else if (inventoryName.contains("Punishment History ")) {
+            event.setCancelled(true);
+
+            final ItemStack currentItem = event.getCurrentItem();
+            if (currentItem == null) return;
+            if (!currentItem.hasItemMeta()) return;
+
+            final ItemMeta itemMeta = currentItem.getItemMeta();
+            if (!itemMeta.hasDisplayName()) return;
+
+            final List<String> skullLore = inventory.getItem(4)
+                    .getItemMeta()
+                    .getLore();
+
+            final OfflinePlayer target;
+            try {
+                target = PlayerSearch.offlinePlayerSearch(UUID.fromString(ChatColor.stripColor(skullLore.getFirst())),
+                        staff);
+                assert (target != null);
+            } catch (final IOException | AssertionError ex) {
+                logSevere(ex);
+                staff.sendMessage(F.fMain(this, F.fError(
+                        "There was an error while fetching your punishment target. Please try again later or contact an administrator if this issue persists.")));
             }
-            punishType = PunishType.MUTE;
-            punishLengthMillis = (long) 3 * 24 * 60 * 60 * 1000;
+        }
+    }
 
-        } else if (displayName.contains("5 Days Mute")) {
-            if (!clicker.hasPermission(PermissionGroup.MODERATOR.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
-            }
-            punishType = PunishType.MUTE;
-            punishLengthMillis = (long) 5 * 24 * 60 * 60 * 1000;
+    public void openPunishGui(final Player staff, final OfflinePlayer target, final String reason) {
+        final Inventory inventory = _hexusPlugin.getServer()
+                .createInventory(staff, 6 * 9, "Punish - " + target.getName());
 
-        } else if (displayName.contains("Permanent Mute")) {
-            if (!clicker.hasPermission(PermissionGroup.MODERATOR.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
-            }
-            punishType = PunishType.MUTE;
-            punishLengthMillis = -1;
+        final ItemStack targetSkull = UtilItem.createItemSkull(target.getName(), C.cGreen + C.fBold + target.getName(),
+                target.getUniqueId()
+                        .toString(), "", C.cWhite + reason);
 
-        } else if (displayName.contains("1 Day Ban")) {
-            if (!clicker.hasPermission(PermissionGroup.TRAINEE.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
-            }
-            punishType = PunishType.BAN;
-            punishLengthMillis = (long) 24 * 60 * 60 * 1000;
+        final ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Punishment History",
+                "View the punishment history of " + F.fItem(target.getName()));
 
-        } else if (displayName.contains("3 Days Ban")) {
-            if (!clicker.hasPermission(PermissionGroup.TRAINEE.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
-            }
-            punishType = PunishType.BAN;
-            punishLengthMillis = (long) 3 * 24 * 60 * 60 * 1000;
+        final ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
+        final ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "Chat Severity 1",
+                "1 Day Mute", "", "Light chat offense");
+        final ItemStack chat2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cYellow + C.fBold + "Chat Severity 2",
+                "3 Days Mute", "", "Moderate chat offense");
+        final ItemStack chat3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "Chat Severity 3",
+                "5 Days Mute", "", "Heavy chat offense");
 
-        } else if (displayName.contains("5 Days Ban")) {
-            if (!clicker.hasPermission(PermissionGroup.MODERATOR.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
-            }
-            punishType = PunishType.BAN;
-            punishLengthMillis = (long) 5 * 24 * 60 * 60 * 1000;
+        final ItemStack gameplayHeader = UtilItem.createItem(Material.IRON_BLOCK,
+                C.cBlue + C.fBold + "Gameplay Offenses");
+        final ItemStack gameplay1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "Gameplay Severity 1",
+                "1 Day Ban", "", "Light gameplay offense");
+        final ItemStack gameplay2 = UtilItem.createItemWool(DyeColor.YELLOW,
+                C.cYellow + C.fBold + "Gameplay Severity 2", "3 Days Ban", "", "Moderate gameplay offense");
+        final ItemStack gameplay3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "Gameplay Severity 3",
+                "5 Days Ban", "", "Heavy gameplay offense");
 
-        } else if (displayName.contains("7 Days Ban")) {
-            if (!clicker.hasPermission(PermissionGroup.MODERATOR.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
-            }
-            punishType = PunishType.BAN;
-            punishLengthMillis = (long) 7 * 24 * 60 * 60 * 1000;
+        final ItemStack clientHeader = UtilItem.createItem(Material.IRON_SWORD, C.cBlue + C.fBold + "Client Offenses");
+        final ItemStack client1 = UtilItem.createItemWool(DyeColor.LIME, C.cGreen + C.fBold + "Client Severity 1",
+                "7 Days Ban", "", "Light client offense");
+        final ItemStack client2 = UtilItem.createItemWool(DyeColor.YELLOW, C.cYellow + C.fBold + "Client Severity 2",
+                "14 Days Ban", "", "Moderate client offense");
+        final ItemStack client3 = UtilItem.createItemWool(DyeColor.ORANGE, C.cGold + C.fBold + "Client Severity 3",
+                "28 Days Ban", "", "Heavy client offense");
 
-        } else if (displayName.contains("14 Days Ban")) {
-            if (!clicker.hasPermission(PermissionGroup.MODERATOR.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
-            }
-            punishType = PunishType.BAN;
-            punishLengthMillis = (long) 14 * 24 * 60 * 60 * 1000;
+        final ItemStack miscHeader = UtilItem.createItem(Material.LEVER, C.cBlue + C.fBold + "Miscellaneous");
+        final ItemStack miscWarn = UtilItem.createItem(Material.PAPER, C.cGreen + C.fBold + "Friendly Warning",
+                "Inform someone that they are breaking the rules");
+        final ItemStack miscMute = UtilItem.createItem(Material.BOOK, C.cRed + C.fBold + "Permanent Mute", "Severity 4",
+                "", "Severe chat offense");
+        final ItemStack miscBan = UtilItem.createItem(Material.REDSTONE_BLOCK, C.cRed + C.fBold + "Permanent Ban",
+                "Severity 4", "", "Severe gameplay/client offense");
 
-        } else if (displayName.contains("30 Days Ban")) {
-            if (!clicker.hasPermission(PermissionGroup.MODERATOR.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
-            }
-            punishType = PunishType.BAN;
-            punishLengthMillis = (long) 30 * 24 * 60 * 60 * 1000;
+        inventory.setItem(4, targetSkull);
+        inventory.setItem(10, chatHeader);
+        inventory.setItem(12, gameplayHeader);
+        inventory.setItem(14, clientHeader);
+        inventory.setItem(16, miscHeader);
 
-        } else if (displayName.contains("Permanent Ban")) {
-            if (!clicker.hasPermission(PermissionGroup.MODERATOR.name())) {
-                clicker.sendMessage(F.fInsufficientPermissions());
-                return;
-            }
-            punishType = PunishType.BAN;
-            punishLengthMillis = -1;
-
-        } else return;
-
-        final ItemStack skull = inventory.getItem(4);
-
-        final List<String> skullLore = skull.getItemMeta()
-                .getLore();
-
-        final UUID uuid = UUID.fromString(ChatColor.stripColor(skullLore.getFirst()));
-        final OfflinePlayer targetOfflinePlayer;
-        try {
-            targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(uuid,
-                    clicker);
-            if (targetOfflinePlayer == null) return;
-        } catch (final IOException ex) {
-            logSevere(ex);
-            clicker.sendMessage(F.fMain(this,
-                    F.fError(
-                            "IOException while fetching OfflinePlayer. Please try again later or contact dev-ops if this issue persists.")));
-            return;
+        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) {
+            inventory.setItem(19, chat1);
+            inventory.setItem(21, gameplay1);
+            inventory.setItem(23, client1);
+            inventory.setItem(25, miscWarn);
         }
 
-        punishAsync(targetOfflinePlayer.getUniqueId(),
-                clicker.getUniqueId(),
-                punishType,
-                punishLengthMillis,
-                ChatColor.stripColor(skullLore.get(2)));
-        clicker.closeInventory();
+        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name())) {
+            inventory.setItem(28, chat2);
+            inventory.setItem(30, gameplay2);
+            inventory.setItem(32, client2);
+        }
+
+        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name())) {
+            inventory.setItem(37, chat3);
+            inventory.setItem(39, gameplay3);
+            inventory.setItem(41, client3);
+        }
+
+        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name())) {
+            inventory.setItem(34, miscMute);
+            inventory.setItem(43, miscBan);
+        }
+
+        if (staff.hasPermission(PERM.COMMAND_PUNISH_HISTORY.name())) inventory.setItem(53, viewHistory);
+
+        staff.openInventory(inventory);
+    }
+
+    public void openHistoryGui(final Player viewer, final OfflinePlayer target) {
+        final boolean viewerCanPunish = viewer.hasPermission(PERM.COMMAND_PUNISH.name());
+
+        final Inventory gui = _hexusPlugin.getServer()
+                .createInventory(viewer, 6 * 9, "Punish History - " + target.getName());
+
+        final ItemStack targetSkull = UtilItem.createItemSkull(target.getName(), C.cGreen + C.fBold + target.getName(),
+                target.getUniqueId()
+                        .toString(), "", C.cWhite + "Viewing punishment history");
+
+//        final ItemStack openPunishGui = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Apply Punishment",
+//                "Open the punishment menu for " + F.fItem(target.getName()));
+//
+//        if (viewerCanPunish) gui.setItem(53, openPunishGui);
+
+        gui.setItem(4, targetSkull);
+
+
+        viewer.openInventory(gui);
     }
 
 }

@@ -1,6 +1,6 @@
-package net.hexuscraft.arcade.game.command;
+package net.hexuscraft.arcade.manager.command;
 
-import net.hexuscraft.arcade.game.ArcadeGame;
+import net.hexuscraft.arcade.manager.ArcadeManager;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.portal.CorePortal;
@@ -9,17 +9,17 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandHub extends BaseCommand<ArcadeGame> {
+public final class CommandHub extends BaseCommand<ArcadeManager> {
 
     private final CorePortal _corePortal;
 
-    public CommandHub(final ArcadeGame arcadeGame, final CorePortal corePortal) {
-        super(arcadeGame,
+    public CommandHub(final ArcadeManager arcadeManager, final CorePortal corePortal) {
+        super(arcadeManager,
                 "hub",
                 "",
                 "Teleport back to a lobby server.",
                 Set.of("lobby"),
-                ArcadeGame.PERM.COMMAND_HUB);
+                ArcadeManager.PERM.COMMAND_HUB);
         _corePortal = corePortal;
     }
 

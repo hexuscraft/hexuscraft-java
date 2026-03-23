@@ -22,15 +22,13 @@ import net.hexuscraft.core.scoreboard.CoreScoreboard;
 import net.hexuscraft.core.teleport.CoreTeleport;
 import org.bukkit.Server;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.FileNotFoundException;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,32 +36,38 @@ import java.util.stream.Stream;
 
 public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Listener {
 
-    public final PluginManager _pluginManager;
+    public final Server _server;
     public final BukkitScheduler _scheduler;
     public final Logger _logger;
     private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPlugins;
+    private final boolean _isDebug;
 
     public HexusPlugin() {
-        final long start = System.currentTimeMillis();
-        final Server server = getServer();
-        _pluginManager = server.getPluginManager();
-        _scheduler = server.getScheduler();
-        _logger = getLogger();
-
-        _miniPlugins = new HashMap<>();
-        requireCorePlugins();
-        logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
+        this(true);
     }
 
     public HexusPlugin(final boolean shouldRequireCorePlugins) {
-        final Server server = getServer();
-        _pluginManager = server.getPluginManager();
-        _scheduler = server.getScheduler();
+        final long start = System.currentTimeMillis();
+        _server = getServer();
+        _scheduler = _server.getScheduler();
         _logger = getLogger();
 
         _miniPlugins = new HashMap<>();
-
         if (shouldRequireCorePlugins) requireCorePlugins();
+
+        _isDebug = getIsDebug();
+
+        logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
+    }
+
+    private boolean getIsDebug() {
+        final File debugFile = new File("_debug.dat");
+        if (debugFile.exists()) try {
+            return Boolean.parseBoolean(readFile(debugFile)[0]);
+        } catch (final FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
+        return false;
     }
 
     public final void requireCorePlugins() {
@@ -106,7 +110,8 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         long start = System.currentTimeMillis();
         logInfo("Enabling...");
 
-        _pluginManager.registerEvents(this, this);
+        _server.getPluginManager()
+                .registerEvents(this, this);
         enable();
         _miniPlugins.values()
                 .forEach(MiniPlugin::enable);
@@ -127,16 +132,25 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         logInfo("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
+    public String[] readFile(File file) throws FileNotFoundException {
+        final List<String> lines = new ArrayList<>();
+        try (final Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) lines.add(scanner.nextLine());
+        }
+        return lines.toArray(String[]::new);
+    }
+
     public final void require(final MiniPlugin<? extends HexusPlugin> miniPlugin) {
         //noinspection unchecked
         _miniPlugins.put((Class<? extends MiniPlugin<? extends HexusPlugin>>) miniPlugin.getClass(), miniPlugin);
     }
 
     public final void logInfo(final String message) {
+        if (!_isDebug) return;
         _logger.log(Level.INFO, message);
     }
 
-    public final void logInfo(final Exception ex) {
+    public final void logInfo(final Throwable ex) {
         logInfo("[" + ex.getClass()
                 .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
                         Arrays.stream(ex.getStackTrace())
@@ -145,10 +159,10 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     public final void logWarning(final String message) {
-        _logger.log(Level.WARNING, message);
+        _logger.log(Level.WARNING, "[WARNING] " + message);
     }
 
-    public final void logWarning(final Exception ex) {
+    public final void logWarning(final Throwable ex) {
         logWarning("[" + ex.getClass()
                 .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
                         Arrays.stream(ex.getStackTrace())
@@ -157,10 +171,10 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     public final void logSevere(final String message) {
-        _logger.log(Level.SEVERE, message);
+        _logger.log(Level.SEVERE, "[SEVERE] " + message);
     }
 
-    public final void logSevere(final Exception ex) {
+    public final void logSevere(final Throwable ex) {
         logSevere("[" + ex.getClass()
                 .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
                         Arrays.stream(ex.getStackTrace())

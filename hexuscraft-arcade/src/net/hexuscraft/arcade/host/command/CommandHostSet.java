@@ -31,7 +31,7 @@ public class CommandHostSet extends BaseCommand<ArcadeHost> {
             return;
         }
 
-        if (args.length == 0 && _miniPlugin._hostOfflinePlayer.get() == null) {
+        if (args.length == 0 && _miniPlugin._host.get() == null) {
             sender.sendMessage(F.fMain(this,
                     F.fError("There is already no server host.")));
             return;
@@ -50,7 +50,7 @@ public class CommandHostSet extends BaseCommand<ArcadeHost> {
         };
 
         if (args.length == 0) {
-            final OfflinePlayer oldHost = _miniPlugin._hostOfflinePlayer.getAndSet(null);
+            final OfflinePlayer oldHost = _miniPlugin._host.getAndSet(null);
             sender.sendMessage(F.fMain(this,
                     "There is no longer a server host."));
             if (oldHost.isOnline()) sendHostRemovalMessage.accept(oldHost.getPlayer());
@@ -65,7 +65,7 @@ public class CommandHostSet extends BaseCommand<ArcadeHost> {
         if (matches.length != 1) return;
 
         final Player newHost = matches[0];
-        final OfflinePlayer oldHost = _miniPlugin._hostOfflinePlayer.getAndSet(newHost);
+        final OfflinePlayer oldHost = _miniPlugin._host.getAndSet(newHost);
 
         if (newHost == oldHost) {
             sender.sendMessage(F.fMain(this,
@@ -74,7 +74,7 @@ public class CommandHostSet extends BaseCommand<ArcadeHost> {
             return;
         }
 
-        _miniPlugin._hostOfflinePlayer.set(newHost);
+        _miniPlugin._host.set(newHost);
         sender.sendMessage(F.fMain(this,
                 "Set the server host to ",
                 F.fItem(newHost.getDisplayName()),

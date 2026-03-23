@@ -1,6 +1,5 @@
 package net.hexuscraft.core.report.command;
 
-import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
@@ -10,7 +9,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -20,7 +18,7 @@ public final class CommandReport extends BaseCommand<CoreReport> {
     public CommandReport(CoreReport coreReport) {
         super(coreReport,
                 "report",
-                "<Player> <Reason>",
+                "<Player>",
                 "Report a player breaking rules.",
                 Set.of(),
                 CoreReport.PERM.COMMAND_REPORT);
@@ -28,7 +26,7 @@ public final class CommandReport extends BaseCommand<CoreReport> {
 
     @Override
     public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length < 2) {
+        if (args.length < 1) {
             sender.sendMessage(help(alias));
             return;
         }
@@ -46,30 +44,7 @@ public final class CommandReport extends BaseCommand<CoreReport> {
             return;
         }
 
-        List<String> reasonArgs = new java.util.ArrayList<>(Arrays.stream(args)
-                .toList());
-        reasonArgs.removeFirst();
-        String reason = String.join(" ",
-                reasonArgs);
-
-        _miniPlugin._hexusPlugin.getServer()
-                .getOnlinePlayers()
-                .forEach(onlinePlayer -> {
-                    if (!onlinePlayer.hasPermission(PermissionGroup.TRAINEE.name())) return;
-                    onlinePlayer.sendMessage(
-                            F.fMain(this,
-                                    F.fItem(offlinePlayer.getName()),
-                                    " reported by ",
-                                    F.fItem(player.getDisplayName()),
-                                    ":\n",
-                                    F.fMain("",
-                                            F.fItem(reason))));
-                });
-
-        sender.sendMessage(F.fMain(this,
-                "Report against ",
-                F.fItem(offlinePlayer.getName()),
-                " has been submitted for review. You will receive a response shortly."));
+        _miniPlugin.openReportGui(player, offlinePlayer);
     }
 
     @Override

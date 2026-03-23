@@ -39,7 +39,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
 
         long finish = System.currentTimeMillis();
         if (finish - start > 2000L) logWarning("Took " + (System.currentTimeMillis() - start) + "ms to enable. (>2s)");
-        logInfo("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
+        logInfo("String.valueOf " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public final void disable() {
@@ -63,7 +63,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         _hexusPlugin.logInfo("[" + _prefix + "] " + message);
     }
 
-    public final void logInfo(final Exception ex) {
+    public final void logInfo(final Throwable ex) {
         logInfo("[" + ex.getClass()
                 .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
                         Arrays.stream(ex.getStackTrace())
@@ -75,7 +75,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         _hexusPlugin.logWarning("[" + _prefix + "] " + message);
     }
 
-    public final void logWarning(final Exception ex) {
+    public final void logWarning(final Throwable ex) {
         logWarning("[" + ex.getClass()
                 .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
                         Arrays.stream(ex.getStackTrace())
@@ -87,7 +87,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         _hexusPlugin.logSevere("[" + _prefix + "] " + message);
     }
 
-    public final void logSevere(final Exception ex) {
+    public final void logSevere(final Throwable ex) {
         logSevere("[" + ex.getClass()
                 .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
                         Arrays.stream(ex.getStackTrace())

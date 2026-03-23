@@ -1,4 +1,4 @@
-package net.hexuscraft.arcade.game;
+package net.hexuscraft.arcade.manager;
 
 public enum GameState {
 

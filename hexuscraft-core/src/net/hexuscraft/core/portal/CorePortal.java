@@ -104,8 +104,8 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         _networkChannelSpies = new HashSet<>();
 
         try {
-            _serverName = read(new File("_name.dat"));
-            _serverGroupName = read(new File("_group.dat"));
+            _serverName = plugin.readFile(new File("_name.dat"))[0];
+            _serverGroupName = plugin.readFile(new File("_group.dat"))[0];
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
@@ -350,7 +350,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
                 .toArray(ServerData[]::new);
         if (availableServers.length == 0) {
             player.sendMessage(F.fMain(this, F.fError("Sorry, we were unable to locate a ", F.fItem(serverGroupName),
-                    " server. Please try again in a few moments or contact an administrator if this issue persists.")));
+                    " server. Please try again later or contact an administrator if this issue persists.")));
             return;
         }
 
@@ -417,10 +417,6 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         return _hexusPlugin.runAsync(
                 () -> _coreDatabase._database._jedis.publish(PortalRestartServerGroupMessage.CHANNEL_NAME,
                         new PortalRestartServerGroupMessage(groupName).toString()));
-    }
-
-    public String read(File file) throws FileNotFoundException {
-        return new Scanner(file).nextLine();
     }
 
     public int getPlayerCount(String name) {

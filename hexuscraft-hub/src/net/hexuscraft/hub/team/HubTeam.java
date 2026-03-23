@@ -15,7 +15,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 public class HubTeam extends MiniPlugin<Hub> {
@@ -33,27 +32,28 @@ public class HubTeam extends MiniPlugin<Hub> {
 
     @EventHandler
     private void onPlayerJoin(final PlayerJoinEvent event) {
-        final Player player = event.getPlayer();
-        final Scoreboard scoreboard = player.getScoreboard();
-
-        final Map<PermissionGroup, Team> teams = new HashMap<>();
+        final Player eventPlayer = event.getPlayer();
+        final Scoreboard eventPlayerScoreboard = eventPlayer.getScoreboard();
 
         Arrays.stream(PermissionGroup.values())
-                .filter(permissionGroup -> scoreboard.getTeam(permissionGroup._prefix) == null)
+                .filter(permissionGroup -> eventPlayerScoreboard.getTeam(permissionGroup._prefix) == null)
                 .forEach((final PermissionGroup group) -> {
-                    final Team team = scoreboard.registerNewTeam(group._prefix);
-                    teams.put(group, team);
+                    final Team team = eventPlayerScoreboard.registerNewTeam(group._prefix);
                     team.setPrefix(F.fPermissionGroup(group, true, true) + C.fReset + " ");
                 });
-        
+
         _corePermission._permissionProfiles.forEach(
                 (final Player target, final PermissionProfile permissionProfile) -> {
                     final PermissionGroup highestGroup = PermissionGroup.getGroupWithHighestWeight(
                             permissionProfile._groups());
-                    teams.computeIfPresent(highestGroup, (group, team) -> {
-                        team.addEntry(target.getName());
-                        return team;
-                    });
+                    if (highestGroup == null) return;
+
+                    _hexusPlugin.getServer()
+                            .getOnlinePlayers()
+                            .stream()
+                            .map(Player::getScoreboard)
+                            .map(scoreboard -> scoreboard.getTeam(highestGroup._prefix))
+                            .forEach(team -> team.addEntry(target.getName()));
                 });
     }
 

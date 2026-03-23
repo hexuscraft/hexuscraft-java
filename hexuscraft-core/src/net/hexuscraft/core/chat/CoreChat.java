@@ -55,8 +55,7 @@ public final class CoreChat extends MiniPlugin<HexusPlugin> {
     private boolean _chatMuted = false;
 
     public CoreChat(final HexusPlugin plugin) {
-        super(plugin,
-                "Chat");
+        super(plugin, "Chat");
 
         PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_HELP);
         PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_SUPPORT);
@@ -76,8 +75,7 @@ public final class CoreChat extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(
-            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _corePermission = (CorePermission) dependencies.get(CorePermission.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
@@ -86,126 +84,99 @@ public final class CoreChat extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onEnable() {
-        _coreCommand.register(new CommandAnnouncement(this,
-                _coreDatabase));
+        _coreCommand.register(new CommandAnnouncement(this, _coreDatabase));
         _coreCommand.register(new CommandBroadcast(this));
         _coreCommand.register(new CommandSilence(this));
-        _coreCommand.register(
-                new CommandSupport(this,
-                        _corePermission,
-                        _coreDatabase,
-                        _corePortal));
-        _coreCommand.register(new CommandSupportResponse(this,
-                _corePermission));
-        _coreCommand.register(new CommandHelp(this,
-                _coreCommand));
+        _coreCommand.register(new CommandSupport(this, _corePermission, _coreDatabase, _corePortal));
+        _coreCommand.register(new CommandSupportResponse(this, _corePermission));
+        _coreCommand.register(new CommandHelp(this, _coreCommand));
 
-        _coreDatabase._database.registerConsumer(ChatAnnouncementMessage.CHANNEL_NAME,
-                (_, _, rawMessage) -> {
-                    final ChatAnnouncementMessage parsedMessage = ChatAnnouncementMessage.fromString(rawMessage);
+        _coreDatabase._database.registerConsumer(ChatAnnouncementMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+            final ChatAnnouncementMessage parsedMessage = ChatAnnouncementMessage.fromString(rawMessage);
 
-                    _hexusPlugin.runAsync(() -> {
-                        final String senderName;
-                        try {
-                            senderName = Objects.requireNonNull(
-                                            PlayerSearch.offlinePlayerSearch(parsedMessage._senderUniqueId()))
-                                    .getName();
-                        } catch (final IOException | NullPointerException ex) {
-                            logSevere(ex);
-                            return;
-                        }
+            _hexusPlugin.runAsync(() -> {
+                final String senderName;
+                try {
+                    senderName = Objects.requireNonNull(
+                                    PlayerSearch.offlinePlayerSearch(parsedMessage._senderUniqueId()))
+                            .getName();
+                } catch (final IOException | NullPointerException ex) {
+                    logSevere(ex);
+                    return;
+                }
 
-                        _hexusPlugin.getServer()
-                                .getOnlinePlayers()
-                                .stream()
-                                .filter(player -> player.hasPermission(PermissionGroup.ADMINISTRATOR.name()))
-                                .forEach(player -> {
+                _hexusPlugin.getServer()
+                        .getOnlinePlayers()
+                        .stream()
+                        .filter(player -> player.hasPermission(PermissionGroup.ADMINISTRATOR.name()))
+                        .forEach(player -> {
 
-                                    player.sendMessage(
-                                            F.fStaff(this,
-                                                    F.fItem(senderName),
-                                                    " sent an announcement to ",
-                                                    F.fPermissionGroup(parsedMessage._permissionGroup()),
-                                                    "."));
-                                });
+                            player.sendMessage(F.fStaff(this, F.fItem(senderName), " sent an announcement to ",
+                                    F.fPermissionGroup(parsedMessage._permissionGroup()), "."));
+                        });
+            });
+
+            _hexusPlugin.getServer()
+                    .getOnlinePlayers()
+                    .stream()
+                    .filter(player -> player.hasPermission(parsedMessage._permissionGroup()
+                            .name()))
+                    .forEach(player -> {
+                        //noinspection deprecation
+                        player.sendTitle(C.cYellow + "Announcement", parsedMessage._message());
+                        player.sendMessage(F.fMain("Announcement", C.cAqua + parsedMessage._message()));
+                        player.playSound(player.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
                     });
+        });
 
-                    _hexusPlugin.getServer()
-                            .getOnlinePlayers()
+        _coreDatabase._database.registerConsumer(ChatSupportMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+            final ChatSupportMessage messageData = ChatSupportMessage.fromString(rawMessage);
+
+            final String senderName;
+            final PermissionGroup[] senderPermissionGroups;
+
+            try {
+                senderName = PlayerSearch.offlinePlayerSearch(messageData._senderUniqueId())
+                        .getName();
+            } catch (final IOException ex) {
+                logSevere(ex);
+                return;
+            }
+
+            final PermissionProfile[] permissionProfiles = _corePermission._permissionProfiles.keySet()
+                    .stream()
+                    .filter(player -> player.getUniqueId()
+                            .equals(messageData._senderUniqueId()))
+                    .map(_corePermission._permissionProfiles::get)
+                    .toArray(PermissionProfile[]::new);
+            if (permissionProfiles.length == 1) senderPermissionGroups = permissionProfiles[0]._groups();
+            else {
+                final Set<PermissionGroup> permissionGroups = new HashSet<>();
+                try {
+                    PermissionQueries.getGroupNames(_coreDatabase._database._jedis, messageData._senderUniqueId())
                             .stream()
-                            .filter(player -> player.hasPermission(parsedMessage._permissionGroup()
-                                    .name()))
-                            .forEach(player -> {
-                                //noinspection deprecation
-                                player.sendTitle(C.cYellow + "Announcement",
-                                        parsedMessage._message());
-                                player.sendMessage(F.fMain("Announcement",
-                                        C.cAqua + parsedMessage._message()));
-                                player.playSound(player.getLocation(),
-                                        Sound.LEVEL_UP,
-                                        Float.MAX_VALUE,
-                                        1);
-                            });
-                });
+                            .map(PermissionGroup::valueOf)
+                            .forEach(permissionGroups::add);
+                } catch (final JedisException ex) {
+                    ex.printStackTrace();
+                }
+                if (permissionGroups.isEmpty()) permissionGroups.add(PermissionGroup._PLAYER);
+                senderPermissionGroups = permissionGroups.toArray(PermissionGroup[]::new);
+            }
 
-        _coreDatabase._database.registerConsumer(ChatSupportMessage.CHANNEL_NAME,
-                (_, _, rawMessage) -> {
-                    final ChatSupportMessage messageData = ChatSupportMessage.fromString(rawMessage);
-
-                    final String senderName;
-                    final PermissionGroup[] senderPermissionGroups;
-
-                    try {
-                        senderName = PlayerSearch.offlinePlayerSearch(messageData._senderUniqueId())
-                                .getName();
-                    } catch (final IOException ex) {
-                        logSevere(ex);
-                        return;
-                    }
-
-                    final PermissionProfile[] permissionProfiles = _corePermission._permissionProfiles.keySet()
-                            .stream()
-                            .filter(player -> player.getUniqueId()
-                                    .equals(messageData._senderUniqueId()))
-                            .map(_corePermission._permissionProfiles::get)
-                            .toArray(PermissionProfile[]::new);
-                    if (permissionProfiles.length == 1) senderPermissionGroups = permissionProfiles[0]._groups();
-                    else {
-                        final Set<PermissionGroup> permissionGroups = new HashSet<>();
-                        try {
-                            PermissionQueries.getGroupNames(_coreDatabase._database._jedis,
-                                            messageData._senderUniqueId())
-                                    .forEach(permissionGroupName -> {
-                                        try {
-                                            permissionGroups.add(PermissionGroup.valueOf(permissionGroupName));
-                                        } catch (final IllegalArgumentException ex) {
-                                            ex.printStackTrace();
-                                        }
-                                    });
-                        } catch (final JedisException ex) {
-                            ex.printStackTrace();
-                        }
-                        if (permissionGroups.isEmpty()) permissionGroups.add(PermissionGroup._PLAYER);
-                        senderPermissionGroups = permissionGroups.toArray(PermissionGroup[]::new);
-                    }
-
-                    _hexusPlugin.getServer()
-                            .getOnlinePlayers()
-                            .stream()
-                            .filter(player -> player.getUniqueId()
-                                    .equals(messageData._senderUniqueId()) ||
-                                    player.hasPermission(PermissionGroup.TRAINEE.name()))
-                            .forEach(player -> {
-                                player.sendMessage(C.cPurple + messageData._serverName() + " " +
-                                        F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(
-                                                senderPermissionGroups)) + " " +
-                                        senderName + C.cPurple + " " + messageData._message());
-                                player.playSound(player.getLocation(),
-                                        Sound.NOTE_PLING,
-                                        Float.MAX_VALUE,
-                                        2);
-                            });
-                });
+            _hexusPlugin.getServer()
+                    .getOnlinePlayers()
+                    .stream()
+                    .filter(player -> player.getUniqueId()
+                            .equals(messageData._senderUniqueId()) || player.hasPermission(
+                            PermissionGroup.TRAINEE.name()))
+                    .forEach(player -> {
+                        player.sendMessage(C.cPurple + messageData._serverName() + " " + F.fPermissionGroup(
+                                PermissionGroup.getGroupWithHighestWeight(
+                                        senderPermissionGroups)) + " " + senderName + C.cPurple + " " + messageData._message());
+                        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+                    });
+        });
     }
 
     @Override
@@ -220,9 +191,8 @@ public final class CoreChat extends MiniPlugin<HexusPlugin> {
     public void setMuted(boolean toggle) {
         _chatMuted = toggle;
         _hexusPlugin.getServer()
-                .broadcastMessage(F.fMain(this,
-                        toggle ? F.fError("The chat is now silenced.") : F.fSuccess(
-                                "The chat is no longer silenced.")));
+                .broadcastMessage(F.fMain(this, toggle ? F.fError("The chat is now silenced.") : F.fSuccess(
+                        "The chat is no longer silenced.")));
     }
 
     @EventHandler
@@ -230,18 +200,16 @@ public final class CoreChat extends MiniPlugin<HexusPlugin> {
         final Player player = event.getPlayer();
 
         if (player.hasPermission(PERM.CHAT_PREFIX.name())) {
-            event.setFormat(F.fChat(0,
-                    PermissionGroup.getGroupWithHighestWeight(
-                            _corePermission._permissionProfiles.get(player)
-                                    ._groups())));
+            event.setFormat(F.fChat(0, PermissionGroup.getGroupWithHighestWeight(
+                    _corePermission._permissionProfiles.get(player)
+                            ._groups())));
         } else {
             event.setFormat(F.fChat(0));
         }
 
         if (_chatMuted && !player.hasPermission(PERM.BYPASS_SILENCE.name())) {
             event.setCancelled(true);
-            player.sendMessage(F.fMain(this,
-                    F.fError("The chat is currently silenced.")));
+            player.sendMessage(F.fMain(this, F.fError("The chat is currently silenced.")));
         }
     }
 

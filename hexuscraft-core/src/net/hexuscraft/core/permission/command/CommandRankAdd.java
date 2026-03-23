@@ -9,7 +9,6 @@ import net.hexuscraft.core.permission.CorePermission;
 import net.hexuscraft.core.player.PlayerSearch;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.Arrays;
@@ -74,13 +73,6 @@ public final class CommandRankAdd extends BaseCommand<CorePermission> {
                     targetGroup.name());
             sender.sendMessage(F.fMain(this, F.fSuccess("Added sub-group " + F.fPermissionGroup(targetGroup), " to ",
                     F.fItem(offlinePlayer.getName()), ".")));
-
-            final Player player = _miniPlugin._hexusPlugin.getServer()
-                    .getPlayer(offlinePlayer.getName());
-            if (player == null) return;
-
-            player.sendMessage(F.fMain(this) + "You now have sub-group " + F.fPermissionGroup(targetGroup) + ".");
-            _miniPlugin.refreshPermissions(player);
         });
 
     }

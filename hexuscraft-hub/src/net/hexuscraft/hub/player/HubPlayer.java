@@ -118,22 +118,22 @@ public final class HubPlayer extends MiniPlugin<Hub> {
     private void refreshInventory(Player player) {
         final PlayerInventory inventory = player.getInventory();
 
-        final ItemStack gameCompass = UtilItem.createItem(Material.COMPASS, C.cGreen + C.fBold + "Game Menu",
-                "Click to open the Game Menu");
+        final ItemStack gameCompass = UtilItem.createItem(Material.COMPASS, C.cGreen + C.fBold + "Games",
+                "Click to open the Games Menu");
         final ItemStack profileSkull = UtilItem.createItemSkull(player.getName(), C.cGreen + C.fBold + player.getName(),
                 "Click to open the Profile Menu");
-        final ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST, C.cGreen + C.fBold + "Cosmetics Menu",
+        final ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST, C.cGreen + C.fBold + "Cosmetics",
                 "Click to open the Cosmetics Menu");
-        final ItemStack shopEmerald = UtilItem.createItem(Material.EMERALD, C.cGreen + C.fBold + "Shop Menu",
-                "Click to open the Shop Menu");
-        final ItemStack lobbyClock = UtilItem.createItem(Material.WATCH, C.cGreen + C.fBold + "Lobby Menu",
-                "Click to open the Lobby Menu");
+        final ItemStack storeEmerald = UtilItem.createItem(Material.EMERALD, C.cGreen + C.fBold + "Store",
+                "Click to open the Store Menu");
+        final ItemStack lobbyClock = UtilItem.createItem(Material.WATCH, C.cGreen + C.fBold + "Lobbies",
+                "Click to open the Lobbies Menu");
 
         inventory.clear();
         inventory.setItem(0, gameCompass);
         inventory.setItem(1, profileSkull);
         inventory.setItem(4, cosmeticsChest);
-        inventory.setItem(7, shopEmerald);
+        inventory.setItem(7, storeEmerald);
         inventory.setItem(8, lobbyClock);
         inventory.setHeldItemSlot(0);
     }
@@ -147,7 +147,7 @@ public final class HubPlayer extends MiniPlugin<Hub> {
         final Material itemType = itemStack.getType();
         final String displayName = ChatColor.stripColor(itemMeta.getDisplayName());
 
-        if (itemType.equals(Material.COMPASS) && displayName.equals("Game Menu")) {
+        if (itemType.equals(Material.COMPASS) && displayName.equals("Games")) {
             openGameMenu(player);
             return true;
         }
@@ -155,15 +155,15 @@ public final class HubPlayer extends MiniPlugin<Hub> {
             openProfileMenu(player);
             return true;
         }
-        if (itemType.equals(Material.CHEST) && displayName.equals("Cosmetics Menu")) {
+        if (itemType.equals(Material.CHEST) && displayName.equals("Cosmetics")) {
             openCosmeticsMenu(player);
             return true;
         }
-        if (itemType.equals(Material.EMERALD) && displayName.equals("Shop Menu")) {
-            openShopMenu(player);
+        if (itemType.equals(Material.EMERALD) && displayName.equals("Store")) {
+            openStoreMenu(player);
             return true;
         }
-        if (itemType.equals(Material.WATCH) && displayName.equals("Lobby Menu")) {
+        if (itemType.equals(Material.WATCH) && displayName.equals("Lobbies")) {
             openLobbyMenu(player);
             return true;
         }
@@ -221,7 +221,7 @@ public final class HubPlayer extends MiniPlugin<Hub> {
         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
-    void openShopMenu(final Player player) {
+    void openStoreMenu(final Player player) {
         player.sendMessage(F.fMain("Shop", "This feature is currently work in progress. Please try again later!"));
         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }

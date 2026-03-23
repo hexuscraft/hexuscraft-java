@@ -55,16 +55,6 @@ public final class CommandRankClear extends BaseCommand<CorePermission> {
                             F.fSuccess("Cleared sub-groups of ",
                                     F.fItem(offlinePlayer.getName()),
                                     ".")));
-
-            final Player player = _miniPlugin._hexusPlugin.getServer()
-                    .getPlayer(offlinePlayer.getName());
-            if (player == null) {
-                return;
-            }
-
-            player.sendMessage(F.fMain(this,
-                    F.fSuccess("Your sub-groups were cleared.")));
-            _miniPlugin.refreshPermissions(player);
         });
     }
 

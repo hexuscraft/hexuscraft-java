@@ -1,6 +1,7 @@
 package net.hexuscraft.common.database;
 
 import redis.clients.jedis.*;
+import redis.clients.jedis.exceptions.JedisException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,7 +23,7 @@ public final class Database {
 
     // TODO::::::::: https://redis.io/docs/latest/develop/clients/jedis/produsage/
 
-    public Database(final String host, final int port, final String username, final String password, final String clientName) throws Exception {
+    public Database(final String host, final int port, final String username, final String password, final String clientName) throws JedisException {
         _consumers = new HashMap<>();
         _jedis = buildUnifiedJedis(host,
                 port,

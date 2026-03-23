@@ -15,7 +15,7 @@ public class CommandHostView extends BaseCommand<ArcadeHost> {
                 "",
                 "View the current server host.",
                 Set.of("v"),
-                ArcadeHost.PERM.COMMAND_HOST_SET);
+                ArcadeHost.PERM.COMMAND_HOST_VIEW);
     }
 
     @Override
@@ -25,7 +25,7 @@ public class CommandHostView extends BaseCommand<ArcadeHost> {
             return;
         }
 
-        final OfflinePlayer host = _miniPlugin._hostOfflinePlayer.get();
+        final OfflinePlayer host = _miniPlugin._host.get();
         if (host == null) {
             sender.sendMessage(F.fMain(this,
                     "There is currently no server host."));

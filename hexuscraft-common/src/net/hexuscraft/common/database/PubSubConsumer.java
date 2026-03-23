@@ -23,5 +23,5 @@ interface TriConsumer<A, B, C> {
 
 @FunctionalInterface
 public interface PubSubConsumer extends TriConsumer<String, String, String> {
-    void accept(final String pattern, final String channelName, final String message);
+    void accept(final String pattern, final String channelName, final String rawMessage);
 }

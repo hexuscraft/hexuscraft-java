@@ -66,7 +66,6 @@ public final class CommandRankInfo extends BaseCommand<CorePermission> {
             sender.sendMessage(F.fMain(this, F.fItem(offlinePlayer.getName()), " Permission Groups: ",
                     F.fItem(groupNames.stream()
                             .map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s)))
-                            .distinct()
                             .toArray(String[]::new))));
         });
     }

@@ -12,7 +12,7 @@ public final class NewsUpdatedMessage extends BaseMessage {
     public final UUID _id;
 
     public NewsUpdatedMessage(final UUID id) {
-        this._id = id;
+        _id = id;
     }
 
     public static NewsUpdatedMessage parse(final String jsonString) {

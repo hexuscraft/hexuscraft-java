@@ -2,6 +2,7 @@ package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.common.database.data.ServerData;
 import net.hexuscraft.common.database.data.ServerGroupData;
+import net.hexuscraft.common.enums.GameType;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilUniqueId;
@@ -97,24 +98,24 @@ public final class CommandHostServer extends BaseCommand<CorePortal> {
         _miniPlugin._hexusPlugin.runAsync(() -> {
             try {
                 new ServerGroupData(serverGroupName,
-                        PermissionGroup._PLAYER.name(),
+                        PermissionGroup._PLAYER,
                         port,
                         port,
                         1,
                         0,
                         "Arcade.jar",
                         "Arcade.zip",
-                        512,
+                        2048,
                         100,
                         false,
                         10000,
-                        new String[]{"SURVIVAL_GAMES"},
+                        new GameType[]{GameType.SURVIVAL_GAMES},
                         sender instanceof final Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(
                         _coreDatabase._database._jedis);
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this,
                         F.fError(
-                                "There was an error creating your server. Please try again in a few moments or contact an administrator if this issue persists.")));
+                                "There was an error creating your server. Please try again later or contact an administrator if this issue persists.")));
                 return;
             }
             sender.sendMessage(F.fMain(this,

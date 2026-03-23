@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 public final class Proxy {
 
     private final String MOTD_PREFIX = String.join("\n",
-            "        §6§lHexuscraft§r §f§lNetwork§r  §9[1.8 & 1.21]§r",
+            "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8 & 1.21.11]§r",
             " §f§l▶§r ");
 
     private final Database _database;
@@ -86,18 +86,19 @@ public final class Proxy {
 
         _database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME,
                 (_, _, rawMessage) -> {
-                    final PunishPunishmentAppliedMessage punishPunishmentAppliedMessage = PunishPunishmentAppliedMessage.parse(
+                    final PunishPunishmentAppliedMessage punishPunishmentAppliedMessage = PunishPunishmentAppliedMessage.fromString(
                             rawMessage);
                     final Optional<Player> optionalPlayer = _server.getPlayer(
-                            punishPunishmentAppliedMessage._targetUUID);
+                            punishPunishmentAppliedMessage._targetUUID());
                     optionalPlayer.ifPresent(player -> _server.getScheduler()
                             .buildTask(this,
                                     () -> {
                                         final Map<String, String> rawData = new HashMap<>(_database._jedis.hgetAll(
                                                 PunishQueries.PUNISHMENT(
-                                                        punishPunishmentAppliedMessage._punishmentUUID)));
+                                                        punishPunishmentAppliedMessage._punishmentUUID())));
                                         rawData.put("id",
-                                                punishPunishmentAppliedMessage._punishmentUUID.toString());
+                                                punishPunishmentAppliedMessage._punishmentUUID()
+                                                        .toString());
                                         final PunishData punishData = new PunishData(rawData);
                                         if (punishData.type != PunishType.BAN) return;
                                         player.disconnect(Component.text(F.fPunish(punishData)));
@@ -305,7 +306,7 @@ public final class Proxy {
             event.setInitialServer(null);
             player.disconnect(Component.text()
                     .color(NamedTextColor.RED)
-                    .append(Component.text("Your game client is too outdated."))
+                    .append(Component.text("Your manager client is too outdated."))
                     .append(Component.text("\nPlease use Minecraft 1.8 or newer to join Hexuscraft.",
                             NamedTextColor.GRAY))
                     .append(Component.text("\n\nwww.hexuscraft.net",

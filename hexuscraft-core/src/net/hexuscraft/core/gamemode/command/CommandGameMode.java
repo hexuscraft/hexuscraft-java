@@ -50,13 +50,13 @@ public final class CommandGameMode extends BaseCommand<CoreGameMode> {
         // Require the COMMAND_GAMEMODE_OTHERS permission to toggle Creative Mode of other players
         if (!sender.hasPermission(CoreGameMode.PERM.COMMAND_GAMEMODE_OTHERS.name())) {
             if (targets.length > 1) {
-                sender.sendMessage(F.fInsufficientPermissions(CoreGameMode.PERM.COMMAND_GAMEMODE_OTHERS));
+                sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
 
             for (final Player target : targets) {
                 if (target.equals(sender)) continue;
-                sender.sendMessage(F.fInsufficientPermissions(CoreGameMode.PERM.COMMAND_GAMEMODE_OTHERS));
+                sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
         }

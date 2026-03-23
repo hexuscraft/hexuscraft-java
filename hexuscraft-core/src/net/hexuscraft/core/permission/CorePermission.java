@@ -3,7 +3,6 @@ package net.hexuscraft.core.permission;
 import net.hexuscraft.common.IPermission;
 import net.hexuscraft.common.database.queries.PermissionQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
-import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.CoreCommand;
@@ -37,8 +36,7 @@ public final class CorePermission extends MiniPlugin<HexusPlugin> {
     private CoreDatabase _coreDatabase;
 
     public CorePermission(final HexusPlugin plugin) {
-        super(plugin,
-                "Permissions");
+        super(plugin, "Permissions");
 
         _permissionProfiles = new HashMap<>();
 
@@ -61,8 +59,7 @@ public final class CorePermission extends MiniPlugin<HexusPlugin> {
 
     @Override
     public void onEnable() {
-        _coreCommand.register(new CommandRank(this,
-                _coreDatabase));
+        _coreCommand.register(new CommandRank(this, _coreDatabase));
     }
 
     @Override
@@ -91,24 +88,14 @@ public final class CorePermission extends MiniPlugin<HexusPlugin> {
             return;
         }
 
-        final Set<PermissionGroup> permissionGroups = new HashSet<>();
-        permissionGroupNames.forEach(permissionGroupName -> {
-            try {
-                permissionGroups.add(PermissionGroup.valueOf(permissionGroupName));
-            } catch (final IllegalArgumentException ex) {
-                logWarning(ex);
-                player.sendMessage(F.fMain(this,
-                        F.fError("There was an error while parsing one of your permission groups '",
-                                F.fItem(permissionGroupName),
-                                "'. Please contact an administrator if this issue persists across multiple servers.")));
-            }
-        });
+        final Set<PermissionGroup> permissionGroups = new HashSet<>(permissionGroupNames.stream()
+                .map(PermissionGroup::valueOf)
+                .toList());
 
-        if (permissionGroups.isEmpty()) permissionGroups.add(PermissionGroup._PLAYER);
+        permissionGroups.add(PermissionGroup._PLAYER);
 
-        _permissionProfiles.put(player,
-                new PermissionProfile(permissionGroups.toArray(PermissionGroup[]::new),
-                        player.addAttachment(_hexusPlugin)));
+        _permissionProfiles.put(player, new PermissionProfile(permissionGroups.toArray(PermissionGroup[]::new),
+                player.addAttachment(_hexusPlugin)));
         refreshPermissions(player);
     }
 
@@ -131,8 +118,7 @@ public final class CorePermission extends MiniPlugin<HexusPlugin> {
 
         final PermissionAttachment attachment = profile._attachment();
         Arrays.stream(profile._groups())
-                .forEach(group -> grantPermissions(attachment,
-                        group));
+                .forEach(group -> grantPermissions(attachment, group));
 
         if (player.hasPermission(PERM.OPERATOR.name())) player.setOp(true);
         else denyBukkitPermissions(attachment);
@@ -154,31 +140,22 @@ public final class CorePermission extends MiniPlugin<HexusPlugin> {
     }
 
     private void denyBukkitPermissions(final PermissionAttachment attachment) {
-        attachment.setPermission("minecraft.command.me",
-                false);
-        attachment.setPermission("minecraft.command.tell",
-                false);
-        attachment.setPermission("bukkit.command.help",
-                false);
-        attachment.setPermission("bukkit.command.plugins",
-                false);
-        attachment.setPermission("bukkit.command.version",
-                false);
+        attachment.setPermission("minecraft.command.me", false);
+        attachment.setPermission("minecraft.command.tell", false);
+        attachment.setPermission("bukkit.command.help", false);
+        attachment.setPermission("bukkit.command.plugins", false);
+        attachment.setPermission("bukkit.command.version", false);
     }
 
     private void grantPermissions(final PermissionAttachment attachment, final PermissionGroup group) {
-        attachment.setPermission(group.name(),
-                true);
-        group._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(),
-                true));
+        attachment.setPermission(group.name(), true);
+        group._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(), true));
 
         Arrays.stream(group._inherits)
                 .forEach(parentGroup -> {
-                    grantPermissions(attachment,
-                            parentGroup);
+                    grantPermissions(attachment, parentGroup);
                     parentGroup._permissions.forEach(
-                            basePermission -> attachment.setPermission(basePermission.toString(),
-                                    true));
+                            basePermission -> attachment.setPermission(basePermission.toString(), true));
                 });
     }
 

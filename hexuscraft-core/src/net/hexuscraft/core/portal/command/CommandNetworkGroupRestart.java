@@ -47,7 +47,7 @@ public final class CommandNetworkGroupRestart extends BaseCommand<CorePortal> {
             } catch (final JedisException ex) {
                 sender.sendMessage(F.fMain(this,
                         F.fError(
-                                "JedisException while fetching server group punish. Please try again later or contact dev-ops if this issue persists.")));
+                                "JedisException while fetching server group punish. Please try again later or contact an administrator if this issue persists.")));
                 return;
             }
 
@@ -65,7 +65,7 @@ public final class CommandNetworkGroupRestart extends BaseCommand<CorePortal> {
                 } catch (final JedisException ex) {
                     sender.sendMessage(F.fMain(this,
                             F.fError(
-                                    "JedisException while restarting server group. Please try again later or contact dev-ops if this issue persists.")));
+                                    "JedisException while restarting server group. Please try again later or contact an administrator if this issue persists.")));
                     return;
                 }
                 sender.sendMessage(F.fMain(this,

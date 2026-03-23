@@ -36,7 +36,7 @@ public final class ItemSearch {
         try {
             //noinspection deprecation
             return new Material[]{Material.getMaterial(Integer.parseInt(searchName))};
-        } catch (final Exception ignored) {
+        } catch (final Throwable ignored) {
         }
 
         return matches;

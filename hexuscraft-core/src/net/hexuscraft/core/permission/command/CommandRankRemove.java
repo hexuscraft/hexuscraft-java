@@ -79,15 +79,6 @@ public final class CommandRankRemove extends BaseCommand<CorePermission> {
                     " from ",
                     F.fItem(offlinePlayer.getName()),
                     "."));
-
-            final Player player = offlinePlayer.getPlayer();
-            if (player == null) return;
-
-            player.sendMessage(F.fMain(this,
-                    "You no longer have sub-group ",
-                    F.fPermissionGroup(targetGroup),
-                    "."));
-            _miniPlugin.refreshPermissions(player);
         });
     }
 
