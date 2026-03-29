@@ -41,7 +41,7 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 
 ### PermissionGroup
 
-> - PLAYER *(default)*
+> - _PLAYER *(default)*
 > - VIP
 > - MVP
 > - MEDIA
@@ -88,7 +88,7 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 > - VELOCITY
 > - BUKKIT
 
-## Redis Keys
+## Redis Data
 
 *`*` required*
 
@@ -149,25 +149,33 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 
 > **HASH** `punishment:(UUID)`
 >
-> *`^` required if `active` is `false`*
+> *`^` required if `active` is `FALSE`*
 >
-> |              Field | Type                         |
-> |-------------------:|:-----------------------------|
-> |              type* | **String** (PunishType Enum) |
-> |            active* | **Boolean**                  |
-> |            origin* | **Long**                     |
-> |            length* | **Long**                     |
-> |            reason* | **String**                   |
-> |            server* | **String**                   |
-> |           staffId* | **String** (UUID)            |
-> |       staffServer* | **String**                   |
-> |      removeOrigin^ | **Long**                     |
-> |      removeReason^ | **String**                   |
-> |      removeServer^ | **String**                   |
-> |     removeStaffId^ | **String** (UUID)            |
-> | removeStaffServer^ | **String**                   | 
+> |               Field | Type           |
+> |--------------------:|:---------------|
+> |               uuid* | **UUID**       |
+> |               type* | **PunishType** |
+> |             active* | **Boolean**    |
+> |             origin* | **Long**       |
+> |             length* | **Long**       |
+> |             reason* | **String**     |
+> |         targetUUID* | **UUID**       |
+> |       targetServer* | **String**     |
+> |          staffUUID* | **UUID**       |
+> |        staffServer* | **String**     |
+> |       removeOrigin^ | **Long**       |
+> |       removeReason^ | **String**     |
+> | removeTargetServer^ | **String**     |
+> |    removeStaffUUID^ | **UUID**       |
+> |  removeStaffServer^ | **String**     | 
 
-> **SET** `user:(UUID):punishments`
+> **SET** `user:(UUID):punishments:received`
+> - `(UUID)` of redis keys `punishment:(UUID)`
+
+> **SET** `user:(UUID):punishments:issued`
+> - `(UUID)` of redis keys `punishment:(UUID)`
+
+> **SET** `user:(UUID):punishments:revoked`
 > - `(UUID)` of redis keys `punishment:(UUID)`
 
 ### Motd

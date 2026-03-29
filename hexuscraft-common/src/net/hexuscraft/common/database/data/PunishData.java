@@ -181,7 +181,7 @@ public class PunishData
         jedis.sadd(PunishQueries.ISSUED(_staffUUID), _uuid.toString());
         if (!_active)
         {
-            jedis.sadd(PunishQueries.ISSUED(_removeStaffUUID), _uuid.toString());
+            jedis.sadd(PunishQueries.REVOKED(_removeStaffUUID), _uuid.toString());
         }
         jedis.publish(PunishPunishmentAppliedMessage.CHANNEL_NAME, new PunishPunishmentAppliedMessage(this).toString());
     }
