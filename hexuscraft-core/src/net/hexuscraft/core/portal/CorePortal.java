@@ -83,14 +83,14 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     public static int MIN_PORT_PRIVATE_SERVERS = 39900;
     public static int MAX_PORT_PRIVATE_SERVERS = 39999;
     public static int EVENT_SERVER_PORT = 30003;
-    public Set<CommandSender> _networkChannelSpies;
-    public long _createdMillis;
-    public String _serverName;
-    public String _serverGroupName;
     private final Messenger _messenger;
     private final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
     private final Set<ServerGroupData> _serverGroupCache;
     private final Set<ServerData> _serverCache;
+    public Set<CommandSender> _networkChannelSpies;
+    public long _createdMillis;
+    public String _serverName;
+    public String _serverGroupName;
     private CoreCommand _coreCommand;
     private CoreDatabase _coreDatabase;
     private BukkitTask _updateServerDataTask;
@@ -121,25 +121,25 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
         _messenger.registerIncomingPluginChannel(_hexusPlugin, PROXY_CHANNEL, this);
 
         PermissionGroup._PLAYER._permissions.addAll(List.of(PERM.COMMAND_SERVER,
-                                                            PERM.COMMAND_PERFORMANCE,
-                                                            PERM.COMMAND_MOTD,
-                                                            PERM.COMMAND_MOTD_VIEW));
+                PERM.COMMAND_PERFORMANCE,
+                PERM.COMMAND_MOTD,
+                PERM.COMMAND_MOTD_VIEW));
         PermissionGroup.VIP._permissions.add(PERM.BYPASS_FULL_PLAYER);
         PermissionGroup.MVP._permissions.add(PERM.COMMAND_HOSTSERVER);
         PermissionGroup.TRAINEE._permissions.add(PERM.BYPASS_FULL_STAFF);
         PermissionGroup.EVENT_LEAD._permissions.add(PERM.COMMAND_HOSTEVENT);
         PermissionGroup.ADMINISTRATOR._permissions.addAll(List.of(PERM.COMMAND_SEND,
-                                                                  PERM.COMMAND_MOTD_SET,
-                                                                  PERM.COMMAND_NETWORK,
-                                                                  PERM.COMMAND_NETWORK_SPY,
-                                                                  PERM.COMMAND_NETWORK_GROUP,
-                                                                  PERM.COMMAND_NETWORK_GROUP_CREATE,
-                                                                  PERM.COMMAND_NETWORK_GROUP_DELETE,
-                                                                  PERM.COMMAND_NETWORK_GROUP_LIST,
-                                                                  PERM.COMMAND_NETWORK_GROUP_RESTART,
-                                                                  PERM.COMMAND_NETWORK_SERVER,
-                                                                  PERM.COMMAND_NETWORK_SERVER_RESTART,
-                                                                  PERM.COMMAND_NETWORK_SERVER_RESTART));
+                PERM.COMMAND_MOTD_SET,
+                PERM.COMMAND_NETWORK,
+                PERM.COMMAND_NETWORK_SPY,
+                PERM.COMMAND_NETWORK_GROUP,
+                PERM.COMMAND_NETWORK_GROUP_CREATE,
+                PERM.COMMAND_NETWORK_GROUP_DELETE,
+                PERM.COMMAND_NETWORK_GROUP_LIST,
+                PERM.COMMAND_NETWORK_GROUP_RESTART,
+                PERM.COMMAND_NETWORK_SERVER,
+                PERM.COMMAND_NETWORK_SERVER_RESTART,
+                PERM.COMMAND_NETWORK_SERVER_RESTART));
     }
 
     @Override
@@ -163,137 +163,96 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
         _coreCommand.register(new CommandNetwork(this, _coreDatabase));
 
         _coreDatabase._database.registerConsumer("*",
-                                                 (_, channelName, message) -> _networkChannelSpies.forEach(commandSender -> commandSender.sendMessage(
-                                                         F.fSub(channelName, message))));
+                (_, channelName, message) -> _networkChannelSpies.forEach(commandSender -> commandSender.sendMessage(F.fSub(
+                        channelName,
+                        message))));
 
         _coreDatabase._database.registerConsumer(PortalTeleportMessage.CHANNEL_NAME,
-                                                 (_, _, rawMessage) -> _hexusPlugin.runAsync(() ->
-                                                                                             {
-                                                                                                 PortalTeleportMessage
-                                                                                                         message
-                                                                                                         = PortalTeleportMessage.parse(
-                                                                                                         rawMessage);
+                (_, _, rawMessage) -> _hexusPlugin.runAsync(() ->
+                {
+                    PortalTeleportMessage message = PortalTeleportMessage.parse(rawMessage);
 
-                                                                                                 _hexusPlugin.getServer()
-                                                                                                             .getOnlinePlayers()
-                                                                                                             .stream()
-                                                                                                             .filter(player -> player.getUniqueId()
-                                                                                                                                     .equals(message._targetUUID))
-                                                                                                             .forEach(
-                                                                                                                     targetPlayer -> teleport(
-                                                                                                                             targetPlayer,
-                                                                                                                             message._serverName));
-                                                                                             }));
+                    _hexusPlugin.getServer()
+                            .getOnlinePlayers()
+                            .stream()
+                            .filter(player -> player.getUniqueId().equals(message._targetUUID))
+                            .forEach(targetPlayer -> teleport(targetPlayer, message._serverName));
+                }));
 
         _coreDatabase._database.registerConsumer(PortalTeleportStaffMessage.CHANNEL_NAME,
-                                                 (_, _, rawMessage) -> _hexusPlugin.runAsync(() ->
-                                                                                             {
-                                                                                                 PortalTeleportStaffMessage
-                                                                                                         message
-                                                                                                         = PortalTeleportStaffMessage.parse(
-                                                                                                         rawMessage);
+                (_, _, rawMessage) -> _hexusPlugin.runAsync(() ->
+                {
+                    PortalTeleportStaffMessage message = PortalTeleportStaffMessage.parse(rawMessage);
 
-                                                                                                 AtomicReference<String>
-                                                                                                         targetName
-                                                                                                         = new AtomicReference<>();
-                                                                                                 AtomicReference<String>
-                                                                                                         senderName
-                                                                                                         = new AtomicReference<>();
+                    AtomicReference<String> targetName = new AtomicReference<>();
+                    AtomicReference<String> senderName = new AtomicReference<>();
 
-                                                                                                 _hexusPlugin.getServer()
-                                                                                                             .getOnlinePlayers()
-                                                                                                             .forEach(
-                                                                                                                     targetPlayer ->
-                                                                                                                     {
-                                                                                                                         if (targetPlayer.getUniqueId()
-                                                                                                                                         .equals(message._targetUUID))
-                                                                                                                         {
-                                                                                                                             targetName.set(
-                                                                                                                                     targetPlayer.getName());
-                                                                                                                             teleport(
-                                                                                                                                     targetPlayer,
-                                                                                                                                     message._serverName);
-                                                                                                                         }
-                                                                                                                         if (targetPlayer.getUniqueId()
-                                                                                                                                         .equals(message._senderUUID))
-                                                                                                                         {
-                                                                                                                             senderName.set(
-                                                                                                                                     targetPlayer.getName());
-                                                                                                                         }
-                                                                                                                     });
+                    _hexusPlugin.getServer().getOnlinePlayers().forEach(targetPlayer ->
+                    {
+                        if (targetPlayer.getUniqueId().equals(message._targetUUID))
+                        {
+                            targetName.set(targetPlayer.getName());
+                            teleport(targetPlayer, message._serverName);
+                        }
+                        if (targetPlayer.getUniqueId().equals(message._senderUUID))
+                        {
+                            senderName.set(targetPlayer.getName());
+                        }
+                    });
 
-                                                                                                 if (message._senderUUID.equals(
-                                                                                                         UtilUniqueId.EMPTY_UUID))
-                                                                                                 {
-                                                                                                     return;
-                                                                                                 }
+                    if (message._senderUUID.equals(UtilUniqueId.EMPTY_UUID))
+                    {
+                        return;
+                    }
 
-                                                                                                 if (targetName.get() ==
-                                                                                                     null)
-                                                                                                 {
-                                                                                                     try
-                                                                                                     {
-                                                                                                         targetName.set(
-                                                                                                                 PlayerSearch.offlinePlayerSearch(
-                                                                                                                                     message._targetUUID)
-                                                                                                                             .getName());
-                                                                                                     }
-                                                                                                     catch (IOException ex)
-                                                                                                     {
-                                                                                                         logWarning(
-                                                                                                                 "IOException while fetching unique id of portal teleport target '" +
-                                                                                                                 message._targetUUID +
-                                                                                                                 "': " +
-                                                                                                                 ex.getMessage());
-                                                                                                         return;
-                                                                                                     }
-                                                                                                 }
+                    if (targetName.get() == null)
+                    {
+                        try
+                        {
+                            targetName.set(PlayerSearch.offlinePlayerSearch(message._targetUUID).getName());
+                        }
+                        catch (IOException ex)
+                        {
+                            logWarning("IOException while fetching unique id of portal teleport target '" +
+                                    message._targetUUID +
+                                    "': " +
+                                    ex.getMessage());
+                            return;
+                        }
+                    }
 
-                                                                                                 if (senderName.get() ==
-                                                                                                     null)
-                                                                                                 {
-                                                                                                     try
-                                                                                                     {
-                                                                                                         senderName.set(
-                                                                                                                 PlayerSearch.offlinePlayerSearch(
-                                                                                                                                     message._senderUUID)
-                                                                                                                             .getName());
-                                                                                                     }
-                                                                                                     catch (IOException ex)
-                                                                                                     {
-                                                                                                         logWarning(
-                                                                                                                 "IOException while fetching unique id of portal teleport sender '" +
-                                                                                                                 message._senderUUID +
-                                                                                                                 "': " +
-                                                                                                                 ex.getMessage());
-                                                                                                         return;
-                                                                                                     }
-                                                                                                 }
+                    if (senderName.get() == null)
+                    {
+                        try
+                        {
+                            senderName.set(PlayerSearch.offlinePlayerSearch(message._senderUUID).getName());
+                        }
+                        catch (IOException ex)
+                        {
+                            logWarning("IOException while fetching unique id of portal teleport sender '" +
+                                    message._senderUUID +
+                                    "': " +
+                                    ex.getMessage());
+                            return;
+                        }
+                    }
 
-                                                                                                 _hexusPlugin.getServer()
-                                                                                                             .getOnlinePlayers()
-                                                                                                             .stream()
-                                                                                                             .filter(player -> player.hasPermission(
-                                                                                                                     PermissionGroup.TRAINEE.name()))
-                                                                                                             .forEach(
-                                                                                                                     player ->
-                                                                                                                     {
-                                                                                                                         player.sendMessage(
-                                                                                                                                 F.fStaff(
-                                                                                                                                         this,
-                                                                                                                                         F.fItem(senderName.get()),
-                                                                                                                                         " sent ",
-                                                                                                                                         F.fItem(targetName.get()),
-                                                                                                                                         " to ",
-                                                                                                                                         F.fItem(message._serverName),
-                                                                                                                                         "."));
-                                                                                                                         player.playSound(
-                                                                                                                                 player.getLocation(),
-                                                                                                                                 Sound.NOTE_PLING,
-                                                                                                                                 Float.MAX_VALUE,
-                                                                                                                                 2);
-                                                                                                                     });
-                                                                                             }));
+                    _hexusPlugin.getServer()
+                            .getOnlinePlayers()
+                            .stream()
+                            .filter(player -> player.hasPermission(PermissionGroup.TRAINEE.name()))
+                            .forEach(player ->
+                            {
+                                player.sendMessage(F.fStaff(this,
+                                        F.fItem(senderName.get()),
+                                        " sent ",
+                                        F.fItem(targetName.get()),
+                                        " to ",
+                                        F.fItem(message._serverName),
+                                        "."));
+                                player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+                            });
+                }));
 
         _coreDatabase._database.registerConsumer(PortalRestartServerMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
@@ -318,16 +277,16 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
         _updateServerDataTask = _hexusPlugin.runAsyncTimer(this::updateServerData, 0, 20);
 
         _updateServerCacheTask = _hexusPlugin.runAsyncTimer(() ->
-                                                            {
-                                                                try
-                                                                {
-                                                                    updateServerCache();
-                                                                }
-                                                                catch (JedisException ex)
-                                                                {
-                                                                    logSevere(ex);
-                                                                }
-                                                            }, 0, 20);
+        {
+            try
+            {
+                updateServerCache();
+            }
+            catch (JedisException ex)
+            {
+                logSevere(ex);
+            }
+        }, 0, 20);
     }
 
     @Override
@@ -350,23 +309,23 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
         Server server = _hexusPlugin.getServer();
 
         ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
-                                                                                 server.getPort()).getAddress(),
-                                                           server.getMotd(),
-                                                           server.getOnlinePlayers().size(),
-                                                           server.getMaxPlayers());
+                server.getPort()).getAddress(),
+                server.getMotd(),
+                server.getOnlinePlayers().size(),
+                server.getMaxPlayers());
         server.getPluginManager().callEvent(ping);
 
         new ServerData(_serverName,
-                       server.getIp(),
-                       ping.getMaxPlayers(),
-                       _createdMillis,
-                       _serverGroupName,
-                       "DEAD",
-                       ping.getNumPlayers(),
-                       server.getPort(),
-                       20,
-                       System.currentTimeMillis(),
-                       false).update(_coreDatabase._database._jedis);
+                server.getIp(),
+                ping.getMaxPlayers(),
+                _createdMillis,
+                _serverGroupName,
+                "DEAD",
+                ping.getNumPlayers(),
+                server.getPort(),
+                20,
+                System.currentTimeMillis(),
+                false).update(_coreDatabase._database._jedis);
     }
 
     public void updateServerData()
@@ -374,10 +333,10 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
         Server server = _hexusPlugin.getServer();
 
         ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
-                                                                                 server.getPort()).getAddress(),
-                                                           server.getMotd(),
-                                                           server.getOnlinePlayers().size(),
-                                                           server.getMaxPlayers());
+                server.getPort()).getAddress(),
+                server.getMotd(),
+                server.getOnlinePlayers().size(),
+                server.getMaxPlayers());
         server.getPluginManager().callEvent(ping);
 
         OptionalDouble
@@ -385,16 +344,16 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
                 = OptionalDouble.of(20); //Arrays.stream(MinecraftServer.getServer().recentTps).average();
 
         new ServerData(_serverName,
-                       server.getIp(),
-                       server.getMaxPlayers(),
-                       _createdMillis,
-                       _serverGroupName,
-                       ping.getMotd(),
-                       ping.getNumPlayers(),
-                       server.getPort(),
-                       averageTps.orElse(2D),
-                       System.currentTimeMillis(),
-                       false).update(_coreDatabase._database._jedis);
+                server.getIp(),
+                server.getMaxPlayers(),
+                _createdMillis,
+                _serverGroupName,
+                ping.getMotd(),
+                ping.getNumPlayers(),
+                server.getPort(),
+                averageTps.orElse(2D),
+                System.currentTimeMillis(),
+                false).update(_coreDatabase._database._jedis);
     }
 
     public void updateServerCache()
@@ -423,10 +382,10 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
                 return;
             }
             _callbacks.get(subChannel).forEach((_, callback) ->
-                                               {
-                                                   callback.setIn(in);
-                                                   callback.run();
-                                               });
+            {
+                callback.setIn(in);
+                callback.run();
+            });
         }
     }
 
@@ -439,11 +398,11 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
         }
 
         player.sendMessage(F.fMain(this,
-                                   "You were sent from ",
-                                   F.fItem(_serverName),
-                                   " to ",
-                                   F.fItem(serverName),
-                                   "."));
+                "You were sent from ",
+                F.fItem(_serverName),
+                " to ",
+                F.fItem(serverName),
+                "."));
 
         // TODO: Change from bungeecord channels to redis channels. Implement behaviour on proxy.
         //noinspection UnstableApiUsage
@@ -456,32 +415,29 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     public BukkitTask teleportAsync(UUID targetUUID, String serverName)
     {
         return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalTeleportMessage.CHANNEL_NAME,
-                                                                                  new PortalTeleportMessage(targetUUID,
-                                                                                                            serverName).stringify()));
+                new PortalTeleportMessage(targetUUID, serverName).stringify()));
     }
 
     public BukkitTask teleportAsync(UUID targetUUID, String serverName, UUID senderUUID)
     {
         return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalTeleportStaffMessage.CHANNEL_NAME,
-                                                                                  new PortalTeleportStaffMessage(
-                                                                                          targetUUID,
-                                                                                          serverName,
-                                                                                          senderUUID).stringify()));
+                new PortalTeleportStaffMessage(targetUUID, serverName, senderUUID).stringify()));
     }
 
     public void teleportPlayerToRandomServer(Player player, String serverGroupName)
     {
         ServerData[] availableServers = _serverCache.stream()
-                                                    .filter(serverData -> serverData._group.equals(serverGroupName))
-                                                    .filter(serverData -> !serverData._updatedByMonitor)
-                                                    .filter(serverData -> !serverData._name.equals(_serverName))
-                                                    .toArray(ServerData[]::new);
+                .filter(serverData -> serverData._group.equals(serverGroupName))
+                .filter(serverData -> !serverData._updatedByMonitor)
+                .filter(serverData -> !serverData._name.equals(_serverName))
+                .toArray(ServerData[]::new);
         if (availableServers.length == 0)
         {
             player.sendMessage(F.fMain(this,
-                                       F.fError("Sorry, we were unable to locate a ",
-                                                F.fItem(serverGroupName),
-                                                " server. Please try again later or contact an administrator if this issue persists.")));
+                    F.fError("Sorry, we were unable to locate a ",
+                            F.fItem(serverGroupName),
+                            " server. Please try again later or contact an administrator if this " +
+                                    "issue persists.")));
             return;
         }
 
@@ -496,16 +452,16 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     public ServerData[] getServers(String serverGroupName)
     {
         return Arrays.stream(getServers())
-                     .filter(serverData -> serverData._group.equalsIgnoreCase(serverGroupName))
-                     .toArray(ServerData[]::new);
+                .filter(serverData -> serverData._group.equalsIgnoreCase(serverGroupName))
+                .toArray(ServerData[]::new);
     }
 
     public String[] getServerNames()
     {
         return Arrays.stream(getServers())
-                     .map(serverData -> serverData._name)
-                     .sorted(Comparator.comparing(String::toLowerCase))
-                     .toArray(String[]::new);
+                .map(serverData -> serverData._name)
+                .sorted(Comparator.comparing(String::toLowerCase))
+                .toArray(String[]::new);
     }
 
     public String[] getServerNames(String serverGroupName)
@@ -516,9 +472,9 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     public ServerData getServer(String serverName)
     {
         return Arrays.stream(getServers())
-                     .filter(serverData -> serverData._name.equalsIgnoreCase(serverName))
-                     .findAny()
-                     .orElse(null);
+                .filter(serverData -> serverData._name.equalsIgnoreCase(serverName))
+                .findAny()
+                .orElse(null);
     }
 
     public ServerGroupData[] getServerGroups()
@@ -529,31 +485,29 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     public ServerGroupData getServerGroup(String serverGroupName)
     {
         return Arrays.stream(getServerGroups())
-                     .filter(serverGroupData -> serverGroupData._name.equalsIgnoreCase(serverGroupName))
-                     .findAny()
-                     .orElse(null);
+                .filter(serverGroupData -> serverGroupData._name.equalsIgnoreCase(serverGroupName))
+                .findAny()
+                .orElse(null);
     }
 
     public String[] getServerGroupNames()
     {
         return _serverGroupCache.stream()
-                                .map(serverGroupData -> serverGroupData._name)
-                                .sorted(Comparator.comparing(String::toLowerCase))
-                                .toArray(String[]::new);
+                .map(serverGroupData -> serverGroupData._name)
+                .sorted(Comparator.comparing(String::toLowerCase))
+                .toArray(String[]::new);
     }
 
     public BukkitTask restartServerAsync(String serverName)
     {
         return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalRestartServerMessage.CHANNEL_NAME,
-                                                                                  new PortalRestartServerMessage(
-                                                                                          serverName).toString()));
+                new PortalRestartServerMessage(serverName).toString()));
     }
 
     public BukkitTask restartServerGroupAsync(String groupName)
     {
         return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalRestartServerGroupMessage.CHANNEL_NAME,
-                                                                                  new PortalRestartServerGroupMessage(
-                                                                                          groupName).toString()));
+                new PortalRestartServerGroupMessage(groupName).toString()));
     }
 
     public int getPlayerCount(String name)
@@ -582,13 +536,13 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     public void unregisterCallback(UUID id)
     {
         _callbacks.forEach((s, uuidRunnableMap) ->
-                           {
-                               if (!uuidRunnableMap.containsKey(id))
-                               {
-                                   return;
-                               }
-                               uuidRunnableMap.remove(id);
-                           });
+        {
+            if (!uuidRunnableMap.containsKey(id))
+            {
+                return;
+            }
+            uuidRunnableMap.remove(id);
+        });
     }
 
     public void sendProxyMessage(String... data)
