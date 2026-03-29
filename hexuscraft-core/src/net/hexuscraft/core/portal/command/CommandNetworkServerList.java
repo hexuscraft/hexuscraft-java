@@ -7,27 +7,24 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandNetworkServerList extends BaseCommand<CorePortal> {
+public final class CommandNetworkServerList extends BaseCommand<CorePortal>
+{
 
-    CommandNetworkServerList(final CorePortal corePortal) {
-        super(corePortal,
-                "list",
-                "",
-                "List all servers.",
-                Set.of("l"),
-                CorePortal.PERM.COMMAND_NETWORK_SERVER_LIST);
+    CommandNetworkServerList(final CorePortal corePortal)
+    {
+        super(corePortal, "list", "", "List all servers.", Set.of("l"), CorePortal.PERM.COMMAND_NETWORK_SERVER_LIST);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length > 0) {
+    public void run(final CommandSender sender, final String alias, final String[] args)
+    {
+        if (args.length > 0)
+        {
             sender.sendMessage(help(alias));
             return;
         }
 
-        sender.sendMessage(F.fMain(this,
-                "Servers: ",
-                F.fItem(_miniPlugin.getServerNames())));
+        sender.sendMessage(F.fMain(this, "Servers: ", F.fItem(_miniPlugin.getServerNames())));
     }
 
 }

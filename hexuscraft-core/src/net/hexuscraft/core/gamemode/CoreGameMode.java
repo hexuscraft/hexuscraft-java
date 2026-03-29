@@ -9,16 +9,19 @@ import net.hexuscraft.core.gamemode.command.CommandGameMode;
 
 import java.util.Map;
 
-public final class CoreGameMode extends MiniPlugin<HexusPlugin> {
+public final class CoreGameMode extends MiniPlugin<HexusPlugin>
+{
 
-    public enum PERM implements IPermission {
+    public enum PERM implements IPermission
+    {
         COMMAND_GAMEMODE,
         COMMAND_GAMEMODE_OTHERS
     }
 
     private CoreCommand _coreCommand;
 
-    public CoreGameMode(final HexusPlugin plugin) {
+    public CoreGameMode(final HexusPlugin plugin)
+    {
         super(plugin, "Game Mode");
 
         PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_GAMEMODE);
@@ -27,12 +30,14 @@ public final class CoreGameMode extends MiniPlugin<HexusPlugin> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }
 
     @Override
-    public void onEnable() {
+    public void onEnable()
+    {
         _coreCommand.register(new CommandGameMode(this));
     }
 

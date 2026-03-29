@@ -34,43 +34,58 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Listener {
+public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Listener
+{
 
     public final Server _server;
     public final BukkitScheduler _scheduler;
     public final Logger _logger;
-    private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPlugins;
+    private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>>
+            _miniPlugins;
     private final boolean _isDebug;
 
-    public HexusPlugin() {
+    public HexusPlugin()
+    {
         this(true);
     }
 
-    public HexusPlugin(final boolean shouldRequireCorePlugins) {
+    public HexusPlugin(final boolean shouldRequireCorePlugins)
+    {
         final long start = System.currentTimeMillis();
         _server = getServer();
         _scheduler = _server.getScheduler();
         _logger = getLogger();
 
         _miniPlugins = new HashMap<>();
-        if (shouldRequireCorePlugins) requireCorePlugins();
+        if (shouldRequireCorePlugins)
+        {
+            requireCorePlugins();
+        }
 
         _isDebug = getIsDebug();
 
         logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    private boolean getIsDebug() {
+    private boolean getIsDebug()
+    {
         final File debugFile = new File("_debug.dat");
-        if (debugFile.exists()) try {
-            return Boolean.parseBoolean(readFile(debugFile)[0]);
-        } catch (final FileNotFoundException ex) {
-            throw new RuntimeException(ex);
+        if (debugFile.exists())
+        {
+            try
+            {
+                return Boolean.parseBoolean(readFile(debugFile)[0]);
+            }
+            catch (final FileNotFoundException ex)
+            {
+                throw new RuntimeException(ex);
+            }
         }
         return false;
     }
 
-    public final void requireCorePlugins() {
+    public final void requireCorePlugins()
+    {
         require(new CoreAntiCheat(this));
         require(new CoreAuthentication(this));
         require(new CoreBossBar(this));
@@ -94,124 +109,154 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     @Override
-    public final void onLoad() {
+    public final void onLoad()
+    {
         final AtomicLong start = new AtomicLong(System.currentTimeMillis());
         logInfo("Loading...");
 
         load();
-        _miniPlugins.values()
-                .forEach(miniPlugin -> miniPlugin.load(_miniPlugins));
+        _miniPlugins.values().forEach(miniPlugin -> miniPlugin.load(_miniPlugins));
 
         logInfo("Loaded in " + (System.currentTimeMillis() - start.get()) + "ms.");
     }
 
     @Override
-    public final void onEnable() {
+    public final void onEnable()
+    {
         long start = System.currentTimeMillis();
         logInfo("Enabling...");
 
-        _server.getPluginManager()
-                .registerEvents(this, this);
+        _server.getPluginManager().registerEvents(this, this);
         enable();
-        _miniPlugins.values()
-                .forEach(MiniPlugin::enable);
+        _miniPlugins.values().forEach(MiniPlugin::enable);
 
         logInfo("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
-    public final void onDisable() {
+    public final void onDisable()
+    {
         long start = System.currentTimeMillis();
         logInfo("Disabling...");
 
         disable();
-        _miniPlugins.values()
-                .forEach(MiniPlugin::disable);
+        _miniPlugins.values().forEach(MiniPlugin::disable);
         _miniPlugins.clear();
 
         logInfo("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public String[] readFile(File file) throws FileNotFoundException {
+    public String[] readFile(File file) throws FileNotFoundException
+    {
         final List<String> lines = new ArrayList<>();
-        try (final Scanner scanner = new Scanner(file)) {
-            while (scanner.hasNextLine()) lines.add(scanner.nextLine());
+        try (final Scanner scanner = new Scanner(file))
+        {
+            while (scanner.hasNextLine())
+                lines.add(scanner.nextLine());
         }
         return lines.toArray(String[]::new);
     }
 
-    public final void require(final MiniPlugin<? extends HexusPlugin> miniPlugin) {
+    public final void require(final MiniPlugin<? extends HexusPlugin> miniPlugin)
+    {
         //noinspection unchecked
         _miniPlugins.put((Class<? extends MiniPlugin<? extends HexusPlugin>>) miniPlugin.getClass(), miniPlugin);
     }
 
-    public final void logInfo(final String message) {
-        if (!_isDebug) return;
+    public final void logInfo(final String message)
+    {
+        if (!_isDebug)
+        {
+            return;
+        }
         _logger.log(Level.INFO, message);
     }
 
-    public final void logInfo(final Throwable ex) {
-        logInfo("[" + ex.getClass()
-                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
-                        Arrays.stream(ex.getStackTrace())
-                                .map(StackTraceElement::toString))
-                .toArray(String[]::new)));
+    public final void logInfo(final Throwable ex)
+    {
+        logInfo("[" +
+                ex.getClass().getName() +
+                "] " +
+                String.join("\n",
+                            Stream.concat(Stream.of(ex.getMessage()),
+                                          Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
+                                  .toArray(String[]::new)));
     }
 
-    public final void logWarning(final String message) {
+    public final void logWarning(final String message)
+    {
         _logger.log(Level.WARNING, "[WARNING] " + message);
     }
 
-    public final void logWarning(final Throwable ex) {
-        logWarning("[" + ex.getClass()
-                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
-                        Arrays.stream(ex.getStackTrace())
-                                .map(StackTraceElement::toString))
-                .toArray(String[]::new)));
+    public final void logWarning(final Throwable ex)
+    {
+        logWarning("[" +
+                   ex.getClass().getName() +
+                   "] " +
+                   String.join("\n",
+                               Stream.concat(Stream.of(ex.getMessage()),
+                                             Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
+                                     .toArray(String[]::new)));
     }
 
-    public final void logSevere(final String message) {
+    public final void logSevere(final String message)
+    {
         _logger.log(Level.SEVERE, "[SEVERE] " + message);
     }
 
-    public final void logSevere(final Throwable ex) {
-        logSevere("[" + ex.getClass()
-                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
-                        Arrays.stream(ex.getStackTrace())
-                                .map(StackTraceElement::toString))
-                .toArray(String[]::new)));
+    public final void logSevere(final Throwable ex)
+    {
+        logSevere("[" +
+                  ex.getClass().getName() +
+                  "] " +
+                  String.join("\n",
+                              Stream.concat(Stream.of(ex.getMessage()),
+                                            Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
+                                    .toArray(String[]::new)));
     }
 
-    public final File getFile() {
+    public final File getFile()
+    {
         return super.getFile();
     }
 
     @Override
-    public final String toString() {
+    public final String toString()
+    {
         return getName();
     }
 
-    public final BukkitTask runSync(final Runnable runnable) {
+    public final BukkitTask runSync(final Runnable runnable)
+    {
         return _scheduler.runTask(this, runnable);
     }
 
-    public final BukkitTask runSyncLater(final Runnable runnable, final long delayTicks) {
+    public final BukkitTask runSyncLater(final Runnable runnable, final long delayTicks)
+    {
         return _scheduler.runTaskLater(this, runnable, delayTicks);
     }
 
-    public final BukkitTask runSyncTimer(final Runnable runnable, final long initialDelayTicks, final long repeatEveryTicks) {
+    public final BukkitTask runSyncTimer(final Runnable runnable,
+                                         final long initialDelayTicks,
+                                         final long repeatEveryTicks)
+    {
         return _scheduler.runTaskTimer(this, runnable, initialDelayTicks, repeatEveryTicks);
     }
 
-    public final BukkitTask runAsync(final Runnable runnable) {
+    public final BukkitTask runAsync(final Runnable runnable)
+    {
         return _scheduler.runTaskAsynchronously(this, runnable);
     }
 
-    public final BukkitTask runAsyncLater(final Runnable runnable, final long delayTicks) {
+    public final BukkitTask runAsyncLater(final Runnable runnable, final long delayTicks)
+    {
         return _scheduler.runTaskLaterAsynchronously(this, runnable, delayTicks);
     }
 
-    public final BukkitTask runAsyncTimer(final Runnable runnable, final long initialDelayTicks, final long repeatEveryTicks) {
+    public final BukkitTask runAsyncTimer(final Runnable runnable,
+                                          final long initialDelayTicks,
+                                          final long repeatEveryTicks)
+    {
         return _scheduler.runTaskTimerAsynchronously(this, runnable, initialDelayTicks, repeatEveryTicks);
     }
 

@@ -5,16 +5,17 @@ import net.hexuscraft.core.command.BaseCommand;
 
 import java.util.Set;
 
-public final class CommandGameSet extends BaseCommand<ArcadeManager> {
+public final class CommandGameSet extends BaseCommand<ArcadeManager>
+{
 
-    CommandGameSet(final ArcadeManager arcadeManager) {
+    CommandGameSet(final ArcadeManager arcadeManager)
+    {
         super(arcadeManager,
-                "set",
-                "<Name> [Map]",
-                "Change the active game.",
-                Set.of("change",
-                        "c"),
-                ArcadeManager.PERM.COMMAND_GAME_SET);
+              "set",
+              "<Name> [Map]",
+              "Change the active game.",
+              Set.of("change", "c"),
+              ArcadeManager.PERM.COMMAND_GAME_SET);
     }
 
 }

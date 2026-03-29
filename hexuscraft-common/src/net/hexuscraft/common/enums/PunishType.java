@@ -1,6 +1,7 @@
 package net.hexuscraft.common.enums;
 
-public enum PunishType {
+public enum PunishType
+{
 
     WARNING,
     KICK,

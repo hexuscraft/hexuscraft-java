@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public final class ServerGroupData {
+public final class ServerGroupData
+{
 
     public final String _name;
 
@@ -29,11 +30,12 @@ public final class ServerGroupData {
     public final boolean _worldEdit;
     public final String _worldZip;
 
-    public ServerGroupData(final String name, final Map<String, String> serverGroupData) {
+    public ServerGroupData(final String name, final Map<String, String> serverGroupData)
+    {
         _name = name;
 
-        _requiredPermission = PermissionGroup.valueOf(
-                serverGroupData.getOrDefault("requiredPermission", PermissionGroup._PLAYER.name()));
+        _requiredPermission = PermissionGroup.valueOf(serverGroupData.getOrDefault("requiredPermission",
+                                                                                   PermissionGroup._PLAYER.name()));
         _minPort = Integer.parseInt(serverGroupData.getOrDefault("minPort", "0"));
         _maxPort = Integer.parseInt(serverGroupData.getOrDefault("maxPort", "0"));
         _totalServers = Integer.parseInt(serverGroupData.getOrDefault("totalServers", "0"));
@@ -44,17 +46,29 @@ public final class ServerGroupData {
         _capacity = Integer.parseInt(serverGroupData.getOrDefault("capacity", "20"));
         _worldEdit = Boolean.parseBoolean(serverGroupData.getOrDefault("worldEdit", "FALSE"));
         _timeoutMillis = Integer.parseInt(serverGroupData.getOrDefault("timeoutMillis", "30000"));
-        _games = Arrays.stream(serverGroupData.getOrDefault("game", "")
-                        .split(","))
-                .filter(s -> !s.trim()
-                        .isEmpty())
-                .map(GameType::valueOf)
-                .toArray(GameType[]::new);
-        _hostUniqueId = UUID.fromString(
-                serverGroupData.getOrDefault("hostUniqueId", UtilUniqueId.EMPTY_UUID.toString()));
+        _games = Arrays.stream(serverGroupData.getOrDefault("game", "").split(","))
+                       .filter(s -> !s.trim().isEmpty())
+                       .map(GameType::valueOf)
+                       .toArray(GameType[]::new);
+        _hostUniqueId = UUID.fromString(serverGroupData.getOrDefault("hostUniqueId",
+                                                                     UtilUniqueId.EMPTY_UUID.toString()));
     }
 
-    public ServerGroupData(final String name, final PermissionGroup requiredPermission, final int minPort, final int maxPort, final int totalServers, final int joinableServers, final String plugin, final String worldZip, final int ram, final int capacity, final boolean worldEdit, final int timeoutMillis, final GameType[] games, final UUID hostUniqueId) {
+    public ServerGroupData(final String name,
+                           final PermissionGroup requiredPermission,
+                           final int minPort,
+                           final int maxPort,
+                           final int totalServers,
+                           final int joinableServers,
+                           final String plugin,
+                           final String worldZip,
+                           final int ram,
+                           final int capacity,
+                           final boolean worldEdit,
+                           final int timeoutMillis,
+                           final GameType[] games,
+                           final UUID hostUniqueId)
+    {
         _name = name;
 
         _requiredPermission = requiredPermission;
@@ -72,7 +86,8 @@ public final class ServerGroupData {
         _hostUniqueId = (hostUniqueId == null) ? UtilUniqueId.EMPTY_UUID : hostUniqueId;
     }
 
-    public Map<String, String> toMap() {
+    public Map<String, String> toMap()
+    {
         final Map<String, String> map = new HashMap<>();
         map.put("requiredPermission", _requiredPermission.name());
         map.put("minPort", Integer.toString(_minPort));
@@ -85,18 +100,18 @@ public final class ServerGroupData {
         map.put("capacity", Integer.toString(_capacity));
         map.put("worldEdit", Boolean.toString(_worldEdit));
         map.put("timeoutMillis", Integer.toString(_timeoutMillis));
-        map.put("game", String.join(",", Arrays.stream(_games)
-                .map(GameType::name)
-                .toArray(String[]::new)));
+        map.put("game", String.join(",", Arrays.stream(_games).map(GameType::name).toArray(String[]::new)));
         map.put("hostUniqueId", _hostUniqueId.toString());
         return map;
     }
 
-    public void update(final UnifiedJedis jedis) {
+    public void update(final UnifiedJedis jedis)
+    {
         jedis.hset(ServerQueries.SERVERGROUP(_name), toMap());
     }
 
-    public ServerData[] getServers(final UnifiedJedis jedis) {
+    public ServerData[] getServers(final UnifiedJedis jedis)
+    {
         return ServerQueries.getServers(jedis, this);
     }
 

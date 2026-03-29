@@ -9,108 +9,181 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public final class PunishData {
+public class PunishData
+{
 
-    public final UUID id; // part of the key name
-    public final PunishType type;
-    public final Boolean active;
-    public final Long origin;
-    public final Long length;
-    public final String reason;
-    public final String server;
-    public final UUID staffId;
-    public final String staffServer;
+    public UUID uuid;
+    public PunishType type;
+    public Boolean active;
+    public Long origin;
+    public Long length;
+    public String reason;
+    public UUID targetUUID;
+    public String targetServer;
+    public UUID staffUUID;
+    public String staffServer;
 
-    // these cannot be guaranteed to exist unless 'active' is false. ye be warned!
-    public final Long removeOrigin;
-    public final String removeReason;
-    public final String removeServer;
-    public final UUID removeStaffId;
-    public final String removeStaffServer;
+    // these cannot be guaranteed to be set unless 'active' is FALSE. ye be warned!
+    public Long removeOrigin;
+    public String removeReason;
+    public String removeTargetServer;
+    public UUID removeStaffUUID;
+    public String removeStaffServer;
 
-    public PunishData(final Map<String, String> rawData) {
-        id = UUID.fromString(rawData.get("id"));
-        type = PunishType.valueOf(rawData.get("type"));
-        active = rawData.get("active")
-                .equals("true");
-        origin = Long.parseLong(rawData.get("origin"));
-        length = Long.parseLong(rawData.get("length"));
-        reason = rawData.get("reason");
-        server = rawData.get("server");
-        staffId = UUID.fromString(rawData.get("staffId"));
-        staffServer = rawData.get("staffServer");
-
-        if (!active) { // we cannot guarantee these should exist unless 'active' is false
-            removeOrigin = Long.parseLong(rawData.get("removeOrigin"));
-            removeReason = rawData.get("removeReason");
-            removeServer = rawData.get("removeServer");
-            removeStaffId = UUID.fromString(rawData.get("removeStaffId"));
-            removeStaffServer = rawData.get("removeStaffServer");
-            return;
-        }
-
-        removeOrigin = null;
-        removeReason = null;
-        removeServer = null;
-        removeStaffId = null;
-        removeStaffServer = null;
+    public PunishData(UUID uuid,
+                      PunishType type,
+                      Boolean active,
+                      Long origin,
+                      Long length,
+                      String reason,
+                      UUID targetUUID,
+                      String targetServer,
+                      UUID staffUUID,
+                      String staffServer)
+    {
+        this.uuid = uuid;
+        this.type = type;
+        this.active = active;
+        this.origin = origin;
+        this.length = length;
+        this.reason = reason;
+        this.targetUUID = targetUUID;
+        this.targetServer = targetServer;
+        this.staffUUID = staffUUID;
+        this.staffServer = staffServer;
     }
 
-    public Map<String, String> toMap() {
+    public PunishData(UUID uuid,
+                      PunishType type,
+                      Boolean active,
+                      Long origin,
+                      Long length,
+                      String reason,
+                      UUID targetUUID,
+                      String targetServer,
+                      UUID staffUUID,
+                      String staffServer,
+
+                      Long removeOrigin,
+                      String removeReason,
+                      String removeTargetServer,
+                      UUID removeStaffUUID,
+                      String removeStaffServer)
+    {
+        this.uuid = uuid;
+        this.type = type;
+        this.active = active;
+        this.origin = origin;
+        this.length = length;
+        this.reason = reason;
+        this.targetUUID = targetUUID;
+        this.targetServer = targetServer;
+        this.staffUUID = staffUUID;
+        this.staffServer = staffServer;
+
+        this.removeOrigin = removeOrigin;
+        this.removeReason = removeReason;
+        this.removeTargetServer = removeTargetServer;
+        this.removeStaffUUID = removeStaffUUID;
+        this.removeStaffServer = removeStaffServer;
+    }
+
+    public PunishData(Map<String, String> map)
+    {
+        this.uuid = UUID.fromString(map.get("uuid"));
+        this.type = PunishType.valueOf(map.get("type"));
+        this.active = Boolean.parseBoolean(map.get("active"));
+        this.origin = Long.parseLong(map.get("origin"));
+        this.length = Long.parseLong(map.get("length"));
+        this.reason = map.get("reason");
+        this.targetUUID = UUID.fromString(map.get("targetUUID"));
+        this.targetServer = map.get("targetServer");
+        this.staffUUID = UUID.fromString(map.get("staffUUID"));
+        this.staffServer = map.get("staffServer");
+
+        if (this.active)
+        {
+            return;
+        }
+        this.removeOrigin = Long.parseLong(map.get("removeOrigin"));
+        this.removeReason = map.get("removeReason");
+        this.removeTargetServer = map.get("removeTargetServer");
+        this.removeStaffUUID = UUID.fromString(map.get("removeStaffUUID"));
+        this.removeStaffServer = map.get("removeStaffServer");
+    }
+
+    public Map<String, String> toMap()
+    {
         Map<String, String> map = new HashMap<>();
+        map.put("uuid", uuid.toString());
         map.put("type", type.name());
-        map.put("active", Boolean.toString(active));
+        map.put("active", active.toString());
         map.put("origin", origin.toString());
         map.put("length", length.toString());
         map.put("reason", reason);
-        map.put("server", server);
-        map.put("staffId", staffId.toString());
+        map.put("targetUUID", targetUUID.toString());
+        map.put("targetServer", targetServer);
+        map.put("staffUUID", staffUUID.toString());
         map.put("staffServer", staffServer);
 
-        if (!active) {
+        if (!active)
+        {
             map.put("removeOrigin", removeOrigin.toString());
             map.put("removeReason", removeReason);
-            map.put("removeServer", removeServer);
-            map.put("removeStaffId", removeStaffId.toString());
+            map.put("removeTargetServer", removeTargetServer);
+            map.put("removeStaffUUID", removeStaffUUID.toString());
             map.put("removeStaffServer", removeStaffServer);
         }
 
         return map;
     }
 
-    public Long getRemaining(final Long now) {
-        if (length == -1) return -1L;
+    public Long getRemaining()
+    {
+        return getRemaining(System.currentTimeMillis());
+    }
+
+    public Long getRemaining(Long now)
+    {
+        if (length == -1)
+        {
+            return -1L;
+        }
 
         return length - (now - origin);
     }
 
-    public Long getRemaining() {
-        return getRemaining(System.currentTimeMillis());
-    }
-
-    public PunishData compare(PunishData punishData) {
+    public PunishData compare(PunishData punishData)
+    {
 
         // Permanent comparison
-        if (length == -1) {
-            if (punishData.length == -1) {
+        if (length == -1)
+        {
+            if (punishData.length == -1)
+            {
                 return origin > punishData.origin ? this : punishData;
             }
             return this;
         }
-        if (punishData.length == -1) {
+        if (punishData.length == -1)
+        {
             return punishData;
         }
 
         // Temporary comparison
-        Long currentMillis = System.currentTimeMillis();
-        return getRemaining(currentMillis) > punishData.getRemaining(currentMillis) ? this : punishData;
+        return getRemaining() > punishData.getRemaining() ? this : punishData;
     }
 
-    public void publish(final UnifiedJedis jedis, final UUID targetUuid) {
-        jedis.hset(PunishQueries.PUNISHMENT(id), toMap());
-        jedis.sadd(PunishQueries.LIST(targetUuid), id.toString());
-        jedis.publish(PunishPunishmentAppliedMessage.CHANNEL_NAME,
-                new PunishPunishmentAppliedMessage(targetUuid, id).toString());
+    public void publish(UnifiedJedis jedis)
+    {
+        jedis.hset(PunishQueries.PUNISHMENT(uuid), toMap());
+        jedis.sadd(PunishQueries.RECEIVED(targetUUID), uuid.toString());
+        jedis.sadd(PunishQueries.ISSUED(staffUUID), uuid.toString());
+        if (!active)
+        {
+            jedis.sadd(PunishQueries.ISSUED(removeStaffUUID), uuid.toString());
+        }
+        jedis.publish(PunishPunishmentAppliedMessage.CHANNEL_NAME, new PunishPunishmentAppliedMessage(this).toString());
     }
 
 }

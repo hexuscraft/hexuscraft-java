@@ -6,7 +6,8 @@ import redis.clients.jedis.UnifiedJedis;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class ServerData {
+public final class ServerData
+{
 
     public final String _name;
 
@@ -21,33 +22,34 @@ public final class ServerData {
     public final long _updated;
     public final boolean _updatedByMonitor;
 
-    public ServerData(final String name, final Map<String, String> serverData) {
+    public ServerData(final String name, final Map<String, String> serverData)
+    {
         _name = name;
 
-        _address = serverData.getOrDefault("address",
-                "127.0.0.1");
-        _capacity = Integer.parseInt(serverData.getOrDefault("capacity",
-                "0"));
-        _createdMillis = Long.parseLong(serverData.getOrDefault("createdMillis",
-                "0"));
+        _address = serverData.getOrDefault("address", "127.0.0.1");
+        _capacity = Integer.parseInt(serverData.getOrDefault("capacity", "0"));
+        _createdMillis = Long.parseLong(serverData.getOrDefault("createdMillis", "0"));
         _group = serverData.get("group");
-        _motd = serverData.getOrDefault("motd",
-                "");
-        _players = Integer.parseInt(serverData.getOrDefault("players",
-                "0"));
-        _port = Integer.parseInt(serverData.getOrDefault("port",
-                "0"));
-        _tps = Double.parseDouble(serverData.getOrDefault("tps",
-                "20"));
-        _updated = Long.parseLong(serverData.getOrDefault("updated",
-                "0"));
-        _updatedByMonitor = Boolean.parseBoolean(serverData.getOrDefault("updatedByMonitor",
-                "false"));
+        _motd = serverData.getOrDefault("motd", "");
+        _players = Integer.parseInt(serverData.getOrDefault("players", "0"));
+        _port = Integer.parseInt(serverData.getOrDefault("port", "0"));
+        _tps = Double.parseDouble(serverData.getOrDefault("tps", "20"));
+        _updated = Long.parseLong(serverData.getOrDefault("updated", "0"));
+        _updatedByMonitor = Boolean.parseBoolean(serverData.getOrDefault("updatedByMonitor", "false"));
     }
 
-    public ServerData(final String name, final String address, final int capacity, final long createdMillis,
-                      final String group, final String motd, final int players, final int port, final double tps,
-                      final long updated, final boolean updatedByMonitor) {
+    public ServerData(final String name,
+                      final String address,
+                      final int capacity,
+                      final long createdMillis,
+                      final String group,
+                      final String motd,
+                      final int players,
+                      final int port,
+                      final double tps,
+                      final long updated,
+                      final boolean updatedByMonitor)
+    {
         _name = name;
 
         _address = address;
@@ -62,34 +64,25 @@ public final class ServerData {
         _updatedByMonitor = updatedByMonitor;
     }
 
-    public Map<String, String> toMap() {
+    public Map<String, String> toMap()
+    {
         final Map<String, String> map = new HashMap<>();
-        map.put("address",
-                _address);
-        map.put("capacity",
-                Integer.toString(_capacity));
-        map.put("createdMillis",
-                Long.toString(_createdMillis));
-        map.put("group",
-                _group);
-        map.put("motd",
-                _motd);
-        map.put("players",
-                Integer.toString(_players));
-        map.put("port",
-                Integer.toString(_port));
-        map.put("tps",
-                Double.toString(_tps));
-        map.put("updated",
-                Long.toString(_updated));
-        map.put("updatedByMonitor",
-                Boolean.toString(_updatedByMonitor));
+        map.put("address", _address);
+        map.put("capacity", Integer.toString(_capacity));
+        map.put("createdMillis", Long.toString(_createdMillis));
+        map.put("group", _group);
+        map.put("motd", _motd);
+        map.put("players", Integer.toString(_players));
+        map.put("port", Integer.toString(_port));
+        map.put("tps", Double.toString(_tps));
+        map.put("updated", Long.toString(_updated));
+        map.put("updatedByMonitor", Boolean.toString(_updatedByMonitor));
         return map;
     }
 
-    public void update(final UnifiedJedis jedis) {
-        jedis.hset(ServerQueries.SERVER(_name),
-                toMap());
+    public void update(final UnifiedJedis jedis)
+    {
+        jedis.hset(ServerQueries.SERVER(_name), toMap());
     }
 
 }

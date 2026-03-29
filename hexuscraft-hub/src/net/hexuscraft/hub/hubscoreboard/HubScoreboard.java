@@ -19,88 +19,107 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
 
-public final class HubScoreboard extends MiniPlugin<Hub> {
+public final class HubScoreboard extends MiniPlugin<Hub>
+{
 
     private final Map<Player, BukkitTask> _sidebarUpdateTasks;
     private CorePortal _corePortal;
     private CorePermission _corePermission;
 
-    public HubScoreboard(final Hub hub) {
-        super(hub,
-                "Hub Scoreboard");
+    public HubScoreboard(final Hub hub)
+    {
+        super(hub, "Hub Scoreboard");
 
         _sidebarUpdateTasks = new HashMap<>();
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    {
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
         _corePermission = (CorePermission) dependencies.get(CorePermission.class);
     }
 
     @Override
-    public void onEnable() {
+    public void onEnable()
+    {
         _hexusPlugin.getServer()
-                .getOnlinePlayers()
-                .stream()
-                .map(player -> new PlayerJoinEvent(player,
-                        null))
-                .forEach(this::onPlayerJoin);
+                    .getOnlinePlayers()
+                    .stream()
+                    .map(player -> new PlayerJoinEvent(player, null))
+                    .forEach(this::onPlayerJoin);
     }
 
     @Override
-    public void onDisable() {
-        _sidebarUpdateTasks.values()
-                .forEach(BukkitTask::cancel);
+    public void onDisable()
+    {
+        _sidebarUpdateTasks.values().forEach(BukkitTask::cancel);
         _sidebarUpdateTasks.clear();
     }
 
     @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event) {
+    private void onPlayerJoin(final PlayerJoinEvent event)
+    {
         final Player player = event.getPlayer();
         final Scoreboard scoreboard = player.getScoreboard(); // Player's scoreboard is set by core MiniPluginScoreboard
 
-        final Objective sidebarObjective = scoreboard.registerNewObjective("§6§lHEXUSCRAFT",
-                "dummy");
+        final Objective sidebarObjective = scoreboard.registerNewObjective("§6§lHEXUSCRAFT", "dummy");
         sidebarObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         final List<Score> sidebarScores = new ArrayList<>();
-        _sidebarUpdateTasks.put(player,
-                _hexusPlugin.runSyncTimer(() -> {
-                            sidebarScores.stream()
-                                    .map(Score::getEntry)
-                                    .forEach(scoreboard::resetScores);
-                            sidebarScores.clear();
+        _sidebarUpdateTasks.put(player, _hexusPlugin.runSyncTimer(() ->
+                                                                  {
+                                                                      sidebarScores.stream()
+                                                                                   .map(Score::getEntry)
+                                                                                   .forEach(scoreboard::resetScores);
+                                                                      sidebarScores.clear();
 
-                            final String[] lines = generateSidebarLines(player);
-                            for (int i = 0; i < lines.length; i++) {
-                                final String line = lines[lines.length - i - 1];
-                                final Score score = sidebarObjective.getScore(C.hexMap.get(i) + C.fReset + line);
-                                score.setScore(i);
-                                sidebarScores.add(score);
-                            }
-                        },
-                        0,
-                        20));
+                                                                      final String[]
+                                                                              lines
+                                                                              = generateSidebarLines(player);
+                                                                      for (int i = 0; i < lines.length; i++)
+                                                                      {
+                                                                          final String line = lines[lines.length -
+                                                                                                    i -
+                                                                                                    1];
+                                                                          final Score score = sidebarObjective.getScore(
+                                                                                  C.hexMap.get(i) + C.fReset + line);
+                                                                          score.setScore(i);
+                                                                          sidebarScores.add(score);
+                                                                      }
+                                                                  }, 0, 20));
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event) {
+    private void onPlayerQuit(final PlayerQuitEvent event)
+    {
         final Player player = event.getPlayer();
-        if (!_sidebarUpdateTasks.containsKey(player)) return;
+        if (!_sidebarUpdateTasks.containsKey(player))
+        {
+            return;
+        }
 
-        _sidebarUpdateTasks.get(player)
-                .cancel();
+        _sidebarUpdateTasks.get(player).cancel();
         _sidebarUpdateTasks.remove(player);
     }
 
-    private String[] generateSidebarLines(final Player player) {
-        return new String[]{C.cAqua + C.fBold + "Server", _corePortal._serverName, "", C.cGreen + C.fBold + "Players", "" + Arrays.stream(
-                        _corePortal.getServers())
-                .mapToInt(s -> s._players)
-                .sum(), "", C.cYellow + C.fBold + "Coins", "0", "", C.cGold + C.fBold + "Rank", PermissionGroup.getGroupWithHighestWeight(
-                _corePermission._permissionProfiles.get(player)
-                        ._groups())._prefix, "", C.cRed + C.fBold + "Website", "www.hexuscraft.net"};
+    private String[] generateSidebarLines(final Player player)
+    {
+        return new String[]{C.cAqua + C.fBold + "Server",
+                            _corePortal._serverName,
+                            "",
+                            C.cGreen + C.fBold + "Players",
+                            "" + Arrays.stream(_corePortal.getServers()).mapToInt(s -> s._players).sum(),
+                            "",
+                            C.cYellow + C.fBold + "Coins",
+                            "0",
+                            "",
+                            C.cGold + C.fBold + "Rank",
+                            PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(player)
+                                                                                                         ._groups())._prefix,
+                            "",
+                            C.cRed + C.fBold + "Website",
+                            "www.hexuscraft.net"};
     }
 
 }

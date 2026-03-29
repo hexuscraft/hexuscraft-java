@@ -41,9 +41,11 @@ import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessageListener {
+public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessageListener
+{
 
-    public enum PERM implements IPermission {
+    public enum PERM implements IPermission
+    {
         COMMAND_SEND,
         COMMAND_SERVER,
         COMMAND_MOTD,
@@ -94,7 +96,8 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
     private BukkitTask _updateServerDataTask;
     private BukkitTask _updateServerCacheTask;
 
-    public CorePortal(final HexusPlugin plugin) {
+    public CorePortal(final HexusPlugin plugin)
+    {
         super(plugin, "Portal");
 
         _createdMillis = System.currentTimeMillis();
@@ -103,34 +106,45 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         _serverCache = new HashSet<>();
         _networkChannelSpies = new HashSet<>();
 
-        try {
+        try
+        {
             _serverName = plugin.readFile(new File("_name.dat"))[0];
             _serverGroupName = plugin.readFile(new File("_group.dat"))[0];
-        } catch (FileNotFoundException ex) {
+        }
+        catch (FileNotFoundException ex)
+        {
             throw new RuntimeException(ex);
         }
 
-        _messenger = _hexusPlugin.getServer()
-                .getMessenger();
+        _messenger = _hexusPlugin.getServer().getMessenger();
         _messenger.registerOutgoingPluginChannel(_hexusPlugin, PROXY_CHANNEL);
         _messenger.registerIncomingPluginChannel(_hexusPlugin, PROXY_CHANNEL, this);
 
-        PermissionGroup._PLAYER._permissions.addAll(
-                List.of(PERM.COMMAND_SERVER, PERM.COMMAND_PERFORMANCE, PERM.COMMAND_MOTD, PERM.COMMAND_MOTD_VIEW));
+        PermissionGroup._PLAYER._permissions.addAll(List.of(PERM.COMMAND_SERVER,
+                                                            PERM.COMMAND_PERFORMANCE,
+                                                            PERM.COMMAND_MOTD,
+                                                            PERM.COMMAND_MOTD_VIEW));
         PermissionGroup.VIP._permissions.add(PERM.BYPASS_FULL_PLAYER);
         PermissionGroup.MVP._permissions.add(PERM.COMMAND_HOSTSERVER);
         PermissionGroup.TRAINEE._permissions.add(PERM.BYPASS_FULL_STAFF);
         PermissionGroup.EVENT_LEAD._permissions.add(PERM.COMMAND_HOSTEVENT);
-        PermissionGroup.ADMINISTRATOR._permissions.addAll(
-                List.of(PERM.COMMAND_SEND, PERM.COMMAND_MOTD_SET, PERM.COMMAND_NETWORK, PERM.COMMAND_NETWORK_SPY,
-                        PERM.COMMAND_NETWORK_GROUP, PERM.COMMAND_NETWORK_GROUP_CREATE,
-                        PERM.COMMAND_NETWORK_GROUP_DELETE, PERM.COMMAND_NETWORK_GROUP_LIST,
-                        PERM.COMMAND_NETWORK_GROUP_RESTART, PERM.COMMAND_NETWORK_SERVER,
-                        PERM.COMMAND_NETWORK_SERVER_RESTART, PERM.COMMAND_NETWORK_SERVER_RESTART));
+        PermissionGroup.ADMINISTRATOR._permissions.addAll(List.of(PERM.COMMAND_SEND,
+                                                                  PERM.COMMAND_MOTD_SET,
+                                                                  PERM.COMMAND_NETWORK,
+                                                                  PERM.COMMAND_NETWORK_SPY,
+                                                                  PERM.COMMAND_NETWORK_GROUP,
+                                                                  PERM.COMMAND_NETWORK_GROUP_CREATE,
+                                                                  PERM.COMMAND_NETWORK_GROUP_DELETE,
+                                                                  PERM.COMMAND_NETWORK_GROUP_LIST,
+                                                                  PERM.COMMAND_NETWORK_GROUP_RESTART,
+                                                                  PERM.COMMAND_NETWORK_SERVER,
+                                                                  PERM.COMMAND_NETWORK_SERVER_RESTART,
+                                                                  PERM.COMMAND_NETWORK_SERVER_RESTART));
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
 
@@ -140,153 +154,253 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
     }
 
     @Override
-    public void onEnable() {
+    public void onEnable()
+    {
         _coreCommand.register(new CommandServer(this, _coreDatabase));
         _coreCommand.register(new CommandSend(this));
         _coreCommand.register(new CommandHostEvent(this, _coreDatabase));
         _coreCommand.register(new CommandHostServer(this, _coreDatabase));
         _coreCommand.register(new CommandNetwork(this, _coreDatabase));
 
-        _coreDatabase._database.registerConsumer("*", (_, channelName, message) -> _networkChannelSpies.forEach(
-                commandSender -> commandSender.sendMessage(F.fSub(channelName, message))));
+        _coreDatabase._database.registerConsumer("*",
+                                                 (_, channelName, message) -> _networkChannelSpies.forEach(commandSender -> commandSender.sendMessage(
+                                                         F.fSub(channelName, message))));
 
         _coreDatabase._database.registerConsumer(PortalTeleportMessage.CHANNEL_NAME,
-                (_, _, rawMessage) -> _hexusPlugin.runAsync(() -> {
-                    final PortalTeleportMessage message = PortalTeleportMessage.parse(rawMessage);
+                                                 (_, _, rawMessage) -> _hexusPlugin.runAsync(() ->
+                                                                                             {
+                                                                                                 final PortalTeleportMessage
+                                                                                                         message
+                                                                                                         = PortalTeleportMessage.parse(
+                                                                                                         rawMessage);
 
-                    _hexusPlugin.getServer()
-                            .getOnlinePlayers()
-                            .stream()
-                            .filter(player -> player.getUniqueId()
-                                    .equals(message._targetUUID))
-                            .forEach(targetPlayer -> teleport(targetPlayer, message._serverName));
-                }));
+                                                                                                 _hexusPlugin.getServer()
+                                                                                                             .getOnlinePlayers()
+                                                                                                             .stream()
+                                                                                                             .filter(player -> player.getUniqueId()
+                                                                                                                                     .equals(message._targetUUID))
+                                                                                                             .forEach(
+                                                                                                                     targetPlayer -> teleport(
+                                                                                                                             targetPlayer,
+                                                                                                                             message._serverName));
+                                                                                             }));
 
         _coreDatabase._database.registerConsumer(PortalTeleportStaffMessage.CHANNEL_NAME,
-                (_, _, rawMessage) -> _hexusPlugin.runAsync(() -> {
-                    final PortalTeleportStaffMessage message = PortalTeleportStaffMessage.parse(rawMessage);
+                                                 (_, _, rawMessage) -> _hexusPlugin.runAsync(() ->
+                                                                                             {
+                                                                                                 final PortalTeleportStaffMessage
+                                                                                                         message
+                                                                                                         = PortalTeleportStaffMessage.parse(
+                                                                                                         rawMessage);
 
-                    final AtomicReference<String> targetName = new AtomicReference<>();
-                    final AtomicReference<String> senderName = new AtomicReference<>();
+                                                                                                 final AtomicReference<String>
+                                                                                                         targetName
+                                                                                                         = new AtomicReference<>();
+                                                                                                 final AtomicReference<String>
+                                                                                                         senderName
+                                                                                                         = new AtomicReference<>();
 
-                    _hexusPlugin.getServer()
-                            .getOnlinePlayers()
-                            .forEach(targetPlayer -> {
-                                if (targetPlayer.getUniqueId()
-                                        .equals(message._targetUUID)) {
-                                    targetName.set(targetPlayer.getName());
-                                    teleport(targetPlayer, message._serverName);
-                                }
-                                if (targetPlayer.getUniqueId()
-                                        .equals(message._senderUUID)) senderName.set(targetPlayer.getName());
-                            });
+                                                                                                 _hexusPlugin.getServer()
+                                                                                                             .getOnlinePlayers()
+                                                                                                             .forEach(
+                                                                                                                     targetPlayer ->
+                                                                                                                     {
+                                                                                                                         if (targetPlayer.getUniqueId()
+                                                                                                                                         .equals(message._targetUUID))
+                                                                                                                         {
+                                                                                                                             targetName.set(
+                                                                                                                                     targetPlayer.getName());
+                                                                                                                             teleport(
+                                                                                                                                     targetPlayer,
+                                                                                                                                     message._serverName);
+                                                                                                                         }
+                                                                                                                         if (targetPlayer.getUniqueId()
+                                                                                                                                         .equals(message._senderUUID))
+                                                                                                                         {
+                                                                                                                             senderName.set(
+                                                                                                                                     targetPlayer.getName());
+                                                                                                                         }
+                                                                                                                     });
 
-                    if (message._senderUUID.equals(UtilUniqueId.EMPTY_UUID)) return;
+                                                                                                 if (message._senderUUID.equals(
+                                                                                                         UtilUniqueId.EMPTY_UUID))
+                                                                                                 {
+                                                                                                     return;
+                                                                                                 }
 
-                    if (targetName.get() == null) try {
-                        targetName.set(PlayerSearch.offlinePlayerSearch(message._targetUUID)
-                                .getName());
-                    } catch (final IOException ex) {
-                        logWarning(
-                                "IOException while fetching unique id of portal teleport target '" + message._targetUUID + "': " + ex.getMessage());
-                        return;
-                    }
+                                                                                                 if (targetName.get() ==
+                                                                                                     null)
+                                                                                                 {
+                                                                                                     try
+                                                                                                     {
+                                                                                                         targetName.set(
+                                                                                                                 PlayerSearch.offlinePlayerSearch(
+                                                                                                                                     message._targetUUID)
+                                                                                                                             .getName());
+                                                                                                     }
+                                                                                                     catch (final
+                                                                                                     IOException ex)
+                                                                                                     {
+                                                                                                         logWarning(
+                                                                                                                 "IOException while fetching unique id of portal teleport target '" +
+                                                                                                                 message._targetUUID +
+                                                                                                                 "': " +
+                                                                                                                 ex.getMessage());
+                                                                                                         return;
+                                                                                                     }
+                                                                                                 }
 
-                    if (senderName.get() == null) try {
-                        senderName.set(PlayerSearch.offlinePlayerSearch(message._senderUUID)
-                                .getName());
-                    } catch (final IOException ex) {
-                        logWarning(
-                                "IOException while fetching unique id of portal teleport sender '" + message._senderUUID + "': " + ex.getMessage());
-                        return;
-                    }
+                                                                                                 if (senderName.get() ==
+                                                                                                     null)
+                                                                                                 {
+                                                                                                     try
+                                                                                                     {
+                                                                                                         senderName.set(
+                                                                                                                 PlayerSearch.offlinePlayerSearch(
+                                                                                                                                     message._senderUUID)
+                                                                                                                             .getName());
+                                                                                                     }
+                                                                                                     catch (final
+                                                                                                     IOException ex)
+                                                                                                     {
+                                                                                                         logWarning(
+                                                                                                                 "IOException while fetching unique id of portal teleport sender '" +
+                                                                                                                 message._senderUUID +
+                                                                                                                 "': " +
+                                                                                                                 ex.getMessage());
+                                                                                                         return;
+                                                                                                     }
+                                                                                                 }
 
-                    _hexusPlugin.getServer()
-                            .getOnlinePlayers()
-                            .stream()
-                            .filter(player -> player.hasPermission(PermissionGroup.TRAINEE.name()))
-                            .forEach(player -> {
-                                player.sendMessage(
-                                        F.fStaff(this, F.fItem(senderName.get()), " sent ", F.fItem(targetName.get()),
-                                                " to ", F.fItem(message._serverName), "."));
-                                player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-                            });
-                }));
+                                                                                                 _hexusPlugin.getServer()
+                                                                                                             .getOnlinePlayers()
+                                                                                                             .stream()
+                                                                                                             .filter(player -> player.hasPermission(
+                                                                                                                     PermissionGroup.TRAINEE.name()))
+                                                                                                             .forEach(
+                                                                                                                     player ->
+                                                                                                                     {
+                                                                                                                         player.sendMessage(
+                                                                                                                                 F.fStaff(
+                                                                                                                                         this,
+                                                                                                                                         F.fItem(senderName.get()),
+                                                                                                                                         " sent ",
+                                                                                                                                         F.fItem(targetName.get()),
+                                                                                                                                         " to ",
+                                                                                                                                         F.fItem(message._serverName),
+                                                                                                                                         "."));
+                                                                                                                         player.playSound(
+                                                                                                                                 player.getLocation(),
+                                                                                                                                 Sound.NOTE_PLING,
+                                                                                                                                 Float.MAX_VALUE,
+                                                                                                                                 2);
+                                                                                                                     });
+                                                                                             }));
 
-        _coreDatabase._database.registerConsumer(PortalRestartServerMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+        _coreDatabase._database.registerConsumer(PortalRestartServerMessage.CHANNEL_NAME, (_, _, rawMessage) ->
+        {
             final PortalRestartServerMessage message = PortalRestartServerMessage.fromString(rawMessage);
-            if (!message._serverName()
-                    .equals(_serverName) && !message._serverName()
-                    .equals("*")) return;
-            _hexusPlugin.getServer()
-                    .shutdown();
+            if (!message._serverName().equals(_serverName) && !message._serverName().equals("*"))
+            {
+                return;
+            }
+            _hexusPlugin.getServer().shutdown();
         });
 
-        _coreDatabase._database.registerConsumer(PortalRestartServerGroupMessage.CHANNEL_NAME,
-                (_, _, rawMessage) -> {
-                    final PortalRestartServerGroupMessage message = PortalRestartServerGroupMessage.fromString(
-                            rawMessage);
-                    if (!message._groupName()
-                            .equals(_serverGroupName) && !message._groupName()
-                            .equals("*")) return;
-                    _hexusPlugin.getServer()
-                            .shutdown();
-                });
+        _coreDatabase._database.registerConsumer(PortalRestartServerGroupMessage.CHANNEL_NAME, (_, _, rawMessage) ->
+        {
+            final PortalRestartServerGroupMessage message = PortalRestartServerGroupMessage.fromString(rawMessage);
+            if (!message._groupName().equals(_serverGroupName) && !message._groupName().equals("*"))
+            {
+                return;
+            }
+            _hexusPlugin.getServer().shutdown();
+        });
 
         _updateServerDataTask = _hexusPlugin.runAsyncTimer(this::updateServerData, 0, 20);
 
-        _updateServerCacheTask = _hexusPlugin.runAsyncTimer(() -> {
-            try {
-                updateServerCache();
-            } catch (final JedisException ex) {
-                logSevere(ex);
-            }
-        }, 0, 20);
+        _updateServerCacheTask = _hexusPlugin.runAsyncTimer(() ->
+                                                            {
+                                                                try
+                                                                {
+                                                                    updateServerCache();
+                                                                }
+                                                                catch (final JedisException ex)
+                                                                {
+                                                                    logSevere(ex);
+                                                                }
+                                                            }, 0, 20);
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable()
+    {
         _messenger.unregisterOutgoingPluginChannel(_hexusPlugin, PROXY_CHANNEL);
         _messenger.unregisterIncomingPluginChannel(_hexusPlugin, PROXY_CHANNEL);
 
         _callbacks.clear();
 
-        if (_updateServerDataTask != null) _updateServerDataTask.cancel();
-        if (_updateServerCacheTask != null) _updateServerCacheTask.cancel();
+        if (_updateServerDataTask != null)
+        {
+            _updateServerDataTask.cancel();
+        }
+        if (_updateServerCacheTask != null)
+        {
+            _updateServerCacheTask.cancel();
+        }
 
         final Server server = _hexusPlugin.getServer();
 
-        final ServerListPingEvent ping = new ServerListPingEvent(
-                new InetSocketAddress(server.getIp(), server.getPort()).getAddress(), server.getMotd(),
-                server.getOnlinePlayers()
-                        .size(), server.getMaxPlayers());
-        server.getPluginManager()
-                .callEvent(ping);
+        final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
+                                                                                       server.getPort()).getAddress(),
+                                                                 server.getMotd(),
+                                                                 server.getOnlinePlayers().size(),
+                                                                 server.getMaxPlayers());
+        server.getPluginManager().callEvent(ping);
 
-        new ServerData(_serverName, server.getIp(), ping.getMaxPlayers(), _createdMillis, _serverGroupName, "DEAD",
-                ping.getNumPlayers(), server.getPort(), 20, System.currentTimeMillis(), false).update(
-                _coreDatabase._database._jedis);
+        new ServerData(_serverName,
+                       server.getIp(),
+                       ping.getMaxPlayers(),
+                       _createdMillis,
+                       _serverGroupName,
+                       "DEAD",
+                       ping.getNumPlayers(),
+                       server.getPort(),
+                       20,
+                       System.currentTimeMillis(),
+                       false).update(_coreDatabase._database._jedis);
     }
 
-    public void updateServerData() {
+    public void updateServerData()
+    {
         final Server server = _hexusPlugin.getServer();
 
-        final ServerListPingEvent ping = new ServerListPingEvent(
-                new InetSocketAddress(server.getIp(), server.getPort()).getAddress(), server.getMotd(),
-                server.getOnlinePlayers()
-                        .size(), server.getMaxPlayers());
-        server.getPluginManager()
-                .callEvent(ping);
+        final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
+                                                                                       server.getPort()).getAddress(),
+                                                                 server.getMotd(),
+                                                                 server.getOnlinePlayers().size(),
+                                                                 server.getMaxPlayers());
+        server.getPluginManager().callEvent(ping);
 
-        final OptionalDouble averageTps = OptionalDouble.of(
-                20); //Arrays.stream(MinecraftServer.getServer().recentTps).average();
+        final OptionalDouble
+                averageTps
+                = OptionalDouble.of(20); //Arrays.stream(MinecraftServer.getServer().recentTps).average();
 
-        new ServerData(_serverName, server.getIp(), server.getMaxPlayers(), _createdMillis, _serverGroupName,
-                ping.getMotd(), ping.getNumPlayers(), server.getPort(), averageTps.orElse(2D),
-                System.currentTimeMillis(), false).update(_coreDatabase._database._jedis);
+        new ServerData(_serverName,
+                       server.getIp(),
+                       server.getMaxPlayers(),
+                       _createdMillis,
+                       _serverGroupName,
+                       ping.getMotd(),
+                       ping.getNumPlayers(),
+                       server.getPort(),
+                       averageTps.orElse(2D),
+                       System.currentTimeMillis(),
+                       false).update(_coreDatabase._database._jedis);
     }
 
-    public void updateServerCache() {
+    public void updateServerCache()
+    {
         final ServerGroupData[] groupCache = ServerQueries.getServerGroups(_coreDatabase._database._jedis);
         final ServerData[] serverCache = ServerQueries.getServers(_coreDatabase._database._jedis);
 
@@ -297,30 +411,41 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
     }
 
     @Override
-    public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {
+    public void onPluginMessageReceived(final String channel, final Player player, final byte[] message)
+    {
         // TODO: Change from bungeecord channels to redis channels. Implement behaviour on proxy.
         //noinspection UnstableApiUsage
         final ByteArrayDataInput in = ByteStreams.newDataInput(message);
 
-        if (channel.equals(PROXY_CHANNEL)) {
+        if (channel.equals(PROXY_CHANNEL))
+        {
             final String subChannel = in.readUTF();
-            if (!_callbacks.containsKey(subChannel)) return;
-            _callbacks.get(subChannel)
-                    .forEach((_, callback) -> {
-                        callback.setIn(in);
-                        callback.run();
-                    });
+            if (!_callbacks.containsKey(subChannel))
+            {
+                return;
+            }
+            _callbacks.get(subChannel).forEach((_, callback) ->
+                                               {
+                                                   callback.setIn(in);
+                                                   callback.run();
+                                               });
         }
     }
 
-    public void teleport(final Player player, final String serverName) {
-        if (serverName.equals(_serverName)) {
+    public void teleport(final Player player, final String serverName)
+    {
+        if (serverName.equals(_serverName))
+        {
             player.sendMessage(F.fMain(this, F.fError("You are already connected to ", F.fItem(serverName), ".")));
             return;
         }
 
-        player.sendMessage(
-                F.fMain(this, "You were sent from ", F.fItem(_serverName), " to ", F.fItem(serverName), "."));
+        player.sendMessage(F.fMain(this,
+                                   "You were sent from ",
+                                   F.fItem(_serverName),
+                                   " to ",
+                                   F.fItem(serverName),
+                                   "."));
 
         // TODO: Change from bungeecord channels to redis channels. Implement behaviour on proxy.
         //noinspection UnstableApiUsage
@@ -330,146 +455,173 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         player.sendPluginMessage(_hexusPlugin, PROXY_CHANNEL, out.toByteArray());
     }
 
-    public BukkitTask teleportAsync(final UUID targetUUID, final String serverName) {
-        return _hexusPlugin.runAsync(
-                () -> _coreDatabase._database._jedis.publish(PortalTeleportMessage.CHANNEL_NAME,
-                        new PortalTeleportMessage(targetUUID, serverName).stringify()));
+    public BukkitTask teleportAsync(final UUID targetUUID, final String serverName)
+    {
+        return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalTeleportMessage.CHANNEL_NAME,
+                                                                                  new PortalTeleportMessage(targetUUID,
+                                                                                                            serverName).stringify()));
     }
 
-    public BukkitTask teleportAsync(final UUID targetUUID, final String serverName, final UUID senderUUID) {
-        return _hexusPlugin.runAsync(
-                () -> _coreDatabase._database._jedis.publish(PortalTeleportStaffMessage.CHANNEL_NAME,
-                        new PortalTeleportStaffMessage(targetUUID, serverName, senderUUID).stringify()));
+    public BukkitTask teleportAsync(final UUID targetUUID, final String serverName, final UUID senderUUID)
+    {
+        return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalTeleportStaffMessage.CHANNEL_NAME,
+                                                                                  new PortalTeleportStaffMessage(
+                                                                                          targetUUID,
+                                                                                          serverName,
+                                                                                          senderUUID).stringify()));
     }
 
-    public void teleportPlayerToRandomServer(final Player player, final String serverGroupName) {
+    public void teleportPlayerToRandomServer(final Player player, final String serverGroupName)
+    {
         final ServerData[] availableServers = _serverCache.stream()
-                .filter(serverData -> serverData._group.equals(serverGroupName))
-                .filter(serverData -> !serverData._updatedByMonitor)
-                .filter(serverData -> !serverData._name.equals(_serverName))
-                .toArray(ServerData[]::new);
-        if (availableServers.length == 0) {
-            player.sendMessage(F.fMain(this, F.fError("Sorry, we were unable to locate a ", F.fItem(serverGroupName),
-                    " server. Please try again later or contact an administrator if this issue persists.")));
+                                                          .filter(serverData -> serverData._group.equals(serverGroupName))
+                                                          .filter(serverData -> !serverData._updatedByMonitor)
+                                                          .filter(serverData -> !serverData._name.equals(_serverName))
+                                                          .toArray(ServerData[]::new);
+        if (availableServers.length == 0)
+        {
+            player.sendMessage(F.fMain(this,
+                                       F.fError("Sorry, we were unable to locate a ",
+                                                F.fItem(serverGroupName),
+                                                " server. Please try again later or contact an administrator if this issue persists.")));
             return;
         }
 
         teleport(player, availableServers[new Random().nextInt(availableServers.length)]._name);
     }
 
-    public ServerData[] getServers() {
-        return _serverCache.stream()
-                .filter(serverData -> !serverData._updatedByMonitor)
-                .toArray(ServerData[]::new);
+    public ServerData[] getServers()
+    {
+        return _serverCache.stream().filter(serverData -> !serverData._updatedByMonitor).toArray(ServerData[]::new);
     }
 
-    public ServerData[] getServers(final String serverGroupName) {
+    public ServerData[] getServers(final String serverGroupName)
+    {
         return Arrays.stream(getServers())
-                .filter(serverData -> serverData._group.equalsIgnoreCase(serverGroupName))
-                .toArray(ServerData[]::new);
+                     .filter(serverData -> serverData._group.equalsIgnoreCase(serverGroupName))
+                     .toArray(ServerData[]::new);
     }
 
-    public String[] getServerNames() {
+    public String[] getServerNames()
+    {
         return Arrays.stream(getServers())
-                .map(serverData -> serverData._name)
-                .sorted(Comparator.comparing(String::toLowerCase))
-                .toArray(String[]::new);
+                     .map(serverData -> serverData._name)
+                     .sorted(Comparator.comparing(String::toLowerCase))
+                     .toArray(String[]::new);
     }
 
-    public String[] getServerNames(final String serverGroupName) {
-        return Arrays.stream(getServers(serverGroupName))
-                .map(serverData -> serverData._name)
-                .toArray(String[]::new);
+    public String[] getServerNames(final String serverGroupName)
+    {
+        return Arrays.stream(getServers(serverGroupName)).map(serverData -> serverData._name).toArray(String[]::new);
     }
 
-    public ServerData getServer(final String serverName) {
+    public ServerData getServer(final String serverName)
+    {
         return Arrays.stream(getServers())
-                .filter(serverData -> serverData._name.equalsIgnoreCase(serverName))
-                .findAny()
-                .orElse(null);
+                     .filter(serverData -> serverData._name.equalsIgnoreCase(serverName))
+                     .findAny()
+                     .orElse(null);
     }
 
-    public ServerGroupData[] getServerGroups() {
+    public ServerGroupData[] getServerGroups()
+    {
         return _serverGroupCache.toArray(ServerGroupData[]::new);
     }
 
-    public ServerGroupData getServerGroup(final String serverGroupName) {
+    public ServerGroupData getServerGroup(final String serverGroupName)
+    {
         return Arrays.stream(getServerGroups())
-                .filter(serverGroupData -> serverGroupData._name.equalsIgnoreCase(serverGroupName))
-                .findAny()
-                .orElse(null);
+                     .filter(serverGroupData -> serverGroupData._name.equalsIgnoreCase(serverGroupName))
+                     .findAny()
+                     .orElse(null);
     }
 
-    public String[] getServerGroupNames() {
+    public String[] getServerGroupNames()
+    {
         return _serverGroupCache.stream()
-                .map(serverGroupData -> serverGroupData._name)
-                .sorted(Comparator.comparing(String::toLowerCase))
-                .toArray(String[]::new);
+                                .map(serverGroupData -> serverGroupData._name)
+                                .sorted(Comparator.comparing(String::toLowerCase))
+                                .toArray(String[]::new);
     }
 
-    public BukkitTask restartServerAsync(final String serverName) {
-        return _hexusPlugin.runAsync(
-                () -> _coreDatabase._database._jedis.publish(PortalRestartServerMessage.CHANNEL_NAME,
-                        new PortalRestartServerMessage(serverName).toString()));
+    public BukkitTask restartServerAsync(final String serverName)
+    {
+        return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalRestartServerMessage.CHANNEL_NAME,
+                                                                                  new PortalRestartServerMessage(
+                                                                                          serverName).toString()));
     }
 
-    public BukkitTask restartServerGroupAsync(final String groupName) {
-        return _hexusPlugin.runAsync(
-                () -> _coreDatabase._database._jedis.publish(PortalRestartServerGroupMessage.CHANNEL_NAME,
-                        new PortalRestartServerGroupMessage(groupName).toString()));
+    public BukkitTask restartServerGroupAsync(final String groupName)
+    {
+        return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalRestartServerGroupMessage.CHANNEL_NAME,
+                                                                                  new PortalRestartServerGroupMessage(
+                                                                                          groupName).toString()));
     }
 
-    public int getPlayerCount(String name) {
+    public int getPlayerCount(String name)
+    {
         // TODO: Change from bungeecord channels to redis channels. Implement behaviour on proxy.
         //noinspection UnstableApiUsage
         ByteArrayDataOutput outServer = ByteStreams.newDataOutput();
         outServer.writeUTF("PlayerCount");
         outServer.writeUTF(name);
-        _hexusPlugin.getServer()
-                .sendPluginMessage(_hexusPlugin, PROXY_CHANNEL, outServer.toByteArray());
+        _hexusPlugin.getServer().sendPluginMessage(_hexusPlugin, PROXY_CHANNEL, outServer.toByteArray());
 
         return 0;
     }
 
-    public UUID registerCallback(final String channelName, final ByteArrayDataInputRunnable callback) {
+    public UUID registerCallback(final String channelName, final ByteArrayDataInputRunnable callback)
+    {
         final UUID id = UUID.randomUUID();
-        if (!_callbacks.containsKey(channelName)) {
+        if (!_callbacks.containsKey(channelName))
+        {
             _callbacks.put(channelName, new HashMap<>());
         }
-        _callbacks.get(channelName)
-                .put(id, callback);
+        _callbacks.get(channelName).put(id, callback);
         return id;
     }
 
-    public void unregisterCallback(UUID id) {
-        _callbacks.forEach((s, uuidRunnableMap) -> {
-            if (!uuidRunnableMap.containsKey(id)) return;
-            uuidRunnableMap.remove(id);
-        });
+    public void unregisterCallback(UUID id)
+    {
+        _callbacks.forEach((s, uuidRunnableMap) ->
+                           {
+                               if (!uuidRunnableMap.containsKey(id))
+                               {
+                                   return;
+                               }
+                               uuidRunnableMap.remove(id);
+                           });
     }
 
-    public void sendProxyMessage(String... data) {
+    public void sendProxyMessage(String... data)
+    {
         // TODO: Change from BungeeCord channels to redis channels. Implement behaviour on proxy.
         //noinspection UnstableApiUsage
         ByteArrayDataOutput outServer = ByteStreams.newDataOutput();
-        for (String s : data) {
+        for (String s : data)
+        {
             outServer.writeUTF(s);
         }
-        _hexusPlugin.getServer()
-                .sendPluginMessage(_hexusPlugin, PROXY_CHANNEL, outServer.toByteArray());
+        _hexusPlugin.getServer().sendPluginMessage(_hexusPlugin, PROXY_CHANNEL, outServer.toByteArray());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    private void onPlayerLogin(final PlayerLoginEvent event) {
-        if (!event.getResult()
-                .equals(PlayerLoginEvent.Result.KICK_FULL)) return;
-        if (!event.getPlayer()
-                .hasPermission(PERM.BYPASS_FULL_PLAYER.name())) return;
+    private void onPlayerLogin(final PlayerLoginEvent event)
+    {
+        if (!event.getResult().equals(PlayerLoginEvent.Result.KICK_FULL))
+        {
+            return;
+        }
+        if (!event.getPlayer().hasPermission(PERM.BYPASS_FULL_PLAYER.name()))
+        {
+            return;
+        }
         event.setResult(PlayerLoginEvent.Result.ALLOWED);
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event) {
+    private void onPlayerQuit(final PlayerQuitEvent event)
+    {
         _networkChannelSpies.remove(event.getPlayer());
     }
 

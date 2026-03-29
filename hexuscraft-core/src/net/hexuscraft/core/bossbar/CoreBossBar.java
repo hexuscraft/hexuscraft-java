@@ -19,44 +19,50 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
-public final class CoreBossBar extends MiniPlugin<HexusPlugin> {
+public final class CoreBossBar extends MiniPlugin<HexusPlugin>
+{
 
     final Map<Player, Set<BossBar>> _bossBarMap;
     final Map<Player, Wither> _witherMap;
 
-    public CoreBossBar(final HexusPlugin plugin) {
+    public CoreBossBar(final HexusPlugin plugin)
+    {
         super(plugin, "Boss Bar");
         _bossBarMap = new HashMap<>();
         _witherMap = new HashMap<>();
     }
 
     @Override
-    public void onEnable() {
-        _hexusPlugin.runAsyncTimer(() -> _bossBarMap.forEach((player, bossBars) -> {
-            if (bossBars.isEmpty()) return;
-            final BossBar activeBossBar = bossBars.stream()
-                    .max(Comparator.comparing(bossBar -> bossBar.weight()
-                            .get()))
-                    .orElse(null);
+    public void onEnable()
+    {
+        _hexusPlugin.runAsyncTimer(() -> _bossBarMap.forEach((player, bossBars) ->
+                                                             {
+                                                                 if (bossBars.isEmpty())
+                                                                 {
+                                                                     return;
+                                                                 }
+                                                                 final BossBar activeBossBar = bossBars.stream()
+                                                                                                       .max(Comparator.comparing(
+                                                                                                               bossBar -> bossBar.weight()
+                                                                                                                                 .get()))
+                                                                                                       .orElse(null);
 
-            final Wither wither = _witherMap.get(player);
-            wither.setCustomName(activeBossBar.message()
-                    .get());
-            wither.getWorld()
-                    .getPlayers()
-                    .stream()
-                    .filter(otherPlayer -> !player.equals(otherPlayer))
-                    .forEach(otherPlayer -> ((CraftPlayer) otherPlayer).getHandle().playerConnection.sendPacket(
-                            new PacketPlayOutEntityDestroy(wither.getEntityId())));
-        }), 0, 1);
+                                                                 final Wither wither = _witherMap.get(player);
+                                                                 wither.setCustomName(activeBossBar.message().get());
+                                                                 wither.getWorld()
+                                                                       .getPlayers()
+                                                                       .stream()
+                                                                       .filter(otherPlayer -> !player.equals(otherPlayer))
+                                                                       .forEach(otherPlayer -> ((CraftPlayer) otherPlayer).getHandle().playerConnection.sendPacket(
+                                                                               new PacketPlayOutEntityDestroy(wither.getEntityId())));
+                                                             }), 0, 1);
     }
 
-    public BossBar registerBossBar(final BossBar bossBar) {
-        if (!_witherMap.containsKey(bossBar.player())) {
-            final Wither wither = bossBar.player()
-                    .getWorld()
-                    .spawn(bossBar.player()
-                            .getLocation(), Wither.class);
+    public BossBar registerBossBar(final BossBar bossBar)
+    {
+        if (!_witherMap.containsKey(bossBar.player()))
+        {
+            final Wither wither = bossBar.player().getWorld().spawn(bossBar.player().getLocation(), Wither.class);
             wither.setCanPickupItems(false);
             wither.setFallDistance(0f);
             wither.setFireTicks(0);
@@ -70,7 +76,7 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin> {
             wither.setTarget(null);
             wither.setVelocity(new Vector());
 
-//            We need to add the invisibility via NBT as Entity::addPotionEffect does mot work, and neither does /effect for that matter! Seriously, try making a wither invisible without modifying NBT. Why does this have to be so difficult??
+            //            We need to add the invisibility via NBT as Entity::addPotionEffect does mot work, and neither does /effect for that matter! Seriously, try making a wither invisible without modifying NBT. Why does this have to be so difficult??
             final NBTTagCompound nbtInvisibilityEffect = new NBTTagCompound();
             nbtInvisibilityEffect.setByte("Id", (byte) 14);
             nbtInvisibilityEffect.setInt("Duration", Integer.MAX_VALUE);
@@ -90,8 +96,12 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin> {
         }
 
         final Set<BossBar> bossBars;
-        if (_bossBarMap.containsKey(bossBar.player())) bossBars = _bossBarMap.get(bossBar.player());
-        else {
+        if (_bossBarMap.containsKey(bossBar.player()))
+        {
+            bossBars = _bossBarMap.get(bossBar.player());
+        }
+        else
+        {
             bossBars = new HashSet<>();
             _bossBarMap.put(bossBar.player(), bossBars);
         }
@@ -100,56 +110,67 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin> {
         return bossBar;
     }
 
-    public void unregisterBossBar(final BossBar bossBar) {
+    public void unregisterBossBar(final BossBar bossBar)
+    {
         final Player player = bossBar.player();
 
-        if (_bossBarMap.containsKey(player)) {
+        if (_bossBarMap.containsKey(player))
+        {
             final Set<BossBar> bossBars = _bossBarMap.get(player);
             bossBars.remove(bossBar);
 
-            if (!bossBars.isEmpty()) return;
+            if (!bossBars.isEmpty())
+            {
+                return;
+            }
             _bossBarMap.remove(player);
         }
 
-        if (_witherMap.containsKey(player)) {
-            _witherMap.get(player)
-                    .remove();
+        if (_witherMap.containsKey(player))
+        {
+            _witherMap.get(player).remove();
             _witherMap.remove(player);
         }
     }
 
     @EventHandler
-    private void onEntityTarget(final EntityTargetEvent event) {
-        if (!event.getEntity()
-                .hasMetadata("BossBarNPC")) return;
+    private void onEntityTarget(final EntityTargetEvent event)
+    {
+        if (!event.getEntity().hasMetadata("BossBarNPC"))
+        {
+            return;
+        }
         event.setCancelled(true);
     }
 
     @EventHandler
-    private void onPlayerMove(final PlayerMoveEvent event) {
+    private void onPlayerMove(final PlayerMoveEvent event)
+    {
         final Player player = event.getPlayer();
-        if (!_witherMap.containsKey(player)) return;
+        if (!_witherMap.containsKey(player))
+        {
+            return;
+        }
 
         final Location location = player.getLocation();
-        location.add(player.getEyeLocation()
-                .getDirection()
-                .multiply(20));
-        location.add(player.getVelocity()
-                .multiply(10));
+        location.add(player.getEyeLocation().getDirection().multiply(20));
+        location.add(player.getVelocity().multiply(10));
         location.setY(Math.clamp(location.getY(), 1, 255));
         location.setYaw(0);
         location.setPitch(0);
 
-        _witherMap.get(player)
-                .teleport(location);
+        _witherMap.get(player).teleport(location);
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event) {
+    private void onPlayerQuit(final PlayerQuitEvent event)
+    {
         final Player player = event.getPlayer();
-        if (!_bossBarMap.containsKey(player)) return;
-        _bossBarMap.get(player)
-                .forEach(this::unregisterBossBar);
+        if (!_bossBarMap.containsKey(player))
+        {
+            return;
+        }
+        _bossBarMap.get(player).forEach(this::unregisterBossBar);
     }
 
 }

@@ -2,7 +2,8 @@ package net.hexuscraft.common.enums;
 
 import net.hexuscraft.common.utils.C;
 
-public enum CheatSeverity {
+public enum CheatSeverity
+{
 
     LOW(C.cGreen),
     MEDIUM(C.cGold),
@@ -10,7 +11,8 @@ public enum CheatSeverity {
 
     public final String _color;
 
-    CheatSeverity(final String color) {
+    CheatSeverity(final String color)
+    {
         _color = color;
     }
 }

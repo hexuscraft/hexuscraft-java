@@ -17,44 +17,54 @@ import org.bukkit.scoreboard.Team;
 import java.util.Arrays;
 import java.util.Map;
 
-public class HubTeam extends MiniPlugin<Hub> {
+public class HubTeam extends MiniPlugin<Hub>
+{
 
     private CorePermission _corePermission;
 
-    public HubTeam(Hub hub) {
+    public HubTeam(Hub hub)
+    {
         super(hub, "Teams");
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    {
         _corePermission = (CorePermission) dependencies.get(CorePermission.class);
     }
 
     @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event) {
+    private void onPlayerJoin(final PlayerJoinEvent event)
+    {
         final Player eventPlayer = event.getPlayer();
         final Scoreboard eventPlayerScoreboard = eventPlayer.getScoreboard();
 
         Arrays.stream(PermissionGroup.values())
-                .filter(permissionGroup -> eventPlayerScoreboard.getTeam(permissionGroup._prefix) == null)
-                .forEach((final PermissionGroup group) -> {
-                    final Team team = eventPlayerScoreboard.registerNewTeam(group._prefix);
-                    team.setPrefix(F.fPermissionGroup(group, true, true) + C.fReset + " ");
-                });
+              .filter(permissionGroup -> eventPlayerScoreboard.getTeam(permissionGroup._prefix) == null)
+              .forEach((final PermissionGroup group) ->
+                       {
+                           final Team team = eventPlayerScoreboard.registerNewTeam(group._prefix);
+                           team.setPrefix(F.fPermissionGroup(group, true, true) + C.fReset + " ");
+                       });
 
-        _corePermission._permissionProfiles.forEach(
-                (final Player target, final PermissionProfile permissionProfile) -> {
-                    final PermissionGroup highestGroup = PermissionGroup.getGroupWithHighestWeight(
-                            permissionProfile._groups());
-                    if (highestGroup == null) return;
+        _corePermission._permissionProfiles.forEach((final Player target, final PermissionProfile permissionProfile) ->
+                                                    {
+                                                        final PermissionGroup
+                                                                highestGroup
+                                                                = PermissionGroup.getGroupWithHighestWeight(
+                                                                permissionProfile._groups());
+                                                        if (highestGroup == null)
+                                                        {
+                                                            return;
+                                                        }
 
-                    _hexusPlugin.getServer()
-                            .getOnlinePlayers()
-                            .stream()
-                            .map(Player::getScoreboard)
-                            .map(scoreboard -> scoreboard.getTeam(highestGroup._prefix))
-                            .forEach(team -> team.addEntry(target.getName()));
-                });
+                                                        _hexusPlugin.getServer()
+                                                                    .getOnlinePlayers()
+                                                                    .stream()
+                                                                    .map(Player::getScoreboard)
+                                                                    .map(scoreboard -> scoreboard.getTeam(highestGroup._prefix))
+                                                                    .forEach(team -> team.addEntry(target.getName()));
+                                                    });
     }
 
 }

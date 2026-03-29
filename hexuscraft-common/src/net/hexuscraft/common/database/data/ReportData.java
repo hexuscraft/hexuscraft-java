@@ -10,7 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public final class ReportData {
+public final class ReportData
+{
 
     public final UUID reportUUID; // part of the key name
     public final UUID senderUUID;
@@ -26,17 +27,18 @@ public final class ReportData {
     public final String removeServer;
     public final UUID removeStaffUUID;
 
-    public ReportData(final Map<String, String> rawData) {
+    public ReportData(final Map<String, String> rawData)
+    {
         reportUUID = UUID.fromString(rawData.get("reportUUID"));
         senderUUID = UUID.fromString(rawData.get("senderUUID"));
         targetUUID = UUID.fromString(rawData.get("targetUUID"));
         reason = ReportSubmitReason.valueOf(rawData.get("reason"));
-        active = rawData.get("active")
-                .equals("true");
+        active = rawData.get("active").equals("true");
         origin = Long.parseLong(rawData.get("origin"));
         server = rawData.get("server");
 
-        if (!active) { // we cannot guarantee these should exist unless 'active' is false
+        if (!active)
+        { // we cannot guarantee these should exist unless 'active' is false
             removeOrigin = Long.parseLong(rawData.get("removeOrigin"));
             removeReason = ReportCloseReason.valueOf(rawData.get("removeReason"));
             removeServer = rawData.get("removeServer");
@@ -50,7 +52,8 @@ public final class ReportData {
         removeStaffUUID = null;
     }
 
-    public Map<String, String> toMap() {
+    public Map<String, String> toMap()
+    {
         Map<String, String> map = new HashMap<>();
         map.put("senderUUID", senderUUID.toString());
         map.put("targetUUID", targetUUID.toString());
@@ -59,7 +62,8 @@ public final class ReportData {
         map.put("origin", origin.toString());
         map.put("server", server);
 
-        if (!active) {
+        if (!active)
+        {
             map.put("removeOrigin", removeOrigin.toString());
             map.put("removeReason", removeReason.name());
             map.put("removeServer", removeServer);
@@ -69,7 +73,8 @@ public final class ReportData {
         return map;
     }
 
-    public void submit(final UnifiedJedis jedis) {
+    public void submit(final UnifiedJedis jedis)
+    {
         jedis.hset(ReportQueries.REPORT(reportUUID), toMap());
         jedis.sadd(ReportQueries.LIST_SUBMITTED(senderUUID), reportUUID.toString());
         jedis.sadd(ReportQueries.LIST_RECEIVED(targetUUID), reportUUID.toString());

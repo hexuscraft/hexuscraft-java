@@ -12,21 +12,25 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.Map;
 
-public final class ArcadeTab extends MiniPlugin<Arcade> {
+public final class ArcadeTab extends MiniPlugin<Arcade>
+{
 
     CorePortal _corePortal;
 
-    ArcadeTab(final Arcade arcade) {
+    public ArcadeTab(final Arcade arcade)
+    {
         super(arcade, "Tab");
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    {
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
     }
 
     @EventHandler
-    public void onPlayerJoin(final PlayerJoinEvent event) {
+    public void onPlayerJoin(final PlayerJoinEvent event)
+    {
         final Player player = event.getPlayer();
         PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_corePortal._serverName), " ");
     }

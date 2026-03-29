@@ -1,6 +1,7 @@
 package net.hexuscraft.arcade.manager;
 
-public enum GameState {
+public enum GameState
+{
 
     LOADING_MAP,
     WAITING_FOR_PLAYERS,

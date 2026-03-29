@@ -1,8 +1,10 @@
 package net.hexuscraft.arcade.manager;
 
-public class GameMap {
+public class GameMap
+{
 
-    GameMap() {
+    GameMap()
+    {
     }
 
 }

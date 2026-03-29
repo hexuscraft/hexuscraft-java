@@ -13,20 +13,24 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.Set;
 
-public final class CommandWorldCreate extends BaseCommand<BuildWorld> {
+public final class CommandWorldCreate extends BaseCommand<BuildWorld>
+{
 
-    public CommandWorldCreate(final BuildWorld buildWorld) {
+    public CommandWorldCreate(final BuildWorld buildWorld)
+    {
         super(buildWorld,
-                "create",
-                "<Name>",
-                "Create a new void world.",
-                Set.of("c"),
-                BuildWorld.PERM.COMMAND_WORLD_CREATE);
+              "create",
+              "<Name>",
+              "Create a new void world.",
+              Set.of("c"),
+              BuildWorld.PERM.COMMAND_WORLD_CREATE);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length != 1) {
+    public void run(final CommandSender sender, final String alias, final String[] args)
+    {
+        if (args.length != 1)
+        {
             sender.sendMessage(help(alias));
             return;
         }
@@ -38,11 +42,8 @@ public final class CommandWorldCreate extends BaseCommand<BuildWorld> {
         worldCreator.generatorSettings("3;0");
         worldCreator.generator("3;0");
 
-        final World world = _miniPlugin._hexusPlugin.getServer()
-                .createWorld(worldCreator);
-        world.setSpawnLocation(0,
-                100,
-                0);
+        final World world = _miniPlugin._hexusPlugin.getServer().createWorld(worldCreator);
+        world.setSpawnLocation(0, 100, 0);
         world.setDifficulty(Difficulty.NORMAL);
         world.setAutoSave(false);
         world.setAmbientSpawnLimit(0);
@@ -50,25 +51,16 @@ public final class CommandWorldCreate extends BaseCommand<BuildWorld> {
         world.setMonsterSpawnLimit(0);
         world.setPVP(false);
         world.setWaterAnimalSpawnLimit(0);
-        Map.of(
-                        "doDaylightCycle",
-                        "false",
-                        "doEntityDrops",
-                        "false",
-                        "doFireTick",
-                        "false",
-                        "mobGriefing",
-                        "false"
-                )
-                .forEach(world::setGameRuleValue);
+        Map.of("doDaylightCycle", "false", "doEntityDrops", "false", "doFireTick", "false", "mobGriefing", "false")
+           .forEach(world::setGameRuleValue);
         world.save();
 
-        sender.sendMessage(F.fMain(this,
-                "Created world ",
-                F.fItem(world.getName()),
-                "."));
+        sender.sendMessage(F.fMain(this, "Created world ", F.fItem(world.getName()), "."));
 
-        if (!(sender instanceof Player player)) return;
+        if (!(sender instanceof Player player))
+        {
+            return;
+        }
         player.teleport(world.getSpawnLocation());
     }
 

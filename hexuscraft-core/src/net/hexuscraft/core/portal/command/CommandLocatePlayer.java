@@ -6,20 +6,22 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandLocatePlayer extends BaseCommand<CorePortal> {
+public final class CommandLocatePlayer extends BaseCommand<CorePortal>
+{
 
-    public CommandLocatePlayer(final CorePortal corePortal) {
+    public CommandLocatePlayer(final CorePortal corePortal)
+    {
         super(corePortal,
-                "player",
-                "<Name>",
-                "Locate a specific player's server.",
-                Set.of("plr",
-                        "p"),
-                CorePortal.PERM.COMMAND_LOCATE_PLAYER);
+              "player",
+              "<Name>",
+              "Locate a specific player's server.",
+              Set.of("plr", "p"),
+              CorePortal.PERM.COMMAND_LOCATE_PLAYER);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args) {
+    public void run(final CommandSender sender, final String alias, final String[] args)
+    {
 
     }
 

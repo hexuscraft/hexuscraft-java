@@ -12,52 +12,54 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandClear extends BaseCommand<CoreItem> {
+public final class CommandClear extends BaseCommand<CoreItem>
+{
 
-    public CommandClear(final CoreItem coreItem) {
+    public CommandClear(final CoreItem coreItem)
+    {
         super(coreItem,
-                "clear",
-                "[Players]",
-                "Clear the inventory of targets.",
-                Set.of("clearinventory"),
-                CoreItem.PERM.COMMAND_CLEAR);
+              "clear",
+              "[Players]",
+              "Clear the inventory of targets.",
+              Set.of("clearinventory"),
+              CoreItem.PERM.COMMAND_CLEAR);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length != 1) {
+    public void run(final CommandSender sender, final String alias, final String[] args)
+    {
+        if (args.length != 1)
+        {
             sender.sendMessage(help(alias));
             return;
         }
 
-        final Player[] targets =
-                PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
-                                .getOnlinePlayers(),
-                        args[0],
-                        sender,
-                        matches -> matches.length == 0);
-        if (targets.length == 0) return;
+        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
+                                                                                         .getOnlinePlayers(),
+                                                                 args[0],
+                                                                 sender,
+                                                                 matches -> matches.length == 0);
+        if (targets.length == 0)
+        {
+            return;
+        }
 
-        Arrays.stream(targets)
-                .forEach(target -> target.getInventory()
-                        .clear());
-        sender.sendMessage(F.fMain(this) + "Cleared the inventories of " +
-                F.fItem(Arrays.stream(targets)
-                        .map(Player::getName)
-                        .toArray(String[]::new)) + ".");
+        Arrays.stream(targets).forEach(target -> target.getInventory().clear());
+        sender.sendMessage(F.fMain(this) +
+                           "Cleared the inventories of " +
+                           F.fItem(Arrays.stream(targets).map(Player::getName).toArray(String[]::new)) +
+                           ".");
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        final List<String> completions = new ArrayList<>(List.of("*",
-                "**",
-                "."));
-        completions.addAll(
-                _miniPlugin._hexusPlugin.getServer()
-                        .getOnlinePlayers()
-                        .stream()
-                        .map(Player::getName)
-                        .toList());
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    {
+        final List<String> completions = new ArrayList<>(List.of("*", "**", "."));
+        completions.addAll(_miniPlugin._hexusPlugin.getServer()
+                                                   .getOnlinePlayers()
+                                                   .stream()
+                                                   .map(Player::getName)
+                                                   .toList());
         return completions;
     }
 }

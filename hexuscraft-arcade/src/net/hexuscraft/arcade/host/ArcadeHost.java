@@ -31,17 +31,18 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ArcadeHost extends MiniPlugin<Arcade> {
+public class ArcadeHost extends MiniPlugin<Arcade>
+{
 
-    public enum PERM implements IPermission {
+    public enum PERM implements IPermission
+    {
         COMMAND_HOST,
         COMMAND_HOST_SET,
         COMMAND_HOST_VIEW
     }
 
     public final AtomicReference<OfflinePlayer> _host;
-    private final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5)
-            .toMillis();
+    private final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5).toMillis();
     private final AtomicReference<BukkitTask> _hostAbandonedTask;
     private final AtomicLong _hostLastSeenMillis;
     private CoreCommand _coreCommand;
@@ -49,7 +50,8 @@ public class ArcadeHost extends MiniPlugin<Arcade> {
     private CorePortal _corePortal;
     private PermissionAttachment _hostPermissionAttachment;
 
-    public ArcadeHost(final Arcade arcade) {
+    public ArcadeHost(final Arcade arcade)
+    {
         super(arcade, "Server Host");
 
         _host = new AtomicReference<>();
@@ -62,64 +64,100 @@ public class ArcadeHost extends MiniPlugin<Arcade> {
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
     }
 
     @Override
-    public void onEnable() {
+    public void onEnable()
+    {
         _coreCommand.register(new CommandHost(this));
 
-        _hexusPlugin.runAsync(() -> {
-            try {
-                _host.set(PlayerSearch.offlinePlayerSearch(
-                        _corePortal.getServerGroup(_corePortal._serverGroupName)._hostUniqueId));
-            } catch (final IOException ex) {
-                logSevere(ex);
-            }
+        _hexusPlugin.runAsync(() ->
+                              {
+                                  try
+                                  {
+                                      _host.set(PlayerSearch.offlinePlayerSearch(_corePortal.getServerGroup(_corePortal._serverGroupName)._hostUniqueId));
+                                  }
+                                  catch (final IOException ex)
+                                  {
+                                      logSevere(ex);
+                                  }
 
-            // We want to wait a little bit before attempting to teleport the server host so the proxies and notchians have time to update their server cache
-            _hexusPlugin.runAsyncLater(() -> {
-                if (_host.get() == null) return;
-                _corePortal.teleportAsync(_host.get()
-                        .getUniqueId(), _corePortal._serverName);
-            }, 40L);
-        });
+                                  // We want to wait a little bit before attempting to teleport the server host so the proxies and notchians have time to update their server cache
+                                  _hexusPlugin.runAsyncLater(() ->
+                                                             {
+                                                                 if (_host.get() == null)
+                                                                 {
+                                                                     return;
+                                                                 }
+                                                                 _corePortal.teleportAsync(_host.get().getUniqueId(),
+                                                                                           _corePortal._serverName);
+                                                             }, 40L);
+                              });
 
-        _hostAbandonedTask.set(_hexusPlugin.runSyncTimer(() -> {
-            // We want to run the host check even if the server was started with no host, as an admin can become the host of any existing server.
-            final OfflinePlayer host = _host.get();
-            if (host == null) return;
-            if (host.isOnline()) return;
-            if ((System.currentTimeMillis() - _hostLastSeenMillis.get()) < MAX_HOST_LAST_SEEN_MILLIS) return;
+        _hostAbandonedTask.set(_hexusPlugin.runSyncTimer(() ->
+                                                         {
+                                                             // We want to run the host check even if the server was started with no host, as an admin can become the host of any existing server.
+                                                             final OfflinePlayer host = _host.get();
+                                                             if (host == null)
+                                                             {
+                                                                 return;
+                                                             }
+                                                             if (host.isOnline())
+                                                             {
+                                                                 return;
+                                                             }
+                                                             if ((System.currentTimeMillis() -
+                                                                  _hostLastSeenMillis.get()) <
+                                                                 MAX_HOST_LAST_SEEN_MILLIS)
+                                                             {
+                                                                 return;
+                                                             }
 
-            _hostAbandonedTask.get()
-                    .cancel();
-            _hexusPlugin.getServer()
-                    .broadcastMessage(F.fMain(this,
-                            "The host has abandoned their server. You will be sent back to a lobby. Thanks for playing!"));
-            _hexusPlugin.getServer()
-                    .getOnlinePlayers()
-                    .forEach(player -> {
-                        //noinspection deprecation
-                        player.sendTitle(C.cYellow + "Server Abandoned", "Sending you back to a lobby...");
-                        player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, Float.MAX_VALUE, 1);
-                    });
-            _coreDatabase._database._jedis.del(ServerQueries.SERVERGROUP(_corePortal._serverGroupName));
-        }, 0, 20L));
+                                                             _hostAbandonedTask.get().cancel();
+                                                             _hexusPlugin.getServer()
+                                                                         .broadcastMessage(F.fMain(this,
+                                                                                                   "The host has abandoned their server. You will be sent back to a lobby. Thanks for playing!"));
+                                                             _hexusPlugin.getServer()
+                                                                         .getOnlinePlayers()
+                                                                         .forEach(player ->
+                                                                                  {
+                                                                                      //noinspection deprecation
+                                                                                      player.sendTitle(C.cYellow +
+                                                                                                       "Server Abandoned",
+                                                                                                       "Sending you back to a lobby...");
+                                                                                      player.playSound(player.getLocation(),
+                                                                                                       Sound.ENDERDRAGON_GROWL,
+                                                                                                       Float.MAX_VALUE,
+                                                                                                       1);
+                                                                                  });
+                                                             _coreDatabase._database._jedis.del(ServerQueries.SERVERGROUP(
+                                                                     _corePortal._serverGroupName));
+                                                         }, 0, 20L));
     }
 
-    public void setHost(final OfflinePlayer newHost) {
+    public void setHost(final OfflinePlayer newHost)
+    {
         final OfflinePlayer oldHost = _host.getAndSet(newHost);
 
-        if (_hostPermissionAttachment != null) _hostPermissionAttachment.remove();
+        if (_hostPermissionAttachment != null)
+        {
+            _hostPermissionAttachment.remove();
+        }
 
-        if (oldHost.isOnline()) oldHost.getPlayer()
-                .sendMessage(F.fMain(this, F.fError("You are no longer the server host.")));
+        if (oldHost.isOnline())
+        {
+            oldHost.getPlayer().sendMessage(F.fMain(this, F.fError("You are no longer the server host.")));
+        }
 
-        if (!newHost.isOnline()) return;
+        if (!newHost.isOnline())
+        {
+            return;
+        }
         final Player newHostPlayer = newHost.getPlayer();
         _hostPermissionAttachment = newHostPlayer.addAttachment(_hexusPlugin);
         _hostPermissionAttachment.setPermission(ArcadeManager.PERM.COMMAND_GAME.name(), true);
@@ -130,10 +168,13 @@ public class ArcadeHost extends MiniPlugin<Arcade> {
     }
 
     @EventHandler
-    public void onPlayerJoin(final PlayerJoinEvent event) {
+    public void onPlayerJoin(final PlayerJoinEvent event)
+    {
         final Player player = event.getPlayer();
-        if (!_host.get()
-                .equals(player)) return;
+        if (!_host.get().equals(player))
+        {
+            return;
+        }
 
         _hostPermissionAttachment = player.addAttachment(_hexusPlugin);
         _hostPermissionAttachment.setPermission(ArcadeManager.PERM.COMMAND_GAME.name(), true);
@@ -143,20 +184,29 @@ public class ArcadeHost extends MiniPlugin<Arcade> {
     }
 
     @EventHandler
-    public void onPlayerQuit(final PlayerQuitEvent event) {
-        if (!event.getPlayer()
-                .equals(_host.get())) return;
+    public void onPlayerQuit(final PlayerQuitEvent event)
+    {
+        if (!event.getPlayer().equals(_host.get()))
+        {
+            return;
+        }
         _hostLastSeenMillis.set(System.currentTimeMillis());
 
-        if (_hostPermissionAttachment == null) return;
+        if (_hostPermissionAttachment == null)
+        {
+            return;
+        }
         _hostPermissionAttachment.remove();
         _hostPermissionAttachment = null;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onAsyncPlayerChat(final AsyncPlayerChatEvent event) {
-        if (!event.getPlayer()
-                .equals(_host.get())) return;
+    public void onAsyncPlayerChat(final AsyncPlayerChatEvent event)
+    {
+        if (!event.getPlayer().equals(_host.get()))
+        {
+            return;
+        }
         event.setFormat(" " + C.cAqua + C.fBold + "HOST" + C.fReset + " " + event.getFormat());
     }
 

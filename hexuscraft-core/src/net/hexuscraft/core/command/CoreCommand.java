@@ -12,46 +12,47 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-public final class CoreCommand extends MiniPlugin<HexusPlugin> {
+public final class CoreCommand extends MiniPlugin<HexusPlugin>
+{
 
     public final Set<Command> _commands;
     private final AtomicReference<SimpleCommandMap> _commandMap;
 
-    public CoreCommand(final HexusPlugin plugin) {
-        super(plugin,
-                "Command");
+    public CoreCommand(final HexusPlugin plugin)
+    {
+        super(plugin, "Command");
 
         _commands = new HashSet<>();
         _commandMap = new AtomicReference<>();
     }
 
     @Override
-    public void onLoad(
-            final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    {
         _commandMap.set(((CraftServer) _hexusPlugin.getServer()).getCommandMap());
     }
 
     @Override
-    public void onEnable() {
-        _commandMap.get()
-                .getCommands()
-                .forEach(command -> command.setPermissionMessage(F.fInsufficientPermissions()));
+    public void onEnable()
+    {
+        _commandMap.get().getCommands().forEach(command -> command.setPermissionMessage(F.fInsufficientPermissions()));
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable()
+    {
         _commands.forEach(this::unregister);
         _commands.clear();
     }
 
-    public void register(final Command command) {
+    public void register(final Command command)
+    {
         _commands.add(command);
-        _commandMap.get()
-                .register("",
-                        command);
+        _commandMap.get().register("", command);
     }
 
-    public void unregister(final Command command) {
+    public void unregister(final Command command)
+    {
         command.unregister(_commandMap.get());
     }
 

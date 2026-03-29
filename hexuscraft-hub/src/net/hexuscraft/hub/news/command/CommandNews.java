@@ -6,18 +6,17 @@ import net.hexuscraft.hub.news.HubNews;
 
 import java.util.Set;
 
-public final class CommandNews extends BaseMultiCommand<HubNews> {
+public final class CommandNews extends BaseMultiCommand<HubNews>
+{
 
-    public CommandNews(final HubNews hubNews, final CoreDatabase coreDatabase) {
+    public CommandNews(final HubNews hubNews, final CoreDatabase coreDatabase)
+    {
         super(hubNews,
-                "news",
-                "Manage the hub news.",
-                Set.of(),
-                HubNews.PERM.COMMAND_NEWS,
-                Set.of(
-                        new CommandNewsAdd(hubNews,
-                                coreDatabase)
-                ));
+              "news",
+              "Manage the hub news.",
+              Set.of(),
+              HubNews.PERM.COMMAND_NEWS,
+              Set.of(new CommandNewsAdd(hubNews, coreDatabase)));
     }
 
 }

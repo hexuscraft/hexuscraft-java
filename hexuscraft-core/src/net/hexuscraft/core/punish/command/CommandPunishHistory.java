@@ -13,53 +13,72 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public final class CommandPunishHistory extends BaseCommand<CorePunish> {
+public final class CommandPunishHistory extends BaseCommand<CorePunish>
+{
 
-    public CommandPunishHistory(CorePunish corePunish) {
-        super(corePunish, "punishmenthistory", "[Player]", "View the history of punishments.",
-                Set.of("punishhistory", "xh"), CorePunish.PERM.COMMAND_PUNISH_HISTORY);
+    public CommandPunishHistory(CorePunish corePunish)
+    {
+        super(corePunish,
+              "punishmenthistory",
+              "[Player]",
+              "View the history of punishments.",
+              Set.of("punishhistory", "xh"),
+              CorePunish.PERM.COMMAND_PUNISH_HISTORY);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (!(sender instanceof final Player senderPlayer)) {
+    public void run(final CommandSender sender, final String alias, final String[] args)
+    {
+        if (!(sender instanceof final Player senderPlayer))
+        {
             sender.sendMessage(F.fMain(this, F.fError("Only players can view punishment history.")));
             return;
         }
 
-        if (args.length > 1) {
+        if (args.length > 1)
+        {
             sender.sendMessage(help(alias));
             return;
         }
 
-        _miniPlugin._hexusPlugin.runAsync(() -> {
-            final OfflinePlayer targetOfflinePlayer;
+        _miniPlugin._hexusPlugin.runAsync(() ->
+                                          {
+                                              final OfflinePlayer targetOfflinePlayer;
 
-            if (args.length == 1) {
-                targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
-                if (targetOfflinePlayer == null) return;
-            } else {
-                targetOfflinePlayer = senderPlayer;
-            }
+                                              if (args.length == 1)
+                                              {
+                                                  targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
+                                                                                                         sender);
+                                                  if (targetOfflinePlayer == null)
+                                                  {
+                                                      return;
+                                                  }
+                                              }
+                                              else
+                                              {
+                                                  targetOfflinePlayer = senderPlayer;
+                                              }
 
-            _miniPlugin.openHistoryGui(senderPlayer, targetOfflinePlayer);
-        });
+                                              _miniPlugin.openHistoryGui(senderPlayer, targetOfflinePlayer);
+                                          });
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    {
         final List<String> names = new ArrayList<>();
-        if (args.length == 1) {
+        if (args.length == 1)
+        {
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                    .getOnlinePlayers()
-                    .stream();
-            if (sender instanceof final Player player) {
+                                                                                     .getOnlinePlayers()
+                                                                                     .stream();
+            if (sender instanceof final Player player)
+            {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }
 
-            names.addAll(streamedOnlinePlayers.map(Player::getName)
-                    .toList());
+            names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
         }
         return names;
     }

@@ -7,23 +7,26 @@ import net.hexuscraft.core.MiniPlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-public final class CoreAuthentication extends MiniPlugin<HexusPlugin> {
+public final class CoreAuthentication extends MiniPlugin<HexusPlugin>
+{
 
-    public enum PERM implements IPermission {
+    public enum PERM implements IPermission
+    {
         REQUIRE_AUTHENTICATION
     }
 
-    public CoreAuthentication(final HexusPlugin plugin) {
-        super(plugin,
-                "Authentication");
+    public CoreAuthentication(final HexusPlugin plugin)
+    {
+        super(plugin, "Authentication");
 
         PermissionGroup.TRAINEE._permissions.add(PERM.REQUIRE_AUTHENTICATION);
     }
 
     @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event) {
-        if (!event.getPlayer()
-                .hasPermission(PERM.REQUIRE_AUTHENTICATION.name())) {
+    private void onPlayerJoin(final PlayerJoinEvent event)
+    {
+        if (!event.getPlayer().hasPermission(PERM.REQUIRE_AUTHENTICATION.name()))
+        {
         }
         // TOOD: 2fa
     }

@@ -5,7 +5,8 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.UUID;
 
-public final class PortalTeleportStaffMessage extends BaseMessage {
+public final class PortalTeleportStaffMessage extends BaseMessage
+{
 
     public final static String CHANNEL_NAME = "portal.teleportStaff";
 
@@ -13,26 +14,26 @@ public final class PortalTeleportStaffMessage extends BaseMessage {
     public final String _serverName;
     public final UUID _senderUUID;
 
-    public PortalTeleportStaffMessage(final UUID targetUUID, final String serverName, final UUID senderUUID) {
+    public PortalTeleportStaffMessage(final UUID targetUUID, final String serverName, final UUID senderUUID)
+    {
         this._targetUUID = targetUUID;
         this._serverName = serverName;
         this._senderUUID = senderUUID;
     }
 
-    public static PortalTeleportStaffMessage parse(final String jsonString) {
+    public static PortalTeleportStaffMessage parse(final String jsonString)
+    {
         final JSONObject jsonObject = new JSONObject(jsonString);
         return new PortalTeleportStaffMessage(UUID.fromString(jsonObject.getString("targetUUID")),
-                jsonObject.getString("serverName"),
-                UUID.fromString(jsonObject.getString("senderUUID")));
+                                              jsonObject.getString("serverName"),
+                                              UUID.fromString(jsonObject.getString("senderUUID")));
     }
 
-    public String stringify() {
-        return new JSONObject(Map.ofEntries(Map.entry("targetUUID",
-                        _targetUUID.toString()),
-                Map.entry("serverName",
-                        _serverName),
-                Map.entry("senderUUID",
-                        _senderUUID.toString()))).toString();
+    public String stringify()
+    {
+        return new JSONObject(Map.ofEntries(Map.entry("targetUUID", _targetUUID.toString()),
+                                            Map.entry("serverName", _serverName),
+                                            Map.entry("senderUUID", _senderUUID.toString()))).toString();
     }
 
 }

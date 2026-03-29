@@ -1,25 +1,49 @@
 package net.hexuscraft.common.database.messages;
 
+import net.hexuscraft.common.database.data.PunishData;
+import net.hexuscraft.common.enums.PunishType;
 import org.json.JSONObject;
 
-import java.util.Map;
 import java.util.UUID;
 
-public record PunishPunishmentAppliedMessage(UUID _targetUUID, UUID _punishmentUUID) {
+public class PunishPunishmentAppliedMessage
+{
 
-    public final static String CHANNEL_NAME = "punish.punishmentApplied";
+    public static String CHANNEL_NAME = "punish.punishmentApplied";
 
-    public static PunishPunishmentAppliedMessage fromString(final String jsonString) {
-        final JSONObject jsonObject = new JSONObject(jsonString);
-        return new PunishPunishmentAppliedMessage(UUID.fromString(jsonObject.getString("targetUUID")),
-                UUID.fromString(jsonObject.getString("punishmentUUID")));
+    public PunishData punishData;
+
+    public PunishPunishmentAppliedMessage(PunishData punishData)
+    {
+        this.punishData = punishData;
+    }
+
+    public static PunishPunishmentAppliedMessage fromString(String jsonString)
+    {
+        JSONObject jsonObject = new JSONObject(jsonString);
+        return new PunishPunishmentAppliedMessage(new PunishData(UUID.fromString(jsonObject.getString("id")),
+                                                                 jsonObject.getEnum(PunishType.class, "type"),
+                                                                 jsonObject.getBoolean("active"),
+                                                                 jsonObject.getLong("origin"),
+                                                                 jsonObject.getLong("length"),
+                                                                 jsonObject.getString("reason"),
+                                                                 UUID.fromString(jsonObject.getString("targetUUID")),
+                                                                 jsonObject.getString("targetServer"),
+                                                                 UUID.fromString(jsonObject.getString("staffUUID")),
+                                                                 jsonObject.getString("staffServer"),
+                                                                 jsonObject.optLongObject("removeOrigin"),
+                                                                 jsonObject.optString("removeReason"),
+                                                                 jsonObject.optString("removeServer"),
+                                                                 jsonObject.has("removeStaffUUID") ?
+                                                                 UUID.fromString(jsonObject.getString("removeStaffUUID")) :
+                                                                 null,
+                                                                 jsonObject.optString("removeStaffServer")));
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
-    public String toString() {
-        return new JSONObject(Map.ofEntries(Map.entry("targetUUID", _targetUUID.toString()),
-                Map.entry("punishmentUUID", _punishmentUUID.toString()))).toString();
+    public String toString()
+    {
+        return new JSONObject(punishData).toString();
     }
 
 }

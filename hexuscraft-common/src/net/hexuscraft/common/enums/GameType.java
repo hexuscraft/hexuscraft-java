@@ -1,6 +1,7 @@
 package net.hexuscraft.common.enums;
 
-public enum GameType {
+public enum GameType
+{
 
     THE_BRIDGES("The Bridges"),
     SURVIVAL_GAMES("Survival Games"),
@@ -14,7 +15,8 @@ public enum GameType {
 
     public final String _name;
 
-    GameType(String name) {
+    GameType(String name)
+    {
         _name = name;
     }
 

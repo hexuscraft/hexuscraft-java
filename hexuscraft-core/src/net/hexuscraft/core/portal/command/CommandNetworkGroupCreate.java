@@ -16,22 +16,29 @@ import java.util.Set;
 
 // TODO: Make this into a "builder" style command: Open a GUI where you can click items to modify properties before creating.
 
-public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal> {
+public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
+{
 
     private final String[] DISALLOWED_CHARACTERS = new String[]{":", "//", "\\\\", ".."};
 
     private final CoreDatabase _coreDatabase;
 
-    CommandNetworkGroupCreate(final CorePortal corePortal, final CoreDatabase coreDatabase) {
-        super(corePortal, "create",
-                "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout (ms) #> [Games]",
-                "Create a server group.", Set.of("c", "add", "a"), CorePortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
+    CommandNetworkGroupCreate(final CorePortal corePortal, final CoreDatabase coreDatabase)
+    {
+        super(corePortal,
+              "create",
+              "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout (ms) #> [Games]",
+              "Create a server group.",
+              Set.of("c", "add", "a"),
+              CorePortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
         _coreDatabase = coreDatabase;
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length < 12) {
+    public void run(final CommandSender sender, final String alias, final String[] args)
+    {
+        if (args.length < 12)
+        {
             sender.sendMessage(help(alias));
             return;
         }
@@ -50,178 +57,325 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal> {
         final int timeoutMillis;
         final GameType[] games;
 
-        try {
+        try
+        {
             name = args[0];
-            if (name.length() > 100) throw new InvalidNetStatGroupCreateArgumentException(this, "Name",
-                    "Length too long (must be between 1-100 characters)");
-            if (name.isEmpty()) throw new InvalidNetStatGroupCreateArgumentException(this, "Name",
-                    "Length too short (must be between 1-100 characters)");
+            if (name.length() > 100)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Name",
+                                                                     "Length too long (must be between 1-100 characters)");
+            }
+            if (name.isEmpty())
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Name",
+                                                                     "Length too short (must be between 1-100 characters)");
+            }
 
-            try {
+            try
+            {
                 requiredPermission = PermissionGroup.valueOf(args[1]);
-            } catch (final IllegalArgumentException ignored) {
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Required Permission",
-                        "Invalid or unrecognised permission group");
+            }
+            catch (final IllegalArgumentException ignored)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Required Permission",
+                                                                     "Invalid or unrecognised permission group");
             }
 
-            try {
+            try
+            {
                 minPort = Integer.parseInt(args[2]);
-            } catch (final NumberFormatException ex) {
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Min Port #",
-                        "Invalid or unrecognised integer");
             }
-            if (minPort < 1) throw new InvalidNetStatGroupCreateArgumentException(this, "Min Port #",
-                    "Port too small (must be between 1-65535)");
-            if (minPort > 65535) throw new InvalidNetStatGroupCreateArgumentException(this, "Min Port #",
-                    "Port too small (must be between 1-65535)");
+            catch (final NumberFormatException ex)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Min Port #",
+                                                                     "Invalid or unrecognised integer");
+            }
+            if (minPort < 1)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Min Port #",
+                                                                     "Port too small (must be between 1-65535)");
+            }
+            if (minPort > 65535)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Min Port #",
+                                                                     "Port too small (must be between 1-65535)");
+            }
 
-            try {
+            try
+            {
                 maxPort = Integer.parseInt(args[3]);
-            } catch (final NumberFormatException ex) {
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Max Port #",
-                        "Invalid or unrecognised integer");
             }
-            if (maxPort < 1) throw new InvalidNetStatGroupCreateArgumentException(this, "Max Port #",
-                    "Port too small (must be between 1-65535)");
-            if (maxPort > 65535) throw new InvalidNetStatGroupCreateArgumentException(this, "Max Port #",
-                    "Port too small (must be between 1-65535)");
+            catch (final NumberFormatException ex)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Max Port #",
+                                                                     "Invalid or unrecognised integer");
+            }
+            if (maxPort < 1)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Max Port #",
+                                                                     "Port too small (must be between 1-65535)");
+            }
+            if (maxPort > 65535)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Max Port #",
+                                                                     "Port too small (must be between 1-65535)");
+            }
 
-            try {
+            try
+            {
                 totalServers = Integer.parseInt(args[4]);
-            } catch (final NumberFormatException ex) {
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Total Servers",
-                        "Invalid or unrecognised integer");
             }
-            if (totalServers < 0) throw new InvalidNetStatGroupCreateArgumentException(this, "Total Servers",
-                    "Number too small (must be greater than 0)");
+            catch (final NumberFormatException ex)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Total Servers",
+                                                                     "Invalid or unrecognised integer");
+            }
+            if (totalServers < 0)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Total Servers",
+                                                                     "Number too small (must be greater than 0)");
+            }
 
-            try {
+            try
+            {
                 joinableServers = Integer.parseInt(args[5]);
-            } catch (final NumberFormatException ex) {
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Joinable Servers",
-                        "Invalid or unrecognised integer");
             }
-            if (joinableServers < 0) throw new InvalidNetStatGroupCreateArgumentException(this, "Joinable Servers",
-                    "Number too small (must be greater than 0)");
+            catch (final NumberFormatException ex)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Joinable Servers",
+                                                                     "Invalid or unrecognised integer");
+            }
+            if (joinableServers < 0)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Joinable Servers",
+                                                                     "Number too small (must be greater than 0)");
+            }
 
             plugin = args[6];
-            if (plugin.length() > 100) throw new InvalidNetStatGroupCreateArgumentException(this, "Plugin",
-                    "Length too long (must be between 1-100 characters)");
-            if (plugin.isEmpty()) throw new InvalidNetStatGroupCreateArgumentException(this, "Plugin",
-                    "Length too short (must be between 1-100 characters)");
-            for (final String characters : DISALLOWED_CHARACTERS) {
-                if (!plugin.contains(characters)) continue;
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Plugin",
-                        "Invalid characters '" + characters + "'");
+            if (plugin.length() > 100)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Plugin",
+                                                                     "Length too long (must be between 1-100 characters)");
+            }
+            if (plugin.isEmpty())
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Plugin",
+                                                                     "Length too short (must be between 1-100 characters)");
+            }
+            for (final String characters : DISALLOWED_CHARACTERS)
+            {
+                if (!plugin.contains(characters))
+                {
+                    continue;
+                }
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Plugin",
+                                                                     "Invalid characters '" + characters + "'");
             }
 
             worldZip = args[7];
-            if (worldZip.length() > 100) throw new InvalidNetStatGroupCreateArgumentException(this, "World Zip",
-                    "Length too long (must be between 1-100 characters)");
-            if (worldZip.isEmpty()) throw new InvalidNetStatGroupCreateArgumentException(this, "World Zip",
-                    "Length too short (must be between 1-100 characters)");
-            for (final String characters : DISALLOWED_CHARACTERS) {
-                if (!worldZip.contains(characters)) continue;
-                throw new InvalidNetStatGroupCreateArgumentException(this, "World Zip",
-                        "Invalid characters '" + characters + "'");
+            if (worldZip.length() > 100)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "World Zip",
+                                                                     "Length too long (must be between 1-100 characters)");
+            }
+            if (worldZip.isEmpty())
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "World Zip",
+                                                                     "Length too short (must be between 1-100 characters)");
+            }
+            for (final String characters : DISALLOWED_CHARACTERS)
+            {
+                if (!worldZip.contains(characters))
+                {
+                    continue;
+                }
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "World Zip",
+                                                                     "Invalid characters '" + characters + "'");
             }
 
-            try {
+            try
+            {
                 ram = Integer.parseInt(args[8]);
-            } catch (final NumberFormatException ignored) {
+            }
+            catch (final NumberFormatException ignored)
+            {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Ram", "Invalid or unrecognised integer");
             }
-            if (ram < 1) throw new InvalidNetStatGroupCreateArgumentException(this, "Ram",
-                    "Number too small (must be greater than 0)");
-
-            try {
-                capacity = Integer.parseInt(args[9]);
-            } catch (final NumberFormatException ignored) {
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Capacity",
-                        "Invalid or unrecognised integer");
+            if (ram < 1)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Ram",
+                                                                     "Number too small (must be greater than 0)");
             }
-            if (capacity < 0) throw new InvalidNetStatGroupCreateArgumentException(this, "Capacity",
-                    "Number too small (must be greater than or equal to 0)");
 
-            try {
+            try
+            {
+                capacity = Integer.parseInt(args[9]);
+            }
+            catch (final NumberFormatException ignored)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Capacity",
+                                                                     "Invalid or unrecognised integer");
+            }
+            if (capacity < 0)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Capacity",
+                                                                     "Number too small (must be greater than or equal to 0)");
+            }
+
+            try
+            {
                 worldEdit = Boolean.parseBoolean(args[10]);
-            } catch (final Throwable ignored) {
+            }
+            catch (final Throwable ignored)
+            {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "World Edit", "Must be TRUE or FALSE");
             }
 
-            try {
+            try
+            {
                 timeoutMillis = Integer.parseInt(args[11]);
-            } catch (final NumberFormatException ignored) {
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Server Timeout",
-                        "Invalid or unrecognised integer");
+            }
+            catch (final NumberFormatException ignored)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Server Timeout",
+                                                                     "Invalid or unrecognised integer");
             }
 
-            try {
-                games = Arrays.stream(args)
-                        .skip(12)
-                        .map(GameType::valueOf)
-                        .toArray(GameType[]::new);
-            } catch (Exception ex) {
-                throw new InvalidNetStatGroupCreateArgumentException(this, "Game Types",
-                        "Invalid or unrecognised game type");
+            try
+            {
+                games = Arrays.stream(args).skip(12).map(GameType::valueOf).toArray(GameType[]::new);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidNetStatGroupCreateArgumentException(this,
+                                                                     "Game Types",
+                                                                     "Invalid or unrecognised game type");
             }
 
-        } catch (final InvalidNetStatGroupCreateArgumentException ex) {
+        }
+        catch (final InvalidNetStatGroupCreateArgumentException ex)
+        {
             sender.sendMessage(ex.constructMessage());
             return;
         }
 
-        _miniPlugin._hexusPlugin.runAsync(() -> {
-            try {
-                new ServerGroupData(name, requiredPermission, minPort, maxPort, totalServers, joinableServers, plugin,
-                        worldZip, ram, capacity, worldEdit, timeoutMillis, games, null).update(
-                        _coreDatabase._database._jedis);
-            } catch (final JedisException ex) {
-                sender.sendMessage(F.fMain(this, F.fError(
-                        "JedisException while updating server group punish. Please  try again later or contact an administrator if this issue persists.")));
-                _miniPlugin._hexusPlugin.logWarning(
-                        "JedisException while '" + sender.getName() + "' creating server group '" + name + "': " + ex.getMessage());
-                return;
-            }
+        _miniPlugin._hexusPlugin.runAsync(() ->
+                                          {
+                                              try
+                                              {
+                                                  new ServerGroupData(name,
+                                                                      requiredPermission,
+                                                                      minPort,
+                                                                      maxPort,
+                                                                      totalServers,
+                                                                      joinableServers,
+                                                                      plugin,
+                                                                      worldZip,
+                                                                      ram,
+                                                                      capacity,
+                                                                      worldEdit,
+                                                                      timeoutMillis,
+                                                                      games,
+                                                                      null).update(_coreDatabase._database._jedis);
+                                              }
+                                              catch (final JedisException ex)
+                                              {
+                                                  sender.sendMessage(F.fMain(this,
+                                                                             F.fError(
+                                                                                     "JedisException while updating server group punish. Please  try again later or contact an administrator if this issue persists.")));
+                                                  _miniPlugin._hexusPlugin.logWarning("JedisException while '" +
+                                                                                      sender.getName() +
+                                                                                      "' creating server group '" +
+                                                                                      name +
+                                                                                      "': " +
+                                                                                      ex.getMessage());
+                                                  return;
+                                              }
 
-            sender.sendMessage(F.fMain(this, F.fSuccess("Created server group with name ", F.fItem(name), ":\n"),
-                    F.fItem("Name: " + F.fItem(name), "Required Permission: " + F.fItem(requiredPermission.name()),
-                            "Min Port: " + F.fItem(Integer.toString(minPort)),
-                            "Max Port: " + F.fItem(Integer.toString(maxPort)),
-                            "Total Servers: " + F.fItem(Integer.toString(totalServers)),
-                            "Joinable Servers: " + F.fItem(Integer.toString(joinableServers)),
-                            "Plugin: " + F.fItem(plugin), "World Zip: " + F.fItem(worldZip),
-                            "Ram: " + F.fItem(Integer.toString(ram)),
-                            "Capacity: " + F.fItem(Integer.toString(capacity)),
-                            "World Edit: " + F.fItem(Boolean.toString(worldEdit)),
-                            "Server Timeout: " + F.fItem(Integer.toString(timeoutMillis)), "Games: " + F.fItem(
-                                    Arrays.stream(games)
-                                            .map(GameType::name)
-                                            .toArray(String[]::new)))));
-        });
+                                              sender.sendMessage(F.fMain(this,
+                                                                         F.fSuccess("Created server group with name ",
+                                                                                    F.fItem(name),
+                                                                                    ":\n"),
+                                                                         F.fItem("Name: " + F.fItem(name),
+                                                                                 "Required Permission: " +
+                                                                                 F.fItem(requiredPermission.name()),
+                                                                                 "Min Port: " +
+                                                                                 F.fItem(Integer.toString(minPort)),
+                                                                                 "Max Port: " +
+                                                                                 F.fItem(Integer.toString(maxPort)),
+                                                                                 "Total Servers: " +
+                                                                                 F.fItem(Integer.toString(totalServers)),
+                                                                                 "Joinable Servers: " +
+                                                                                 F.fItem(Integer.toString(
+                                                                                         joinableServers)),
+                                                                                 "Plugin: " + F.fItem(plugin),
+                                                                                 "World Zip: " + F.fItem(worldZip),
+                                                                                 "Ram: " +
+                                                                                 F.fItem(Integer.toString(ram)),
+                                                                                 "Capacity: " +
+                                                                                 F.fItem(Integer.toString(capacity)),
+                                                                                 "World Edit: " +
+                                                                                 F.fItem(Boolean.toString(worldEdit)),
+                                                                                 "Server Timeout: " +
+                                                                                 F.fItem(Integer.toString(timeoutMillis)),
+                                                                                 "Games: " +
+                                                                                 F.fItem(Arrays.stream(games)
+                                                                                               .map(GameType::name)
+                                                                                               .toArray(String[]::new)))));
+                                          });
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length == 2) return Arrays.stream(PermissionGroup.values())
-                .map(PermissionGroup::name)
-                .toList();
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    {
+        if (args.length == 2)
+        {
+            return Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).toList();
+        }
         return List.of();
     }
 
-    private static final class InvalidNetStatGroupCreateArgumentException extends Exception {
+    private static final class InvalidNetStatGroupCreateArgumentException extends Exception
+    {
 
         private final CommandNetworkGroupCreate _command;
         private final String _argument;
         private final String _reason;
 
-        public InvalidNetStatGroupCreateArgumentException(final CommandNetworkGroupCreate command, final String argument, final String reason) {
+        public InvalidNetStatGroupCreateArgumentException(final CommandNetworkGroupCreate command,
+                                                          final String argument,
+                                                          final String reason)
+        {
             _command = command;
             _argument = argument;
             _reason = reason;
         }
 
-        private String constructMessage() {
+        private String constructMessage()
+        {
             return F.fMain(_command, F.fError("Invalid argument ", F.fItem(_argument), ": "), F.fItem(_reason));
         }
     }

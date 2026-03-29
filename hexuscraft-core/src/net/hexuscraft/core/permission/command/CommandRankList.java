@@ -9,29 +9,34 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.Set;
 
-public final class CommandRankList extends BaseCommand<CorePermission> {
+public final class CommandRankList extends BaseCommand<CorePermission>
+{
 
-    CommandRankList(CorePermission corePermission) {
+    CommandRankList(CorePermission corePermission)
+    {
         super(corePermission,
-                "list",
-                "",
-                "List all permission groups.",
-                Set.of("l"),
-                CorePermission.PERM.COMMAND_RANK_LIST);
+              "list",
+              "",
+              "List all permission groups.",
+              Set.of("l"),
+              CorePermission.PERM.COMMAND_RANK_LIST);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length != 0) {
+    public void run(final CommandSender sender, final String alias, final String[] args)
+    {
+        if (args.length != 0)
+        {
             sender.sendMessage(help(alias));
             return;
         }
 
-        sender.sendMessage(F.fMain(this) + "Listing Groups:\n"
-                + F.fMain("") +
-                F.fItem(Arrays.stream(PermissionGroup.values())
-                        .map(group -> group._color + group.name())
-                        .toArray(String[]::new)));
+        sender.sendMessage(F.fMain(this) +
+                           "Listing Groups:\n" +
+                           F.fMain("") +
+                           F.fItem(Arrays.stream(PermissionGroup.values())
+                                         .map(group -> group._color + group.name())
+                                         .toArray(String[]::new)));
     }
 
 

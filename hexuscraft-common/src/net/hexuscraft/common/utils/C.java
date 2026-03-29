@@ -2,7 +2,8 @@ package net.hexuscraft.common.utils;
 
 import java.util.Map;
 
-public final class C {
+public final class C
+{
 
     public static final String fBold = "§l";
     public static final String fItalic = "§o";
@@ -28,38 +29,21 @@ public final class C {
     public static final String cWhite = "§f";
     public static final String cYellow = "§e";
 
-    public static final Map<Integer, String> hexMap =
-            Map.ofEntries(Map.entry(0,
-                            cBlack),
-                    Map.entry(1,
-                            cBlue),
-                    Map.entry(2,
-                            cDGreen),
-                    Map.entry(3,
-                            cDAqua),
-                    Map.entry(4,
-                            cDRed),
-                    Map.entry(5,
-                            cDPurple),
-                    Map.entry(6,
-                            cGold),
-                    Map.entry(7,
-                            cGray),
-                    Map.entry(8,
-                            cDGray),
-                    Map.entry(9,
-                            cBlue),
-                    Map.entry(10,
-                            cGreen),
-                    Map.entry(11,
-                            cAqua),
-                    Map.entry(12,
-                            cRed),
-                    Map.entry(13,
-                            cPurple),
-                    Map.entry(14,
-                            cYellow),
-                    Map.entry(15,
-                            cWhite));
+    public static final Map<Integer, String> hexMap = Map.ofEntries(Map.entry(0, cBlack),
+                                                                    Map.entry(1, cBlue),
+                                                                    Map.entry(2, cDGreen),
+                                                                    Map.entry(3, cDAqua),
+                                                                    Map.entry(4, cDRed),
+                                                                    Map.entry(5, cDPurple),
+                                                                    Map.entry(6, cGold),
+                                                                    Map.entry(7, cGray),
+                                                                    Map.entry(8, cDGray),
+                                                                    Map.entry(9, cBlue),
+                                                                    Map.entry(10, cGreen),
+                                                                    Map.entry(11, cAqua),
+                                                                    Map.entry(12, cRed),
+                                                                    Map.entry(13, cPurple),
+                                                                    Map.entry(14, cYellow),
+                                                                    Map.entry(15, cWhite));
 
 }

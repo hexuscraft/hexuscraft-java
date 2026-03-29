@@ -8,19 +8,23 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-public enum PermissionGroup {
+public enum PermissionGroup
+{
 
-//    Base Ranks
+    //    Base Ranks
 
     _PLAYER("Player", C.cWhite, 1, "A normal Hexian player. Thanks for playing our server!"),
     VIP("VIP", C.cGreen, 2, "The first purchasable rank, available at store.hexuscraft.net.", _PLAYER),
     MVP("MVP", C.cAqua, 3, "The second purchasable rank, available at store.hexuscraft.net.", VIP),
     MEDIA("Media", C.cDPurple, 4, "Content creators and influencers who create Minecraft gameplay videos.", MVP),
 
-//    Public Teams
+    //    Public Teams
 
-    BUILD_TEAM("Builder", C.cBlue, 10, "Builders are responsible for creating and updating our game and lobby maps.",
-            MEDIA), // Build Team
+    BUILD_TEAM("Builder",
+               C.cBlue,
+               10,
+               "Builders are responsible for creating and updating our game and lobby maps.",
+               MEDIA), // Build Team
     BUILD_LEAD("BuildLead", C.cWhite, 0, "Build Lead", BUILD_TEAM), // Build Team Lead
 
     EVENT_TEAM("E.Team", C.cWhite, 0, "Event Team"), // Events Team
@@ -32,24 +36,33 @@ public enum PermissionGroup {
     QUALITY_ASSURANCE_TEAM("QaTeam", C.cWhite, 0, "QA Team"),
     QUALITY_ASSURANCE_LEAD("QaLead", C.cWhite, 0, "QA Lead", QUALITY_ASSURANCE_TEAM),
 
-// Staff-Only Teams
+    // Staff-Only Teams
 
     STAFF_MANAGEMENT_TEAM("SmTeam", C.cWhite, 0, "Staff Management Team"),
     STAFF_MANAGEMENT_LEAD("SmLead", C.cWhite, 0, "Staff Management Lead", STAFF_MANAGEMENT_TEAM),
 
-//    Staff Ranks
+    //    Staff Ranks
 
-    TRAINEE("Trainee", C.cDAqua, 200,
+    TRAINEE("Trainee",
+            C.cDAqua,
+            200,
             "Trainees are moderators-in-training, undergoing a trial phase before becoming a fully-fleged moderator. You can contact them for assistance with /a.",
             MVP),
-    MODERATOR("Mod", C.cYellow, 201,
-            "Moderators are responsible for assisting players, handling player reports and punishing rule-breakers. You can contact them for assistance with /a.",
-            TRAINEE),
-    SENIOR_MODERATOR("Sr.Mod", C.cGold, 202,
-            "Senior Moderators are moderators who have joined a staff-only team. They are responsible for performing their team's duties in addition to assisting players, handling player reports and punishing rule-breakers. You can contact them for assistance with /a.",
-            MODERATOR),
-    ADMINISTRATOR("Admin", C.cRed, 203, "Administrators lead a team. They are responsible for managing their team ",
-            SENIOR_MODERATOR),
+    MODERATOR("Mod",
+              C.cYellow,
+              201,
+              "Moderators are responsible for assisting players, handling player reports and punishing rule-breakers. You can contact them for assistance with /a.",
+              TRAINEE),
+    SENIOR_MODERATOR("Sr.Mod",
+                     C.cGold,
+                     202,
+                     "Senior Moderators are moderators who have joined a staff-only team. They are responsible for performing their team's duties in addition to assisting players, handling player reports and punishing rule-breakers. You can contact them for assistance with /a.",
+                     MODERATOR),
+    ADMINISTRATOR("Admin",
+                  C.cRed,
+                  203,
+                  "Administrators lead a team. They are responsible for managing their team ",
+                  SENIOR_MODERATOR),
 
     ;
 
@@ -61,7 +74,12 @@ public enum PermissionGroup {
 
     public final List<IPermission> _permissions;
 
-    PermissionGroup(final String prefix, final String color, final int weight, final String description, final PermissionGroup... inherits) {
+    PermissionGroup(final String prefix,
+                    final String color,
+                    final int weight,
+                    final String description,
+                    final PermissionGroup... inherits)
+    {
         _prefix = prefix;
         _color = color;
         _weight = weight;
@@ -70,30 +88,51 @@ public enum PermissionGroup {
         _permissions = new ArrayList<>();
     }
 
-    public static String[] getColoredNames(final boolean skipServerGroups) {
+    public static String[] getColoredNames(final boolean skipServerGroups)
+    {
         final List<String> names = new ArrayList<>();
-        for (final PermissionGroup group : PermissionGroup.values()) {
+        for (final PermissionGroup group : PermissionGroup.values())
+        {
             final String groupName = group.name();
-            if (skipServerGroups && groupName.startsWith("_")) continue;
+            if (skipServerGroups && groupName.startsWith("_"))
+            {
+                continue;
+            }
             names.add(group._color + groupName);
         }
         return names.toArray(new String[0]);
     }
 
-    public static String[] getColoredNames() {
+    public static String[] getColoredNames()
+    {
         return getColoredNames(true);
     }
 
-    public static PermissionGroup getGroupWithLowestWeight(final PermissionGroup[] potentialGroups) {
-        return Arrays.stream(potentialGroups)
-                .min(Comparator.comparingInt(group -> group._weight))
-                .orElse(null);
+    public static PermissionGroup getGroupWithLowestWeight(final PermissionGroup[] potentialGroups)
+    {
+        return Arrays.stream(potentialGroups).min(Comparator.comparingInt(group -> group._weight)).orElse(null);
     }
 
-    public static PermissionGroup getGroupWithHighestWeight(final PermissionGroup[] potentialGroups) {
-        return Arrays.stream(potentialGroups)
-                .max(Comparator.comparingInt(group -> group._weight))
-                .orElse(null);
+    public static PermissionGroup getGroupWithHighestWeight(final PermissionGroup[] potentialGroups)
+    {
+        return Arrays.stream(potentialGroups).max(Comparator.comparingInt(group -> group._weight)).orElse(null);
+    }
+
+    public static PermissionGroup valueOfSafe(final String name)
+    {
+        return valueOfElse(name, PermissionGroup._PLAYER);
+    }
+
+    public static PermissionGroup valueOfElse(final String name, final PermissionGroup fallback)
+    {
+        try
+        {
+            return PermissionGroup.valueOf(name);
+        }
+        catch (final IllegalArgumentException | NullPointerException ex)
+        {
+            return fallback;
+        }
     }
 
 }

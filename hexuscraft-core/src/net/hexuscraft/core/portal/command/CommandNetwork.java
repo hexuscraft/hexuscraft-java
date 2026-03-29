@@ -6,23 +6,20 @@ import net.hexuscraft.core.portal.CorePortal;
 
 import java.util.Set;
 
-public final class CommandNetwork extends BaseMultiCommand<CorePortal> {
+public final class CommandNetwork extends BaseMultiCommand<CorePortal>
+{
 
-    public CommandNetwork(final CorePortal corePortal, final CoreDatabase coreDatabase) {
+    public CommandNetwork(final CorePortal corePortal, final CoreDatabase coreDatabase)
+    {
         super(corePortal,
-                "network",
-                "Manage the network.",
-                Set.of("net"),
-                CorePortal.PERM.COMMAND_NETWORK,
-                Set.of(
-                        new CommandNetworkGroup(corePortal,
-                                coreDatabase),
-                        new CommandNetworkServer(corePortal,
-                                coreDatabase),
-                        new CommandNetworkSpy(corePortal),
-                        new CommandNetworkMotd(corePortal,
-                                coreDatabase)
-                ));
+              "network",
+              "Manage the network.",
+              Set.of("net"),
+              CorePortal.PERM.COMMAND_NETWORK,
+              Set.of(new CommandNetworkGroup(corePortal, coreDatabase),
+                     new CommandNetworkServer(corePortal, coreDatabase),
+                     new CommandNetworkSpy(corePortal),
+                     new CommandNetworkMotd(corePortal, coreDatabase)));
     }
 
 }

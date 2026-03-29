@@ -13,34 +13,38 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public final class CommandReport extends BaseCommand<CoreReport> {
+public final class CommandReport extends BaseCommand<CoreReport>
+{
 
-    public CommandReport(CoreReport coreReport) {
+    public CommandReport(CoreReport coreReport)
+    {
         super(coreReport,
-                "report",
-                "<Player>",
-                "Report a player breaking rules.",
-                Set.of(),
-                CoreReport.PERM.COMMAND_REPORT);
+              "report",
+              "<Player>",
+              "Report a player breaking rules.",
+              Set.of(),
+              CoreReport.PERM.COMMAND_REPORT);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length < 1) {
+    public void run(final CommandSender sender, final String alias, final String[] args)
+    {
+        if (args.length < 1)
+        {
             sender.sendMessage(help(alias));
             return;
         }
 
-        if (!(sender instanceof final Player player)) {
+        if (!(sender instanceof final Player player))
+        {
             sender.sendMessage(F.fMain(this) + "Only players can use this command.");
             return;
         }
 
-        final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
-                player);
-        if (offlinePlayer == null) {
-            sender.sendMessage(F.fMatches(new String[]{},
-                    args[0]));
+        final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], player);
+        if (offlinePlayer == null)
+        {
+            sender.sendMessage(F.fMatches(new String[]{}, args[0]));
             return;
         }
 
@@ -48,19 +52,22 @@ public final class CommandReport extends BaseCommand<CoreReport> {
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args) {
+    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    {
         final List<String> names = new ArrayList<>();
-        if (args.length == 1) {
+        if (args.length == 1)
+        {
 
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                    .getOnlinePlayers()
-                    .stream();
+                                                                                     .getOnlinePlayers()
+                                                                                     .stream();
             if (sender instanceof final Player player)
+            {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+            }
 
-            names.addAll(streamedOnlinePlayers.map(Player::getName)
-                    .toList());
+            names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
         }
         return names;
     }

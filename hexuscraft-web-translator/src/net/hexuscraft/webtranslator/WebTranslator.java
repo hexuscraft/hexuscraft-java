@@ -16,9 +16,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public final class WebTranslator extends HexusPlugin {
+public final class WebTranslator extends HexusPlugin
+{
 
-    public WebTranslator() {
+    public WebTranslator()
+    {
         super(false);
 
         require(new CoreBuildVersion(this));
@@ -29,43 +31,35 @@ public final class WebTranslator extends HexusPlugin {
     }
 
     @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event) {
+    private void onPlayerJoin(final PlayerJoinEvent event)
+    {
         final Player player = event.getPlayer();
 
-        event.setJoinMessage(F.fSub("Join",
-                player.getName()));
-        player.teleport(new Location(getServer().getWorlds()
-                .getFirst(),
-                0,
-                0,
-                0,
-                0,
-                0));
+        event.setJoinMessage(F.fSub("Join", player.getName()));
+        player.teleport(new Location(getServer().getWorlds().getFirst(), 0, 0, 0, 0, 0));
         player.setGameMode(GameMode.SPECTATOR);
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event) {
-        event.setQuitMessage(F.fSub("Quit",
-                event.getPlayer()
-                        .getName()));
+    private void onPlayerQuit(final PlayerQuitEvent event)
+    {
+        event.setQuitMessage(F.fSub("Quit", event.getPlayer().getName()));
     }
 
     @EventHandler
-    private void onEntityDamage(final EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
+    private void onEntityDamage(final EntityDamageEvent event)
+    {
+        if (!(event.getEntity() instanceof Player))
+        {
+            return;
+        }
         event.setCancelled(true);
     }
 
     @EventHandler
-    private void onPlayerMove(final PlayerMoveEvent event) {
-        event.setTo(new Location(getServer().getWorlds()
-                .getFirst(),
-                0,
-                0,
-                0,
-                0,
-                0));
+    private void onPlayerMove(final PlayerMoveEvent event)
+    {
+        event.setTo(new Location(getServer().getWorlds().getFirst(), 0, 0, 0, 0, 0));
     }
 
 }

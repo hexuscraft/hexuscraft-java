@@ -7,12 +7,17 @@ import net.hexuscraft.arcade.manager.TeamGame;
 import net.hexuscraft.common.enums.GameType;
 import net.hexuscraft.common.utils.C;
 
-public final class GameTheBridges extends TeamGame {
+public final class GameTheBridges extends TeamGame
+{
 
-    private GameTheBridges(final ArcadeManager arcadeManager) {
-        super(GameType.THE_BRIDGES, new GameKit[]{},
-                new GameTeam[]{new GameTeam("Red", C.cRed), new GameTeam("Blue", C.cAqua), new GameTeam("Green",
-                        C.cGreen), new GameTeam("Yellow", C.cYellow),});
+    private GameTheBridges(final ArcadeManager arcadeManager)
+    {
+        super(GameType.THE_BRIDGES,
+              new GameKit[]{},
+              new GameTeam[]{new GameTeam("Red", C.cRed),
+                             new GameTeam("Blue", C.cAqua),
+                             new GameTeam("Green", C.cGreen),
+                             new GameTeam("Yellow", C.cYellow),});
     }
 
 }

@@ -7,27 +7,29 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandNetworkGroupList extends BaseCommand<CorePortal> {
+public final class CommandNetworkGroupList extends BaseCommand<CorePortal>
+{
 
-    CommandNetworkGroupList(final CorePortal corePortal) {
+    CommandNetworkGroupList(final CorePortal corePortal)
+    {
         super(corePortal,
-                "list",
-                "",
-                "List all server groups.",
-                Set.of("l"),
-                CorePortal.PERM.COMMAND_NETWORK_GROUP_LIST);
+              "list",
+              "",
+              "List all server groups.",
+              Set.of("l"),
+              CorePortal.PERM.COMMAND_NETWORK_GROUP_LIST);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length > 0) {
+    public void run(final CommandSender sender, final String alias, final String[] args)
+    {
+        if (args.length > 0)
+        {
             sender.sendMessage(help(alias));
             return;
         }
 
-        sender.sendMessage(F.fMain(this,
-                "Server Groups: ",
-                F.fItem(_miniPlugin.getServerGroupNames())));
+        sender.sendMessage(F.fMain(this, "Server Groups: ", F.fItem(_miniPlugin.getServerGroupNames())));
     }
 
 }

@@ -8,37 +8,36 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandNpcPurge extends BaseCommand<CoreNpc> {
+public final class CommandNpcPurge extends BaseCommand<CoreNpc>
+{
 
-    CommandNpcPurge(final CoreNpc coreNpc) {
+    CommandNpcPurge(final CoreNpc coreNpc)
+    {
         super(coreNpc,
-                "purge",
-                "",
-                "Temporarily purge all NPCs.",
-                Set.of("p",
-                        "kill",
-                        "k",
-                        "destroy",
-                        "d"),
-                CoreNpc.PERM.COMMAND_ENTITY_PURGE);
+              "purge",
+              "",
+              "Temporarily purge all NPCs.",
+              Set.of("p", "kill", "k", "destroy", "d"),
+              CoreNpc.PERM.COMMAND_ENTITY_PURGE);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args) {
-        if (args.length > 0) {
+    public void run(final CommandSender sender, final String alias, final String[] args)
+    {
+        if (args.length > 0)
+        {
             sender.sendMessage(help(alias));
             return;
         }
 
-        if (!(sender instanceof final Player player)) {
-            sender.sendMessage(F.fMain(this,
-                    F.fError("Only players can purge NPCs in their current world.")));
+        if (!(sender instanceof final Player player))
+        {
+            sender.sendMessage(F.fMain(this, F.fError("Only players can purge NPCs in their current world.")));
             return;
         }
 
         _miniPlugin.removeNPCs(player.getWorld());
-        sender.sendMessage(F.fMain(this,
-                "Purged all NPCs in your world."));
+        sender.sendMessage(F.fMain(this, "Purged all NPCs in your world."));
     }
 
 }

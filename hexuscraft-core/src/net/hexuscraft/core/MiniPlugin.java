@@ -7,19 +7,22 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMiniPlugin {
+public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMiniPlugin
+{
 
     public final T _hexusPlugin;
     public final String _prefix;
 
-    public MiniPlugin(final T plugin, final String prefix) {
+    public MiniPlugin(final T plugin, final String prefix)
+    {
         final long start = System.currentTimeMillis();
         _hexusPlugin = plugin;
         _prefix = prefix;
         logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void load(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap) {
+    public final void load(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap)
+    {
         final long start = System.currentTimeMillis();
         logInfo("Loading...");
 
@@ -28,21 +31,24 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         logInfo("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void enable() {
+    public final void enable()
+    {
         long start = System.currentTimeMillis();
         logInfo("Enabling...");
 
-        _hexusPlugin.getServer()
-                .getPluginManager()
-                .registerEvents(this, _hexusPlugin);
+        _hexusPlugin.getServer().getPluginManager().registerEvents(this, _hexusPlugin);
         onEnable();
 
         long finish = System.currentTimeMillis();
-        if (finish - start > 2000L) logWarning("Took " + (System.currentTimeMillis() - start) + "ms to enable. (>2s)");
+        if (finish - start > 2000L)
+        {
+            logWarning("Took " + (System.currentTimeMillis() - start) + "ms to enable. (>2s)");
+        }
         logInfo("String.valueOf " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void disable() {
+    public final void disable()
+    {
         long start = System.currentTimeMillis();
         logInfo("Disabling...");
 
@@ -50,49 +56,65 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         onDisable();
 
         long finish = System.currentTimeMillis();
-        if (finish - start > 2000L) logWarning("Took " + (System.currentTimeMillis() - start) + "ms to disable. (>2s)");
+        if (finish - start > 2000L)
+        {
+            logWarning("Took " + (System.currentTimeMillis() - start) + "ms to disable. (>2s)");
+        }
         logInfo("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return _prefix;
     }
 
-    public final void logInfo(final String message) {
+    public final void logInfo(final String message)
+    {
         _hexusPlugin.logInfo("[" + _prefix + "] " + message);
     }
 
-    public final void logInfo(final Throwable ex) {
-        logInfo("[" + ex.getClass()
-                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
-                        Arrays.stream(ex.getStackTrace())
-                                .map(StackTraceElement::toString))
-                .toArray(String[]::new)));
+    public final void logInfo(final Throwable ex)
+    {
+        logInfo("[" +
+                ex.getClass().getName() +
+                "] " +
+                String.join("\n",
+                            Stream.concat(Stream.of(ex.getMessage()),
+                                          Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
+                                  .toArray(String[]::new)));
     }
 
-    public final void logWarning(final String message) {
+    public final void logWarning(final String message)
+    {
         _hexusPlugin.logWarning("[" + _prefix + "] " + message);
     }
 
-    public final void logWarning(final Throwable ex) {
-        logWarning("[" + ex.getClass()
-                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
-                        Arrays.stream(ex.getStackTrace())
-                                .map(StackTraceElement::toString))
-                .toArray(String[]::new)));
+    public final void logWarning(final Throwable ex)
+    {
+        logWarning("[" +
+                   ex.getClass().getName() +
+                   "] " +
+                   String.join("\n",
+                               Stream.concat(Stream.of(ex.getMessage()),
+                                             Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
+                                     .toArray(String[]::new)));
     }
 
-    public final void logSevere(final String message) {
+    public final void logSevere(final String message)
+    {
         _hexusPlugin.logSevere("[" + _prefix + "] " + message);
     }
 
-    public final void logSevere(final Throwable ex) {
-        logSevere("[" + ex.getClass()
-                .getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()),
-                        Arrays.stream(ex.getStackTrace())
-                                .map(StackTraceElement::toString))
-                .toArray(String[]::new)));
+    public final void logSevere(final Throwable ex)
+    {
+        logSevere("[" +
+                  ex.getClass().getName() +
+                  "] " +
+                  String.join("\n",
+                              Stream.concat(Stream.of(ex.getMessage()),
+                                            Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
+                                    .toArray(String[]::new)));
     }
 
 }

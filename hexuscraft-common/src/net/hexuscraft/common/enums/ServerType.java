@@ -1,6 +1,7 @@
 package net.hexuscraft.common.enums;
 
-public enum ServerType {
+public enum ServerType
+{
     VELOCITY,
     BUKKIT
 }

@@ -5,19 +5,17 @@ import net.hexuscraft.core.npc.CoreNpc;
 
 import java.util.Set;
 
-public final class CommandNpc extends BaseMultiCommand<CoreNpc> {
+public final class CommandNpc extends BaseMultiCommand<CoreNpc>
+{
 
-    public CommandNpc(final CoreNpc coreNpc) {
+    public CommandNpc(final CoreNpc coreNpc)
+    {
         super(coreNpc,
-                "npc",
-                "Manage server NPCs.",
-                Set.of("nonplayercharacter"),
-                CoreNpc.PERM.COMMAND_ENTITY,
-                Set.of(
-                        new CommandNpcList(coreNpc),
-                        new CommandNpcRefresh(coreNpc),
-                        new CommandNpcPurge(coreNpc)
-                ));
+              "npc",
+              "Manage server NPCs.",
+              Set.of("nonplayercharacter"),
+              CoreNpc.PERM.COMMAND_ENTITY,
+              Set.of(new CommandNpcList(coreNpc), new CommandNpcRefresh(coreNpc), new CommandNpcPurge(coreNpc)));
     }
 
 }

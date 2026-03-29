@@ -1,7 +1,9 @@
 package net.hexuscraft.common.database.messages;
 
-public interface IMessage {
-    static BaseMessage parse(final String jsonString) {
+public interface IMessage
+{
+    static BaseMessage parse(final String jsonString)
+    {
         return null;
     }
 

@@ -9,38 +9,39 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public final class NewsData {
+public final class NewsData
+{
 
     public final UUID _id; // part of the key name
     public final boolean _active;
     public final int _weight;
     public final String _message;
 
-    public NewsData(final UUID id, final Map<String, String> data) {
+    public NewsData(final UUID id, final Map<String, String> data)
+    {
         _id = id;
         _active = Boolean.parseBoolean(data.get("active"));
         _weight = Integer.parseInt(data.get("weight"));
         _message = data.get("message");
     }
 
-    public Map<String, String> toMap() {
+    public Map<String, String> toMap()
+    {
         final Map<String, String> map = new HashMap<>();
-        map.put("active",
-                Boolean.toString(_active));
-        map.put("weight",
-                Integer.toString(_weight));
-        map.put("message",
-                _message);
+        map.put("active", Boolean.toString(_active));
+        map.put("weight", Integer.toString(_weight));
+        map.put("message", _message);
         return map;
     }
 
-    public void publish(final UnifiedJedis jedis) {
-        jedis.hset(NewsQueries.NEWS(_id),
-                toMap());
+    public void publish(final UnifiedJedis jedis)
+    {
+        jedis.hset(NewsQueries.NEWS(_id), toMap());
         jedis.publish(NewsUpdatedMessage.CHANNEL_NAME, new NewsUpdatedMessage(_id).stringify());
     }
 
-    public void delete(final UnifiedJedis jedis) {
+    public void delete(final UnifiedJedis jedis)
+    {
         jedis.del(NewsQueries.NEWS(_id));
         jedis.publish(NewsDeletedMessage.CHANNEL_NAME, new NewsDeletedMessage(_id).stringify());
     }

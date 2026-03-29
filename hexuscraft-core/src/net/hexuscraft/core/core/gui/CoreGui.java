@@ -1,4 +1,5 @@
 package net.hexuscraft.core.core.gui;
 
-public class CoreGui {
+public class CoreGui
+{
 }
