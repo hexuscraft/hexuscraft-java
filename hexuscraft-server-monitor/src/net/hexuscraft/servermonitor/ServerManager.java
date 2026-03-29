@@ -37,11 +37,11 @@ public class ServerManager
         catch (JedisException ex)
         {
             _monitor.log("JedisException while getting servers for startServer(" +
-                         serverGroupData._name +
-                         ": " +
-                         reason +
-                         "): " +
-                         ex.getMessage());
+                    serverGroupData._name +
+                    ": " +
+                    reason +
+                    "): " +
+                    ex.getMessage());
             return Optional.empty();
         }
 
@@ -76,39 +76,39 @@ public class ServerManager
         try
         {
             new ServerData(serverName,
-                           "",
-                           serverGroupData._capacity,
-                           System.currentTimeMillis(),
-                           serverGroupData._name,
-                           "",
-                           0,
-                           serverPort,
-                           20,
-                           System.currentTimeMillis(),
-                           true).update(jedis);
+                    "",
+                    serverGroupData._capacity,
+                    System.currentTimeMillis(),
+                    serverGroupData._name,
+                    "",
+                    0,
+                    serverPort,
+                    20,
+                    System.currentTimeMillis(),
+                    true).update(jedis);
         }
         catch (JedisException ex)
         {
             _monitor.log("JedisException while creating template server punish for startServer(" +
-                         serverGroupData._name +
-                         ": " +
-                         reason +
-                         "): " +
-                         ex.getMessage());
+                    serverGroupData._name +
+                    ": " +
+                    reason +
+                    "): " +
+                    ex.getMessage());
             return Optional.empty();
         }
 
         try
         {
             Process process = new ProcessBuilder(_path + "/Scripts/StartServer.cmd",
-                                                 serverGroupData._name + "-" + lowestId,
-                                                 serverGroupData._name,
-                                                 Integer.toString(serverPort),
-                                                 Integer.toString(serverGroupData._ram),
-                                                 Integer.toString(serverGroupData._capacity),
-                                                 serverGroupData._plugin,
-                                                 serverGroupData._worldZip,
-                                                 Boolean.toString(serverGroupData._worldEdit)).start();
+                    serverGroupData._name + "-" + lowestId,
+                    serverGroupData._name,
+                    Integer.toString(serverPort),
+                    Integer.toString(serverGroupData._ram),
+                    Integer.toString(serverGroupData._capacity),
+                    serverGroupData._plugin,
+                    serverGroupData._worldZip,
+                    Boolean.toString(serverGroupData._worldEdit)).start();
 
             boolean finished = process.waitFor(serverGroupData._timeoutMillis, TimeUnit.MILLISECONDS);
 
@@ -116,8 +116,8 @@ public class ServerManager
             {
                 process.destroy();
                 throw new IOException("Aborting as start script did not finish within " +
-                                      serverGroupData._timeoutMillis +
-                                      "ms");
+                        serverGroupData._timeoutMillis +
+                        "ms");
             }
 
             int exitValue = process.exitValue();
@@ -143,40 +143,35 @@ public class ServerManager
         }
 
         Thread thread = new Thread(() ->
-                                   {
-                                       try
-                                       {
-                                           _monitor.log(serverName + ": Async-waiting for redis data...");
+        {
+            try
+            {
+                _monitor.log(serverName + ": Async-waiting for redis data...");
 
-                                           long startMs = System.currentTimeMillis();
-                                           while (true)
-                                           {
-                                               if ((System.currentTimeMillis() - startMs) > 30000L)
-                                               {
-                                                   killServer(jedis,
-                                                              serverName,
-                                                              serverGroupData._name,
-                                                              "Slow Start-up");
-                                                   break;
-                                               }
-                                               ServerData serverData = ServerQueries.getServer(jedis, serverName);
-                                               if (serverData != null && !serverData._updatedByMonitor)
-                                               {
-                                                   break;
-                                               }
+                long startMs = System.currentTimeMillis();
+                while (true)
+                {
+                    if ((System.currentTimeMillis() - startMs) > 30000L)
+                    {
+                        killServer(jedis, serverName, serverGroupData._name, "Slow Start-up");
+                        break;
+                    }
+                    ServerData serverData = ServerQueries.getServer(jedis, serverName);
+                    if (serverData != null && !serverData._updatedByMonitor)
+                    {
+                        break;
+                    }
 
-                                               //noinspection BusyWait
-                                               Thread.sleep(1L);
-                                           }
-                                           _monitor.log(serverName + ": Started");
-                                       }
-                                       catch (InterruptedException ex)
-                                       {
-                                           _monitor.log(serverName +
-                                                        ": Exception while busy-waiting: " +
-                                                        ex.getMessage());
-                                       }
-                                   });
+                    //noinspection BusyWait
+                    Thread.sleep(1L);
+                }
+                _monitor.log(serverName + ": Started");
+            }
+            catch (InterruptedException ex)
+            {
+                _monitor.log(serverName + ": Exception while busy-waiting: " + ex.getMessage());
+            }
+        });
         thread.start();
         return Optional.of(thread);
     }
@@ -188,8 +183,8 @@ public class ServerManager
         try
         {
             Process process = new ProcessBuilder(_path + "/scripts/killServer.cmd",
-                                                 serverName,
-                                                 serverGroupName).start();
+                    serverName,
+                    serverGroupName).start();
             boolean finished = process.waitFor(10, TimeUnit.SECONDS);
 
             if (!finished)

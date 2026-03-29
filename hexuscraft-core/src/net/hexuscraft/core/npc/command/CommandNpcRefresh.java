@@ -28,18 +28,15 @@ public class CommandNpcRefresh extends BaseCommand<CoreNpc>
 
         sender.sendMessage(F.fMain(this) + "Processing NPC refresh...");
         _miniPlugin._hexusPlugin.getServer().getWorlds().forEach(world ->
-                                                                 {
-                                                                     sender.sendMessage(F.fMain(this) +
-                                                                                        "Refreshing NPCs in world " +
-                                                                                        F.fItem(world.getName()) +
-                                                                                        ".");
-                                                                     _miniPlugin.refreshNPCs(world);
-                                                                 });
+        {
+            sender.sendMessage(F.fMain(this) + "Refreshing NPCs in world " + F.fItem(world.getName()) + ".");
+            _miniPlugin.refreshNPCs(world);
+        });
 
         sender.sendMessage(F.fMain(this) +
-                           "Completed NPC refresh in " +
-                           F.fItem(F.fTime(System.currentTimeMillis() - start)) +
-                           ".");
+                "Completed NPC refresh in " +
+                F.fItem(F.fTime(System.currentTimeMillis() - start)) +
+                ".");
     }
 
 }

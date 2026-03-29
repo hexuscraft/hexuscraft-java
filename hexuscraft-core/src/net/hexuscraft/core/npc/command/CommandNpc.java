@@ -11,11 +11,11 @@ public class CommandNpc extends BaseMultiCommand<CoreNpc>
     public CommandNpc(CoreNpc coreNpc)
     {
         super(coreNpc,
-              "npc",
-              "Manage server NPCs.",
-              Set.of("nonplayercharacter"),
-              CoreNpc.PERM.COMMAND_ENTITY,
-              Set.of(new CommandNpcList(coreNpc), new CommandNpcRefresh(coreNpc), new CommandNpcPurge(coreNpc)));
+                "npc",
+                "Manage server NPCs.",
+                Set.of("nonplayercharacter"),
+                CoreNpc.PERM.COMMAND_ENTITY,
+                Set.of(new CommandNpcList(coreNpc), new CommandNpcRefresh(coreNpc), new CommandNpcPurge(coreNpc)));
     }
 
 }

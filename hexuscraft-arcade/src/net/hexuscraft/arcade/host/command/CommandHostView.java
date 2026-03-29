@@ -32,7 +32,7 @@ public class CommandHostView extends BaseCommand<ArcadeHost>
         }
 
         sender.sendMessage(F.fMain(this,
-                                   "The current server host is ",
-                                   F.fItem(host.isOnline() ? host.getPlayer().getDisplayName() : host.getName())));
+                "The current server host is ",
+                F.fItem(host.isOnline() ? host.getPlayer().getDisplayName() : host.getName())));
     }
 }

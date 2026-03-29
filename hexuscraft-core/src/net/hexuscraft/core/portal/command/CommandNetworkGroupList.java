@@ -13,11 +13,11 @@ public class CommandNetworkGroupList extends BaseCommand<CorePortal>
     CommandNetworkGroupList(CorePortal corePortal)
     {
         super(corePortal,
-              "list",
-              "",
-              "List all server groups.",
-              Set.of("l"),
-              CorePortal.PERM.COMMAND_NETWORK_GROUP_LIST);
+                "list",
+                "",
+                "List all server groups.",
+                Set.of("l"),
+                CorePortal.PERM.COMMAND_NETWORK_GROUP_LIST);
     }
 
     @Override

@@ -14,8 +14,8 @@ public record ChatSupportResponseMessage(UUID _senderUniqueId, UUID _targetUniqu
     {
         JSONObject jsonObject = new JSONObject(jsonString);
         return new ChatSupportResponseMessage(UUID.fromString(jsonObject.getString("senderUniqueId")),
-                                              UUID.fromString(jsonObject.getString("targetUniqueId")),
-                                              jsonObject.getString("message"));
+                UUID.fromString(jsonObject.getString("targetUniqueId")),
+                jsonObject.getString("message"));
     }
 
     @Override
@@ -23,11 +23,11 @@ public record ChatSupportResponseMessage(UUID _senderUniqueId, UUID _targetUniqu
     public String toString()
     {
         return new JSONObject(Map.of("senderUniqueId",
-                                     _senderUniqueId.toString(),
-                                     "targetUniqueId",
-                                     _targetUniqueId.toString(),
-                                     "message",
-                                     _message)).toString();
+                _senderUniqueId.toString(),
+                "targetUniqueId",
+                _targetUniqueId.toString(),
+                "message",
+                _message)).toString();
     }
 
 }

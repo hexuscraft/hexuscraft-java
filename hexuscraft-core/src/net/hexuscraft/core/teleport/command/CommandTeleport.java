@@ -21,11 +21,11 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
     public CommandTeleport(CoreTeleport coreTeleport)
     {
         super(coreTeleport,
-              "teleport",
-              "[Players] (<Player> / <X> <Y> <Z> [<Yaw> <Pitch>])",
-              "Teleport one or more players to a player or coordinates",
-              Set.of("tp"),
-              CoreTeleport.PERM.COMMAND_TELEPORT);
+                "teleport",
+                "[Players] (<Player> / <X> <Y> <Z> [<Yaw> <Pitch>])",
+                "Teleport one or more players to a player or coordinates",
+                Set.of("tp"),
+                CoreTeleport.PERM.COMMAND_TELEPORT);
     }
 
     @Override
@@ -45,10 +45,7 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
             targets = new Player[]{player};
 
             Player[] potentialDestinations = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
-                                                                                                     .getOnlinePlayers(),
-                                                                             args[0],
-                                                                             sender,
-                                                                             players -> players.length != 1);
+                    .getOnlinePlayers(), args[0], sender, players -> players.length != 1);
             if (potentialDestinations.length != 1)
             {
                 return;
@@ -65,19 +62,16 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
             }
 
             targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                      args[0],
-                                                      sender,
-                                                      players -> players.length == 0);
+                    args[0],
+                    sender,
+                    players -> players.length == 0);
             if (targets.length == 0)
             {
                 return;
             }
 
             Player[] potentialDestinations = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
-                                                                                                     .getOnlinePlayers(),
-                                                                             args[1],
-                                                                             sender,
-                                                                             players -> players.length != 1);
+                    .getOnlinePlayers(), args[1], sender, players -> players.length != 1);
             if (potentialDestinations.length != 1)
             {
                 return;
@@ -111,7 +105,7 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
             catch (NumberFormatException ex)
             {
                 sender.sendMessage(F.fMain(this,
-                                           F.fError("Invalid coordinates ", F.fItem(args[0], args[1], args[2]), ".")));
+                        F.fError("Invalid coordinates ", F.fItem(args[0], args[1], args[2]), ".")));
                 return;
             }
             destination = new Location(player.getWorld(), x, y, z, 0, 0);
@@ -131,17 +125,17 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
             }
 
             targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                      args[0],
-                                                      sender,
-                                                      players -> players.length == 0);
+                    args[0],
+                    sender,
+                    players -> players.length == 0);
             if (targets.length == 0)
             {
                 return;
             }
 
             World destinationWorld = sender instanceof Player player ?
-                                     player.getWorld() :
-                                     _miniPlugin._hexusPlugin.getServer().getWorlds().getFirst();
+                    player.getWorld() :
+                    _miniPlugin._hexusPlugin.getServer().getWorlds().getFirst();
             if (destinationWorld == null)
             {
                 sender.sendMessage(F.fMain(this, F.fError("Invalid destination world")));
@@ -157,7 +151,7 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
             catch (NumberFormatException ex)
             {
                 sender.sendMessage(F.fMain(this,
-                                           F.fError("Invalid coordinates ", F.fItem(args[1], args[2], args[3]), ".")));
+                        F.fError("Invalid coordinates ", F.fItem(args[1], args[2], args[3]), ".")));
                 return;
             }
             destination = new Location(destinationWorld, x, y, z, 0, 0);
@@ -191,9 +185,8 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
             catch (NumberFormatException ex)
             {
                 sender.sendMessage(F.fMain(this,
-                                           F.fError("Invalid coordinates ",
-                                                    F.fItem(args[0], args[1], args[2], F.fItem(args[3], args[4]))),
-                                           "."));
+                        F.fError("Invalid coordinates ", F.fItem(args[0], args[1], args[2], F.fItem(args[3], args[4]))),
+                        "."));
                 return;
             }
             destination = new Location(player.getWorld(), x, y, z, yaw, pitch);
@@ -213,17 +206,17 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
             }
 
             targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                      args[0],
-                                                      sender,
-                                                      players -> players.length == 0);
+                    args[0],
+                    sender,
+                    players -> players.length == 0);
             if (targets.length == 0)
             {
                 return;
             }
 
             World destinationWorld = sender instanceof Player player ?
-                                     player.getWorld() :
-                                     _miniPlugin._hexusPlugin.getServer().getWorlds().getFirst();
+                    player.getWorld() :
+                    _miniPlugin._hexusPlugin.getServer().getWorlds().getFirst();
             if (destinationWorld == null)
             {
                 sender.sendMessage(F.fMain(this, F.fError("Invalid destination world")));
@@ -242,9 +235,8 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
             catch (NumberFormatException ex)
             {
                 sender.sendMessage(F.fMain(this,
-                                           F.fError("Invalid coordinates ",
-                                                    F.fItem(args[1], args[2], args[3], F.fItem(args[4], args[5]))),
-                                           "."));
+                        F.fError("Invalid coordinates ", F.fItem(args[1], args[2], args[3], F.fItem(args[4], args[5]))),
+                        "."));
                 return;
             }
             destination = new Location(destinationWorld, x, y, z, yaw, pitch);
@@ -263,11 +255,11 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
         }
 
         sender.sendMessage(F.fMain(this,
-                                   "Teleporting ",
-                                   F.fItem(Arrays.stream(targets).map(Player::getDisplayName).toArray(String[]::new)),
-                                   " to ",
-                                   destinationName,
-                                   "."));
+                "Teleporting ",
+                F.fItem(Arrays.stream(targets).map(Player::getDisplayName).toArray(String[]::new)),
+                " to ",
+                destinationName,
+                "."));
         Arrays.stream(targets).forEach(target -> target.teleport(destination));
     }
 
@@ -281,19 +273,19 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
             {
                 names.add(".");
                 names.addAll(_miniPlugin._hexusPlugin.getServer()
-                                                     .getOnlinePlayers()
-                                                     .stream()
-                                                     .filter(target -> target.canSee(player))
-                                                     .map(Player::getName)
-                                                     .toList());
+                        .getOnlinePlayers()
+                        .stream()
+                        .filter(target -> target.canSee(player))
+                        .map(Player::getName)
+                        .toList());
                 return names;
             }
 
             names.addAll(_miniPlugin._hexusPlugin.getServer()
-                                                 .getOnlinePlayers()
-                                                 .stream()
-                                                 .map(Player::getName)
-                                                 .toList());
+                    .getOnlinePlayers()
+                    .stream()
+                    .map(Player::getName)
+                    .toList());
             return names;
         }
 
@@ -305,11 +297,11 @@ public class CommandTeleport extends BaseCommand<CoreTeleport>
                 names.add(".");
                 names.add(Integer.toString(player.getLocation().getBlockZ()));
                 names.addAll(_miniPlugin._hexusPlugin.getServer()
-                                                     .getOnlinePlayers()
-                                                     .stream()
-                                                     .filter(target -> target.canSee(player))
-                                                     .map(Player::getName)
-                                                     .toList());
+                        .getOnlinePlayers()
+                        .stream()
+                        .filter(target -> target.canSee(player))
+                        .map(Player::getName)
+                        .toList());
                 return names;
             }
 

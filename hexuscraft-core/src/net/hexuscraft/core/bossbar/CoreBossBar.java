@@ -36,26 +36,24 @@ public class CoreBossBar extends MiniPlugin<HexusPlugin>
     public void onEnable()
     {
         _hexusPlugin.runAsyncTimer(() -> _bossBarMap.forEach((player, bossBars) ->
-                                                             {
-                                                                 if (bossBars.isEmpty())
-                                                                 {
-                                                                     return;
-                                                                 }
-                                                                 BossBar activeBossBar = bossBars.stream()
-                                                                                                 .max(Comparator.comparing(
-                                                                                                         bossBar -> bossBar.weight()
-                                                                                                                           .get()))
-                                                                                                 .orElse(null);
+        {
+            if (bossBars.isEmpty())
+            {
+                return;
+            }
+            BossBar activeBossBar = bossBars.stream()
+                    .max(Comparator.comparing(bossBar -> bossBar.weight().get()))
+                    .orElse(null);
 
-                                                                 Wither wither = _witherMap.get(player);
-                                                                 wither.setCustomName(activeBossBar.message().get());
-                                                                 wither.getWorld()
-                                                                       .getPlayers()
-                                                                       .stream()
-                                                                       .filter(otherPlayer -> !player.equals(otherPlayer))
-                                                                       .forEach(otherPlayer -> ((CraftPlayer) otherPlayer).getHandle().playerConnection.sendPacket(
-                                                                               new PacketPlayOutEntityDestroy(wither.getEntityId())));
-                                                             }), 0, 1);
+            Wither wither = _witherMap.get(player);
+            wither.setCustomName(activeBossBar.message().get());
+            wither.getWorld()
+                    .getPlayers()
+                    .stream()
+                    .filter(otherPlayer -> !player.equals(otherPlayer))
+                    .forEach(otherPlayer -> ((CraftPlayer) otherPlayer).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(
+                            wither.getEntityId())));
+        }), 0, 1);
     }
 
     public BossBar registerBossBar(BossBar bossBar)
@@ -76,7 +74,9 @@ public class CoreBossBar extends MiniPlugin<HexusPlugin>
             wither.setTarget(null);
             wither.setVelocity(new Vector());
 
-            //            We need to add the invisibility via NBT as Entity::addPotionEffect does mot work, and neither does /effect for that matter! Seriously, try making a wither invisible without modifying NBT. Why does this have to be so difficult??
+            //            We need to add the invisibility via NBT as Entity::addPotionEffect does mot work, and
+            //            neither does /effect for that matter! Seriously, try making a wither invisible without
+            //            modifying NBT. Why does this have to be so difficult??
             NBTTagCompound nbtInvisibilityEffect = new NBTTagCompound();
             nbtInvisibilityEffect.setByte("Id", (byte) 14);
             nbtInvisibilityEffect.setInt("Duration", Integer.MAX_VALUE);

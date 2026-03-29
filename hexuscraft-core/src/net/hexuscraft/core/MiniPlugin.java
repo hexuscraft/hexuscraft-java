@@ -80,9 +80,9 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
                 ex.getClass().getName() +
                 "] " +
                 String.join("\n",
-                            Stream.concat(Stream.of(ex.getMessage()),
-                                          Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
-                                  .toArray(String[]::new)));
+                        Stream.concat(Stream.of(ex.getMessage()),
+                                        Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
+                                .toArray(String[]::new)));
     }
 
     public void logWarning(String message)
@@ -93,12 +93,12 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
     public void logWarning(Throwable ex)
     {
         logWarning("[" +
-                   ex.getClass().getName() +
-                   "] " +
-                   String.join("\n",
-                               Stream.concat(Stream.of(ex.getMessage()),
-                                             Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
-                                     .toArray(String[]::new)));
+                ex.getClass().getName() +
+                "] " +
+                String.join("\n",
+                        Stream.concat(Stream.of(ex.getMessage()),
+                                        Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
+                                .toArray(String[]::new)));
     }
 
     public void logSevere(String message)
@@ -109,12 +109,12 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
     public void logSevere(Throwable ex)
     {
         logSevere("[" +
-                  ex.getClass().getName() +
-                  "] " +
-                  String.join("\n",
-                              Stream.concat(Stream.of(ex.getMessage()),
-                                            Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
-                                    .toArray(String[]::new)));
+                ex.getClass().getName() +
+                "] " +
+                String.join("\n",
+                        Stream.concat(Stream.of(ex.getMessage()),
+                                        Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
+                                .toArray(String[]::new)));
     }
 
 }

@@ -39,15 +39,15 @@ public class ServerQueries
     {
         Set<ServerData> serverDataSet = new HashSet<>();
         jedis.keys(Database.buildQuery("server", "*"))
-             .forEach(key -> serverDataSet.add(getServer(jedis, key.split(Database.KEY_DELIMITER, 2)[1])));
+                .forEach(key -> serverDataSet.add(getServer(jedis, key.split(Database.KEY_DELIMITER, 2)[1])));
         return serverDataSet.toArray(ServerData[]::new);
     }
 
     public static ServerData[] getServers(UnifiedJedis jedis, String serverGroupName)
     {
         return Arrays.stream(getServers(jedis))
-                     .filter(serverData -> serverData._group.equals(serverGroupName))
-                     .toArray(ServerData[]::new);
+                .filter(serverData -> serverData._group.equals(serverGroupName))
+                .toArray(ServerData[]::new);
     }
 
     public static ServerData[] getServers(UnifiedJedis jedis, ServerGroupData serverGroupData)
@@ -79,7 +79,7 @@ public class ServerQueries
     {
         Set<ServerGroupData> serverGroupDataSet = new HashSet<>();
         jedis.keys(Database.buildQuery("servergroup", "*"))
-             .forEach(key -> serverGroupDataSet.add(getServerGroup(jedis, key.split(Database.KEY_DELIMITER, 2)[1])));
+                .forEach(key -> serverGroupDataSet.add(getServerGroup(jedis, key.split(Database.KEY_DELIMITER, 2)[1])));
         return serverGroupDataSet.toArray(ServerGroupData[]::new);
     }
 

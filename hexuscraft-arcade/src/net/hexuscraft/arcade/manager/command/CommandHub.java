@@ -17,11 +17,11 @@ public class CommandHub extends BaseCommand<ArcadeManager>
     public CommandHub(ArcadeManager arcadeManager, CorePortal corePortal)
     {
         super(arcadeManager,
-              "hub",
-              "",
-              "Teleport back to a lobby server.",
-              Set.of("lobby"),
-              ArcadeManager.PERM.COMMAND_HUB);
+                "hub",
+                "",
+                "Teleport back to a lobby server.",
+                Set.of("lobby"),
+                ArcadeManager.PERM.COMMAND_HUB);
         _corePortal = corePortal;
     }
 

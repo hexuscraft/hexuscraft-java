@@ -24,11 +24,11 @@ public class CommandRankInfo extends BaseCommand<CorePermission>
     CommandRankInfo(CorePermission corePermission, CoreDatabase coreDatabase)
     {
         super(corePermission,
-              "info",
-              "<Player>",
-              "List the groups of a player.",
-              Set.of("i"),
-              CorePermission.PERM.COMMAND_RANK_INFO);
+                "info",
+                "<Player>",
+                "List the groups of a player.",
+                Set.of("i"),
+                CorePermission.PERM.COMMAND_RANK_INFO);
         _coreDatabase = coreDatabase;
     }
 
@@ -42,57 +42,52 @@ public class CommandRankInfo extends BaseCommand<CorePermission>
         }
 
         _miniPlugin._hexusPlugin.runAsync(() ->
-                                          {
-                                              OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
-                                                                                                             sender);
-                                              if (offlinePlayer == null)
-                                              {
-                                                  sender.sendMessage(F.fMatches(new String[]{}, args[0]));
-                                                  return;
-                                              }
+        {
+            OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+            if (offlinePlayer == null)
+            {
+                sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+                return;
+            }
 
-                                              if (offlinePlayer.isOnline())
-                                              {
-                                                  Player player = offlinePlayer.getPlayer();
-                                                  if (_miniPlugin._permissionProfiles.containsKey(player))
-                                                  {
-                                                      sender.sendMessage(F.fMain(this,
-                                                                                 F.fItem(offlinePlayer.getName()),
-                                                                                 " Permission Groups: ",
-                                                                                 F.fItem(Arrays.stream(_miniPlugin._permissionProfiles.get(
-                                                                                                       player)._groups())
-                                                                                               .map(F::fPermissionGroup)
-                                                                                               .toArray(String[]::new))));
-                                                      return;
-                                                  }
-                                              }
+            if (offlinePlayer.isOnline())
+            {
+                Player player = offlinePlayer.getPlayer();
+                if (_miniPlugin._permissionProfiles.containsKey(player))
+                {
+                    sender.sendMessage(F.fMain(this,
+                            F.fItem(offlinePlayer.getName()),
+                            " Permission Groups: ",
+                            F.fItem(Arrays.stream(_miniPlugin._permissionProfiles.get(player)._groups())
+                                    .map(F::fPermissionGroup)
+                                    .toArray(String[]::new))));
+                    return;
+                }
+            }
 
-                                              Set<String> groupNames;
-                                              try
-                                              {
-                                                  groupNames
-                                                          = _coreDatabase._database._jedis.smembers(PermissionQueries.GROUPS(
-                                                          offlinePlayer.getUniqueId()));
-                                              }
-                                              catch (JedisException ex)
-                                              {
-                                                  sender.sendMessage(F.fMain(this,
-                                                                             F.fError(
-                                                                                     "An exception occurred while fetching the permission groups of ",
-                                                                                     F.fItem(offlinePlayer.getName()),
-                                                                                     ". Please try again later.")));
-                                                  return;
-                                              }
+            Set<String> groupNames;
+            try
+            {
+                groupNames
+                        =
+                        _coreDatabase._database._jedis.smembers(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
+            }
+            catch (JedisException ex)
+            {
+                sender.sendMessage(F.fMain(this,
+                        F.fError("An exception occurred while fetching the permission groups of ",
+                                F.fItem(offlinePlayer.getName()),
+                                ". Please try again later.")));
+                return;
+            }
 
-                                              sender.sendMessage(F.fMain(this,
-                                                                         F.fItem(offlinePlayer.getName()),
-                                                                         " Permission Groups: ",
-                                                                         F.fItem(groupNames.stream()
-                                                                                           .map(s -> F.fPermissionGroup(
-                                                                                                   PermissionGroup.valueOf(
-                                                                                                           s)))
-                                                                                           .toArray(String[]::new))));
-                                          });
+            sender.sendMessage(F.fMain(this,
+                    F.fItem(offlinePlayer.getName()),
+                    " Permission Groups: ",
+                    F.fItem(groupNames.stream()
+                            .map(s -> F.fPermissionGroup(PermissionGroup.valueOf(s)))
+                            .toArray(String[]::new))));
+        });
     }
 
     @Override
@@ -101,8 +96,8 @@ public class CommandRankInfo extends BaseCommand<CorePermission>
         if (args.length == 1)
         {
             return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                        sender,
-                                                        false);
+                    sender,
+                    false);
         }
         return List.of();
     }

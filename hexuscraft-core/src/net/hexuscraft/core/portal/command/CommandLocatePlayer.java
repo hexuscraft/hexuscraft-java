@@ -12,11 +12,11 @@ public class CommandLocatePlayer extends BaseCommand<CorePortal>
     public CommandLocatePlayer(CorePortal corePortal)
     {
         super(corePortal,
-              "player",
-              "<Name>",
-              "Locate a specific player's server.",
-              Set.of("plr", "p"),
-              CorePortal.PERM.COMMAND_LOCATE_PLAYER);
+                "player",
+                "<Name>",
+                "Locate a specific player's server.",
+                Set.of("plr", "p"),
+                CorePortal.PERM.COMMAND_LOCATE_PLAYER);
     }
 
     @Override

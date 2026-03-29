@@ -21,16 +21,16 @@ public class CommandSupport extends BaseCommand<CoreChat>
     private final CoreDatabase _coreDatabase;
 
     public CommandSupport(CoreChat coreChat,
-                          CorePermission corePermission,
-                          CoreDatabase coreDatabase,
-                          CorePortal corePortal)
+            CorePermission corePermission,
+            CoreDatabase coreDatabase,
+            CorePortal corePortal)
     {
         super(coreChat,
-              "support",
-              "<Message>",
-              "Request help from a staff member.",
-              Set.of("a", "admin", "helpop", "sc", "staffchat"),
-              CoreChat.PERM.COMMAND_SUPPORT);
+                "support",
+                "<Message>",
+                "Request help from a staff member.",
+                Set.of("a", "admin", "helpop", "sc", "staffchat"),
+                CoreChat.PERM.COMMAND_SUPPORT);
         _corePermission = corePermission;
         _coreDatabase = coreDatabase;
         _corePortal = corePortal;
@@ -55,38 +55,34 @@ public class CommandSupport extends BaseCommand<CoreChat>
         {
             _miniPlugin._receivedTipSet.add(player);
             player.sendMessage(F.fMain(this,
-                                       "You should receive a reply shortly if a staff member is available. You can also report rule-breakers with ",
-                                       F.fItem("/report"),
-                                       "."));
+                    "You should receive a reply shortly if a staff member is available. You can also report " +
+                            "rule-breakers with ",
+                    F.fItem("/report"),
+                    "."));
         }
 
         _miniPlugin._hexusPlugin.runAsync(() ->
-                                          {
-                                              try
-                                              {
-                                                  _coreDatabase._database._jedis.publish(ChatSupportMessage.CHANNEL_NAME,
-                                                                                         new ChatSupportMessage(player.getUniqueId(),
-                                                                                                                player.getName(),
-                                                                                                                _corePermission._permissionProfiles.get(
-                                                                                                                                       player)
-                                                                                                                                                   ._groups(),
-                                                                                                                _corePortal._serverName,
-                                                                                                                String.join(
-                                                                                                                        " ",
-                                                                                                                        args)).toString());
-                                              }
-                                              catch (JedisException ex)
-                                              {
-                                                  sender.sendMessage(F.fMain(this,
-                                                                             F.fError(
-                                                                                     "An error occurred while sending your support message. Maybe try again later?")));
+        {
+            try
+            {
+                _coreDatabase._database._jedis.publish(ChatSupportMessage.CHANNEL_NAME,
+                        new ChatSupportMessage(player.getUniqueId(),
+                                player.getName(),
+                                _corePermission._permissionProfiles.get(player)._groups(),
+                                _corePortal._serverName,
+                                String.join(" ", args)).toString());
+            }
+            catch (JedisException ex)
+            {
+                sender.sendMessage(F.fMain(this,
+                        F.fError("An error occurred while sending your support message. Maybe try again later?")));
 
-                                                  _miniPlugin.logWarning("JedisException while player '" +
-                                                                         sender.getName() +
-                                                                         "' sending support message: " +
-                                                                         ex.getMessage());
-                                              }
-                                          });
+                _miniPlugin.logWarning("JedisException while player '" +
+                        sender.getName() +
+                        "' sending support message: " +
+                        ex.getMessage());
+            }
+        });
     }
 
 }

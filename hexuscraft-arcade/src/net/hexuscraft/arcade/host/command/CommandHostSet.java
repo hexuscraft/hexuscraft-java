@@ -19,11 +19,11 @@ public class CommandHostSet extends BaseCommand<ArcadeHost>
     public CommandHostSet(ArcadeHost arcadeHost)
     {
         super(arcadeHost,
-              "set",
-              "[Player]",
-              "View or set the host of this server.",
-              Set.of("s"),
-              ArcadeHost.PERM.COMMAND_HOST_SET);
+                "set",
+                "[Player]",
+                "View or set the host of this server.",
+                Set.of("s"),
+                ArcadeHost.PERM.COMMAND_HOST_SET);
     }
 
     @Override
@@ -61,9 +61,9 @@ public class CommandHostSet extends BaseCommand<ArcadeHost>
         }
 
         Player[] matches = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                           args[0],
-                                                           sender,
-                                                           players -> players.length != 1);
+                args[0],
+                sender,
+                players -> players.length != 1);
         if (matches.length != 1)
         {
             return;
@@ -75,8 +75,7 @@ public class CommandHostSet extends BaseCommand<ArcadeHost>
         if (newHost == oldHost)
         {
             sender.sendMessage(F.fMain(this,
-                                       F.fError(F.fItem(newHost.getDisplayName()),
-                                                " is already the host of this server.")));
+                    F.fError(F.fItem(newHost.getDisplayName()), " is already the host of this server.")));
             return;
         }
 
@@ -94,8 +93,8 @@ public class CommandHostSet extends BaseCommand<ArcadeHost>
         if (args.length == 1)
         {
             return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                        sender,
-                                                        false);
+                    sender,
+                    false);
         }
         return List.of();
     }

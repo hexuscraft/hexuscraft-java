@@ -99,118 +99,88 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             PunishData punishData = PunishPunishmentAppliedMessage.fromString(rawMessage).punishData;
 
             _hexusPlugin.runAsync(() ->
-                                  {
-                                      OfflinePlayer target;
-                                      try
-                                      {
-                                          target = PlayerSearch.offlinePlayerSearch(punishData._targetUUID);
-                                          assert (target != null);
-                                      }
-                                      catch (IOException | AssertionError ex)
-                                      {
-                                          logWarning("Could not fetch offline player for punish target '" +
-                                                     punishData._targetUUID +
-                                                     "': " +
-                                                     ex.getMessage());
-                                          return;
-                                      }
+            {
+                OfflinePlayer target;
+                try
+                {
+                    target = PlayerSearch.offlinePlayerSearch(punishData._targetUUID);
+                    assert (target != null);
+                }
+                catch (IOException | AssertionError ex)
+                {
+                    logWarning("Could not fetch offline player for punish target '" +
+                            punishData._targetUUID +
+                            "': " +
+                            ex.getMessage());
+                    return;
+                }
 
-                                      AtomicReference<String> staffName = new AtomicReference<>();
-                                      if (punishData._staffUUID.equals(UtilUniqueId.EMPTY_UUID))
-                                      {
-                                          staffName.set(_hexusPlugin.getServer().getConsoleSender().getName());
-                                      }
-                                      else
-                                      {
-                                          try
-                                          {
-                                              staffName.set(Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(
-                                                      punishData._staffUUID)).getName());
-                                          }
-                                          catch (IOException | NullPointerException ex)
-                                          {
-                                              logSevere(ex);
-                                              return;
-                                          }
-                                      }
+                AtomicReference<String> staffName = new AtomicReference<>();
+                if (punishData._staffUUID.equals(UtilUniqueId.EMPTY_UUID))
+                {
+                    staffName.set(_hexusPlugin.getServer().getConsoleSender().getName());
+                }
+                else
+                {
+                    try
+                    {
+                        staffName.set(Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(punishData._staffUUID))
+                                .getName());
+                    }
+                    catch (IOException | NullPointerException ex)
+                    {
+                        logSevere(ex);
+                        return;
+                    }
+                }
 
-                                      Optional.ofNullable(target.getPlayer()).ifPresent((Player targetPlayer) ->
-                                                                                        {
-                                                                                            String
-                                                                                                    punishMessage
-                                                                                                    = F.fPunish(
-                                                                                                    punishData);
-                                                                                            targetPlayer.sendMessage(
-                                                                                                    punishMessage);
-                                                                                            targetPlayer.playSound(
-                                                                                                    targetPlayer.getLocation(),
-                                                                                                    Sound.CAT_MEOW,
-                                                                                                    Float.MAX_VALUE,
-                                                                                                    0.6F);
-                                                                                        });
+                Optional.ofNullable(target.getPlayer()).ifPresent((Player targetPlayer) ->
+                {
+                    String punishMessage = F.fPunish(punishData);
+                    targetPlayer.sendMessage(punishMessage);
+                    targetPlayer.playSound(targetPlayer.getLocation(), Sound.CAT_MEOW, Float.MAX_VALUE, 0.6F);
+                });
 
-                                      _hexusPlugin.getServer()
-                                                  .getOnlinePlayers()
-                                                  .stream()
-                                                  .filter((Player staff) -> staff.hasPermission(PERM.PUNISH_ALERTS.name()))
-                                                  .forEach((Player staff) ->
-                                                           {
-                                                               switch (punishData._type)
-                                                               {
-                                                                   case PunishType.WARNING ->
-                                                                           staff.sendMessage(F.fStaff(this,
-                                                                                                      F.fItem(staffName.get()),
-                                                                                                      " warned ",
-                                                                                                      F.fItem(target.getName()),
-                                                                                                      ".\n",
-                                                                                                      F.fStaff("",
-                                                                                                               "Reason: ",
-                                                                                                               C.cWhite +
-                                                                                                               punishData._reason)));
-                                                                   case PunishType.KICK -> staff.sendMessage(F.fStaff(
-                                                                           this,
-                                                                           F.fItem(staffName.get()),
-                                                                           " kicked ",
-                                                                           F.fItem(target.getName()),
-                                                                           ".\n",
-                                                                           F.fStaff("",
-                                                                                    "Reason: ",
-                                                                                    C.cWhite + punishData._reason)));
-                                                                   case PunishType.MUTE -> staff.sendMessage(F.fStaff(
-                                                                           this,
-                                                                           F.fItem(staffName.get()),
-                                                                           " muted ",
-                                                                           F.fItem(target.getName()),
-                                                                           ".\n",
-                                                                           F.fStaff("",
-                                                                                    "Duration: ",
-                                                                                    C.cWhite +
-                                                                                    F.fTime(punishData._length)),
-                                                                           "\n",
-                                                                           F.fStaff("",
-                                                                                    "Reason: ",
-                                                                                    C.cWhite + punishData._reason)));
-                                                                   case PunishType.BAN -> staff.sendMessage(F.fStaff(
-                                                                           this,
-                                                                           F.fItem(staffName.get()),
-                                                                           " banned ",
-                                                                           F.fItem(target.getName()),
-                                                                           ".\n",
-                                                                           F.fStaff("",
-                                                                                    "Duration: ",
-                                                                                    C.cWhite +
-                                                                                    F.fTime(punishData._length)),
-                                                                           "\n",
-                                                                           F.fStaff("",
-                                                                                    "Reason: ",
-                                                                                    C.cWhite + punishData._reason)));
-                                                               }
-                                                               staff.playSound(staff.getLocation(),
-                                                                               Sound.CAT_MEOW,
-                                                                               Float.MAX_VALUE,
-                                                                               0.6F);
-                                                           });
-                                  });
+                _hexusPlugin.getServer()
+                        .getOnlinePlayers()
+                        .stream()
+                        .filter((Player staff) -> staff.hasPermission(PERM.PUNISH_ALERTS.name()))
+                        .forEach((Player staff) ->
+                        {
+                            switch (punishData._type)
+                            {
+                                case PunishType.WARNING -> staff.sendMessage(F.fStaff(this,
+                                        F.fItem(staffName.get()),
+                                        " warned ",
+                                        F.fItem(target.getName()),
+                                        ".\n",
+                                        F.fStaff("", "Reason: ", C.cWhite + punishData._reason)));
+                                case PunishType.KICK -> staff.sendMessage(F.fStaff(this,
+                                        F.fItem(staffName.get()),
+                                        " kicked ",
+                                        F.fItem(target.getName()),
+                                        ".\n",
+                                        F.fStaff("", "Reason: ", C.cWhite + punishData._reason)));
+                                case PunishType.MUTE -> staff.sendMessage(F.fStaff(this,
+                                        F.fItem(staffName.get()),
+                                        " muted ",
+                                        F.fItem(target.getName()),
+                                        ".\n",
+                                        F.fStaff("", "Duration: ", C.cWhite + F.fTime(punishData._length)),
+                                        "\n",
+                                        F.fStaff("", "Reason: ", C.cWhite + punishData._reason)));
+                                case PunishType.BAN -> staff.sendMessage(F.fStaff(this,
+                                        F.fItem(staffName.get()),
+                                        " banned ",
+                                        F.fItem(target.getName()),
+                                        ".\n",
+                                        F.fStaff("", "Duration: ", C.cWhite + F.fTime(punishData._length)),
+                                        "\n",
+                                        F.fStaff("", "Reason: ", C.cWhite + punishData._reason)));
+                            }
+                            staff.playSound(staff.getLocation(), Sound.CAT_MEOW, Float.MAX_VALUE, 0.6F);
+                        });
+            });
         });
     }
 
@@ -226,13 +196,15 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         {
             UnifiedJedis jedis = _coreDatabase._database._jedis;
             Set<UUID> punishmentIds = jedis.smembers(PunishQueries.RECEIVED(event.getUniqueId()))
-                                           .stream()
-                                           .map(UUID::fromString)
-                                           .collect(Collectors.toSet());
+                    .stream()
+                    .map(UUID::fromString)
+                    .collect(Collectors.toSet());
 
             // We want to display the longest ban remaining.
-            // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most recent ban.
-            // If there are multiple bans matching this and were also applied at the EXACT same time (??), fate decides the displayed message.
+            // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most
+            // recent ban.
+            // If there are multiple bans matching this and were also applied at the EXACT same time (??), fate
+            // decides the displayed message.
 
             Set<PunishData> activePunishments = new HashSet<>();
 
@@ -264,18 +236,18 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                     if (remaining <= 0)
                     {
                         _coreDatabase._database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
-                                                            Map.of("active",
-                                                                   "false",
-                                                                   "removeOrigin",
-                                                                   Long.toString(System.currentTimeMillis()),
-                                                                   "removeReason",
-                                                                   "EXPIRED",
-                                                                   "removeServer",
-                                                                   _corePortal._serverName,
-                                                                   "removeStaffId",
-                                                                   UtilUniqueId.EMPTY_UUID.toString(),
-                                                                   "removeStaffServer",
-                                                                   _corePortal._serverName));
+                                Map.of("active",
+                                        "false",
+                                        "removeOrigin",
+                                        Long.toString(System.currentTimeMillis()),
+                                        "removeReason",
+                                        "EXPIRED",
+                                        "removeServer",
+                                        _corePortal._serverName,
+                                        "removeStaffId",
+                                        UtilUniqueId.EMPTY_UUID.toString(),
+                                        "removeStaffServer",
+                                        _corePortal._serverName));
                         continue;
                     }
 
@@ -319,42 +291,38 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
     }
 
     public BukkitTask punishAsync(UUID targetUUID,
-                                  UUID staffUUID,
-                                  PunishType punishType,
-                                  long lengthMillis,
-                                  String reason)
+            UUID staffUUID,
+            PunishType punishType,
+            long lengthMillis,
+            String reason)
     {
         return punishAsync(targetUUID, staffUUID, punishType, lengthMillis, reason, null);
     }
 
     public BukkitTask punishAsync(UUID targetUUID,
-                                  UUID staffUUID,
-                                  PunishType punishType,
-                                  long lengthMillis,
-                                  String reason,
-                                  Consumer<PunishData> callback)
+            UUID staffUUID,
+            PunishType punishType,
+            long lengthMillis,
+            String reason,
+            Consumer<PunishData> callback)
     {
         PunishData punishData = new PunishData(Map.ofEntries(Map.entry("id", UUID.randomUUID().toString()),
-                                                             Map.entry("type", punishType.name()),
-                                                             Map.entry("active", "true"),
-                                                             Map.entry("origin",
-                                                                       Long.toString(System.currentTimeMillis())),
-                                                             Map.entry("length", Long.toString(lengthMillis)),
-                                                             Map.entry("reason", reason),
-                                                             Map.entry("server", _corePortal._serverName),
-                                                             Map.entry("staffId",
-                                                                       (staffUUID == null ?
-                                                                        UtilUniqueId.EMPTY_UUID :
-                                                                        staffUUID).toString()),
-                                                             Map.entry("staffServer", _corePortal._serverName)));
+                Map.entry("type", punishType.name()),
+                Map.entry("active", "true"),
+                Map.entry("origin", Long.toString(System.currentTimeMillis())),
+                Map.entry("length", Long.toString(lengthMillis)),
+                Map.entry("reason", reason),
+                Map.entry("server", _corePortal._serverName),
+                Map.entry("staffId", (staffUUID == null ? UtilUniqueId.EMPTY_UUID : staffUUID).toString()),
+                Map.entry("staffServer", _corePortal._serverName)));
         return _hexusPlugin.runAsync(() ->
-                                     {
-                                         punishData.publish(_coreDatabase._database._jedis);
-                                         if (callback != null)
-                                         {
-                                             callback.accept(punishData);
-                                         }
-                                     });
+        {
+            punishData.publish(_coreDatabase._database._jedis);
+            if (callback != null)
+            {
+                callback.accept(punishData);
+            }
+        });
     }
 
     @EventHandler
@@ -394,15 +362,16 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             try
             {
                 target = PlayerSearch.offlinePlayerSearch(UUID.fromString(ChatColor.stripColor(skullLore.getFirst())),
-                                                          staff);
+                        staff);
                 assert (target != null);
             }
             catch (IOException | AssertionError ex)
             {
                 logSevere(ex);
                 staff.sendMessage(F.fMain(this,
-                                          F.fError(
-                                                  "There was an error while fetching your punishment target. Please try again later or contact an administrator if this issue persists.")));
+                        F.fError("There was an error while fetching your punishment target. Please try again later or" +
+                                " " +
+                                "contact an administrator if this issue persists.")));
                 return;
             }
 
@@ -528,10 +497,10 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             }
 
             punishAsync(target.getUniqueId(),
-                        staff.getUniqueId(),
-                        punishType.get(),
-                        punishLengthMillis.get(),
-                        ChatColor.stripColor(skullLore.get(2)));
+                    staff.getUniqueId(),
+                    punishType.get(),
+                    punishLengthMillis.get(),
+                    ChatColor.stripColor(skullLore.get(2)));
             staff.closeInventory();
         }
         else if (inventoryName.contains("Punishment History "))
@@ -560,15 +529,16 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             try
             {
                 target = PlayerSearch.offlinePlayerSearch(UUID.fromString(ChatColor.stripColor(skullLore.getFirst())),
-                                                          staff);
+                        staff);
                 assert (target != null);
             }
             catch (IOException | AssertionError ex)
             {
                 logSevere(ex);
                 staff.sendMessage(F.fMain(this,
-                                          F.fError(
-                                                  "There was an error while fetching your punishment target. Please try again later or contact an administrator if this issue persists.")));
+                        F.fError("There was an error while fetching your punishment target. Please try again later or" +
+                                " " +
+                                "contact an administrator if this issue persists.")));
             }
         }
     }
@@ -578,80 +548,80 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         Inventory inventory = _hexusPlugin.getServer().createInventory(staff, 6 * 9, "Punish - " + target.getName());
 
         ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
-                                                         C.cGreen + C.fBold + target.getName(),
-                                                         target.getUniqueId().toString(),
-                                                         "",
-                                                         C.cWhite + reason);
+                C.cGreen + C.fBold + target.getName(),
+                target.getUniqueId().toString(),
+                "",
+                C.cWhite + reason);
 
         ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG,
-                                                    C.cBlue + C.fBold + "Punishment History",
-                                                    "View the punishment history of " + F.fItem(target.getName()));
+                C.cBlue + C.fBold + "Punishment History",
+                "View the punishment history of " + F.fItem(target.getName()));
 
         ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
         ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME,
-                                                  C.cGreen + C.fBold + "Chat Severity 1",
-                                                  "1 Day Mute",
-                                                  "",
-                                                  "Light chat offense");
+                C.cGreen + C.fBold + "Chat Severity 1",
+                "1 Day Mute",
+                "",
+                "Light chat offense");
         ItemStack chat2 = UtilItem.createItemWool(DyeColor.YELLOW,
-                                                  C.cYellow + C.fBold + "Chat Severity 2",
-                                                  "3 Days Mute",
-                                                  "",
-                                                  "Moderate chat offense");
+                C.cYellow + C.fBold + "Chat Severity 2",
+                "3 Days Mute",
+                "",
+                "Moderate chat offense");
         ItemStack chat3 = UtilItem.createItemWool(DyeColor.ORANGE,
-                                                  C.cGold + C.fBold + "Chat Severity 3",
-                                                  "5 Days Mute",
-                                                  "",
-                                                  "Heavy chat offense");
+                C.cGold + C.fBold + "Chat Severity 3",
+                "5 Days Mute",
+                "",
+                "Heavy chat offense");
 
         ItemStack gameplayHeader = UtilItem.createItem(Material.IRON_BLOCK, C.cBlue + C.fBold + "Gameplay Offenses");
         ItemStack gameplay1 = UtilItem.createItemWool(DyeColor.LIME,
-                                                      C.cGreen + C.fBold + "Gameplay Severity 1",
-                                                      "1 Day Ban",
-                                                      "",
-                                                      "Light gameplay offense");
+                C.cGreen + C.fBold + "Gameplay Severity 1",
+                "1 Day Ban",
+                "",
+                "Light gameplay offense");
         ItemStack gameplay2 = UtilItem.createItemWool(DyeColor.YELLOW,
-                                                      C.cYellow + C.fBold + "Gameplay Severity 2",
-                                                      "3 Days Ban",
-                                                      "",
-                                                      "Moderate gameplay offense");
+                C.cYellow + C.fBold + "Gameplay Severity 2",
+                "3 Days Ban",
+                "",
+                "Moderate gameplay offense");
         ItemStack gameplay3 = UtilItem.createItemWool(DyeColor.ORANGE,
-                                                      C.cGold + C.fBold + "Gameplay Severity 3",
-                                                      "5 Days Ban",
-                                                      "",
-                                                      "Heavy gameplay offense");
+                C.cGold + C.fBold + "Gameplay Severity 3",
+                "5 Days Ban",
+                "",
+                "Heavy gameplay offense");
 
         ItemStack clientHeader = UtilItem.createItem(Material.IRON_SWORD, C.cBlue + C.fBold + "Client Offenses");
         ItemStack client1 = UtilItem.createItemWool(DyeColor.LIME,
-                                                    C.cGreen + C.fBold + "Client Severity 1",
-                                                    "7 Days Ban",
-                                                    "",
-                                                    "Light client offense");
+                C.cGreen + C.fBold + "Client Severity 1",
+                "7 Days Ban",
+                "",
+                "Light client offense");
         ItemStack client2 = UtilItem.createItemWool(DyeColor.YELLOW,
-                                                    C.cYellow + C.fBold + "Client Severity 2",
-                                                    "14 Days Ban",
-                                                    "",
-                                                    "Moderate client offense");
+                C.cYellow + C.fBold + "Client Severity 2",
+                "14 Days Ban",
+                "",
+                "Moderate client offense");
         ItemStack client3 = UtilItem.createItemWool(DyeColor.ORANGE,
-                                                    C.cGold + C.fBold + "Client Severity 3",
-                                                    "28 Days Ban",
-                                                    "",
-                                                    "Heavy client offense");
+                C.cGold + C.fBold + "Client Severity 3",
+                "28 Days Ban",
+                "",
+                "Heavy client offense");
 
         ItemStack miscHeader = UtilItem.createItem(Material.LEVER, C.cBlue + C.fBold + "Miscellaneous");
         ItemStack miscWarn = UtilItem.createItem(Material.PAPER,
-                                                 C.cGreen + C.fBold + "Friendly Warning",
-                                                 "Inform someone that they are breaking the rules");
+                C.cGreen + C.fBold + "Friendly Warning",
+                "Inform someone that they are breaking the rules");
         ItemStack miscMute = UtilItem.createItem(Material.BOOK,
-                                                 C.cRed + C.fBold + "Permanent Mute",
-                                                 "Severity 4",
-                                                 "",
-                                                 "Severe chat offense");
+                C.cRed + C.fBold + "Permanent Mute",
+                "Severity 4",
+                "",
+                "Severe chat offense");
         ItemStack miscBan = UtilItem.createItem(Material.REDSTONE_BLOCK,
-                                                C.cRed + C.fBold + "Permanent Ban",
-                                                "Severity 4",
-                                                "",
-                                                "Severe gameplay/client offense");
+                C.cRed + C.fBold + "Permanent Ban",
+                "Severity 4",
+                "",
+                "Severe gameplay/client offense");
 
         inventory.setItem(4, targetSkull);
         inventory.setItem(10, chatHeader);
@@ -702,12 +672,13 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         Inventory gui = _hexusPlugin.getServer().createInventory(viewer, 6 * 9, "Punish History - " + target.getName());
 
         ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
-                                                         C.cGreen + C.fBold + target.getName(),
-                                                         target.getUniqueId().toString(),
-                                                         "",
-                                                         C.cWhite + "Viewing punishment history");
+                C.cGreen + C.fBold + target.getName(),
+                target.getUniqueId().toString(),
+                "",
+                C.cWhite + "Viewing punishment history");
 
-        //        ItemStack openPunishGui = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Apply Punishment",
+        //        ItemStack openPunishGui = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Apply
+        //        Punishment",
         //                "Open the punishment menu for " + F.fItem(target.getName()));
         //
         //        if (viewerCanPunish) gui.setItem(53, openPunishGui);

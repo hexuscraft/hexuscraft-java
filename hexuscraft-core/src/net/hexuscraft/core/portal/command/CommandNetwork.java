@@ -12,14 +12,14 @@ public class CommandNetwork extends BaseMultiCommand<CorePortal>
     public CommandNetwork(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
-              "network",
-              "Manage the network.",
-              Set.of("net"),
-              CorePortal.PERM.COMMAND_NETWORK,
-              Set.of(new CommandNetworkGroup(corePortal, coreDatabase),
-                     new CommandNetworkServer(corePortal, coreDatabase),
-                     new CommandNetworkSpy(corePortal),
-                     new CommandNetworkMotd(corePortal, coreDatabase)));
+                "network",
+                "Manage the network.",
+                Set.of("net"),
+                CorePortal.PERM.COMMAND_NETWORK,
+                Set.of(new CommandNetworkGroup(corePortal, coreDatabase),
+                        new CommandNetworkServer(corePortal, coreDatabase),
+                        new CommandNetworkSpy(corePortal),
+                        new CommandNetworkMotd(corePortal, coreDatabase)));
     }
 
 }

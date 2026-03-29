@@ -40,31 +40,28 @@ public class HubTeam extends MiniPlugin<Hub>
         Scoreboard eventPlayerScoreboard = eventPlayer.getScoreboard();
 
         Arrays.stream(PermissionGroup.values())
-              .filter(permissionGroup -> eventPlayerScoreboard.getTeam(permissionGroup._prefix) == null)
-              .forEach((PermissionGroup group) ->
-                       {
-                           Team team = eventPlayerScoreboard.registerNewTeam(group._prefix);
-                           team.setPrefix(F.fPermissionGroup(group, true, true) + C.fReset + " ");
-                       });
+                .filter(permissionGroup -> eventPlayerScoreboard.getTeam(permissionGroup._prefix) == null)
+                .forEach((PermissionGroup group) ->
+                {
+                    Team team = eventPlayerScoreboard.registerNewTeam(group._prefix);
+                    team.setPrefix(F.fPermissionGroup(group, true, true) + C.fReset + " ");
+                });
 
         _corePermission._permissionProfiles.forEach((Player target, PermissionProfile permissionProfile) ->
-                                                    {
-                                                        PermissionGroup
-                                                                highestGroup
-                                                                = PermissionGroup.getGroupWithHighestWeight(
-                                                                permissionProfile._groups());
-                                                        if (highestGroup == null)
-                                                        {
-                                                            return;
-                                                        }
+        {
+            PermissionGroup highestGroup = PermissionGroup.getGroupWithHighestWeight(permissionProfile._groups());
+            if (highestGroup == null)
+            {
+                return;
+            }
 
-                                                        _hexusPlugin.getServer()
-                                                                    .getOnlinePlayers()
-                                                                    .stream()
-                                                                    .map(Player::getScoreboard)
-                                                                    .map(scoreboard -> scoreboard.getTeam(highestGroup._prefix))
-                                                                    .forEach(team -> team.addEntry(target.getName()));
-                                                    });
+            _hexusPlugin.getServer()
+                    .getOnlinePlayers()
+                    .stream()
+                    .map(Player::getScoreboard)
+                    .map(scoreboard -> scoreboard.getTeam(highestGroup._prefix))
+                    .forEach(team -> team.addEntry(target.getName()));
+        });
     }
 
 }

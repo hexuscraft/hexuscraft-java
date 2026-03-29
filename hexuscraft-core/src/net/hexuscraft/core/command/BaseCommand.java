@@ -18,11 +18,11 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
     public T _miniPlugin;
 
     public BaseCommand(T miniPlugin,
-                       String name,
-                       String usage,
-                       String description,
-                       Set<String> aliases,
-                       IPermission permission)
+            String name,
+            String usage,
+            String description,
+            Set<String> aliases,
+            IPermission permission)
     {
         super(name.toLowerCase(), description, usage, aliases.stream().map(String::toLowerCase).toList());
 
@@ -40,14 +40,13 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
     public boolean isAlias(String alias)
     {
         return getName().equalsIgnoreCase(alias) ||
-               getAliases().stream().map(String::toLowerCase).toList().contains(alias.toLowerCase());
+                getAliases().stream().map(String::toLowerCase).toList().contains(alias.toLowerCase());
     }
 
     public void run(CommandSender sender, String alias, String[] args)
     {
         sender.sendMessage(F.fMain(this,
-                                   F.fError(
-                                           "This command has no implementation. Please contact a staff member if this issue persists.")));
+                F.fError("This command has no implementation. Please contact a staff member if this issue persists.")));
     }
 
     public List<String> tab(CommandSender sender, String alias, String[] args)
@@ -75,21 +74,18 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
         catch (Throwable ex)
         {
             _miniPlugin.logInfo("An exception occurred while CommandSender '" +
-                                sender.getName() +
-                                "' executing BaseCommand '" +
-                                alias +
-                                " " +
-                                String.join(" ", args) +
-                                "':" +
-                                ex.getMessage() +
-                                "\n> " +
-                                String.join("\n",
-                                            Arrays.stream(ex.getStackTrace())
-                                                  .map(StackTraceElement::toString)
-                                                  .toArray(String[]::new)));
+                    sender.getName() +
+                    "' executing BaseCommand '" +
+                    alias +
+                    " " +
+                    String.join(" ", args) +
+                    "':" +
+                    ex.getMessage() +
+                    "\n> " +
+                    String.join("\n",
+                            Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)));
             sender.sendMessage(F.fMain(this,
-                                       F.fError(
-                                               "An unknown error occurred while executing this command. Please try again later.")));
+                    F.fError("An unknown error occurred while executing this command. Please try again later.")));
         }
         return true;
     }
@@ -103,10 +99,9 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
         }
 
         return tab(sender, alias, args).stream()
-                                       .filter(Objects::nonNull)
-                                       .filter(completion -> completion.toLowerCase()
-                                                                       .startsWith(args[args.length - 1].toLowerCase()))
-                                       .toList();
+                .filter(Objects::nonNull)
+                .filter(completion -> completion.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
+                .toList();
     }
 
 }

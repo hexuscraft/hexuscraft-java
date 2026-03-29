@@ -79,64 +79,55 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
             ReportSubmittedMessage parsedMessage = ReportSubmittedMessage.fromString(rawMessage);
 
             _hexusPlugin.runAsync(() ->
-                                  {
-                                      Map<String, String>
-                                              rawData
-                                              = new HashMap<>(_coreDatabase._database._jedis.hgetAll(ReportQueries.REPORT(
-                                              parsedMessage.reportUUID())));
-                                      rawData.put("reportUUID", parsedMessage.reportUUID().toString());
+            {
+                Map<String, String> rawData = new HashMap<>(_coreDatabase._database._jedis.hgetAll(ReportQueries.REPORT(
+                        parsedMessage.reportUUID())));
+                rawData.put("reportUUID", parsedMessage.reportUUID().toString());
 
-                                      ReportData reportData = new ReportData(rawData);
+                ReportData reportData = new ReportData(rawData);
 
-                                      OfflinePlayer sender, target;
+                OfflinePlayer sender, target;
 
-                                      try
-                                      {
-                                          sender = PlayerSearch.offlinePlayerSearch(reportData.senderUUID);
-                                          assert (sender != null);
-                                      }
-                                      catch (IOException | AssertionError ex)
-                                      {
-                                          logSevere(ex);
-                                          return;
-                                      }
+                try
+                {
+                    sender = PlayerSearch.offlinePlayerSearch(reportData.senderUUID);
+                    assert (sender != null);
+                }
+                catch (IOException | AssertionError ex)
+                {
+                    logSevere(ex);
+                    return;
+                }
 
-                                      try
-                                      {
-                                          target = PlayerSearch.offlinePlayerSearch(reportData.targetUUID);
-                                          assert (target != null);
-                                      }
-                                      catch (IOException | AssertionError ex)
-                                      {
-                                          logSevere(ex);
-                                          return;
-                                      }
+                try
+                {
+                    target = PlayerSearch.offlinePlayerSearch(reportData.targetUUID);
+                    assert (target != null);
+                }
+                catch (IOException | AssertionError ex)
+                {
+                    logSevere(ex);
+                    return;
+                }
 
-                                      _hexusPlugin.getServer()
-                                                  .getOnlinePlayers()
-                                                  .stream()
-                                                  .filter(player -> player.hasPermission(PERM.REPORT_ALERTS.name()))
-                                                  .forEach(player ->
-                                                           {
-                                                               player.sendMessage(F.fStaff(this,
-                                                                                           F.fItem(sender.getName()),
-                                                                                           " reported ",
-                                                                                           F.fItem(target.getName()),
-                                                                                           ":") +
-                                                                                  "\n" +
-                                                                                  F.fStaff("",
-                                                                                           "Reason: ",
-                                                                                           F.fItem(reportData.reason._friendlyName)) +
-                                                                                  "\n" +
-                                                                                  F.fStaff("",
-                                                                                           "Server: ",
-                                                                                           F.fItem(reportData.server)));
-                                                               player.playSound(player.getLocation(),
-                                                                                Sound.NOTE_PLING,
-                                                                                Float.MAX_VALUE,
-                                                                                2);
-                                                           });
-                                  });
+                _hexusPlugin.getServer()
+                        .getOnlinePlayers()
+                        .stream()
+                        .filter(player -> player.hasPermission(PERM.REPORT_ALERTS.name()))
+                        .forEach(player ->
+                        {
+                            player.sendMessage(F.fStaff(this,
+                                    F.fItem(sender.getName()),
+                                    " reported ",
+                                    F.fItem(target.getName()),
+                                    ":") +
+                                    "\n" +
+                                    F.fStaff("", "Reason: ", F.fItem(reportData.reason._friendlyName)) +
+                                    "\n" +
+                                    F.fStaff("", "Server: ", F.fItem(reportData.server)));
+                            player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+                        });
+            });
         });
     }
 
@@ -162,13 +153,12 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
     public void submitReport(Player reporter, OfflinePlayer target, ReportSubmitReason reason)
     {
         new ReportData(Map.ofEntries(Map.entry("reportUUID", UUID.randomUUID().toString()),
-                                     Map.entry("senderUUID", reporter.getUniqueId().toString()),
-                                     Map.entry("targetUUID", target.getUniqueId().toString()),
-                                     Map.entry("reason", reason.name()),
-                                     Map.entry("active", Boolean.toString(true)),
-                                     Map.entry("origin", Long.toString(System.currentTimeMillis())),
-                                     Map.entry("server",
-                                               _corePortal._serverName))).submit(_coreDatabase._database._jedis);
+                Map.entry("senderUUID", reporter.getUniqueId().toString()),
+                Map.entry("targetUUID", target.getUniqueId().toString()),
+                Map.entry("reason", reason.name()),
+                Map.entry("active", Boolean.toString(true)),
+                Map.entry("origin", Long.toString(System.currentTimeMillis())),
+                Map.entry("server", _corePortal._serverName))).submit(_coreDatabase._database._jedis);
     }
 
     public void openReportGui(Player reporter, OfflinePlayer target)
@@ -176,32 +166,32 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
         Inventory inventory = _hexusPlugin.getServer().createInventory(reporter, 3 * 9, "Report - " + target.getName());
 
         ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
-                                                         C.cGreen + C.fBold + target.getName(),
-                                                         target.getUniqueId().toString());
+                C.cGreen + C.fBold + target.getName(),
+                target.getUniqueId().toString());
 
         ItemStack history = UtilItem.createItem(Material.NAME_TAG,
-                                                C.cBlue + C.fBold + "Report History",
-                                                "View the report history of " + F.fItem(target.getName()));
+                C.cBlue + C.fBold + "Report History",
+                "View the report history of " + F.fItem(target.getName()));
 
         ItemStack chat = UtilItem.createItem(Material.BOOK_AND_QUILL,
-                                             C.cGreen + C.fBold + "Breaking Chat Rules",
-                                             "Spamming",
-                                             "Bigotry",
-                                             "etc.");
+                C.cGreen + C.fBold + "Breaking Chat Rules",
+                "Spamming",
+                "Bigotry",
+                "etc.");
         ItemStack gameplay = UtilItem.createItem(Material.IRON_BLOCK,
-                                                 C.cGreen + C.fBold + "Breaking Gameplay Rules",
-                                                 "Map Exploits",
-                                                 "Abusing Bugs",
-                                                 "etc.");
+                C.cGreen + C.fBold + "Breaking Gameplay Rules",
+                "Map Exploits",
+                "Abusing Bugs",
+                "etc.");
         ItemStack client = UtilItem.createItem(Material.IRON_SWORD,
-                                               C.cGreen + C.fBold + "Unapproved Client Modifications",
-                                               "Flying",
-                                               "Xray",
-                                               "etc.");
+                C.cGreen + C.fBold + "Unapproved Client Modifications",
+                "Flying",
+                "Xray",
+                "etc.");
         ItemStack misc = UtilItem.createItem(Material.PAPER,
-                                             C.cGreen + C.fBold + "Other Rule Violation",
-                                             "User is breaking our rules in another way not listed here",
-                                             "(We recommend also submitting a support ticket in this scenario)");
+                C.cGreen + C.fBold + "Other Rule Violation",
+                "User is breaking our rules in another way not listed here",
+                "(We recommend also submitting a support ticket in this scenario)");
 
         inventory.setItem(4, targetSkull);
         inventory.setItem(10, chat);
@@ -273,24 +263,23 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
         }
 
         _hexusPlugin.runAsync(() ->
-                              {
-                                  try
-                                  {
-                                      submitReport(reporter, reportGui._target(), reportReason.get());
-                                  }
-                                  catch (JedisException ex)
-                                  {
-                                      reporter.sendMessage(F.fMain(this,
-                                                                   F.fError(
-                                                                           "There was an error while submitting your report. Please try again later or contact an administrator if this issue persists.")));
-                                      logSevere(ex);
-                                      return;
-                                  }
+        {
+            try
+            {
+                submitReport(reporter, reportGui._target(), reportReason.get());
+            }
+            catch (JedisException ex)
+            {
+                reporter.sendMessage(F.fMain(this,
+                        F.fError("There was an error while submitting your report. Please try again later or contact " +
+                                "an administrator if this issue persists.")));
+                logSevere(ex);
+                return;
+            }
 
-                                  reporter.sendMessage(F.fMain(this,
-                                                               F.fSuccess(
-                                                                       "Your report has been successfully submitted and will be reviewed shortly.")));
-                              });
+            reporter.sendMessage(F.fMain(this,
+                    F.fSuccess("Your report has been successfully submitted and will be reviewed shortly.")));
+        });
     }
 
 }

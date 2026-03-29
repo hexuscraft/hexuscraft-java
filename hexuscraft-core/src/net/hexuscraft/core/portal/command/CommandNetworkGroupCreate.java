@@ -14,7 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-// TODO: Make this into a "builder" style command: Open a GUI where you can click items to modify properties before creating.
+// TODO: Make this into a "builder" style command: Open a GUI where you can click items to modify properties before
+//  creating.
 
 public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
 {
@@ -26,11 +27,13 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
     CommandNetworkGroupCreate(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
-              "create",
-              "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> <Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout (ms) #> [Games]",
-              "Create a server group.",
-              Set.of("c", "add", "a"),
-              CorePortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
+                "create",
+                "<Name> <Required Permission> <Min Port #> <Max Port #> <Total Servers #> <Joinable Servers #> " +
+                        "<Plugin File> <World Zip> <Ram #> <Capacity #> <World Edit TRUE/FALSE> <Server Timeout (ms) " +
+                        "#> [Games]",
+                "Create a server group.",
+                Set.of("c", "add", "a"),
+                CorePortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
         _coreDatabase = coreDatabase;
     }
 
@@ -63,14 +66,14 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             if (name.length() > 100)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Name",
-                                                                     "Length too long (must be between 1-100 characters)");
+                        "Name",
+                        "Length too long (must be between 1-100 characters)");
             }
             if (name.isEmpty())
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Name",
-                                                                     "Length too short (must be between 1-100 characters)");
+                        "Name",
+                        "Length too short (must be between 1-100 characters)");
             }
 
             try
@@ -80,8 +83,8 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             catch (IllegalArgumentException ignored)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Required Permission",
-                                                                     "Invalid or unrecognised permission group");
+                        "Required Permission",
+                        "Invalid or unrecognised permission group");
             }
 
             try
@@ -91,20 +94,20 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             catch (NumberFormatException ex)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Min Port #",
-                                                                     "Invalid or unrecognised integer");
+                        "Min Port #",
+                        "Invalid or unrecognised integer");
             }
             if (minPort < 1)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Min Port #",
-                                                                     "Port too small (must be between 1-65535)");
+                        "Min Port #",
+                        "Port too small (must be between 1-65535)");
             }
             if (minPort > 65535)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Min Port #",
-                                                                     "Port too small (must be between 1-65535)");
+                        "Min Port #",
+                        "Port too small (must be between 1-65535)");
             }
 
             try
@@ -114,20 +117,20 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             catch (NumberFormatException ex)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Max Port #",
-                                                                     "Invalid or unrecognised integer");
+                        "Max Port #",
+                        "Invalid or unrecognised integer");
             }
             if (maxPort < 1)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Max Port #",
-                                                                     "Port too small (must be between 1-65535)");
+                        "Max Port #",
+                        "Port too small (must be between 1-65535)");
             }
             if (maxPort > 65535)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Max Port #",
-                                                                     "Port too small (must be between 1-65535)");
+                        "Max Port #",
+                        "Port too small (must be between 1-65535)");
             }
 
             try
@@ -137,14 +140,14 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             catch (NumberFormatException ex)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Total Servers",
-                                                                     "Invalid or unrecognised integer");
+                        "Total Servers",
+                        "Invalid or unrecognised integer");
             }
             if (totalServers < 0)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Total Servers",
-                                                                     "Number too small (must be greater than 0)");
+                        "Total Servers",
+                        "Number too small (must be greater than 0)");
             }
 
             try
@@ -154,28 +157,28 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             catch (NumberFormatException ex)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Joinable Servers",
-                                                                     "Invalid or unrecognised integer");
+                        "Joinable Servers",
+                        "Invalid or unrecognised integer");
             }
             if (joinableServers < 0)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Joinable Servers",
-                                                                     "Number too small (must be greater than 0)");
+                        "Joinable Servers",
+                        "Number too small (must be greater than 0)");
             }
 
             plugin = args[6];
             if (plugin.length() > 100)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Plugin",
-                                                                     "Length too long (must be between 1-100 characters)");
+                        "Plugin",
+                        "Length too long (must be between 1-100 characters)");
             }
             if (plugin.isEmpty())
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Plugin",
-                                                                     "Length too short (must be between 1-100 characters)");
+                        "Plugin",
+                        "Length too short (must be between 1-100 characters)");
             }
             for (String characters : DISALLOWED_CHARACTERS)
             {
@@ -184,22 +187,22 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
                     continue;
                 }
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Plugin",
-                                                                     "Invalid characters '" + characters + "'");
+                        "Plugin",
+                        "Invalid characters '" + characters + "'");
             }
 
             worldZip = args[7];
             if (worldZip.length() > 100)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "World Zip",
-                                                                     "Length too long (must be between 1-100 characters)");
+                        "World Zip",
+                        "Length too long (must be between 1-100 characters)");
             }
             if (worldZip.isEmpty())
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "World Zip",
-                                                                     "Length too short (must be between 1-100 characters)");
+                        "World Zip",
+                        "Length too short (must be between 1-100 characters)");
             }
             for (String characters : DISALLOWED_CHARACTERS)
             {
@@ -208,8 +211,8 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
                     continue;
                 }
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "World Zip",
-                                                                     "Invalid characters '" + characters + "'");
+                        "World Zip",
+                        "Invalid characters '" + characters + "'");
             }
 
             try
@@ -223,8 +226,8 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             if (ram < 1)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Ram",
-                                                                     "Number too small (must be greater than 0)");
+                        "Ram",
+                        "Number too small (must be greater than 0)");
             }
 
             try
@@ -234,14 +237,14 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             catch (NumberFormatException ignored)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Capacity",
-                                                                     "Invalid or unrecognised integer");
+                        "Capacity",
+                        "Invalid or unrecognised integer");
             }
             if (capacity < 0)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Capacity",
-                                                                     "Number too small (must be greater than or equal to 0)");
+                        "Capacity",
+                        "Number too small (must be greater than or equal to 0)");
             }
 
             try
@@ -260,8 +263,8 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             catch (NumberFormatException ignored)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Server Timeout",
-                                                                     "Invalid or unrecognised integer");
+                        "Server Timeout",
+                        "Invalid or unrecognised integer");
             }
 
             try
@@ -271,8 +274,8 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             catch (Exception ex)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
-                                                                     "Game Types",
-                                                                     "Invalid or unrecognised game type");
+                        "Game Types",
+                        "Invalid or unrecognised game type");
             }
 
         }
@@ -283,69 +286,54 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
         }
 
         _miniPlugin._hexusPlugin.runAsync(() ->
-                                          {
-                                              try
-                                              {
-                                                  new ServerGroupData(name,
-                                                                      requiredPermission,
-                                                                      minPort,
-                                                                      maxPort,
-                                                                      totalServers,
-                                                                      joinableServers,
-                                                                      plugin,
-                                                                      worldZip,
-                                                                      ram,
-                                                                      capacity,
-                                                                      worldEdit,
-                                                                      timeoutMillis,
-                                                                      games,
-                                                                      null).update(_coreDatabase._database._jedis);
-                                              }
-                                              catch (JedisException ex)
-                                              {
-                                                  sender.sendMessage(F.fMain(this,
-                                                                             F.fError(
-                                                                                     "JedisException while updating server group punish. Please  try again later or contact an administrator if this issue persists.")));
-                                                  _miniPlugin._hexusPlugin.logWarning("JedisException while '" +
-                                                                                      sender.getName() +
-                                                                                      "' creating server group '" +
-                                                                                      name +
-                                                                                      "': " +
-                                                                                      ex.getMessage());
-                                                  return;
-                                              }
+        {
+            try
+            {
+                new ServerGroupData(name,
+                        requiredPermission,
+                        minPort,
+                        maxPort,
+                        totalServers,
+                        joinableServers,
+                        plugin,
+                        worldZip,
+                        ram,
+                        capacity,
+                        worldEdit,
+                        timeoutMillis,
+                        games,
+                        null).update(_coreDatabase._database._jedis);
+            }
+            catch (JedisException ex)
+            {
+                sender.sendMessage(F.fMain(this,
+                        F.fError("JedisException while updating server group punish. Please  try again later or " +
+                                "contact an administrator if this issue persists.")));
+                _miniPlugin._hexusPlugin.logWarning("JedisException while '" +
+                        sender.getName() +
+                        "' creating server group '" +
+                        name +
+                        "': " +
+                        ex.getMessage());
+                return;
+            }
 
-                                              sender.sendMessage(F.fMain(this,
-                                                                         F.fSuccess("Created server group with name ",
-                                                                                    F.fItem(name),
-                                                                                    ":\n"),
-                                                                         F.fItem("Name: " + F.fItem(name),
-                                                                                 "Required Permission: " +
-                                                                                 F.fItem(requiredPermission.name()),
-                                                                                 "Min Port: " +
-                                                                                 F.fItem(Integer.toString(minPort)),
-                                                                                 "Max Port: " +
-                                                                                 F.fItem(Integer.toString(maxPort)),
-                                                                                 "Total Servers: " +
-                                                                                 F.fItem(Integer.toString(totalServers)),
-                                                                                 "Joinable Servers: " +
-                                                                                 F.fItem(Integer.toString(
-                                                                                         joinableServers)),
-                                                                                 "Plugin: " + F.fItem(plugin),
-                                                                                 "World Zip: " + F.fItem(worldZip),
-                                                                                 "Ram: " +
-                                                                                 F.fItem(Integer.toString(ram)),
-                                                                                 "Capacity: " +
-                                                                                 F.fItem(Integer.toString(capacity)),
-                                                                                 "World Edit: " +
-                                                                                 F.fItem(Boolean.toString(worldEdit)),
-                                                                                 "Server Timeout: " +
-                                                                                 F.fItem(Integer.toString(timeoutMillis)),
-                                                                                 "Games: " +
-                                                                                 F.fItem(Arrays.stream(games)
-                                                                                               .map(GameType::name)
-                                                                                               .toArray(String[]::new)))));
-                                          });
+            sender.sendMessage(F.fMain(this,
+                    F.fSuccess("Created server group with name ", F.fItem(name), ":\n"),
+                    F.fItem("Name: " + F.fItem(name),
+                            "Required Permission: " + F.fItem(requiredPermission.name()),
+                            "Min Port: " + F.fItem(Integer.toString(minPort)),
+                            "Max Port: " + F.fItem(Integer.toString(maxPort)),
+                            "Total Servers: " + F.fItem(Integer.toString(totalServers)),
+                            "Joinable Servers: " + F.fItem(Integer.toString(joinableServers)),
+                            "Plugin: " + F.fItem(plugin),
+                            "World Zip: " + F.fItem(worldZip),
+                            "Ram: " + F.fItem(Integer.toString(ram)),
+                            "Capacity: " + F.fItem(Integer.toString(capacity)),
+                            "World Edit: " + F.fItem(Boolean.toString(worldEdit)),
+                            "Server Timeout: " + F.fItem(Integer.toString(timeoutMillis)),
+                            "Games: " + F.fItem(Arrays.stream(games).map(GameType::name).toArray(String[]::new)))));
+        });
     }
 
     @Override
@@ -366,8 +354,8 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
         private final String _reason;
 
         public InvalidNetStatGroupCreateArgumentException(CommandNetworkGroupCreate command,
-                                                          String argument,
-                                                          String reason)
+                String argument,
+                String reason)
         {
             _command = command;
             _argument = argument;

@@ -18,11 +18,12 @@ public class CommandParse extends BaseCommand<BuildParse>
     public CommandParse(BuildParse parse)
     {
         super(parse,
-              "parse",
-              "<Radius>",
-              "Parse your current world. The parse centers around chunk (0,0). The radius is the amount of chunks in each direction parsed.",
-              Set.of(),
-              BuildParse.PERM.COMMAND_PARSE);
+                "parse",
+                "<Radius>",
+                "Parse your current world. The parse centers around chunk (0,0). The radius is the amount of chunks " +
+                        "in each direction parsed.",
+                Set.of(),
+                BuildParse.PERM.COMMAND_PARSE);
     }
 
     @Override
@@ -43,9 +44,9 @@ public class CommandParse extends BaseCommand<BuildParse>
         catch (ExRadiusTooSmall ex)
         {
             sender.sendMessage(F.fMain(this,
-                                       F.fError("Radius too small."),
-                                       "Minimum radius: ",
-                                       F.fItem(Integer.toString(ex._minimumRadius))));
+                    F.fError("Radius too small."),
+                    "Minimum radius: ",
+                    F.fItem(Integer.toString(ex._minimumRadius))));
         }
         catch (ExInvalidWorld ex)
         {

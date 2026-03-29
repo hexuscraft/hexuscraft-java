@@ -47,10 +47,8 @@ public class ServerMonitor implements Runnable
         catch (UnknownHostException | FileNotFoundException ex)
         {
             System.out.println("Exception while instantiating: " +
-                               String.join("\n",
-                                           Arrays.stream(ex.getStackTrace())
-                                                 .map(StackTraceElement::toString)
-                                                 .toArray(String[]::new)));
+                    String.join("\n",
+                            Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)));
         }
     }
 
@@ -72,10 +70,10 @@ public class ServerMonitor implements Runnable
         Map<ServerGroupData, Set<ServerData>> joinableServersMap = new HashMap<>();
 
         _serverGroupDataMap.values().forEach(serverGroupData ->
-                                             {
-                                                 totalServersMap.put(serverGroupData, new HashSet<>());
-                                                 joinableServersMap.put(serverGroupData, new HashSet<>());
-                                             });
+        {
+            totalServersMap.put(serverGroupData, new HashSet<>());
+            joinableServersMap.put(serverGroupData, new HashSet<>());
+        });
 
         for (ServerData serverData : _serverDataMap.values())
         {
@@ -100,9 +98,9 @@ public class ServerMonitor implements Runnable
             }
 
             if ((System.currentTimeMillis() - serverData._updated) >
-                (serverData._updatedByMonitor ?
-                 Math.max(30000L, serverGroupData._timeoutMillis) :
-                 serverGroupData._timeoutMillis))
+                    (serverData._updatedByMonitor ?
+                            Math.max(30000L, serverGroupData._timeoutMillis) :
+                            serverGroupData._timeoutMillis))
             {
                 _manager.killServer(_database._jedis, serverData._name, serverData._group, "Unresponsive");
                 return;
@@ -121,9 +119,9 @@ public class ServerMonitor implements Runnable
         }
 
         for (ServerGroupData serverGroupData : _serverGroupDataMap.values()
-                                                                  .stream()
-                                                                  .sorted(Comparator.comparingInt(value -> value._minPort))
-                                                                  .toArray(ServerGroupData[]::new))
+                .stream()
+                .sorted(Comparator.comparingInt(value -> value._minPort))
+                .toArray(ServerGroupData[]::new))
         {
             Set<ServerData> totalServers = totalServersMap.get(serverGroupData);
             int totalServersAmount = totalServers.size();
@@ -144,9 +142,9 @@ public class ServerMonitor implements Runnable
                 if (bestServerToKill != null)
                 {
                     _manager.killServer(_database._jedis,
-                                        bestServerToKill._name,
-                                        bestServerToKill._group,
-                                        "Excess Servers");
+                            bestServerToKill._name,
+                            bestServerToKill._group,
+                            "Excess Servers");
                     return;
                 }
             }

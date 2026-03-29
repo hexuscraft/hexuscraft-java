@@ -44,10 +44,10 @@ public class ArcadeLobby extends MiniPlugin<Arcade>
 
         Player player = event.getPlayer();
         player.teleport(_hexusPlugin.getServer()
-                                    .getWorlds()
-                                    .getFirst()
-                                    .getSpawnLocation()
-                                    .add(new Vector(0.5, 0, 0.5)));
+                .getWorlds()
+                .getFirst()
+                .getSpawnLocation()
+                .add(new Vector(0.5, 0, 0.5)));
         player.resetPlayerTime();
         player.resetPlayerWeather();
         player.resetMaxHealth();

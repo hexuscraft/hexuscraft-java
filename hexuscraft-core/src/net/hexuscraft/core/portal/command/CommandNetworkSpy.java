@@ -13,11 +13,11 @@ public class CommandNetworkSpy extends BaseCommand<CorePortal>
     CommandNetworkSpy(CorePortal corePortal)
     {
         super(corePortal,
-              "spy",
-              "",
-              "Receive event logs from ServerMonitor.",
-              Set.of(),
-              CorePortal.PERM.COMMAND_NETWORK_SPY);
+                "spy",
+                "",
+                "Receive event logs from ServerMonitor.",
+                Set.of(),
+                CorePortal.PERM.COMMAND_NETWORK_SPY);
     }
 
     @Override

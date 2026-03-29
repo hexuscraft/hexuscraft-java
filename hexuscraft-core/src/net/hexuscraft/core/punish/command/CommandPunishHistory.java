@@ -19,11 +19,11 @@ public class CommandPunishHistory extends BaseCommand<CorePunish>
     public CommandPunishHistory(CorePunish corePunish)
     {
         super(corePunish,
-              "punishmenthistory",
-              "[Player]",
-              "View the history of punishments.",
-              Set.of("punishhistory", "xh"),
-              CorePunish.PERM.COMMAND_PUNISH_HISTORY);
+                "punishmenthistory",
+                "[Player]",
+                "View the history of punishments.",
+                Set.of("punishhistory", "xh"),
+                CorePunish.PERM.COMMAND_PUNISH_HISTORY);
     }
 
     @Override
@@ -42,25 +42,24 @@ public class CommandPunishHistory extends BaseCommand<CorePunish>
         }
 
         _miniPlugin._hexusPlugin.runAsync(() ->
-                                          {
-                                              OfflinePlayer targetOfflinePlayer;
+        {
+            OfflinePlayer targetOfflinePlayer;
 
-                                              if (args.length == 1)
-                                              {
-                                                  targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
-                                                                                                         sender);
-                                                  if (targetOfflinePlayer == null)
-                                                  {
-                                                      return;
-                                                  }
-                                              }
-                                              else
-                                              {
-                                                  targetOfflinePlayer = senderPlayer;
-                                              }
+            if (args.length == 1)
+            {
+                targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+                if (targetOfflinePlayer == null)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                targetOfflinePlayer = senderPlayer;
+            }
 
-                                              _miniPlugin.openHistoryGui(senderPlayer, targetOfflinePlayer);
-                                          });
+            _miniPlugin.openHistoryGui(senderPlayer, targetOfflinePlayer);
+        });
     }
 
     @Override
@@ -71,8 +70,8 @@ public class CommandPunishHistory extends BaseCommand<CorePunish>
         {
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                                                                                     .getOnlinePlayers()
-                                                                                     .stream();
+                    .getOnlinePlayers()
+                    .stream();
             if (sender instanceof Player player)
             {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));

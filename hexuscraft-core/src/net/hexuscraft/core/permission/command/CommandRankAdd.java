@@ -24,11 +24,11 @@ public class CommandRankAdd extends BaseCommand<CorePermission>
     CommandRankAdd(CorePermission corePermission, CoreDatabase coreDatabase)
     {
         super(corePermission,
-              "add",
-              "<Player> <Permission Group>",
-              "Add a group to a player.",
-              Set.of("a"),
-              CorePermission.PERM.COMMAND_RANK_ADD);
+                "add",
+                "<Player> <Permission Group>",
+                "Add a group to a player.",
+                Set.of("a"),
+                CorePermission.PERM.COMMAND_RANK_ADD);
         _coreDatabase = coreDatabase;
     }
 
@@ -45,17 +45,17 @@ public class CommandRankAdd extends BaseCommand<CorePermission>
         try
         {
             targetGroup = Arrays.stream(PermissionGroup.values())
-                                .filter(group -> group.name().equalsIgnoreCase(args[1]))
-                                .findFirst()
-                                .orElseThrow();
+                    .filter(group -> group.name().equalsIgnoreCase(args[1]))
+                    .findFirst()
+                    .orElseThrow();
         }
         catch (NoSuchElementException ex)
         {
             sender.sendMessage(F.fMain(this, F.fError("You specified an invalid group name: ", F.fItem(args[1]))) +
-                               "\n" +
-                               F.fMain("", "Available groups: ") +
-                               F.fItem(PermissionGroup.getColoredNames()) +
-                               ".");
+                    "\n" +
+                    F.fMain("", "Available groups: ") +
+                    F.fItem(PermissionGroup.getColoredNames()) +
+                    ".");
             return;
         }
 
@@ -81,19 +81,19 @@ public class CommandRankAdd extends BaseCommand<CorePermission>
             }
 
             sender.sendMessage(F.fMain(this,
-                                       "Adding sub-group ",
-                                       F.fPermissionGroup(targetGroup),
-                                       " to ",
-                                       F.fItem(offlinePlayer.getName()),
-                                       "..."));
+                    "Adding sub-group ",
+                    F.fPermissionGroup(targetGroup),
+                    " to ",
+                    F.fItem(offlinePlayer.getName()),
+                    "..."));
 
             _coreDatabase._database._jedis.sadd(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()),
-                                                targetGroup.name());
+                    targetGroup.name());
             sender.sendMessage(F.fMain(this,
-                                       F.fSuccess("Added sub-group " + F.fPermissionGroup(targetGroup),
-                                                  " to ",
-                                                  F.fItem(offlinePlayer.getName()),
-                                                  ".")));
+                    F.fSuccess("Added sub-group " + F.fPermissionGroup(targetGroup),
+                            " to ",
+                            F.fItem(offlinePlayer.getName()),
+                            ".")));
         });
 
     }
@@ -104,15 +104,15 @@ public class CommandRankAdd extends BaseCommand<CorePermission>
         if (args.length == 1)
         {
             return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                        sender,
-                                                        false);
+                    sender,
+                    false);
         }
         if (args.length == 2)
         {
             return Arrays.stream(PermissionGroup.values())
-                         .map(PermissionGroup::name)
-                         .filter(permissionGroupName -> !permissionGroupName.startsWith("_"))
-                         .toList();
+                    .map(PermissionGroup::name)
+                    .filter(permissionGroupName -> !permissionGroupName.startsWith("_"))
+                    .toList();
         }
         return List.of();
     }

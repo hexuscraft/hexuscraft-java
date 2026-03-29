@@ -15,11 +15,11 @@ public class CommandBuildVersion extends BaseCommand<CoreBuildVersion>
     public CommandBuildVersion(CoreBuildVersion plugin)
     {
         super(plugin,
-              "buildversion",
-              "",
-              "View information about the current plugin.",
-              Set.of("bv"),
-              CoreBuildVersion.PERM.COMMAND_BUILDVERSION);
+                "buildversion",
+                "",
+                "View information about the current plugin.",
+                Set.of("bv"),
+                CoreBuildVersion.PERM.COMMAND_BUILDVERSION);
     }
 
     @Override
@@ -37,18 +37,18 @@ public class CommandBuildVersion extends BaseCommand<CoreBuildVersion>
 
         StringBuilder builder = new StringBuilder(F.fMain(this, "Plugin Information:\n"));
         Map.of("Name",
-               description.getName(),
-               "Main",
-               description.getMain(),
-               "Version",
-               description.getVersion(),
-               "Load",
-               description.getLoad().name(),
-               "Last Modified",
-               F.fTime(System.currentTimeMillis() - lastModified) + " (" + lastModified + ")",
-               "File Size",
-               plugin.getSizeBytes() + " (B)")
-           .forEach((key, value) -> builder.append(F.fMain("", key, ": ", F.fItem(value), "\n")));
+                        description.getName(),
+                        "Main",
+                        description.getMain(),
+                        "Version",
+                        description.getVersion(),
+                        "Load",
+                        description.getLoad().name(),
+                        "Last Modified",
+                        F.fTime(System.currentTimeMillis() - lastModified) + " (" + lastModified + ")",
+                        "File Size",
+                        plugin.getSizeBytes() + " (B)")
+                .forEach((key, value) -> builder.append(F.fMain("", key, ": ", F.fItem(value), "\n")));
         sender.sendMessage(builder.toString());
     }
 

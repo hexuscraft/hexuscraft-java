@@ -11,11 +11,11 @@ public class CommandGameSet extends BaseCommand<ArcadeManager>
     CommandGameSet(ArcadeManager arcadeManager)
     {
         super(arcadeManager,
-              "set",
-              "<Name> [Map]",
-              "Change the active game.",
-              Set.of("change", "c"),
-              ArcadeManager.PERM.COMMAND_GAME_SET);
+                "set",
+                "<Name> [Map]",
+                "Change the active game.",
+                Set.of("change", "c"),
+                ArcadeManager.PERM.COMMAND_GAME_SET);
     }
 
 }

@@ -31,7 +31,7 @@ public class NewsQueries
     {
         Set<NewsData> news = new HashSet<>();
         jedis.keys(Database.buildQuery("news", "*"))
-             .forEach(key -> news.add(getNews(jedis, UUID.fromString(key.split(Database.KEY_DELIMITER, 2)[1]))));
+                .forEach(key -> news.add(getNews(jedis, UUID.fromString(key.split(Database.KEY_DELIMITER, 2)[1]))));
         return news.toArray(NewsData[]::new);
     }
 

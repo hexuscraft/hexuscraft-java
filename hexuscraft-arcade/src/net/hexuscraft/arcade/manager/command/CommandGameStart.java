@@ -11,11 +11,11 @@ public class CommandGameStart extends BaseCommand<ArcadeManager>
     CommandGameStart(ArcadeManager arcadeManager)
     {
         super(arcadeManager,
-              "start",
-              "[Seconds]",
-              "Start the currently loaded game.",
-              Set.of(),
-              ArcadeManager.PERM.COMMAND_GAME_START);
+                "start",
+                "[Seconds]",
+                "Start the currently loaded game.",
+                Set.of(),
+                ArcadeManager.PERM.COMMAND_GAME_START);
     }
 
 }

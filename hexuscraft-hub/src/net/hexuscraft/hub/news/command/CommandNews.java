@@ -12,11 +12,11 @@ public class CommandNews extends BaseMultiCommand<HubNews>
     public CommandNews(HubNews hubNews, CoreDatabase coreDatabase)
     {
         super(hubNews,
-              "news",
-              "Manage the hub news.",
-              Set.of(),
-              HubNews.PERM.COMMAND_NEWS,
-              Set.of(new CommandNewsAdd(hubNews, coreDatabase)));
+                "news",
+                "Manage the hub news.",
+                Set.of(),
+                HubNews.PERM.COMMAND_NEWS,
+                Set.of(new CommandNewsAdd(hubNews, coreDatabase)));
     }
 
 }

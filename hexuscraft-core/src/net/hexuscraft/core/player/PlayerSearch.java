@@ -50,9 +50,9 @@ public class PlayerSearch
     }
 
     public static Player[] onlinePlayerSearch(Collection<? extends Player> onlinePlayers,
-                                              String searchName,
-                                              CommandSender sender,
-                                              Predicate<Player[]> shouldSendMatches)
+            String searchName,
+            CommandSender sender,
+            Predicate<Player[]> shouldSendMatches)
     {
         if (searchName.equals(".") && sender instanceof Player player)
         {
@@ -69,16 +69,14 @@ public class PlayerSearch
         if (shouldSendMatches.test(matches))
         {
             sender.sendMessage(F.fMain("Online Player Search",
-                                       F.fMatches(Arrays.stream(matches)
-                                                        .map(Player::getDisplayName)
-                                                        .toArray(String[]::new), searchName)));
+                    F.fMatches(Arrays.stream(matches).map(Player::getDisplayName).toArray(String[]::new), searchName)));
         }
         return matches;
     }
 
     public static List<String> onlinePlayerCompletions(Collection<? extends Player> onlinePlayers,
-                                                       CommandSender sender,
-                                                       boolean showSelectors)
+            CommandSender sender,
+            boolean showSelectors)
     {
         List<String> completions = new ArrayList<>();
         if (sender instanceof Player player)
@@ -154,7 +152,7 @@ public class PlayerSearch
         try
         {
             url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" +
-                          uuid.toString().replaceAll("-", "")).toURL();
+                    uuid.toString().replaceAll("-", "")).toURL();
         }
         catch (URISyntaxException e)
         {
@@ -180,17 +178,17 @@ public class PlayerSearch
 
         JSONArray propertiesArray = jsonObject.getJSONArray("properties");
         return new MojangSession(UUID.fromString(new StringBuilder(jsonObject.getString("id")).insert(20, '-')
-                                                                                              .insert(16, '-')
-                                                                                              .insert(12, '-')
-                                                                                              .insert(8, '-')
-                                                                                              .toString()),
-                                 jsonObject.getString("name"),
-                                 IntStream.range(0, propertiesArray.length())
-                                          .mapToObj(propertiesArray::getJSONObject)
-                                          .collect(Collectors.toMap(obj -> obj.getString("name"),
-                                                                    obj -> obj.getString("value"),
-                                                                    (_, replacement) -> replacement,
-                                                                    HashMap::new)));
+                .insert(16, '-')
+                .insert(12, '-')
+                .insert(8, '-')
+                .toString()),
+                jsonObject.getString("name"),
+                IntStream.range(0, propertiesArray.length())
+                        .mapToObj(propertiesArray::getJSONObject)
+                        .collect(Collectors.toMap(obj -> obj.getString("name"),
+                                obj -> obj.getString("value"),
+                                (_, replacement) -> replacement,
+                                HashMap::new)));
     }
 
 }

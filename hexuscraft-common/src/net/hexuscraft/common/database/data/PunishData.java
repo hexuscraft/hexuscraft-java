@@ -31,15 +31,15 @@ public class PunishData
     public String _removeStaffServer;
 
     public PunishData(UUID uuid,
-                      PunishType type,
-                      Boolean active,
-                      Long origin,
-                      Long length,
-                      String reason,
-                      UUID targetUUID,
-                      String targetServer,
-                      UUID staffUUID,
-                      String staffServer)
+            PunishType type,
+            Boolean active,
+            Long origin,
+            Long length,
+            String reason,
+            UUID targetUUID,
+            String targetServer,
+            UUID staffUUID,
+            String staffServer)
     {
         _uuid = uuid;
         _type = type;
@@ -54,21 +54,21 @@ public class PunishData
     }
 
     public PunishData(UUID uuid,
-                      PunishType type,
-                      Boolean active,
-                      Long origin,
-                      Long length,
-                      String reason,
-                      UUID targetUUID,
-                      String targetServer,
-                      UUID staffUUID,
-                      String staffServer,
+            PunishType type,
+            Boolean active,
+            Long origin,
+            Long length,
+            String reason,
+            UUID targetUUID,
+            String targetServer,
+            UUID staffUUID,
+            String staffServer,
 
-                      Long removeOrigin,
-                      String removeReason,
-                      String removeTargetServer,
-                      UUID removeStaffUUID,
-                      String removeStaffServer)
+            Long removeOrigin,
+            String removeReason,
+            String removeTargetServer,
+            UUID removeStaffUUID,
+            String removeStaffServer)
     {
         _uuid = uuid;
         _type = type;

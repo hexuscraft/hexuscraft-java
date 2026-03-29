@@ -25,10 +25,10 @@ public class CommandRules extends BaseCommand<CorePunish>
         }
 
         sender.sendMessage(F.fMain(this, "Server Rules:") +
-                           "\n" +
-                           F.fMain("", "1. Don't use gameplay-affecting client modifications") +
-                           "\n" +
-                           F.fMain("", "2. Be respectful, civil, and kind to all players"));
+                "\n" +
+                F.fMain("", "1. Don't use gameplay-affecting client modifications") +
+                "\n" +
+                F.fMain("", "2. Be respectful, civil, and kind to all players"));
     }
 
 }

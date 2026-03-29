@@ -41,17 +41,17 @@ public class UtilCooldown
         Set<Cooldown> parentList = _cooldownMap.get(parent);
         parentList.add(cooldown);
         new Thread(() ->
-                   {
-                       try
-                       {
-                           Thread.sleep(cooldown._delayMs);
-                           parentList.remove(cooldown);
-                       }
-                       catch (InterruptedException ex)
-                       {
-                           ex.printStackTrace();
-                       }
-                   }).start();
+        {
+            try
+            {
+                Thread.sleep(cooldown._delayMs);
+                parentList.remove(cooldown);
+            }
+            catch (InterruptedException ex)
+            {
+                ex.printStackTrace();
+            }
+        }).start();
     }
 
     public static boolean use(Object parent, String name, Long delayMs)

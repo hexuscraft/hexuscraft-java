@@ -17,11 +17,11 @@ public class CommandSpawn extends BaseCommand<HubPlayer>
     public CommandSpawn(HubPlayer hubPlayer)
     {
         super(hubPlayer,
-              "spawn",
-              "[Player]",
-              "Warp to spawn.",
-              Set.of("stuck", "hub", "lobby"),
-              HubPlayer.PERM.COMMAND_SPAWN);
+                "spawn",
+                "[Player]",
+                "Warp to spawn.",
+                Set.of("stuck", "hub", "lobby"),
+                HubPlayer.PERM.COMMAND_SPAWN);
     }
 
     @Override
@@ -44,9 +44,9 @@ public class CommandSpawn extends BaseCommand<HubPlayer>
             }
 
             Player[] players = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                               args[0],
-                                                               sender,
-                                                               matches -> matches.length != 1);
+                    args[0],
+                    sender,
+                    matches -> matches.length != 1);
             if (players.length != 1)
             {
                 return;
@@ -72,28 +72,23 @@ public class CommandSpawn extends BaseCommand<HubPlayer>
         }
 
         target.sendMessage(F.fMain(this) +
-                           "You were teleported to spawn by " +
-                           F.fItem(sender instanceof Player player ? player.getDisplayName() : sender.getName()) +
-                           ".");
+                "You were teleported to spawn by " +
+                F.fItem(sender instanceof Player player ? player.getDisplayName() : sender.getName()) +
+                ".");
         sender.sendMessage(F.fMain(this) + "Teleported " + F.fItem(target.getDisplayName()) + " to spawn.");
         _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(staff ->
-                                                                        {
-                                                                            if (!staff.hasPermission(PermissionGroup.TRAINEE.name()))
-                                                                            {
-                                                                                return;
-                                                                            }
-                                                                            staff.sendMessage(F.fStaff(this,
-                                                                                                       F.fItem(sender instanceof Player player ?
-                                                                                                               player.getDisplayName() :
-                                                                                                               sender.getName()),
-                                                                                                       " teleported ",
-                                                                                                       F.fItem(target.getDisplayName()),
-                                                                                                       " to spawn."));
-                                                                            staff.playSound(staff.getLocation(),
-                                                                                            Sound.NOTE_PLING,
-                                                                                            Float.MAX_VALUE,
-                                                                                            2);
+        {
+            if (!staff.hasPermission(PermissionGroup.TRAINEE.name()))
+            {
+                return;
+            }
+            staff.sendMessage(F.fStaff(this,
+                    F.fItem(sender instanceof Player player ? player.getDisplayName() : sender.getName()),
+                    " teleported ",
+                    F.fItem(target.getDisplayName()),
+                    " to spawn."));
+            staff.playSound(staff.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
 
-                                                                        });
+        });
     }
 }

@@ -17,11 +17,12 @@ public class CommandNetworkServerRestart extends BaseCommand<CorePortal>
     public CommandNetworkServerRestart(CorePortal corePortal)
     {
         super(corePortal,
-              "restart",
-              "<Server>",
-              "The specified server will prevent new players from joining, send existing players to a Lobby, and then restart.",
-              Set.of("r", "reboot", "rb"),
-              CorePortal.PERM.COMMAND_NETWORK_SERVER_RESTART);
+                "restart",
+                "<Server>",
+                "The specified server will prevent new players from joining, send existing players to a Lobby, and " +
+                        "then restart.",
+                Set.of("r", "reboot", "rb"),
+                CorePortal.PERM.COMMAND_NETWORK_SERVER_RESTART);
     }
 
     @Override
@@ -42,50 +43,43 @@ public class CommandNetworkServerRestart extends BaseCommand<CorePortal>
         }
 
         _miniPlugin._hexusPlugin.runAsync(() ->
-                                          {
-                                              ServerData serverData;
-                                              try
-                                              {
-                                                  serverData = _miniPlugin.getServer(args[0]);
-                                              }
-                                              catch (JedisException ex)
-                                              {
-                                                  sender.sendMessage(F.fMain(this,
-                                                                             F.fError(
-                                                                                     "JedisException while fetching server punish. Please try again later or contact an administrator if this issue persists.")));
-                                                  return;
-                                              }
+        {
+            ServerData serverData;
+            try
+            {
+                serverData = _miniPlugin.getServer(args[0]);
+            }
+            catch (JedisException ex)
+            {
+                sender.sendMessage(F.fMain(this,
+                        F.fError("JedisException while fetching server punish. Please try again later or contact an " +
+                                "administrator if this issue persists.")));
+                return;
+            }
 
-                                              if (serverData == null)
-                                              {
-                                                  sender.sendMessage(F.fMain(this,
-                                                                             F.fError(
-                                                                                     "Could not locate server with name ",
-                                                                                     F.fItem(args[0]),
-                                                                                     ".")));
-                                                  return;
-                                              }
+            if (serverData == null)
+            {
+                sender.sendMessage(F.fMain(this,
+                        F.fError("Could not locate server with name ", F.fItem(args[0]), ".")));
+                return;
+            }
 
-                                              _miniPlugin._hexusPlugin.runAsync(() ->
-                                                                                {
-                                                                                    try
-                                                                                    {
-                                                                                        _miniPlugin.restartServerAsync(
-                                                                                                serverData._name);
-                                                                                    }
-                                                                                    catch (JedisException ex)
-                                                                                    {
-                                                                                        sender.sendMessage(F.fMain(this,
-                                                                                                                   F.fError(
-                                                                                                                           "JedisException while restarting server. Please try again later or contact an administrator if this issue persists.")));
-                                                                                        return;
-                                                                                    }
-                                                                                    sender.sendMessage(F.fMain(this,
-                                                                                                               "Restarting server ",
-                                                                                                               F.fItem(serverData._name),
-                                                                                                               "..."));
-                                                                                });
-                                          });
+            _miniPlugin._hexusPlugin.runAsync(() ->
+            {
+                try
+                {
+                    _miniPlugin.restartServerAsync(serverData._name);
+                }
+                catch (JedisException ex)
+                {
+                    sender.sendMessage(F.fMain(this,
+                            F.fError("JedisException while restarting server. Please try again later or contact an " +
+                                    "administrator if this issue persists.")));
+                    return;
+                }
+                sender.sendMessage(F.fMain(this, "Restarting server ", F.fItem(serverData._name), "..."));
+            });
+        });
     }
 
     @Override

@@ -39,16 +39,16 @@ public class ServerData
     }
 
     public ServerData(String name,
-                      String address,
-                      int capacity,
-                      long createdMillis,
-                      String group,
-                      String motd,
-                      int players,
-                      int port,
-                      double tps,
-                      long updated,
-                      boolean updatedByMonitor)
+            String address,
+            int capacity,
+            long createdMillis,
+            String group,
+            String motd,
+            int players,
+            int port,
+            double tps,
+            long updated,
+            boolean updatedByMonitor)
     {
         _name = name;
 

@@ -54,11 +54,11 @@ public class Hub extends HexusPlugin
         {
             Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_spawn.dat").toFile());
             _spawn = new Location(event.getWorld(),
-                                  scanner.nextDouble(),
-                                  scanner.nextDouble(),
-                                  scanner.nextDouble(),
-                                  scanner.nextFloat(),
-                                  scanner.nextFloat());
+                    scanner.nextDouble(),
+                    scanner.nextDouble(),
+                    scanner.nextDouble(),
+                    scanner.nextFloat(),
+                    scanner.nextFloat());
         }
         catch (FileNotFoundException ex)
         {

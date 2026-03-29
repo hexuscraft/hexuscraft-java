@@ -28,9 +28,9 @@ public class ItemSearch
         }
 
         Material[] matches = Arrays.stream(Material.values())
-                                   .filter(ItemSearch::isMaterialAnItem)
-                                   .filter(material -> material.name().toLowerCase().contains(searchName.toLowerCase()))
-                                   .toArray(Material[]::new);
+                .filter(ItemSearch::isMaterialAnItem)
+                .filter(material -> material.name().toLowerCase().contains(searchName.toLowerCase()))
+                .toArray(Material[]::new);
 
         for (Material match : matches)
             if (match.name().equalsIgnoreCase(searchName))
@@ -51,15 +51,14 @@ public class ItemSearch
     }
 
     public static Material[] itemSearch(String searchName,
-                                        CommandSender sender,
-                                        Predicate<Material[]> shouldSendMatches)
+            CommandSender sender,
+            Predicate<Material[]> shouldSendMatches)
     {
         Material[] matches = itemSearch(searchName);
         if (shouldSendMatches.test(matches))
         {
             sender.sendMessage(F.fMain("Item Search",
-                                       F.fMatches(Arrays.stream(matches).map(Material::name).toArray(String[]::new),
-                                                  searchName)));
+                    F.fMatches(Arrays.stream(matches).map(Material::name).toArray(String[]::new), searchName)));
         }
         return matches;
     }

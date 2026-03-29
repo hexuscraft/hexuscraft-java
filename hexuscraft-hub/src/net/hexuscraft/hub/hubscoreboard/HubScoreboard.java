@@ -44,10 +44,10 @@ public class HubScoreboard extends MiniPlugin<Hub>
     public void onEnable()
     {
         _hexusPlugin.getServer()
-                    .getOnlinePlayers()
-                    .stream()
-                    .map(player -> new PlayerJoinEvent(player, null))
-                    .forEach(this::onPlayerJoin);
+                .getOnlinePlayers()
+                .stream()
+                .map(player -> new PlayerJoinEvent(player, null))
+                .forEach(this::onPlayerJoin);
     }
 
     @Override
@@ -68,24 +68,19 @@ public class HubScoreboard extends MiniPlugin<Hub>
 
         List<Score> sidebarScores = new ArrayList<>();
         _sidebarUpdateTasks.put(player, _hexusPlugin.runSyncTimer(() ->
-                                                                  {
-                                                                      sidebarScores.stream()
-                                                                                   .map(Score::getEntry)
-                                                                                   .forEach(scoreboard::resetScores);
-                                                                      sidebarScores.clear();
+        {
+            sidebarScores.stream().map(Score::getEntry).forEach(scoreboard::resetScores);
+            sidebarScores.clear();
 
-                                                                      String[] lines = generateSidebarLines(player);
-                                                                      for (int i = 0; i < lines.length; i++)
-                                                                      {
-                                                                          String line = lines[lines.length - i - 1];
-                                                                          Score
-                                                                                  score
-                                                                                  = sidebarObjective.getScore(C.hexMap.get(
-                                                                                  i) + C.fReset + line);
-                                                                          score.setScore(i);
-                                                                          sidebarScores.add(score);
-                                                                      }
-                                                                  }, 0, 20));
+            String[] lines = generateSidebarLines(player);
+            for (int i = 0; i < lines.length; i++)
+            {
+                String line = lines[lines.length - i - 1];
+                Score score = sidebarObjective.getScore(C.hexMap.get(i) + C.fReset + line);
+                score.setScore(i);
+                sidebarScores.add(score);
+            }
+        }, 0, 20));
     }
 
     @EventHandler
@@ -104,20 +99,20 @@ public class HubScoreboard extends MiniPlugin<Hub>
     private String[] generateSidebarLines(Player player)
     {
         return new String[]{C.cAqua + C.fBold + "Server",
-                            _corePortal._serverName,
-                            "",
-                            C.cGreen + C.fBold + "Players",
-                            "" + Arrays.stream(_corePortal.getServers()).mapToInt(s -> s._players).sum(),
-                            "",
-                            C.cYellow + C.fBold + "Coins",
-                            "0",
-                            "",
-                            C.cGold + C.fBold + "Rank",
-                            PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(player)
-                                                                                                         ._groups())._prefix,
-                            "",
-                            C.cRed + C.fBold + "Website",
-                            "www.hexuscraft.net"};
+                _corePortal._serverName,
+                "",
+                C.cGreen + C.fBold + "Players",
+                "" + Arrays.stream(_corePortal.getServers()).mapToInt(s -> s._players).sum(),
+                "",
+                C.cYellow + C.fBold + "Coins",
+                "0",
+                "",
+                C.cGold + C.fBold + "Rank",
+                PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(player)
+                        ._groups())._prefix,
+                "",
+                C.cRed + C.fBold + "Website",
+                "www.hexuscraft.net"};
     }
 
 }

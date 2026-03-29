@@ -40,6 +40,7 @@ public class ArcadeHost extends MiniPlugin<Arcade>
         COMMAND_HOST_SET,
         COMMAND_HOST_VIEW
     }
+
     private final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5).toMillis();
     private final AtomicReference<BukkitTask> _hostAbandonedTask;
     private final AtomicLong _hostLastSeenMillis;
@@ -76,67 +77,59 @@ public class ArcadeHost extends MiniPlugin<Arcade>
         _coreCommand.register(new CommandHost(this));
 
         _hexusPlugin.runAsync(() ->
-                              {
-                                  try
-                                  {
-                                      _host.set(PlayerSearch.offlinePlayerSearch(_corePortal.getServerGroup(_corePortal._serverGroupName)._hostUniqueId));
-                                  }
-                                  catch (IOException ex)
-                                  {
-                                      logSevere(ex);
-                                  }
+        {
+            try
+            {
+                _host.set(PlayerSearch.offlinePlayerSearch(_corePortal.getServerGroup(_corePortal._serverGroupName)._hostUniqueId));
+            }
+            catch (IOException ex)
+            {
+                logSevere(ex);
+            }
 
-                                  // We want to wait a little bit before attempting to teleport the server host so the proxies and notchians have time to update their server cache
-                                  _hexusPlugin.runAsyncLater(() ->
-                                                             {
-                                                                 if (_host.get() == null)
-                                                                 {
-                                                                     return;
-                                                                 }
-                                                                 _corePortal.teleportAsync(_host.get().getUniqueId(),
-                                                                                           _corePortal._serverName);
-                                                             }, 40L);
-                              });
+            // We want to wait a little bit before attempting to teleport the server host so the proxies and
+            // notchians have time to update their server cache
+            _hexusPlugin.runAsyncLater(() ->
+            {
+                if (_host.get() == null)
+                {
+                    return;
+                }
+                _corePortal.teleportAsync(_host.get().getUniqueId(), _corePortal._serverName);
+            }, 40L);
+        });
 
         _hostAbandonedTask.set(_hexusPlugin.runSyncTimer(() ->
-                                                         {
-                                                             // We want to run the host check even if the server was started with no host, as an admin can become the host of any existing server.
-                                                             OfflinePlayer host = _host.get();
-                                                             if (host == null)
-                                                             {
-                                                                 return;
-                                                             }
-                                                             if (host.isOnline())
-                                                             {
-                                                                 return;
-                                                             }
-                                                             if ((System.currentTimeMillis() -
-                                                                  _hostLastSeenMillis.get()) <
-                                                                 MAX_HOST_LAST_SEEN_MILLIS)
-                                                             {
-                                                                 return;
-                                                             }
+        {
+            // We want to run the host check even if the server was started with no host, as an admin can become the
+            // host of any existing server.
+            OfflinePlayer host = _host.get();
+            if (host == null)
+            {
+                return;
+            }
+            if (host.isOnline())
+            {
+                return;
+            }
+            if ((System.currentTimeMillis() - _hostLastSeenMillis.get()) < MAX_HOST_LAST_SEEN_MILLIS)
+            {
+                return;
+            }
 
-                                                             _hostAbandonedTask.get().cancel();
-                                                             _hexusPlugin.getServer()
-                                                                         .broadcastMessage(F.fMain(this,
-                                                                                                   "The host has abandoned their server. You will be sent back to a lobby. Thanks for playing!"));
-                                                             _hexusPlugin.getServer()
-                                                                         .getOnlinePlayers()
-                                                                         .forEach(player ->
-                                                                                  {
-                                                                                      //noinspection deprecation
-                                                                                      player.sendTitle(C.cYellow +
-                                                                                                       "Server Abandoned",
-                                                                                                       "Sending you back to a lobby...");
-                                                                                      player.playSound(player.getLocation(),
-                                                                                                       Sound.ENDERDRAGON_GROWL,
-                                                                                                       Float.MAX_VALUE,
-                                                                                                       1);
-                                                                                  });
-                                                             _coreDatabase._database._jedis.del(ServerQueries.SERVERGROUP(
-                                                                     _corePortal._serverGroupName));
-                                                         }, 0, 20L));
+            _hostAbandonedTask.get().cancel();
+            _hexusPlugin.getServer()
+                    .broadcastMessage(F.fMain(this,
+                            "The host has abandoned their server. You will be sent back to a lobby. Thanks for " +
+                                    "playing!"));
+            _hexusPlugin.getServer().getOnlinePlayers().forEach(player ->
+            {
+                //noinspection deprecation
+                player.sendTitle(C.cYellow + "Server Abandoned", "Sending you back to a lobby...");
+                player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, Float.MAX_VALUE, 1);
+            });
+            _coreDatabase._database._jedis.del(ServerQueries.SERVERGROUP(_corePortal._serverGroupName));
+        }, 0, 20L));
     }
 
     public void setHost(OfflinePlayer newHost)

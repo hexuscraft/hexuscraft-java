@@ -91,19 +91,20 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
             logSevere(ex);
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
             event.setKickMessage(
-                    "There was an error while fetching your permission groups. Please try again later or contact an administrator if this issue persists.");
+                    "There was an error while fetching your permission groups. Please try again later or contact an " +
+                            "administrator if this issue persists.");
             return;
         }
 
         Set<PermissionGroup> permissionGroups = new HashSet<>(permissionGroupNames.stream()
-                                                                                  .map(PermissionGroup::valueOf)
-                                                                                  .toList());
+                .map(PermissionGroup::valueOf)
+                .toList());
 
         permissionGroups.add(PermissionGroup._PLAYER);
 
         _permissionProfiles.put(player,
-                                new PermissionProfile(permissionGroups.toArray(PermissionGroup[]::new),
-                                                      player.addAttachment(_hexusPlugin)));
+                new PermissionProfile(permissionGroups.toArray(PermissionGroup[]::new),
+                        player.addAttachment(_hexusPlugin)));
         refreshPermissions(player);
     }
 
@@ -123,8 +124,8 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         if (profile == null)
         {
             logWarning("Unable to grant permissions for player '" +
-                       player.getName() +
-                       "' as they have no permission profile.");
+                    player.getName() +
+                    "' as they have no permission profile.");
             return;
         }
 
@@ -149,8 +150,8 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         if (profile == null)
         {
             logWarning("Unable to clear permissions for player '" +
-                       player.getName() +
-                       "' as they have no permission profile.");
+                    player.getName() +
+                    "' as they have no permission profile.");
             return;
         }
 
@@ -173,12 +174,11 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         group._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(), true));
 
         Arrays.stream(group._inherits).forEach(parentGroup ->
-                                               {
-                                                   grantPermissions(attachment, parentGroup);
-                                                   parentGroup._permissions.forEach(basePermission -> attachment.setPermission(
-                                                           basePermission.toString(),
-                                                           true));
-                                               });
+        {
+            grantPermissions(attachment, parentGroup);
+            parentGroup._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(),
+                    true));
+        });
     }
 
 }

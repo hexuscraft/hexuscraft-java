@@ -15,11 +15,11 @@ public class CommandRankList extends BaseCommand<CorePermission>
     CommandRankList(CorePermission corePermission)
     {
         super(corePermission,
-              "list",
-              "",
-              "List all permission groups.",
-              Set.of("l"),
-              CorePermission.PERM.COMMAND_RANK_LIST);
+                "list",
+                "",
+                "List all permission groups.",
+                Set.of("l"),
+                CorePermission.PERM.COMMAND_RANK_LIST);
     }
 
     @Override
@@ -32,11 +32,11 @@ public class CommandRankList extends BaseCommand<CorePermission>
         }
 
         sender.sendMessage(F.fMain(this) +
-                           "Listing Groups:\n" +
-                           F.fMain("") +
-                           F.fItem(Arrays.stream(PermissionGroup.values())
-                                         .map(group -> group._color + group.name())
-                                         .toArray(String[]::new)));
+                "Listing Groups:\n" +
+                F.fMain("") +
+                F.fItem(Arrays.stream(PermissionGroup.values())
+                        .map(group -> group._color + group.name())
+                        .toArray(String[]::new)));
     }
 
 

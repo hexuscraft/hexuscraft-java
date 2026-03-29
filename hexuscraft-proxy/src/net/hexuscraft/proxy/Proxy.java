@@ -46,8 +46,8 @@ public class Proxy
 {
 
     private final String MOTD_PREFIX = String.join("\n",
-                                                   "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8]§r",
-                                                   " §f§l▶§r ");
+            "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8]§r",
+            " §f§l▶§r ");
 
     //    private String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8 & 26.1]§r",
     //            " §f§l▶§r ");
@@ -77,15 +77,15 @@ public class Proxy
         commandManager.getAliases().forEach(commandManager::unregister);
 
         _server.getScheduler()
-               .buildTask(this, this::updateMOTD)
-               .repeat(Duration.ofSeconds(5))
-               .delay(Duration.ofSeconds(0))
-               .schedule();
+                .buildTask(this, this::updateMOTD)
+                .repeat(Duration.ofSeconds(5))
+                .delay(Duration.ofSeconds(0))
+                .schedule();
         _server.getScheduler()
-               .buildTask(this, this::updateServers)
-               .repeat(Duration.ofSeconds(1))
-               .delay(Duration.ofSeconds(0))
-               .schedule();
+                .buildTask(this, this::updateServers)
+                .repeat(Duration.ofSeconds(1))
+                .delay(Duration.ofSeconds(0))
+                .schedule();
 
         _database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
@@ -122,26 +122,24 @@ public class Proxy
         AtomicInteger capacityCount = new AtomicInteger();
 
         Arrays.stream(ServerQueries.getServers(_database._jedis)).forEach(serverData ->
-                                                                          {
-                                                                              if (serverData._updatedByMonitor)
-                                                                              {
-                                                                                  return;
-                                                                              }
+        {
+            if (serverData._updatedByMonitor)
+            {
+                return;
+            }
 
-                                                                              ServerInfo serverInfo = new ServerInfo(
-                                                                                      serverData._name,
-                                                                                      new InetSocketAddress(serverData._address,
-                                                                                                            serverData._port));
-                                                                              allServers.add(serverInfo);
+            ServerInfo serverInfo = new ServerInfo(serverData._name,
+                    new InetSocketAddress(serverData._address, serverData._port));
+            allServers.add(serverInfo);
 
-                                                                              if (serverData._group.equals("Lobby"))
-                                                                              {
-                                                                                  fallbackServers.add(serverData._name);
-                                                                              }
+            if (serverData._group.equals("Lobby"))
+            {
+                fallbackServers.add(serverData._name);
+            }
 
-                                                                              playerCount.addAndGet(serverData._players);
-                                                                              capacityCount.addAndGet(serverData._capacity);
-                                                                          });
+            playerCount.addAndGet(serverData._players);
+            capacityCount.addAndGet(serverData._capacity);
+        });
 
         _server.getConfiguration().getAttemptConnectionOrder().clear();
         _server.getAllServers().stream().map(RegisteredServer::getServerInfo).forEach(_server::unregisterServer);
@@ -161,12 +159,12 @@ public class Proxy
     {
         QueryResponse.Builder builder = QueryResponse.builder();
         builder.players("§r",
-                        "    §6§lHexuscraft§r §f§lNetwork§r    ",
-                        "§r",
-                        "  §f§l▶§r  Mini Games",
-                        "  §f§l▶§r  Private Servers",
-                        "  §f§l▶§r  Tournaments",
-                        "§r");
+                "    §6§lHexuscraft§r §f§lNetwork§r    ",
+                "§r",
+                "  §f§l▶§r  Mini Games",
+                "  §f§l▶§r  Private Servers",
+                "  §f§l▶§r  Tournaments",
+                "§r");
         builder.clearPlugins();
         builder.proxyVersion("Minecraft 1.8");
         builder.gameVersion("Minecraft 1.8");
@@ -185,15 +183,14 @@ public class Proxy
 
         builder.description(Component.text(_motd.get()));
         builder.samplePlayers(new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)),
-                              new ServerPing.SamplePlayer("    §6§lHexuscraft§r §f§lNetwork§r    ", new UUID(0L, 0L)),
-                              new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)),
-                              new ServerPing.SamplePlayer("  §f§l▶§r  Mini Games", new UUID(0L, 0L)),
-                              new ServerPing.SamplePlayer("  §f§l▶§r  Private Servers", new UUID(0L, 0L)),
-                              new ServerPing.SamplePlayer("  §f§l▶§r  Tournaments", new UUID(0L, 0L)),
-                              new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)));
+                new ServerPing.SamplePlayer("    §6§lHexuscraft§r §f§lNetwork§r    ", new UUID(0L, 0L)),
+                new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)),
+                new ServerPing.SamplePlayer("  §f§l▶§r  Mini Games", new UUID(0L, 0L)),
+                new ServerPing.SamplePlayer("  §f§l▶§r  Private Servers", new UUID(0L, 0L)),
+                new ServerPing.SamplePlayer("  §f§l▶§r  Tournaments", new UUID(0L, 0L)),
+                new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)));
         builder.version(new ServerPing.Version(Math.max(ProtocolVersion.MINECRAFT_1_8.getProtocol(),
-                                                        event.getConnection().getProtocolVersion().getProtocol()),
-                                               "Minecraft 1.8"));
+                event.getConnection().getProtocolVersion().getProtocol()), "Minecraft 1.8"));
         try
         {
             builder.favicon(Favicon.create(Path.of("server-icon.png")));
@@ -212,13 +209,15 @@ public class Proxy
         {
             UnifiedJedis jedis = _database._jedis;
             Set<UUID> punishmentIds = jedis.smembers(PunishQueries.RECEIVED(event.getPlayer().getUniqueId()))
-                                           .stream()
-                                           .map(UUID::fromString)
-                                           .collect(Collectors.toSet());
+                    .stream()
+                    .map(UUID::fromString)
+                    .collect(Collectors.toSet());
 
             // We want to display the longest ban remaining.
-            // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most recent ban.
-            // If there are multiple bans matching this and were also applied at the EXACT same time (??), fate decides the displayed message.
+            // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most
+            // recent ban.
+            // If there are multiple bans matching this and were also applied at the EXACT same time (??), fate
+            // decides the displayed message.
 
             Set<PunishData> activePunishments = new HashSet<>();
 
@@ -250,18 +249,18 @@ public class Proxy
                     if (remaining <= 0)
                     {
                         _database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
-                                              Map.of("active",
-                                                     "false",
-                                                     "removeOrigin",
-                                                     Long.toString(System.currentTimeMillis()),
-                                                     "removeReason",
-                                                     "EXPIRED",
-                                                     "removeServer",
-                                                     "Proxy-" + _server.getBoundAddress().toString(),
-                                                     "removeStaffId",
-                                                     UtilUniqueId.EMPTY_UUID.toString(),
-                                                     "removeStaffServer",
-                                                     "Proxy-" + _server.getBoundAddress().toString()));
+                                Map.of("active",
+                                        "false",
+                                        "removeOrigin",
+                                        Long.toString(System.currentTimeMillis()),
+                                        "removeReason",
+                                        "EXPIRED",
+                                        "removeServer",
+                                        "Proxy-" + _server.getBoundAddress().toString(),
+                                        "removeStaffId",
+                                        UtilUniqueId.EMPTY_UUID.toString(),
+                                        "removeStaffServer",
+                                        "Proxy-" + _server.getBoundAddress().toString()));
                         continue;
                     }
 
@@ -270,9 +269,9 @@ public class Proxy
                 catch (JedisException ex)
                 {
                     _logger.warning("Error while checking punish punish for '" +
-                                    event.getPlayer().getUsername() +
-                                    "': " +
-                                    ex.getMessage());
+                            event.getPlayer().getUsername() +
+                            "': " +
+                            ex.getMessage());
                 }
             }
 
@@ -304,9 +303,9 @@ public class Proxy
         catch (JedisException ex)
         {
             _logger.warning("Error while fetching punishment punish for '" +
-                            event.getPlayer().getUsername() +
-                            "': " +
-                            ex.getMessage());
+                    event.getPlayer().getUsername() +
+                    "': " +
+                    ex.getMessage());
         }
 
     }
@@ -320,30 +319,28 @@ public class Proxy
         {
             event.setInitialServer(null);
             player.disconnect(Component.text()
-                                       .color(NamedTextColor.RED)
-                                       .append(Component.text("Your manager client is too outdated."))
-                                       .append(Component.text("\nPlease use Minecraft 1.8 or newer to join Hexuscraft.",
-                                                              NamedTextColor.GRAY))
-                                       .append(Component.text("\n\nwww.hexuscraft.net", NamedTextColor.YELLOW))
-                                       .build());
+                    .color(NamedTextColor.RED)
+                    .append(Component.text("Your manager client is too outdated."))
+                    .append(Component.text("\nPlease use Minecraft 1.8 or newer to join Hexuscraft.",
+                            NamedTextColor.GRAY))
+                    .append(Component.text("\n\nwww.hexuscraft.net", NamedTextColor.YELLOW))
+                    .build());
             return;
         }
 
         RegisteredServer[] lobbyServers = _server.getAllServers()
-                                                 .stream()
-                                                 .filter(registeredServer -> registeredServer.getServerInfo()
-                                                                                             .getName()
-                                                                                             .split("-(?=[^-]*$)")[0].equals(
-                                                         "Lobby"))
-                                                 .toArray(RegisteredServer[]::new);
+                .stream()
+                .filter(registeredServer -> registeredServer.getServerInfo().getName().split("-(?=[^-]*$)")[0].equals(
+                        "Lobby"))
+                .toArray(RegisteredServer[]::new);
         if (lobbyServers.length == 0)
         {
             player.disconnect(Component.text()
-                                       .color(NamedTextColor.RED)
-                                       .append(Component.text("There are currently no lobby servers available."))
-                                       .append(Component.text("\nPlease try again later.", NamedTextColor.GRAY))
-                                       .append(Component.text("\n\nwww.hexuscraft.net", NamedTextColor.YELLOW))
-                                       .build());
+                    .color(NamedTextColor.RED)
+                    .append(Component.text("There are currently no lobby servers available."))
+                    .append(Component.text("\nPlease try again later.", NamedTextColor.GRAY))
+                    .append(Component.text("\n\nwww.hexuscraft.net", NamedTextColor.YELLOW))
+                    .build());
             return;
         }
 

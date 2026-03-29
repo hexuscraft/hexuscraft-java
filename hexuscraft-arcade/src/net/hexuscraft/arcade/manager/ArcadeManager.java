@@ -36,11 +36,9 @@ public class ArcadeManager extends MiniPlugin<Arcade>
     }
 
     private final Map<GameType, Class<? extends Game>> GAME_CLASS_MAP = Map.ofEntries(Map.entry(GameType.SURVIVAL_GAMES,
-                                                                                                GameSurvivalGames.class),
-                                                                                      Map.entry(GameType.SURVIVAL_GAMES_2,
-                                                                                                GameSurvivalGamesDuo.class),
-                                                                                      Map.entry(GameType.THE_BRIDGES,
-                                                                                                GameTheBridges.class));
+                    GameSurvivalGames.class),
+            Map.entry(GameType.SURVIVAL_GAMES_2, GameSurvivalGamesDuo.class),
+            Map.entry(GameType.THE_BRIDGES, GameTheBridges.class));
     private final Random _nextBestGameRandom = new Random();
     private final AtomicReference<BukkitTask> _gameTickTask = new AtomicReference<>();
     public AtomicReference<Game> _game = new AtomicReference<>();
@@ -106,7 +104,7 @@ public class ArcadeManager extends MiniPlugin<Arcade>
             try
             {
                 Constructor<? extends Game> constructor = GAME_CLASS_MAP.get(nextBestGametype)
-                                                                        .getDeclaredConstructor(ArcadeManager.class);
+                        .getDeclaredConstructor(ArcadeManager.class);
                 constructor.setAccessible(true);
                 _game.set(constructor.newInstance(this));
             }

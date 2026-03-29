@@ -27,12 +27,10 @@ public class CooldownBukkit
         }
 
         sender.sendMessage(F.fMain(this,
-                                   "You cannot use ",
-                                   F.fItem(name),
-                                   " for another ",
-                                   F.fTime(calculateRemaining(System.currentTimeMillis(),
-                                                              cooldown._started(),
-                                                              cooldown._delayMs()))));
+                "You cannot use ",
+                F.fItem(name),
+                " for another ",
+                F.fTime(calculateRemaining(System.currentTimeMillis(), cooldown._started(), cooldown._delayMs()))));
         return false;
     }
 

@@ -23,11 +23,11 @@ public class CommandRankClear extends BaseCommand<CorePermission>
     public CommandRankClear(CorePermission permission, CoreDatabase database)
     {
         super(permission,
-              "clear",
-              "<Player>",
-              "Clears a player's additional groups.",
-              Set.of(),
-              CorePermission.PERM.COMMAND_RANK_CLEAR);
+                "clear",
+                "<Player>",
+                "Clears a player's additional groups.",
+                Set.of(),
+                CorePermission.PERM.COMMAND_RANK_CLEAR);
         _coreDatabase = database;
     }
 
@@ -41,25 +41,20 @@ public class CommandRankClear extends BaseCommand<CorePermission>
         }
 
         _miniPlugin._hexusPlugin.runAsync(() ->
-                                          {
-                                              OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0]);
-                                              if (offlinePlayer == null)
-                                              {
-                                                  sender.sendMessage(F.fMatches(new String[]{}, args[0]));
-                                                  return;
-                                              }
+        {
+            OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0]);
+            if (offlinePlayer == null)
+            {
+                sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+                return;
+            }
 
-                                              sender.sendMessage(F.fMain(this,
-                                                                         "Clearing sub-groups of ",
-                                                                         F.fItem(offlinePlayer.getName()),
-                                                                         "..."));
+            sender.sendMessage(F.fMain(this, "Clearing sub-groups of ", F.fItem(offlinePlayer.getName()), "..."));
 
-                                              _coreDatabase._database._jedis.del(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
-                                              sender.sendMessage(F.fMain(this,
-                                                                         F.fSuccess("Cleared sub-groups of ",
-                                                                                    F.fItem(offlinePlayer.getName()),
-                                                                                    ".")));
-                                          });
+            _coreDatabase._database._jedis.del(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
+            sender.sendMessage(F.fMain(this,
+                    F.fSuccess("Cleared sub-groups of ", F.fItem(offlinePlayer.getName()), ".")));
+        });
     }
 
     @Override
@@ -70,8 +65,8 @@ public class CommandRankClear extends BaseCommand<CorePermission>
         {
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                                                                                     .getOnlinePlayers()
-                                                                                     .stream();
+                    .getOnlinePlayers()
+                    .stream();
             if (sender instanceof Player player)
             {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));

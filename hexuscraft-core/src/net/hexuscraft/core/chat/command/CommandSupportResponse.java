@@ -23,11 +23,11 @@ public class CommandSupportResponse extends BaseCommand<CoreChat>
     public CommandSupportResponse(CoreChat coreChat, CorePermission corePermission)
     {
         super(coreChat,
-              "supportresponse",
-              "<Player> <Message>",
-              "Respond to a help request.",
-              Set.of("ma", "sr"),
-              CoreChat.PERM.COMMAND_SUPPORT_STAFF);
+                "supportresponse",
+                "<Player> <Message>",
+                "Respond to a help request.",
+                Set.of("ma", "sr"),
+                CoreChat.PERM.COMMAND_SUPPORT_STAFF);
         _corePermission = corePermission;
     }
 
@@ -44,34 +44,34 @@ public class CommandSupportResponse extends BaseCommand<CoreChat>
             }
 
             PermissionGroup permissionGroup = sender instanceof Player ?
-                                              PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(
-                                                      (Player) sender)._groups()) :
-                                              null;
+                    PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get((Player) sender)
+                            ._groups()) :
+                    null;
 
             for (Player player : _miniPlugin._hexusPlugin.getServer().getOnlinePlayers())
             {
                 if (player.equals(sender) ||
-                    player.equals(target) ||
-                    player.hasPermission(PermissionGroup.TRAINEE.name()))
+                        player.equals(target) ||
+                        player.hasPermission(PermissionGroup.TRAINEE.name()))
                 {
                     PermissionGroup
                             targetGroup
                             = PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(player)
-                                                                                                           ._groups());
+                            ._groups());
 
                     String sourceStr = F.fPermissionGroup(permissionGroup) + " " + sender.getName();
                     String targetStr = F.fPermissionGroup(targetGroup) + " " + player.getName();
 
                     player.sendMessage(sourceStr +
-                                       C.fReset +
-                                       C.cPurple +
-                                       " -> " +
-                                       C.fReset +
-                                       targetStr +
-                                       C.fReset +
-                                       " " +
-                                       C.cPurple +
-                                       String.join(" ", Arrays.stream(args).toList().subList(1, args.length)));
+                            C.fReset +
+                            C.cPurple +
+                            " -> " +
+                            C.fReset +
+                            targetStr +
+                            C.fReset +
+                            " " +
+                            C.cPurple +
+                            String.join(" ", Arrays.stream(args).toList().subList(1, args.length)));
                     if (player.equals(target))
                     {
                         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
@@ -93,8 +93,8 @@ public class CommandSupportResponse extends BaseCommand<CoreChat>
             return List.of();
         }
         return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                    sender,
-                                                    false);
+                sender,
+                false);
     }
 
 }

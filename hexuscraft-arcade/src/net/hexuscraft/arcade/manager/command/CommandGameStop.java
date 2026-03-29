@@ -11,11 +11,11 @@ public class CommandGameStop extends BaseCommand<ArcadeManager>
     CommandGameStop(ArcadeManager arcadeManager)
     {
         super(arcadeManager,
-              "stop",
-              "",
-              "Stop the currently active game.",
-              Set.of(),
-              ArcadeManager.PERM.COMMAND_GAME_STOP);
+                "stop",
+                "",
+                "Stop the currently active game.",
+                Set.of(),
+                ArcadeManager.PERM.COMMAND_GAME_STOP);
     }
 
 }

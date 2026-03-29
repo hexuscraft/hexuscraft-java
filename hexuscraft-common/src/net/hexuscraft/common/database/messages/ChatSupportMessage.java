@@ -22,13 +22,13 @@ public record ChatSupportMessage(UUID _senderUniqueId,
         JSONObject jsonObject = new JSONObject(jsonString);
         JSONArray permissionGroups = jsonObject.getJSONArray("permissionGroups");
         return new ChatSupportMessage(UUID.fromString(jsonObject.getString("senderUniqueId")),
-                                      jsonObject.getString("username"),
-                                      IntStream.range(0, permissionGroups.length())
-                                               .mapToObj(permissionGroups::getString)
-                                               .map(PermissionGroup::valueOfSafe)
-                                               .toArray(PermissionGroup[]::new),
-                                      jsonObject.getString("serverName"),
-                                      jsonObject.getString("message"));
+                jsonObject.getString("username"),
+                IntStream.range(0, permissionGroups.length())
+                        .mapToObj(permissionGroups::getString)
+                        .map(PermissionGroup::valueOfSafe)
+                        .toArray(PermissionGroup[]::new),
+                jsonObject.getString("serverName"),
+                jsonObject.getString("message"));
     }
 
     @Override
@@ -36,10 +36,10 @@ public record ChatSupportMessage(UUID _senderUniqueId,
     public String toString()
     {
         return new JSONObject(Map.ofEntries(Map.entry("senderUniqueId", _senderUniqueId.toString()),
-                                            Map.entry("username", _username),
-                                            Map.entry("permissionGroups", new JSONArray(_permissionGroups)),
-                                            Map.entry("serverName", _serverName),
-                                            Map.entry("message", _message))).toString();
+                Map.entry("username", _username),
+                Map.entry("permissionGroups", new JSONArray(_permissionGroups)),
+                Map.entry("serverName", _serverName),
+                Map.entry("message", _message))).toString();
     }
 
 }

@@ -27,11 +27,11 @@ public class CommandNetworkMotdView extends BaseCommand<CorePortal>
     public void run(CommandSender sender, String alias, String[] args)
     {
         sender.sendMessage(F.fMain(this,
-                                   "Viewing the current MOTD:\n",
-                                   F.fSub("",
-                                          C.fReset +
-                                          ChatColor.translateAlternateColorCodes('&',
-                                                                                 ServerQueries.getMotd(_coreDatabase._database._jedis)))));
+                "Viewing the current MOTD:\n",
+                F.fSub("",
+                        C.fReset +
+                                ChatColor.translateAlternateColorCodes('&',
+                                        ServerQueries.getMotd(_coreDatabase._database._jedis)))));
     }
 
 }

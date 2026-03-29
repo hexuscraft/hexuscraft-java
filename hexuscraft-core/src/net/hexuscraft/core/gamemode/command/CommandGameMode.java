@@ -18,11 +18,11 @@ public class CommandGameMode extends BaseCommand<CoreGameMode>
     public CommandGameMode(CoreGameMode coreGameMode)
     {
         super(coreGameMode,
-              "gamemode",
-              "<Players> [Toggle]",
-              "Toggle creative mode.",
-              Set.of("gm"),
-              CoreGameMode.PERM.COMMAND_GAMEMODE);
+                "gamemode",
+                "<Players> [Toggle]",
+                "Toggle creative mode.",
+                Set.of("gm"),
+                CoreGameMode.PERM.COMMAND_GAMEMODE);
     }
 
     @Override
@@ -39,9 +39,9 @@ public class CommandGameMode extends BaseCommand<CoreGameMode>
         if (args.length > 0)
         {
             targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                      args[0],
-                                                      sender,
-                                                      matches -> matches.length == 0);
+                    args[0],
+                    sender,
+                    matches -> matches.length == 0);
             if (targets.length == 0)
             {
                 return;
@@ -101,9 +101,9 @@ public class CommandGameMode extends BaseCommand<CoreGameMode>
 
         Arrays.stream(targets).forEach(target -> target.setGameMode(newGameMode));
         sender.sendMessage(F.fMain(this,
-                                   F.fItem(Arrays.stream(targets).map(Player::getDisplayName).toArray(String[]::new)),
-                                   " Creative Mode: ",
-                                   F.fBoolean(newGameMode.equals(GameMode.CREATIVE))));
+                F.fItem(Arrays.stream(targets).map(Player::getDisplayName).toArray(String[]::new)),
+                " Creative Mode: ",
+                F.fBoolean(newGameMode.equals(GameMode.CREATIVE))));
     }
 
     @Override
@@ -112,8 +112,8 @@ public class CommandGameMode extends BaseCommand<CoreGameMode>
         if (args.length == 1)
         {
             return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                        sender,
-                                                        true);
+                    sender,
+                    true);
         }
         return List.of();
     }

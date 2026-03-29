@@ -12,12 +12,12 @@ public class CommandNetworkMotd extends BaseMultiCommand<CorePortal>
     public CommandNetworkMotd(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
-              "messageoftheday",
-              "Manage the network MOTD.",
-              Set.of("motd"),
-              CorePortal.PERM.COMMAND_MOTD,
-              Set.of(new CommandNetworkMotdView(corePortal, coreDatabase),
-                     new CommandNetworkMotdSet(corePortal, coreDatabase)));
+                "messageoftheday",
+                "Manage the network MOTD.",
+                Set.of("motd"),
+                CorePortal.PERM.COMMAND_MOTD,
+                Set.of(new CommandNetworkMotdView(corePortal, coreDatabase),
+                        new CommandNetworkMotdSet(corePortal, coreDatabase)));
     }
 
 }

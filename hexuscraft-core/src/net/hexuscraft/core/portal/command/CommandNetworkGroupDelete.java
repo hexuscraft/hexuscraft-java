@@ -19,11 +19,11 @@ public class CommandNetworkGroupDelete extends BaseCommand<CorePortal>
     CommandNetworkGroupDelete(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
-              "delete",
-              "<Name>",
-              "Delete a server group.",
-              Set.of("del", "d"),
-              CorePortal.PERM.COMMAND_NETWORK_GROUP_DELETE);
+                "delete",
+                "<Name>",
+                "Delete a server group.",
+                Set.of("del", "d"),
+                CorePortal.PERM.COMMAND_NETWORK_GROUP_DELETE);
         _coreDatabase = coreDatabase;
     }
 

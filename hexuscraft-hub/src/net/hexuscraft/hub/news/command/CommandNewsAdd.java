@@ -26,11 +26,11 @@ public class CommandNewsAdd extends BaseCommand<HubNews>
     public CommandNewsAdd(HubNews hubNews, CoreDatabase coreDatabase)
     {
         super(hubNews,
-              "add",
-              "<Active TRUE/FALSE> <Weight #> <Message>",
-              "Add a news line.",
-              Set.of("a"),
-              HubNews.PERM.COMMAND_NEWS_ADD);
+                "add",
+                "<Active TRUE/FALSE> <Weight #> <Message>",
+                "Add a news line.",
+                Set.of("a"),
+                HubNews.PERM.COMMAND_NEWS_ADD);
         _coreDatabase = coreDatabase;
     }
 
@@ -62,19 +62,19 @@ public class CommandNewsAdd extends BaseCommand<HubNews>
         catch (NumberFormatException ex)
         {
             sender.sendMessage(F.fMain(this,
-                                       F.fError("There was an error while parsing weight ",
-                                                F.fItem(args[1]),
-                                                ". Defaulting to ",
-                                                F.fItem(String.valueOf(weight.get())),
-                                                ".")));
+                    F.fError("There was an error while parsing weight ",
+                            F.fItem(args[1]),
+                            ". Defaulting to ",
+                            F.fItem(String.valueOf(weight.get())),
+                            ".")));
         }
 
         String message = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
         NewsData newsData = new NewsData(UUID.randomUUID(),
-                                         Map.ofEntries(Map.entry("active", Boolean.toString(active.get())),
-                                                       Map.entry("weight", Integer.toString(weight.get())),
-                                                       Map.entry("message", message)));
+                Map.ofEntries(Map.entry("active", Boolean.toString(active.get())),
+                        Map.entry("weight", Integer.toString(weight.get())),
+                        Map.entry("message", message)));
 
         try
         {
@@ -84,8 +84,8 @@ public class CommandNewsAdd extends BaseCommand<HubNews>
         catch (JedisException ex)
         {
             sender.sendMessage(F.fMain(this,
-                                       F.fError(
-                                               "There was an error while publishing news. Please try again later or contact an administrator if this issue persists.")));
+                    F.fError("There was an error while publishing news. Please try again later or contact an " +
+                            "administrator if this issue persists.")));
         }
     }
 }

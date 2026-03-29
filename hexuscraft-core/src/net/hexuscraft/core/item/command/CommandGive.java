@@ -22,11 +22,11 @@ public class CommandGive extends BaseCommand<CoreItem>
     public CommandGive(CoreItem itemCenter)
     {
         super(itemCenter,
-              "give",
-              "<Players> <Item> [Amount] [Enchantment:Level Enchantment:Level ...]",
-              "Give yourself an item or give items to players with optional enchantments.",
-              Set.of("g", "item", "i"),
-              CoreItem.PERM.COMMAND_GIVE);
+                "give",
+                "<Players> <Item> [Amount] [Enchantment:Level Enchantment:Level ...]",
+                "Give yourself an item or give items to players with optional enchantments.",
+                Set.of("g", "item", "i"),
+                CoreItem.PERM.COMMAND_GIVE);
     }
 
     @Override
@@ -39,9 +39,9 @@ public class CommandGive extends BaseCommand<CoreItem>
         }
 
         Player[] matches = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                           args[0],
-                                                           sender,
-                                                           predicateMatches -> predicateMatches.length == 0);
+                args[0],
+                sender,
+                predicateMatches -> predicateMatches.length == 0);
         if (matches.length == 0)
         {
             return;
@@ -65,10 +65,10 @@ public class CommandGive extends BaseCommand<CoreItem>
             catch (NumberFormatException ex)
             {
                 sender.sendMessage(F.fMain(this,
-                                           F.fError("Invalid amount, expected a positive integer. "),
-                                           "Defaulting to ",
-                                           F.fItem(String.valueOf(amount.get())),
-                                           "."));
+                        F.fError("Invalid amount, expected a positive integer. "),
+                        "Defaulting to ",
+                        F.fItem(String.valueOf(amount.get())),
+                        "."));
             }
         }
 
@@ -89,60 +89,40 @@ public class CommandGive extends BaseCommand<CoreItem>
         if (args.length > 3)
         {
             Arrays.stream(Arrays.copyOfRange(args, 3, args.length)).map(s -> s.split(":")).forEach(strings ->
-                                                                                                   {
-                                                                                                       Enchantment
-                                                                                                               enchantment
-                                                                                                               = Enchantment.getByName(
-                                                                                                               strings[0]);
-                                                                                                       if (enchantment ==
-                                                                                                           null)
-                                                                                                       {
-                                                                                                           sender.sendMessage(
-                                                                                                                   F.fMain(this) +
-                                                                                                                   "Unknown enchantment named " +
-                                                                                                                   F.fItem(strings[0]) +
-                                                                                                                   ". Listing Enchantments:\n" +
-                                                                                                                   F.fMain("") +
-                                                                                                                   F.fItem(Arrays.stream(
-                                                                                                                                         Enchantment.values())
-                                                                                                                                 .map(Enchantment::getName)
-                                                                                                                                 .toArray(
-                                                                                                                                         String[]::new)));
-                                                                                                           return;
-                                                                                                       }
+            {
+                Enchantment enchantment = Enchantment.getByName(strings[0]);
+                if (enchantment == null)
+                {
+                    sender.sendMessage(F.fMain(this) +
+                            "Unknown enchantment named " +
+                            F.fItem(strings[0]) +
+                            ". Listing Enchantments:\n" +
+                            F.fMain("") +
+                            F.fItem(Arrays.stream(Enchantment.values())
+                                    .map(Enchantment::getName)
+                                    .toArray(String[]::new)));
+                    return;
+                }
 
-                                                                                                       AtomicInteger
-                                                                                                               enchantmentLevel
-                                                                                                               = new AtomicInteger(
-                                                                                                               1);
-                                                                                                       if (strings.length >
-                                                                                                           1)
-                                                                                                       {
-                                                                                                           try
-                                                                                                           {
-                                                                                                               enchantmentLevel.set(
-                                                                                                                       Integer.parseInt(
-                                                                                                                               strings[1]));
-                                                                                                           }
-                                                                                                           catch (NumberFormatException ex)
-                                                                                                           {
-                                                                                                               sender.sendMessage(
-                                                                                                                       F.fMain(this,
-                                                                                                                               F.fError(
-                                                                                                                                       "Unknown enchantment level ",
-                                                                                                                                       F.fItem(strings[1]),
-                                                                                                                                       ". "),
-                                                                                                                               "Defaulting to ",
-                                                                                                                               F.fItem(String.valueOf(
-                                                                                                                                       enchantmentLevel.get())),
-                                                                                                                               "."));
-                                                                                                           }
-                                                                                                       }
+                AtomicInteger enchantmentLevel = new AtomicInteger(1);
+                if (strings.length > 1)
+                {
+                    try
+                    {
+                        enchantmentLevel.set(Integer.parseInt(strings[1]));
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        sender.sendMessage(F.fMain(this,
+                                F.fError("Unknown enchantment level ", F.fItem(strings[1]), ". "),
+                                "Defaulting to ",
+                                F.fItem(String.valueOf(enchantmentLevel.get())),
+                                "."));
+                    }
+                }
 
-                                                                                                       enchantmentMap.put(
-                                                                                                               enchantment,
-                                                                                                               enchantmentLevel.get());
-                                                                                                   });
+                enchantmentMap.put(enchantment, enchantmentLevel.get());
+            });
         }
 
         for (String arg : args[1].split(","))
@@ -152,8 +132,8 @@ public class CommandGive extends BaseCommand<CoreItem>
             AtomicReference<Byte> data = new AtomicReference<>((byte) 0);
 
             Material[] targetMaterials = ItemSearch.itemSearch(materialName,
-                                                               sender,
-                                                               materials -> materials.length != 1);
+                    sender,
+                    materials -> materials.length != 1);
             if (targetMaterials.length != 1)
             {
                 continue;
@@ -168,12 +148,12 @@ public class CommandGive extends BaseCommand<CoreItem>
                 catch (NumberFormatException ex)
                 {
                     sender.sendMessage(F.fMain(this,
-                                               F.fError("Invalid material punish for ",
-                                                        F.fItem(targetMaterials[0].name()),
-                                                        ", expected an integer. "),
-                                               "Defaulting to ",
-                                               F.fItem(String.valueOf(data.get())),
-                                               "."));
+                            F.fError("Invalid material punish for ",
+                                    F.fItem(targetMaterials[0].name()),
+                                    ", expected an integer. "),
+                            "Defaulting to ",
+                            F.fItem(String.valueOf(data.get())),
+                            "."));
                 }
             }
 
@@ -192,11 +172,11 @@ public class CommandGive extends BaseCommand<CoreItem>
             }
 
             sender.sendMessage(F.fMain(this,
-                                       "Gave ",
-                                       F.fItem(amount + " " + targetMaterials[0].name()),
-                                       " to ",
-                                       F.fItem(Arrays.stream(matches).map(Player::getName).toArray(String[]::new)),
-                                       "."));
+                    "Gave ",
+                    F.fItem(amount + " " + targetMaterials[0].name()),
+                    " to ",
+                    F.fItem(Arrays.stream(matches).map(Player::getName).toArray(String[]::new)),
+                    "."));
         }
     }
 
@@ -210,8 +190,8 @@ public class CommandGive extends BaseCommand<CoreItem>
             {
                 //noinspection ReassignedVariable
                 Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                                                                                         .getOnlinePlayers()
-                                                                                         .stream();
+                        .getOnlinePlayers()
+                        .stream();
                 if (sender instanceof Player player)
                 {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
@@ -221,9 +201,9 @@ public class CommandGive extends BaseCommand<CoreItem>
                 names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
             }
             case 2 -> names.addAll(Arrays.stream(Material.values())
-                                         .filter(ItemSearch::isMaterialAnItem)
-                                         .map(Material::name)
-                                         .toList());
+                    .filter(ItemSearch::isMaterialAnItem)
+                    .map(Material::name)
+                    .toList());
             case 3 ->
             {
                 for (int i = 1; i <= 64; i++)

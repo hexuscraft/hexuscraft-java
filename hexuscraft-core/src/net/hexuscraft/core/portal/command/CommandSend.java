@@ -18,11 +18,11 @@ public class CommandSend extends BaseCommand<CorePortal>
     public CommandSend(CorePortal corePortal)
     {
         super(corePortal,
-              "send",
-              "<Player> <Name>",
-              "Teleport a player to a server.",
-              Set.of(),
-              CorePortal.PERM.COMMAND_SEND);
+                "send",
+                "<Player> <Name>",
+                "Teleport a player to a server.",
+                Set.of(),
+                CorePortal.PERM.COMMAND_SEND);
     }
 
     @Override
@@ -52,13 +52,13 @@ public class CommandSend extends BaseCommand<CorePortal>
         if (sender instanceof Player player)
         {
             _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(),
-                                                                              serverName,
-                                                                              player.getUniqueId()));
+                    serverName,
+                    player.getUniqueId()));
             return;
         }
 
         _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(),
-                                                                          serverName));
+                serverName));
     }
 
     @Override
@@ -67,8 +67,8 @@ public class CommandSend extends BaseCommand<CorePortal>
         if (args.length == 1)
         {
             return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                        sender,
-                                                        false);
+                    sender,
+                    false);
         }
         if (args.length == 2)
         {

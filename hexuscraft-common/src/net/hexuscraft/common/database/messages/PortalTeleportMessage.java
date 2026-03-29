@@ -23,13 +23,13 @@ public class PortalTeleportMessage extends BaseMessage
     {
         JSONObject jsonObject = new JSONObject(jsonString);
         return new PortalTeleportMessage(UUID.fromString(jsonObject.getString("targetUUID")),
-                                         jsonObject.getString("serverName"));
+                jsonObject.getString("serverName"));
     }
 
     public String stringify()
     {
         return new JSONObject(Map.ofEntries(Map.entry("targetUUID", _targetUUID.toString()),
-                                            Map.entry("serverName", _serverName))).toString();
+                Map.entry("serverName", _serverName))).toString();
     }
 
 }

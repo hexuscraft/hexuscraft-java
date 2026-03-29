@@ -304,8 +304,8 @@ public class CoreNpc extends MiniPlugin<HexusPlugin>
                 ArmorStand gameName = world.spawn(location, ArmorStand.class);
                 spawnedEntities.add(gameName);
                 gameName.setCustomName(C.cGreen +
-                                       C.fBold +
-                                       (data[1].equals("CLANS") ? "Clans" : GameType.valueOf(data[1])._name));
+                        C.fBold +
+                        (data[1].equals("CLANS") ? "Clans" : GameType.valueOf(data[1])._name));
                 gameName.setCustomNameVisible(true);
                 gameName.setGravity(false);
                 gameName.setMarker(true);
@@ -331,13 +331,13 @@ public class CoreNpc extends MiniPlugin<HexusPlugin>
     public void removeNPCs(World world)
     {
         world.getEntities().forEach(entity ->
-                                    {
-                                        if (entity.getMetadata("NPC").isEmpty())
-                                        {
-                                            return;
-                                        }
-                                        entity.remove();
-                                    });
+        {
+            if (entity.getMetadata("NPC").isEmpty())
+            {
+                return;
+            }
+            entity.remove();
+        });
     }
 
     public void refreshNPCs(World world)
@@ -360,17 +360,17 @@ public class CoreNpc extends MiniPlugin<HexusPlugin>
         }
 
         npcStrings.forEach(s ->
-                           {
-                               String[] npc = s.split(",");
-                               double x = Double.parseDouble(npc[0]);
-                               double y = Double.parseDouble(npc[1]);
-                               double z = Double.parseDouble(npc[2]);
-                               float yaw = Float.parseFloat(npc[3]);
-                               float pitch = Float.parseFloat(npc[4]);
+        {
+            String[] npc = s.split(",");
+            double x = Double.parseDouble(npc[0]);
+            double y = Double.parseDouble(npc[1]);
+            double z = Double.parseDouble(npc[2]);
+            float yaw = Float.parseFloat(npc[3]);
+            float pitch = Float.parseFloat(npc[4]);
 
-                               String[] data = Arrays.copyOfRange(npc, 5, npc.length);
-                               createEntity(world, x, y, z, yaw, pitch, data);
-                           });
+            String[] data = Arrays.copyOfRange(npc, 5, npc.length);
+            createEntity(world, x, y, z, yaw, pitch, data);
+        });
     }
 
     @EventHandler
@@ -383,11 +383,11 @@ public class CoreNpc extends MiniPlugin<HexusPlugin>
     {
         List<Entity> npcs = new ArrayList<>();
         _hexusPlugin.getServer()
-                    .getWorlds()
-                    .forEach(world -> npcs.addAll(world.getEntities()
-                                                       .stream()
-                                                       .filter(entity -> entity.hasMetadata("NPC"))
-                                                       .toList()));
+                .getWorlds()
+                .forEach(world -> npcs.addAll(world.getEntities()
+                        .stream()
+                        .filter(entity -> entity.hasMetadata("NPC"))
+                        .toList()));
         return npcs.toArray(Entity[]::new);
     }
 
@@ -405,9 +405,9 @@ public class CoreNpc extends MiniPlugin<HexusPlugin>
         List<MetadataValue> metadata = entity.getMetadata("NPC");
         player.sendMessage(F.fMain(this, "Metadata:"));
         metadata.forEach(metadataValue ->
-                         {
-                             player.sendMessage(F.fMain("", metadataValue.value().toString()));
-                         });
+        {
+            player.sendMessage(F.fMain("", metadataValue.value().toString()));
+        });
     }
 
 }

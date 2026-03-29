@@ -13,11 +13,11 @@ public class GameTheBridges extends TeamGame
     private GameTheBridges(ArcadeManager arcadeManager)
     {
         super(GameType.THE_BRIDGES,
-              new GameKit[]{},
-              new GameTeam[]{new GameTeam("Red", C.cRed),
-                             new GameTeam("Blue", C.cAqua),
-                             new GameTeam("Green", C.cGreen),
-                             new GameTeam("Yellow", C.cYellow),});
+                new GameKit[]{},
+                new GameTeam[]{new GameTeam("Red", C.cRed),
+                        new GameTeam("Blue", C.cAqua),
+                        new GameTeam("Green", C.cGreen),
+                        new GameTeam("Yellow", C.cYellow),});
     }
 
 }

@@ -30,17 +30,12 @@ public class CommandNetworkMotdSet extends BaseCommand<CorePortal>
         sender.sendMessage(F.fMain(this, "Please wait... Updating the MOTD to:\n", C.fReset + message));
 
         _miniPlugin._hexusPlugin.runAsync(() ->
-                                          {
-                                              ServerQueries.setMotd(_coreDatabase._database._jedis, message);
-                                              _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this,
-                                                                                                                F.fSuccess(
-                                                                                                                        "Successfully updated the MOTD:\n"),
-                                                                                                                C.fReset +
-                                                                                                                message) +
-                                                                                                        "\n" +
-                                                                                                        F.fMain("",
-                                                                                                                "It may take a few seconds for all proxies to update.")));
-                                          });
+        {
+            ServerQueries.setMotd(_coreDatabase._database._jedis, message);
+            _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this,
+                    F.fSuccess("Successfully updated the MOTD:\n"),
+                    C.fReset + message) + "\n" + F.fMain("", "It may take a few seconds for all proxies to update.")));
+        });
 
     }
 

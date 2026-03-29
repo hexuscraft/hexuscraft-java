@@ -14,11 +14,11 @@ public class CommandNpcPurge extends BaseCommand<CoreNpc>
     CommandNpcPurge(CoreNpc coreNpc)
     {
         super(coreNpc,
-              "purge",
-              "",
-              "Temporarily purge all NPCs.",
-              Set.of("p", "kill", "k", "destroy", "d"),
-              CoreNpc.PERM.COMMAND_ENTITY_PURGE);
+                "purge",
+                "",
+                "Temporarily purge all NPCs.",
+                Set.of("p", "kill", "k", "destroy", "d"),
+                CoreNpc.PERM.COMMAND_ENTITY_PURGE);
     }
 
     @Override

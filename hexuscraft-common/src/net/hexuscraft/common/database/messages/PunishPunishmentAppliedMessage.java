@@ -22,22 +22,20 @@ public class PunishPunishmentAppliedMessage
     {
         JSONObject jsonObject = new JSONObject(jsonString);
         return new PunishPunishmentAppliedMessage(new PunishData(UUID.fromString(jsonObject.getString("id")),
-                                                                 jsonObject.getEnum(PunishType.class, "type"),
-                                                                 jsonObject.getBoolean("active"),
-                                                                 jsonObject.getLong("origin"),
-                                                                 jsonObject.getLong("length"),
-                                                                 jsonObject.getString("reason"),
-                                                                 UUID.fromString(jsonObject.getString("targetUUID")),
-                                                                 jsonObject.getString("targetServer"),
-                                                                 UUID.fromString(jsonObject.getString("staffUUID")),
-                                                                 jsonObject.getString("staffServer"),
-                                                                 jsonObject.optLongObject("removeOrigin"),
-                                                                 jsonObject.optString("removeReason"),
-                                                                 jsonObject.optString("removeServer"),
-                                                                 jsonObject.has("removeStaffUUID") ?
-                                                                 UUID.fromString(jsonObject.getString("removeStaffUUID")) :
-                                                                 null,
-                                                                 jsonObject.optString("removeStaffServer")));
+                jsonObject.getEnum(PunishType.class, "type"),
+                jsonObject.getBoolean("active"),
+                jsonObject.getLong("origin"),
+                jsonObject.getLong("length"),
+                jsonObject.getString("reason"),
+                UUID.fromString(jsonObject.getString("targetUUID")),
+                jsonObject.getString("targetServer"),
+                UUID.fromString(jsonObject.getString("staffUUID")),
+                jsonObject.getString("staffServer"),
+                jsonObject.optLongObject("removeOrigin"),
+                jsonObject.optString("removeReason"),
+                jsonObject.optString("removeServer"),
+                jsonObject.has("removeStaffUUID") ? UUID.fromString(jsonObject.getString("removeStaffUUID")) : null,
+                jsonObject.optString("removeStaffServer")));
     }
 
     @Override

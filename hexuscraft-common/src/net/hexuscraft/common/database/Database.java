@@ -69,16 +69,16 @@ public class Database
         catch (FileNotFoundException ex)
         {
             System.out.println("WARNING: Could not locate '" +
-                               redisFile.getName() +
-                               "'. Using default credentials '" +
-                               atomicUsername.get() +
-                               ":" +
-                               atomicPassword.get() +
-                               "@" +
-                               atomicHost.get() +
-                               ":" +
-                               atomicPort.get() +
-                               "'.");
+                    redisFile.getName() +
+                    "'. Using default credentials '" +
+                    atomicUsername.get() +
+                    ":" +
+                    atomicPassword.get() +
+                    "@" +
+                    atomicHost.get() +
+                    ":" +
+                    atomicPort.get() +
+                    "'.");
         }
 
         AtomicReference<String> clientName = new AtomicReference<>();
@@ -90,22 +90,22 @@ public class Database
         catch (FileNotFoundException ex)
         {
             clientName.set(new Random().ints(16, 0, 36)
-                                       .mapToObj("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"::charAt)
-                                       .map(String::valueOf)
-                                       .collect(Collectors.joining()));
+                    .mapToObj("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"::charAt)
+                    .map(String::valueOf)
+                    .collect(Collectors.joining()));
             System.out.println("WARNING: Could not locate '" +
-                               nameFile.getName() +
-                               "'. Using random client name '" +
-                               clientName.get() +
-                               "'.");
+                    nameFile.getName() +
+                    "'. Using random client name '" +
+                    clientName.get() +
+                    "'.");
         }
 
         _consumers = new HashMap<>();
         _jedis = buildUnifiedJedis(atomicHost.get(),
-                                   atomicPort.get(),
-                                   atomicUsername.get(),
-                                   atomicPassword.get(),
-                                   clientName.get());
+                atomicPort.get(),
+                atomicUsername.get(),
+                atomicPassword.get(),
+                clientName.get());
         java.security.Security.setProperty("networkaddress.cache.ttl", "0");
         java.security.Security.setProperty("networkaddress.cache.negative.ttl", "0");
     }
@@ -129,17 +129,17 @@ public class Database
         connectionPoolConfig.setTimeBetweenEvictionRuns(Duration.ofSeconds(1));
 
         JedisClientConfig jedisClientConfig = DefaultJedisClientConfig.builder()
-                                                                      .clientName(clientName)
-                                                                      .database(0)
-                                                                      .user(username)
-                                                                      .password(password)
-                                                                      .build();
+                .clientName(clientName)
+                .database(0)
+                .user(username)
+                .password(password)
+                .build();
 
         return RedisClient.builder()
-                          .clientConfig(jedisClientConfig)
-                          .hostAndPort(hostAndPort)
-                          .poolConfig(connectionPoolConfig)
-                          .build();
+                .clientConfig(jedisClientConfig)
+                .hostAndPort(hostAndPort)
+                .poolConfig(connectionPoolConfig)
+                .build();
     }
 
     public void registerConsumer(String pattern, PubSubConsumer consumer)
@@ -171,14 +171,14 @@ public class Database
     public void unregisterConsumer(PubSubConsumer consumer)
     {
         _consumers.forEach((pattern, consumerMap) ->
-                           {
-                               consumerMap.remove(consumer);
-                               if (!consumerMap.isEmpty())
-                               {
-                                   return;
-                               }
-                               _consumers.remove(pattern);
-                           });
+        {
+            consumerMap.remove(consumer);
+            if (!consumerMap.isEmpty())
+            {
+                return;
+            }
+            _consumers.remove(pattern);
+        });
     }
 
     public void unregisterConsumers()

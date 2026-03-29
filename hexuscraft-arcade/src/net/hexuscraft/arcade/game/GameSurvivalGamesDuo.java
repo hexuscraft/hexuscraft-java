@@ -13,14 +13,14 @@ public class GameSurvivalGamesDuo extends TeamGame
     private GameSurvivalGamesDuo(ArcadeManager arcadeManager)
     {
         super(GameType.SURVIVAL_GAMES,
-              new GameKit[]{},
-              new GameTeam[]{new GameTeam("Black", C.cBlack),
-                             new GameTeam("Blue", C.cDBlue),
-                             new GameTeam("Green", C.cDGreen),
-                             new GameTeam("Aqua", C.cDAqua),
-                             new GameTeam("Red", C.cDRed),
-                             new GameTeam("Purple", C.cDPurple),
-                             new GameTeam("", C.cDPurple),});
+                new GameKit[]{},
+                new GameTeam[]{new GameTeam("Black", C.cBlack),
+                        new GameTeam("Blue", C.cDBlue),
+                        new GameTeam("Green", C.cDGreen),
+                        new GameTeam("Aqua", C.cDAqua),
+                        new GameTeam("Red", C.cDRed),
+                        new GameTeam("Purple", C.cDPurple),
+                        new GameTeam("", C.cDPurple),});
     }
 
 }

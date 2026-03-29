@@ -34,14 +34,14 @@ public class CommandNpcList extends BaseCommand<CoreNpc>
         List<String> response = new ArrayList<>();
         response.add(F.fMain(this, "Listing ", F.fItem(entities.length + " Entities")));
         response.addAll(Arrays.stream(entities)
-                              .map(entity -> F.fMain("",
-                                                     F.fItem(entity.getCustomName()),
-                                                     " (",
-                                                     entity.getType().name(),
-                                                     ") (",
-                                                     FBukkit.fItem(entity.getLocation()),
-                                                     ")"))
-                              .toList());
+                .map(entity -> F.fMain("",
+                        F.fItem(entity.getCustomName()),
+                        " (",
+                        entity.getType().name(),
+                        ") (",
+                        FBukkit.fItem(entity.getLocation()),
+                        ")"))
+                .toList());
         sender.sendMessage(String.join("\n", response));
     }
 

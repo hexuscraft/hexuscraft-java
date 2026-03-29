@@ -19,11 +19,11 @@ public class CommandReport extends BaseCommand<CoreReport>
     public CommandReport(CoreReport coreReport)
     {
         super(coreReport,
-              "report",
-              "<Player>",
-              "Report a player breaking rules.",
-              Set.of(),
-              CoreReport.PERM.COMMAND_REPORT);
+                "report",
+                "<Player>",
+                "Report a player breaking rules.",
+                Set.of(),
+                CoreReport.PERM.COMMAND_REPORT);
     }
 
     @Override
@@ -60,8 +60,8 @@ public class CommandReport extends BaseCommand<CoreReport>
 
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                                                                                     .getOnlinePlayers()
-                                                                                     .stream();
+                    .getOnlinePlayers()
+                    .stream();
             if (sender instanceof Player player)
             {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));

@@ -71,18 +71,17 @@ public class HubNews extends MiniPlugin<Hub>
             NewsUpdatedMessage parsedMessage = NewsUpdatedMessage.parse(rawMessage);
 
             _hexusPlugin.runAsync(() ->
-                                  {
-                                      NewsData newNewsData = NewsQueries.getNews(_coreDatabase._database._jedis,
-                                                                                 parsedMessage._id);
-                                      if (newNewsData == null)
-                                      {
-                                          return; // silences the linter
-                                      }
+            {
+                NewsData newNewsData = NewsQueries.getNews(_coreDatabase._database._jedis, parsedMessage._id);
+                if (newNewsData == null)
+                {
+                    return; // silences the linter
+                }
 
-                                      _newsDatas.removeIf(newsData -> newsData._id.equals(newNewsData._id));
-                                      _newsDatas.add(newNewsData);
-                                      _newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
-                                  });
+                _newsDatas.removeIf(newsData -> newsData._id.equals(newNewsData._id));
+                _newsDatas.add(newNewsData);
+                _newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
+            });
         });
 
         _coreDatabase._database.registerConsumer(NewsDeletedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
@@ -92,37 +91,32 @@ public class HubNews extends MiniPlugin<Hub>
         });
 
         _hexusPlugin.runAsync(() ->
-                              {
-                                  NewsData[] news = NewsQueries.getNews(_coreDatabase._database._jedis);
-                                  _newsDatas.clear();
-                                  _newsDatas.addAll(Arrays.asList(news));
-                                  _newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
-                              });
+        {
+            NewsData[] news = NewsQueries.getNews(_coreDatabase._database._jedis);
+            _newsDatas.clear();
+            _newsDatas.addAll(Arrays.asList(news));
+            _newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
+        });
 
         _hexusPlugin.runAsyncTimer(() ->
-                                   {
-                                       _activeNews.clear();
-                                       _activeNews.addAll(_newsDatas.stream()
-                                                                    .filter(newsData -> newsData._active)
-                                                                    .toList());
+        {
+            _activeNews.clear();
+            _activeNews.addAll(_newsDatas.stream().filter(newsData -> newsData._active).toList());
 
-                                       if (_activeNews.isEmpty())
-                                       {
-                                           _bossBars.values()
-                                                    .forEach(bossBar -> bossBar.message()
-                                                                               .set(C.cGold + C.fBold + "HEXUSCRAFT"));
-                                           return;
-                                       }
+            if (_activeNews.isEmpty())
+            {
+                _bossBars.values().forEach(bossBar -> bossBar.message().set(C.cGold + C.fBold + "HEXUSCRAFT"));
+                return;
+            }
 
-                                       if (_activeNewsIndex.incrementAndGet() >= _activeNews.size())
-                                       {
-                                           _activeNewsIndex.set(0);
-                                       }
+            if (_activeNewsIndex.incrementAndGet() >= _activeNews.size())
+            {
+                _activeNewsIndex.set(0);
+            }
 
-                                       _bossBars.values()
-                                                .forEach(bossBar -> bossBar.message()
-                                                                           .set(_activeNews.get(_activeNewsIndex.get())._message));
-                                   }, 0, 100); // 5 seconds
+            _bossBars.values()
+                    .forEach(bossBar -> bossBar.message().set(_activeNews.get(_activeNewsIndex.get())._message));
+        }, 0, 100); // 5 seconds
 
         _coreCommand.register(new CommandNews(this, _coreDatabase));
     }

@@ -65,11 +65,11 @@ public class F
     public static String fMatches(String[] matches, String searchName)
     {
         return F.fItem(matches.length + (matches.length == 1 ? " Match" : " Matches")) +
-               C.cGray +
-               " for " +
-               F.fItem(searchName) +
-               C.cGray +
-               (matches.length == 0 ? "." : ": " + F.fItem(matches));
+                C.cGray +
+                " for " +
+                F.fItem(searchName) +
+                C.cGray +
+                (matches.length == 0 ? "." : ": " + F.fItem(matches));
     }
 
 
@@ -99,14 +99,14 @@ public class F
     public static String fChat(int level, PermissionGroup permissionGroup)
     {
         return C.cGray +
-               level +
-               " " +
-               fPermissionGroup(permissionGroup, true, true) +
-               C.cYellow +
-               " %s" +
-               C.fReset +
-               " " +
-               "%s";
+                level +
+                " " +
+                fPermissionGroup(permissionGroup, true, true) +
+                C.cYellow +
+                " %s" +
+                C.fReset +
+                " " +
+                "%s";
     }
 
 
@@ -158,44 +158,44 @@ public class F
             case WARNING ->
             {
                 return F.fMain("Punish", "You received a warning.") +
-                       "\n" +
-                       F.fMain("", "Reason: ", F.fItem(punishData._reason));
+                        "\n" +
+                        F.fMain("", "Reason: ", F.fItem(punishData._reason));
             }
             case KICK ->
             {
                 return C.cRed +
-                       C.fBold +
-                       "You were kicked from the server\n" +
-                       C.cWhite +
-                       punishData._reason +
-                       C.cDGreen +
-                       "\nUnfairly removed? Let us know at " +
-                       C.cGreen +
-                       "www.hexuscraft.net\n\n" +
-                       C.cDGray +
-                       punishData._uuid.toString();
+                        C.fBold +
+                        "You were kicked from the server\n" +
+                        C.cWhite +
+                        punishData._reason +
+                        C.cDGreen +
+                        "\nUnfairly removed? Let us know at " +
+                        C.cGreen +
+                        "www.hexuscraft.net\n\n" +
+                        C.cDGray +
+                        punishData._uuid.toString();
             }
             case BAN ->
             {
                 return C.cRed +
-                       C.fBold +
-                       "You are banned for " +
-                       F.fTime(punishData.getRemaining()) +
-                       "\n" +
-                       C.cWhite +
-                       punishData._reason +
-                       C.cDGreen +
-                       "\nUnfairly banned? Appeal at " +
-                       C.cGreen +
-                       "www.hexuscraft.net\n\n" +
-                       C.cDGray +
-                       punishData._uuid.toString();
+                        C.fBold +
+                        "You are banned for " +
+                        F.fTime(punishData.getRemaining()) +
+                        "\n" +
+                        C.cWhite +
+                        punishData._reason +
+                        C.cDGreen +
+                        "\nUnfairly banned? Appeal at " +
+                        C.cGreen +
+                        "www.hexuscraft.net\n\n" +
+                        C.cDGray +
+                        punishData._uuid.toString();
             }
             case MUTE ->
             {
                 return F.fMain("Punish", "You are muted for ", F.fItem(F.fTime(punishData._length))) +
-                       "\n" +
-                       F.fMain("", "Reason: ", F.fItem(punishData._reason));
+                        "\n" +
+                        F.fMain("", "Reason: ", F.fItem(punishData._reason));
             }
         }
         return "<unknown PunishData.type>";
@@ -205,19 +205,19 @@ public class F
     public static String fCheat(String playerName, CheatSeverity severity, String reason)
     {
         return F.fStaff(severity._color) +
-               F.fMain("AC", F.fItem(playerName), " failed ", severity._color + reason + C.cGray, ".");
+                F.fMain("AC", F.fItem(playerName), " failed ", severity._color + reason + C.cGray, ".");
     }
 
     public static String fCheat(String playerName, CheatSeverity severity, String reason, String serverName)
     {
         return F.fStaff(severity._color) +
-               F.fMain("AC",
-                       F.fItem(playerName),
-                       " failed ",
-                       severity._color + reason + C.cGray,
-                       " in ",
-                       serverName,
-                       ".");
+                F.fMain("AC",
+                        F.fItem(playerName),
+                        " failed ",
+                        severity._color + reason + C.cGray,
+                        " in ",
+                        serverName,
+                        ".");
     }
 
 
@@ -289,14 +289,14 @@ public class F
     public static String fWelcomeMessage(String playerName)
     {
         return String.join("§r\n",
-                           " ",
-                           " §b§lWelcome " + playerName + " to Hexuscraft!",
-                           "  §7A mini-game server inspired by the legacy Mineplex Network",
-                           "   §7Type §e/help§7 to see available commands ",
-                           " ",
-                           "  §7We are open source! Contribute to help improve our server",
-                           "   §e§nhttps://github.com/hexuscraft",
-                           " ");
+                " ",
+                " §b§lWelcome " + playerName + " to Hexuscraft!",
+                "  §7A mini-game server inspired by the legacy Mineplex Network",
+                "   §7Type §e/help§7 to see available commands ",
+                " ",
+                "  §7We are open source! Contribute to help improve our server",
+                "   §e§nhttps://github.com/hexuscraft",
+                " ");
     }
 
 }

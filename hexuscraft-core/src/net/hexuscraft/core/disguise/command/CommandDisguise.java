@@ -18,11 +18,11 @@ public class CommandDisguise extends BaseCommand<CoreDisguise>
     public CommandDisguise(CoreDisguise coreDisguise)
     {
         super(coreDisguise,
-              "disguise",
-              "[Target] [Username]",
-              "Disguise yourself, or force another player to disguise, as another player.",
-              Set.of("nick"),
-              CoreDisguise.PERM.COMMAND_DISGUISE);
+                "disguise",
+                "[Target] [Username]",
+                "Disguise yourself, or force another player to disguise, as another player.",
+                Set.of("nick"),
+                CoreDisguise.PERM.COMMAND_DISGUISE);
     }
 
     @Override
@@ -51,14 +51,12 @@ public class CommandDisguise extends BaseCommand<CoreDisguise>
         else
         {
             Player[] potentialMatches = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
-                                                                                                .getOnlinePlayers(),
-                                                                        args[0]);
+                    .getOnlinePlayers(), args[0]);
             if (potentialMatches.length != 1)
             {
                 sender.sendMessage(F.fMain(this,
-                                           F.fMatches(Arrays.stream(potentialMatches)
-                                                            .map(Player::getName)
-                                                            .toArray(String[]::new), args[0])));
+                        F.fMatches(Arrays.stream(potentialMatches).map(Player::getName).toArray(String[]::new),
+                                args[0])));
                 return;
             }
 
@@ -81,11 +79,11 @@ public class CommandDisguise extends BaseCommand<CoreDisguise>
             return;
         }
         sender.sendMessage(F.fMain(this,
-                                   "Disguised ",
-                                   F.fItem(targetPlayer.getName()),
-                                   " as ",
-                                   F.fItem(potentialDisguise.getName()),
-                                   "."));
+                "Disguised ",
+                F.fItem(targetPlayer.getName()),
+                " as ",
+                F.fItem(potentialDisguise.getName()),
+                "."));
     }
 
     @Override

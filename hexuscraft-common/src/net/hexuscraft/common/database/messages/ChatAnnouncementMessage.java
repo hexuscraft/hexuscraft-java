@@ -16,8 +16,8 @@ public record ChatAnnouncementMessage(UUID _senderUniqueId, String _message, Per
         JSONObject jsonObject = new JSONObject(jsonString);
 
         return new ChatAnnouncementMessage(UUID.fromString(jsonObject.getString("senderUniqueId")),
-                                           jsonObject.getString("message"),
-                                           PermissionGroup.valueOf(jsonObject.getString("permissionGroup")));
+                jsonObject.getString("message"),
+                PermissionGroup.valueOf(jsonObject.getString("permissionGroup")));
     }
 
     @Override
@@ -25,11 +25,11 @@ public record ChatAnnouncementMessage(UUID _senderUniqueId, String _message, Per
     public String toString()
     {
         return new JSONObject(Map.of("senderUniqueId",
-                                     _senderUniqueId.toString(),
-                                     "message",
-                                     _message,
-                                     "permissionGroup",
-                                     _permissionGroup.name())).toString();
+                _senderUniqueId.toString(),
+                "message",
+                _message,
+                "permissionGroup",
+                _permissionGroup.name())).toString();
     }
 
 }

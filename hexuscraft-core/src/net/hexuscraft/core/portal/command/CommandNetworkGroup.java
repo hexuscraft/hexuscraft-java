@@ -12,14 +12,14 @@ public class CommandNetworkGroup extends BaseMultiCommand<CorePortal>
     public CommandNetworkGroup(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
-              "group",
-              "Manage server groups.",
-              Set.of("g"),
-              CorePortal.PERM.COMMAND_NETWORK_GROUP,
-              Set.of(new CommandNetworkGroupCreate(corePortal, coreDatabase),
-                     new CommandNetworkGroupDelete(corePortal, coreDatabase),
-                     new CommandNetworkGroupList(corePortal),
-                     new CommandNetworkGroupRestart(corePortal)));
+                "group",
+                "Manage server groups.",
+                Set.of("g"),
+                CorePortal.PERM.COMMAND_NETWORK_GROUP,
+                Set.of(new CommandNetworkGroupCreate(corePortal, coreDatabase),
+                        new CommandNetworkGroupDelete(corePortal, coreDatabase),
+                        new CommandNetworkGroupList(corePortal),
+                        new CommandNetworkGroupRestart(corePortal)));
     }
 
 }

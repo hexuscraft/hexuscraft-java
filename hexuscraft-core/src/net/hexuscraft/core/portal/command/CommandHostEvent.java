@@ -23,11 +23,11 @@ public class CommandHostEvent extends BaseCommand<CorePortal>
     public CommandHostEvent(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
-              "hostevent",
-              "",
-              "Start the event server or teleport to the existing event server.",
-              Set.of("hes", "mes", "hosthes", "hostmes"),
-              CorePortal.PERM.COMMAND_HOSTEVENT);
+                "hostevent",
+                "",
+                "Start the event server or teleport to the existing event server.",
+                Set.of("hes", "mes", "hosthes", "hostmes"),
+                CorePortal.PERM.COMMAND_HOSTEVENT);
 
         _coreDatabase = coreDatabase;
     }
@@ -59,41 +59,41 @@ public class CommandHostEvent extends BaseCommand<CorePortal>
         if (_miniPlugin.getServerGroup(serverGroupName) != null)
         {
             sender.sendMessage(F.fMain(this,
-                                       "Your server is currently being created. You will be teleported shortly."));
+                    "Your server is currently being created. You will be teleported shortly."));
             return;
         }
 
         _miniPlugin._hexusPlugin.runAsync(() ->
-                                          {
-                                              try
-                                              {
-                                                  new ServerGroupData(serverGroupName,
-                                                                      PermissionGroup._PLAYER,
-                                                                      CorePortal.EVENT_SERVER_PORT,
-                                                                      CorePortal.EVENT_SERVER_PORT,
-                                                                      1,
-                                                                      0,
-                                                                      "Arcade.jar",
-                                                                      "Arcade.zip",
-                                                                      2048,
-                                                                      100,
-                                                                      false,
-                                                                      10000,
-                                                                      new GameType[]{GameType.SURVIVAL_GAMES},
-                                                                      sender instanceof Player player ?
-                                                                      player.getUniqueId() :
-                                                                      UtilUniqueId.EMPTY_UUID).update(_coreDatabase._database._jedis);
-                                              }
-                                              catch (JedisException ex)
-                                              {
-                                                  sender.sendMessage(F.fMain(this,
-                                                                             F.fError(
-                                                                                     "There was an error creating your server. Please try again later or contact an administrator if this issue persists.")));
-                                                  return;
-                                              }
-                                              sender.sendMessage(F.fMain(this,
-                                                                         F.fSuccess(
-                                                                                 "Successfully created your server. You will be automatically teleported once your server has started. This may take up to 30 seconds.")));
-                                          });
+        {
+            try
+            {
+                new ServerGroupData(serverGroupName,
+                        PermissionGroup._PLAYER,
+                        CorePortal.EVENT_SERVER_PORT,
+                        CorePortal.EVENT_SERVER_PORT,
+                        1,
+                        0,
+                        "Arcade.jar",
+                        "Arcade.zip",
+                        2048,
+                        100,
+                        false,
+                        10000,
+                        new GameType[]{GameType.SURVIVAL_GAMES},
+                        sender instanceof Player player ? player.getUniqueId() : UtilUniqueId.EMPTY_UUID).update(
+                        _coreDatabase._database._jedis);
+            }
+            catch (JedisException ex)
+            {
+                sender.sendMessage(F.fMain(this,
+                        F.fError("There was an error creating your server. Please try again later or contact an " +
+                                "administrator if this issue persists.")));
+                return;
+            }
+            sender.sendMessage(F.fMain(this,
+                    F.fSuccess(
+                            "Successfully created your server. You will be automatically teleported once your server " +
+                                    "has started. This may take up to 30 seconds.")));
+        });
     }
 }

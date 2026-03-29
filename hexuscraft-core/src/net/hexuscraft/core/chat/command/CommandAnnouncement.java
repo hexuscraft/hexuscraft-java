@@ -22,11 +22,11 @@ public class CommandAnnouncement extends BaseCommand<CoreChat>
     public CommandAnnouncement(CoreChat coreChat, CoreDatabase coreDatabase)
     {
         super(coreChat,
-              "announce",
-              "<Permission Group> <Message>",
-              "Broadcast a message to the entire network.",
-              Set.of("announcement"),
-              CoreChat.PERM.COMMAND_ANNOUNCEMENT);
+                "announce",
+                "<Permission Group> <Message>",
+                "Broadcast a message to the entire network.",
+                Set.of("announcement"),
+                CoreChat.PERM.COMMAND_ANNOUNCEMENT);
         _coreDatabase = coreDatabase;
     }
 
@@ -47,21 +47,18 @@ public class CommandAnnouncement extends BaseCommand<CoreChat>
         catch (IllegalArgumentException ex)
         {
             sender.sendMessage(F.fMain(this,
-                                       F.fItem(args[0]),
-                                       " is not a valid group. Groups: ",
-                                       F.fItem(PermissionGroup.getColoredNames())));
+                    F.fItem(args[0]),
+                    " is not a valid group. Groups: ",
+                    F.fItem(PermissionGroup.getColoredNames())));
             return;
         }
 
         _coreDatabase._database._jedis.publish(ChatAnnouncementMessage.CHANNEL_NAME,
-                                               new ChatAnnouncementMessage(sender instanceof Player player ?
-                                                                           player.getUniqueId() :
-                                                                           UtilUniqueId.EMPTY_UUID,
-                                                                           String.join(" ",
-                                                                                       Arrays.stream(args)
-                                                                                             .skip(1)
-                                                                                             .toArray(String[]::new)),
-                                                                           permissionGroup).toString());
+                new ChatAnnouncementMessage(sender instanceof Player player ?
+                        player.getUniqueId() :
+                        UtilUniqueId.EMPTY_UUID,
+                        String.join(" ", Arrays.stream(args).skip(1).toArray(String[]::new)),
+                        permissionGroup).toString());
 
         sender.sendMessage(F.fMain(this, "Message has been announced."));
     }

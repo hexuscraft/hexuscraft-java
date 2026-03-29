@@ -21,11 +21,11 @@ public class CommandServer extends BaseCommand<CorePortal>
     public CommandServer(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
-              "server",
-              "[Name]",
-              "View your current server or teleport to a server.",
-              Set.of("sv", "portal"),
-              CorePortal.PERM.COMMAND_SERVER);
+                "server",
+                "[Name]",
+                "View your current server or teleport to a server.",
+                Set.of("sv", "portal"),
+                CorePortal.PERM.COMMAND_SERVER);
         _coreDatabase = coreDatabase;
     }
 
@@ -45,7 +45,7 @@ public class CommandServer extends BaseCommand<CorePortal>
             if (serverData == null)
             {
                 sender.sendMessage(F.fMain(this,
-                                           F.fError("Could not locate server with name ", F.fItem(serverName), ".")));
+                        F.fError("Could not locate server with name ", F.fItem(serverName), ".")));
                 return;
             }
 
@@ -53,9 +53,7 @@ public class CommandServer extends BaseCommand<CorePortal>
             if (serverGroupData == null)
             {
                 sender.sendMessage(F.fMain(this,
-                                           F.fError("Could not locate server group with name ",
-                                                    F.fItem(serverData._group),
-                                                    ".")));
+                        F.fError("Could not locate server group with name ", F.fItem(serverData._group), ".")));
                 return;
             }
             if (!sender.hasPermission(serverGroupData._requiredPermission.name()))

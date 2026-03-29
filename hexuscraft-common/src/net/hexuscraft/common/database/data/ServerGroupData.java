@@ -35,7 +35,7 @@ public class ServerGroupData
         _name = name;
 
         _requiredPermission = PermissionGroup.valueOf(serverGroupData.getOrDefault("requiredPermission",
-                                                                                   PermissionGroup._PLAYER.name()));
+                PermissionGroup._PLAYER.name()));
         _minPort = Integer.parseInt(serverGroupData.getOrDefault("minPort", "0"));
         _maxPort = Integer.parseInt(serverGroupData.getOrDefault("maxPort", "0"));
         _totalServers = Integer.parseInt(serverGroupData.getOrDefault("totalServers", "0"));
@@ -47,27 +47,27 @@ public class ServerGroupData
         _worldEdit = Boolean.parseBoolean(serverGroupData.getOrDefault("worldEdit", "FALSE"));
         _timeoutMillis = Integer.parseInt(serverGroupData.getOrDefault("timeoutMillis", "30000"));
         _games = Arrays.stream(serverGroupData.getOrDefault("game", "").split(","))
-                       .filter(s -> !s.trim().isEmpty())
-                       .map(GameType::valueOf)
-                       .toArray(GameType[]::new);
+                .filter(s -> !s.trim().isEmpty())
+                .map(GameType::valueOf)
+                .toArray(GameType[]::new);
         _hostUniqueId = UUID.fromString(serverGroupData.getOrDefault("hostUniqueId",
-                                                                     UtilUniqueId.EMPTY_UUID.toString()));
+                UtilUniqueId.EMPTY_UUID.toString()));
     }
 
     public ServerGroupData(String name,
-                           PermissionGroup requiredPermission,
-                           int minPort,
-                           int maxPort,
-                           int totalServers,
-                           int joinableServers,
-                           String plugin,
-                           String worldZip,
-                           int ram,
-                           int capacity,
-                           boolean worldEdit,
-                           int timeoutMillis,
-                           GameType[] games,
-                           UUID hostUniqueId)
+            PermissionGroup requiredPermission,
+            int minPort,
+            int maxPort,
+            int totalServers,
+            int joinableServers,
+            String plugin,
+            String worldZip,
+            int ram,
+            int capacity,
+            boolean worldEdit,
+            int timeoutMillis,
+            GameType[] games,
+            UUID hostUniqueId)
     {
         _name = name;
 

@@ -20,11 +20,11 @@ public class CommandPunish extends BaseCommand<CorePunish>
     public CommandPunish(CorePunish corePunish)
     {
         super(corePunish,
-              "punishment",
-              "<Player> <Reason>",
-              "Open the punishment panel.",
-              Set.of("punish", "x"),
-              CorePunish.PERM.COMMAND_PUNISH);
+                "punishment",
+                "<Player> <Reason>",
+                "Open the punishment panel.",
+                Set.of("punish", "x"),
+                CorePunish.PERM.COMMAND_PUNISH);
     }
 
     @Override
@@ -43,21 +43,17 @@ public class CommandPunish extends BaseCommand<CorePunish>
         }
 
         _miniPlugin._hexusPlugin.runAsync(() ->
-                                          {
-                                              OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
-                                                                                                             sender);
-                                              if (offlinePlayer == null)
-                                              {
-                                                  sender.sendMessage(F.fMatches(new String[]{}, args[0]));
-                                                  return;
-                                              }
+        {
+            OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+            if (offlinePlayer == null)
+            {
+                sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+                return;
+            }
 
-                                              String reasonMessage = String.join(" ",
-                                                                                 Arrays.stream(args)
-                                                                                       .skip(1)
-                                                                                       .toArray(String[]::new));
-                                              _miniPlugin.openPunishGui(player, offlinePlayer, reasonMessage);
-                                          });
+            String reasonMessage = String.join(" ", Arrays.stream(args).skip(1).toArray(String[]::new));
+            _miniPlugin.openPunishGui(player, offlinePlayer, reasonMessage);
+        });
     }
 
     @Override
@@ -68,8 +64,8 @@ public class CommandPunish extends BaseCommand<CorePunish>
         {
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                                                                                     .getOnlinePlayers()
-                                                                                     .stream();
+                    .getOnlinePlayers()
+                    .stream();
             if (sender instanceof Player player)
             {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));

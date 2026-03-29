@@ -18,11 +18,11 @@ public class CommandClear extends BaseCommand<CoreItem>
     public CommandClear(CoreItem coreItem)
     {
         super(coreItem,
-              "clear",
-              "[Players]",
-              "Clear the inventory of targets.",
-              Set.of("clearinventory"),
-              CoreItem.PERM.COMMAND_CLEAR);
+                "clear",
+                "[Players]",
+                "Clear the inventory of targets.",
+                Set.of("clearinventory"),
+                CoreItem.PERM.COMMAND_CLEAR);
     }
 
     @Override
@@ -35,9 +35,9 @@ public class CommandClear extends BaseCommand<CoreItem>
         }
 
         Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
-                                                           args[0],
-                                                           sender,
-                                                           matches -> matches.length == 0);
+                args[0],
+                sender,
+                matches -> matches.length == 0);
         if (targets.length == 0)
         {
             return;
@@ -45,9 +45,9 @@ public class CommandClear extends BaseCommand<CoreItem>
 
         Arrays.stream(targets).forEach(target -> target.getInventory().clear());
         sender.sendMessage(F.fMain(this) +
-                           "Cleared the inventories of " +
-                           F.fItem(Arrays.stream(targets).map(Player::getName).toArray(String[]::new)) +
-                           ".");
+                "Cleared the inventories of " +
+                F.fItem(Arrays.stream(targets).map(Player::getName).toArray(String[]::new)) +
+                ".");
     }
 
     @Override
@@ -55,10 +55,10 @@ public class CommandClear extends BaseCommand<CoreItem>
     {
         List<String> completions = new ArrayList<>(List.of("*", "**", "."));
         completions.addAll(_miniPlugin._hexusPlugin.getServer()
-                                                   .getOnlinePlayers()
-                                                   .stream()
-                                                   .map(Player::getName)
-                                                   .toList());
+                .getOnlinePlayers()
+                .stream()
+                .map(Player::getName)
+                .toList());
         return completions;
     }
 }

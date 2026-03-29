@@ -14,11 +14,11 @@ public class CommandLocateServer extends BaseCommand<CorePortal>
     public CommandLocateServer(CorePortal corePortal)
     {
         super(corePortal,
-              "server",
-              "<Name>",
-              "List all players in a specific server.",
-              Set.of("srv", "s"),
-              CorePortal.PERM.COMMAND_LOCATE_SERVER);
+                "server",
+                "<Name>",
+                "List all players in a specific server.",
+                Set.of("srv", "s"),
+                CorePortal.PERM.COMMAND_LOCATE_SERVER);
     }
 
     @Override

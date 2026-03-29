@@ -11,11 +11,11 @@ public class CommandWorld extends BaseMultiCommand<BuildWorld>
     public CommandWorld(BuildWorld buildWorld)
     {
         super(buildWorld,
-              "world",
-              "Create, edit and remove worlds.",
-              Set.of(),
-              BuildWorld.PERM.COMMAND_WORLD,
-              Set.of(new CommandWorldCreate(buildWorld)));
+                "world",
+                "Create, edit and remove worlds.",
+                Set.of(),
+                BuildWorld.PERM.COMMAND_WORLD,
+                Set.of(new CommandWorldCreate(buildWorld)));
     }
 
 }

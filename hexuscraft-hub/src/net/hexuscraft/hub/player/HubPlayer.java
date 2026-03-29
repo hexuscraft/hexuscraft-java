@@ -71,17 +71,14 @@ public class HubPlayer extends MiniPlugin<Hub>
     {
         _pluginCommand.register(new CommandSpawn(this));
         _actionTextTask = _hexusPlugin.getServer()
-                                      .getScheduler()
-                                      .runTaskTimer(_hexusPlugin,
-                                                    () -> _hexusPlugin.getServer()
-                                                                      .getOnlinePlayers()
-                                                                      .forEach(player -> PlayerTabInfo.sendActionText(
-                                                                              player,
-                                                                              C.cYellow +
-                                                                              C.fBold +
-                                                                              "WWW.HEXUSCRAFT.NET")),
-                                                    0,
-                                                    40);
+                .getScheduler()
+                .runTaskTimer(_hexusPlugin,
+                        () -> _hexusPlugin.getServer()
+                                .getOnlinePlayers()
+                                .forEach(player -> PlayerTabInfo.sendActionText(player,
+                                        C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET")),
+                        0,
+                        40);
     }
 
     @Override
@@ -137,20 +134,20 @@ public class HubPlayer extends MiniPlugin<Hub>
         PlayerInventory inventory = player.getInventory();
 
         ItemStack gameCompass = UtilItem.createItem(Material.COMPASS,
-                                                    C.cGreen + C.fBold + "Games",
-                                                    "Click to open the Games Menu");
+                C.cGreen + C.fBold + "Games",
+                "Click to open the Games Menu");
         ItemStack profileSkull = UtilItem.createItemSkull(player.getName(),
-                                                          C.cGreen + C.fBold + player.getName(),
-                                                          "Click to open the Profile Menu");
+                C.cGreen + C.fBold + player.getName(),
+                "Click to open the Profile Menu");
         ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST,
-                                                       C.cGreen + C.fBold + "Cosmetics",
-                                                       "Click to open the Cosmetics Menu");
+                C.cGreen + C.fBold + "Cosmetics",
+                "Click to open the Cosmetics Menu");
         ItemStack storeEmerald = UtilItem.createItem(Material.EMERALD,
-                                                     C.cGreen + C.fBold + "Store",
-                                                     "Click to open the Store Menu");
+                C.cGreen + C.fBold + "Store",
+                "Click to open the Store Menu");
         ItemStack lobbyClock = UtilItem.createItem(Material.WATCH,
-                                                   C.cGreen + C.fBold + "Lobbies",
-                                                   "Click to open the Lobbies Menu");
+                C.cGreen + C.fBold + "Lobbies",
+                "Click to open the Lobbies Menu");
 
         inventory.clear();
         inventory.setItem(0, gameCompass);
@@ -283,49 +280,27 @@ public class HubPlayer extends MiniPlugin<Hub>
         Inventory lobbyMenu = _hexusPlugin.getServer().createInventory(player, 54, "Lobby Menu");
 
         Arrays.stream(_corePortal.getServers("Lobby")).limit(54).forEach(serverData ->
-                                                                         {
-                                                                             int
-                                                                                     lobbyId
-                                                                                     = Integer.parseInt(serverData._name.split(
-                                                                                     serverData._group + "-")[1]);
-                                                                             if (lobbyId > 54)
-                                                                             {
-                                                                                 return;
-                                                                             }
+        {
+            int lobbyId = Integer.parseInt(serverData._name.split(serverData._group + "-")[1]);
+            if (lobbyId > 54)
+            {
+                return;
+            }
 
-                                                                             boolean
-                                                                                     isCurrentServer
-                                                                                     = serverData._name.equals(
-                                                                                     _corePortal._serverName);
+            boolean isCurrentServer = serverData._name.equals(_corePortal._serverName);
 
-                                                                             ItemStack serverItem = new ItemStack(
-                                                                                     isCurrentServer ?
-                                                                                     Material.EMERALD_BLOCK :
-                                                                                     Material.IRON_BLOCK);
-                                                                             serverItem.setAmount(lobbyId);
+            ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
+            serverItem.setAmount(lobbyId);
 
-                                                                             ItemMeta
-                                                                                     serverItemMeta
-                                                                                     = serverItem.getItemMeta();
-                                                                             serverItemMeta.setDisplayName(C.cAqua +
-                                                                                                           C.fBold +
-                                                                                                           "Lobby-" +
-                                                                                                           lobbyId);
-                                                                             serverItemMeta.setLore(List.of(C.cDAqua +
-                                                                                                            serverData._players +
-                                                                                                            "/" +
-                                                                                                            serverData._capacity +
-                                                                                                            " Players",
-                                                                                                            "",
-                                                                                                            C.cYellow +
-                                                                                                            C.fBold +
-                                                                                                            (isCurrentServer ?
-                                                                                                             "YOU ARE HERE" :
-                                                                                                             "CLICK TO CONNECT")));
+            ItemMeta serverItemMeta = serverItem.getItemMeta();
+            serverItemMeta.setDisplayName(C.cAqua + C.fBold + "Lobby-" + lobbyId);
+            serverItemMeta.setLore(List.of(C.cDAqua + serverData._players + "/" + serverData._capacity + " Players",
+                    "",
+                    C.cYellow + C.fBold + (isCurrentServer ? "YOU ARE HERE" : "CLICK TO CONNECT")));
 
-                                                                             serverItem.setItemMeta(serverItemMeta);
-                                                                             lobbyMenu.setItem(lobbyId - 1, serverItem);
-                                                                         });
+            serverItem.setItemMeta(serverItemMeta);
+            lobbyMenu.setItem(lobbyId - 1, serverItem);
+        });
         player.openInventory(lobbyMenu);
         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }

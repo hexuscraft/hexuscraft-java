@@ -15,11 +15,11 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
     private final Set<BaseCommand<T>> _commands;
 
     public BaseMultiCommand(T miniPlugin,
-                            String name,
-                            String description,
-                            Set<String> aliases,
-                            IPermission permission,
-                            Set<BaseCommand<T>> commands)
+            String name,
+            String description,
+            Set<String> aliases,
+            IPermission permission,
+            Set<BaseCommand<T>> commands)
     {
         super(miniPlugin, name, "", description, aliases, permission);
         _commands = commands;
@@ -49,19 +49,14 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
         builder.append(help(alias));
 
         _commands.stream().sorted(Comparator.comparing(Command::getName)).forEach(command ->
-                                                                                  {
-                                                                                      if (!command.testPermissionSilent(
-                                                                                              sender))
-                                                                                      {
-                                                                                          return;
-                                                                                      }
-                                                                                      builder.append("\n")
-                                                                                             .append(F.fCommand(alias +
-                                                                                                                " " +
-                                                                                                                command.getName(),
-                                                                                                                command.getUsage(),
-                                                                                                                command.getDescription()));
-                                                                                  });
+        {
+            if (!command.testPermissionSilent(sender))
+            {
+                return;
+            }
+            builder.append("\n")
+                    .append(F.fCommand(alias + " " + command.getName(), command.getUsage(), command.getDescription()));
+        });
 
         sender.sendMessage(builder.toString());
     }
@@ -89,14 +84,14 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
 
         List<String> completions = new ArrayList<>();
         _commands.forEach(commandBase ->
-                          {
-                              if (!commandBase.testPermissionSilent(sender))
-                              {
-                                  return;
-                              }
-                              completions.add(commandBase.getName());
-                              completions.addAll(commandBase.getAliases());
-                          });
+        {
+            if (!commandBase.testPermissionSilent(sender))
+            {
+                return;
+            }
+            completions.add(commandBase.getName());
+            completions.addAll(commandBase.getAliases());
+        });
         return completions;
     }
 

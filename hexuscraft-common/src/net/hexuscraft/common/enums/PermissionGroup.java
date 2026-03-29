@@ -21,10 +21,10 @@ public enum PermissionGroup
     //    Public Teams
 
     BUILD_TEAM("Builder",
-               C.cBlue,
-               10,
-               "Builders are responsible for creating and updating our game and lobby maps.",
-               MEDIA), // Build Team
+            C.cBlue,
+            10,
+            "Builders are responsible for creating and updating our game and lobby maps.",
+            MEDIA), // Build Team
     BUILD_LEAD("BuildLead", C.cWhite, 0, "Build Lead", BUILD_TEAM), // Build Team Lead
 
     EVENT_TEAM("E.Team", C.cWhite, 0, "Event Team"), // Events Team
@@ -46,23 +46,27 @@ public enum PermissionGroup
     TRAINEE("Trainee",
             C.cDAqua,
             200,
-            "Trainees are moderators-in-training, undergoing a trial phase before becoming a fully-fleged moderator. You can contact them for assistance with /a.",
+            "Trainees are moderators-in-training, undergoing a trial phase before becoming a fully-fleged moderator. " +
+                    "You can contact them for assistance with /a.",
             MVP),
     MODERATOR("Mod",
-              C.cYellow,
-              201,
-              "Moderators are responsible for assisting players, handling player reports and punishing rule-breakers. You can contact them for assistance with /a.",
-              TRAINEE),
+            C.cYellow,
+            201,
+            "Moderators are responsible for assisting players, handling player reports and punishing rule-breakers. " +
+                    "You can contact them for assistance with /a.",
+            TRAINEE),
     SENIOR_MODERATOR("Sr.Mod",
-                     C.cGold,
-                     202,
-                     "Senior Moderators are moderators who have joined a staff-only team. They are responsible for performing their team's duties in addition to assisting players, handling player reports and punishing rule-breakers. You can contact them for assistance with /a.",
-                     MODERATOR),
+            C.cGold,
+            202,
+            "Senior Moderators are moderators who have joined a staff-only team. They are responsible for performing " +
+                    "their team's duties in addition to assisting players, handling player reports and punishing " +
+                    "rule-breakers. You can contact them for assistance with /a.",
+            MODERATOR),
     ADMINISTRATOR("Admin",
-                  C.cRed,
-                  203,
-                  "Administrators lead a team. They are responsible for managing their team ",
-                  SENIOR_MODERATOR),
+            C.cRed,
+            203,
+            "Administrators lead a team. They are responsible for managing their team ",
+            SENIOR_MODERATOR),
 
     ;
 

@@ -19,11 +19,11 @@ public class CommandWorldCreate extends BaseCommand<BuildWorld>
     public CommandWorldCreate(BuildWorld buildWorld)
     {
         super(buildWorld,
-              "create",
-              "<Name>",
-              "Create a new void world.",
-              Set.of("c"),
-              BuildWorld.PERM.COMMAND_WORLD_CREATE);
+                "create",
+                "<Name>",
+                "Create a new void world.",
+                Set.of("c"),
+                BuildWorld.PERM.COMMAND_WORLD_CREATE);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class CommandWorldCreate extends BaseCommand<BuildWorld>
         world.setPVP(false);
         world.setWaterAnimalSpawnLimit(0);
         Map.of("doDaylightCycle", "false", "doEntityDrops", "false", "doFireTick", "false", "mobGriefing", "false")
-           .forEach(world::setGameRuleValue);
+                .forEach(world::setGameRuleValue);
         world.save();
 
         sender.sendMessage(F.fMain(this, "Created world ", F.fItem(world.getName()), "."));

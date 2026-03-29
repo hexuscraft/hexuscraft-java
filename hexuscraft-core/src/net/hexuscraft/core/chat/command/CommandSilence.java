@@ -27,40 +27,33 @@ public class CommandSilence extends BaseCommand<CoreChat>
             {
                 _miniPlugin.setMuted(false);
                 _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player ->
-                                                                                {
-                                                                                    if (!player.hasPermission(CoreChat.PERM.COMMAND_SILENCE_SEE.name()))
-                                                                                    {
-                                                                                        return;
-                                                                                    }
+                {
+                    if (!player.hasPermission(CoreChat.PERM.COMMAND_SILENCE_SEE.name()))
+                    {
+                        return;
+                    }
 
-                                                                                    JSONObject
-                                                                                            jsonObject
-                                                                                            = new JSONObject(Map.of(
-                                                                                            "text",
-                                                                                            F.fStaff(this,
-                                                                                                     F.fSuccess(F.fItem(
-                                                                                                                        sender instanceof Player senderPlayer ?
-                                                                                                                        senderPlayer.getDisplayName() :
-                                                                                                                        sender.getName()),
-                                                                                                                " un-muted the global chat."))));
-                                                                                    player.sendRawMessage(jsonObject.toString());
-                                                                                });
+                    JSONObject jsonObject = new JSONObject(Map.of("text",
+                            F.fStaff(this,
+                                    F.fSuccess(F.fItem(sender instanceof Player senderPlayer ?
+                                            senderPlayer.getDisplayName() :
+                                            sender.getName()), " un-muted the global chat."))));
+                    player.sendRawMessage(jsonObject.toString());
+                });
                 return;
             }
             _miniPlugin.setMuted(true);
             _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player ->
-                                                                            {
-                                                                                if (!player.hasPermission(CoreChat.PERM.COMMAND_SILENCE_SEE.name()))
-                                                                                {
-                                                                                    return;
-                                                                                }
-                                                                                player.sendMessage(F.fStaff(this,
-                                                                                                            F.fError(F.fItem(
-                                                                                                                             sender instanceof Player senderPlayer ?
-                                                                                                                             senderPlayer.getDisplayName() :
-                                                                                                                             sender.getName()),
-                                                                                                                     " muted the global chat")));
-                                                                            });
+            {
+                if (!player.hasPermission(CoreChat.PERM.COMMAND_SILENCE_SEE.name()))
+                {
+                    return;
+                }
+                player.sendMessage(F.fStaff(this,
+                        F.fError(F.fItem(sender instanceof Player senderPlayer ?
+                                senderPlayer.getDisplayName() :
+                                sender.getName()), " muted the global chat")));
+            });
 
             return;
         }

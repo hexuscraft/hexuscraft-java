@@ -33,10 +33,9 @@ public class CommandHelp extends BaseCommand<CoreChat>
         if (args.length == 1)
         {
             Command[] availableCommands = _coreCommand._commands.stream()
-                                                                .filter(command -> command.testPermissionSilent(sender))
-                                                                .sorted(Comparator.comparing(command -> command.getName()
-                                                                                                               .toLowerCase()))
-                                                                .toArray(Command[]::new);
+                    .filter(command -> command.testPermissionSilent(sender))
+                    .sorted(Comparator.comparing(command -> command.getName().toLowerCase()))
+                    .toArray(Command[]::new);
 
             int pageAmount = (int) Math.ceil((double) availableCommands.length / 8);
 
@@ -62,29 +61,29 @@ public class CommandHelp extends BaseCommand<CoreChat>
             List<String> commandStrings = new ArrayList<>();
 
             Arrays.stream(availableCommands)
-                  .skip((pageNumber - 1) * 8L)
-                  .limit(8)
-                  .map(command -> F.fCommand(command.getName(), command.getUsage(), command.getDescription()))
-                  .forEach(commandStrings::add);
+                    .skip((pageNumber - 1) * 8L)
+                    .limit(8)
+                    .map(command -> F.fCommand(command.getName(), command.getUsage(), command.getDescription()))
+                    .forEach(commandStrings::add);
 
             sender.sendMessage(F.fMain(this, "Commands Page ", F.fItem(pageNumber + " / " + pageAmount), ":") +
-                               "\n" +
-                               String.join("\n", commandStrings));
+                    "\n" +
+                    String.join("\n", commandStrings));
 
             return;
         }
 
         sender.sendMessage(F.fMain(this, "Hey there! Need some help?") +
-                           "\n" +
-                           String.join("\n", constructHelpStrings(alias)));
+                "\n" +
+                String.join("\n", constructHelpStrings(alias)));
     }
 
     private String[] constructHelpStrings(String alias)
     {
         return new String[]{F.fMain("", "Visit our website: " + C.cGreen + "https://hexuscraft.net"),
-                            F.fMain("", "Join our Discord: " + C.cPurple + "https://discord.gg/yusJMxrg3e"),
-                            F.fMain("", "Request help from staff with ", F.fItem("/support"), "."),
-                            F.fMain("", "Type ", F.fItem("/" + alias + " 1"), " for a list of commands.")};
+                F.fMain("", "Join our Discord: " + C.cPurple + "https://discord.gg/yusJMxrg3e"),
+                F.fMain("", "Request help from staff with ", F.fItem("/support"), "."),
+                F.fMain("", "Type ", F.fItem("/" + alias + " 1"), " for a list of commands.")};
 
     }
 

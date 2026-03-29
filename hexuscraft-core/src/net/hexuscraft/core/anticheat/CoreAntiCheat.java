@@ -137,13 +137,13 @@ public class CoreAntiCheat extends MiniPlugin<HexusPlugin>
     public void alert(Player player, String reason, CheatSeverity severity)
     {
         _hexusPlugin.getServer()
-                    .getOnlinePlayers()
-                    .stream()
-                    .filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name()))
-                    .forEach(staff -> staff.sendMessage(F.fCheat(player.getDisplayName(),
-                                                                 severity,
-                                                                 reason,
-                                                                 _corePortal._serverName)));
+                .getOnlinePlayers()
+                .stream()
+                .filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name()))
+                .forEach(staff -> staff.sendMessage(F.fCheat(player.getDisplayName(),
+                        severity,
+                        reason,
+                        _corePortal._serverName)));
     }
 
     public void kick(Player player, String reason)
