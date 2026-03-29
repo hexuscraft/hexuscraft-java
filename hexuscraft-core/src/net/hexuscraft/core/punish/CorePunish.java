@@ -96,7 +96,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
 
         _coreDatabase._database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            PunishData punishData = PunishPunishmentAppliedMessage.fromString(rawMessage).punishData;
+            PunishData punishData = PunishPunishmentAppliedMessage.fromString(rawMessage)._punishData;
 
             _hexusPlugin.runAsync(() ->
             {

@@ -14,7 +14,7 @@ public class NewsDeletedMessage extends BaseMessage
 
     public NewsDeletedMessage(UUID id)
     {
-        this._id = id;
+        _id = id;
     }
 
     public static NewsDeletedMessage parse(String jsonString)

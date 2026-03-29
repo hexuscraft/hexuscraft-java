@@ -5,16 +5,16 @@ import com.google.common.io.ByteArrayDataInput;
 public abstract class ByteArrayDataInputRunnable implements Runnable
 {
 
-    ByteArrayDataInput in;
+    ByteArrayDataInput _in;
 
     public ByteArrayDataInput getIn()
     {
-        return this.in;
+        return _in;
     }
 
     public void setIn(ByteArrayDataInput in)
     {
-        this.in = in;
+        _in = in;
     }
 
     @Override

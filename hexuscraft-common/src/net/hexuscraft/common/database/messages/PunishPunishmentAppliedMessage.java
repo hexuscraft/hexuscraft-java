@@ -11,11 +11,11 @@ public class PunishPunishmentAppliedMessage
 
     public static String CHANNEL_NAME = "punish.punishmentApplied";
 
-    public PunishData punishData;
+    public PunishData _punishData;
 
     public PunishPunishmentAppliedMessage(PunishData punishData)
     {
-        this.punishData = punishData;
+        _punishData = punishData;
     }
 
     public static PunishPunishmentAppliedMessage fromString(String jsonString)
@@ -41,7 +41,7 @@ public class PunishPunishmentAppliedMessage
     @Override
     public String toString()
     {
-        return new JSONObject(punishData).toString();
+        return new JSONObject(_punishData).toString();
     }
 
 }

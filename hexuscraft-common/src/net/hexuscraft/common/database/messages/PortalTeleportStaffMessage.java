@@ -16,9 +16,9 @@ public class PortalTeleportStaffMessage extends BaseMessage
 
     public PortalTeleportStaffMessage(UUID targetUUID, String serverName, UUID senderUUID)
     {
-        this._targetUUID = targetUUID;
-        this._serverName = serverName;
-        this._senderUUID = senderUUID;
+        _targetUUID = targetUUID;
+        _serverName = serverName;
+        _senderUUID = senderUUID;
     }
 
     public static PortalTeleportStaffMessage parse(String jsonString)

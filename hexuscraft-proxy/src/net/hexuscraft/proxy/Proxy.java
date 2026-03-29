@@ -91,12 +91,12 @@ public class Proxy
         {
             PunishPunishmentAppliedMessage punishPunishmentAppliedMessage = PunishPunishmentAppliedMessage.fromString(
                     rawMessage);
-            Optional<Player> optionalPlayer = _server.getPlayer(punishPunishmentAppliedMessage.punishData._targetUUID);
+            Optional<Player> optionalPlayer = _server.getPlayer(punishPunishmentAppliedMessage._punishData._targetUUID);
             optionalPlayer.ifPresent(player -> _server.getScheduler().buildTask(this, () ->
             {
                 Map<String, String> rawData = new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(
-                        punishPunishmentAppliedMessage.punishData._uuid)));
-                rawData.put("id", punishPunishmentAppliedMessage.punishData._uuid.toString());
+                        punishPunishmentAppliedMessage._punishData._uuid)));
+                rawData.put("id", punishPunishmentAppliedMessage._punishData._uuid.toString());
                 PunishData punishData = new PunishData(rawData);
                 if (punishData._type != PunishType.BAN)
                 {
