@@ -35,9 +35,14 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 
 ### GameType
 
+> - THE_BRIDGES
 > - SURVIVAL_GAMES
+> - SURVIVAL_GAMES_2
 > - MICRO_BATTLES
 > - SKYWARS
+> - SKYWARS_2
+> - CAKE_WARS
+> - CAKE_WARS_2
 
 ### PermissionGroup
 
