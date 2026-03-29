@@ -8,11 +8,11 @@ import java.util.UUID;
 public record ReportSubmittedMessage(UUID reportUUID)
 {
 
-    public final static String CHANNEL_NAME = "report.submitted";
+    public static String CHANNEL_NAME = "report.submitted";
 
-    public static ReportSubmittedMessage fromString(final String jsonString)
+    public static ReportSubmittedMessage fromString(String jsonString)
     {
-        final JSONObject jsonObject = new JSONObject(jsonString);
+        JSONObject jsonObject = new JSONObject(jsonString);
         return new ReportSubmittedMessage(UUID.fromString(jsonObject.getString("reportUUID")));
     }
 

@@ -41,7 +41,7 @@ import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessageListener
+public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessageListener
 {
 
     public enum PERM implements IPermission
@@ -79,24 +79,24 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         BYPASS_FULL_STAFF
     }
 
-    public static final String PROXY_CHANNEL = "BungeeCord";
-    public static final int MIN_PORT_PRIVATE_SERVERS = 39900;
-    public static final int MAX_PORT_PRIVATE_SERVERS = 39999;
-    public static final int EVENT_SERVER_PORT = 30003;
-    public final Set<CommandSender> _networkChannelSpies;
-    public final long _createdMillis;
-    public final String _serverName;
-    public final String _serverGroupName;
+    public static String PROXY_CHANNEL = "BungeeCord";
+    public static int MIN_PORT_PRIVATE_SERVERS = 39900;
+    public static int MAX_PORT_PRIVATE_SERVERS = 39999;
+    public static int EVENT_SERVER_PORT = 30003;
     private final Messenger _messenger;
     private final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
     private final Set<ServerGroupData> _serverGroupCache;
     private final Set<ServerData> _serverCache;
+    public Set<CommandSender> _networkChannelSpies;
+    public long _createdMillis;
+    public String _serverName;
+    public String _serverGroupName;
     private CoreCommand _coreCommand;
     private CoreDatabase _coreDatabase;
     private BukkitTask _updateServerDataTask;
     private BukkitTask _updateServerCacheTask;
 
-    public CorePortal(final HexusPlugin plugin)
+    public CorePortal(HexusPlugin plugin)
     {
         super(plugin, "Portal");
 
@@ -143,7 +143,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
@@ -169,7 +169,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         _coreDatabase._database.registerConsumer(PortalTeleportMessage.CHANNEL_NAME,
                                                  (_, _, rawMessage) -> _hexusPlugin.runAsync(() ->
                                                                                              {
-                                                                                                 final PortalTeleportMessage
+                                                                                                 PortalTeleportMessage
                                                                                                          message
                                                                                                          = PortalTeleportMessage.parse(
                                                                                                          rawMessage);
@@ -188,15 +188,15 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         _coreDatabase._database.registerConsumer(PortalTeleportStaffMessage.CHANNEL_NAME,
                                                  (_, _, rawMessage) -> _hexusPlugin.runAsync(() ->
                                                                                              {
-                                                                                                 final PortalTeleportStaffMessage
+                                                                                                 PortalTeleportStaffMessage
                                                                                                          message
                                                                                                          = PortalTeleportStaffMessage.parse(
                                                                                                          rawMessage);
 
-                                                                                                 final AtomicReference<String>
+                                                                                                 AtomicReference<String>
                                                                                                          targetName
                                                                                                          = new AtomicReference<>();
-                                                                                                 final AtomicReference<String>
+                                                                                                 AtomicReference<String>
                                                                                                          senderName
                                                                                                          = new AtomicReference<>();
 
@@ -299,7 +299,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
 
         _coreDatabase._database.registerConsumer(PortalRestartServerMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            final PortalRestartServerMessage message = PortalRestartServerMessage.fromString(rawMessage);
+            PortalRestartServerMessage message = PortalRestartServerMessage.fromString(rawMessage);
             if (!message._serverName().equals(_serverName) && !message._serverName().equals("*"))
             {
                 return;
@@ -309,7 +309,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
 
         _coreDatabase._database.registerConsumer(PortalRestartServerGroupMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            final PortalRestartServerGroupMessage message = PortalRestartServerGroupMessage.fromString(rawMessage);
+            PortalRestartServerGroupMessage message = PortalRestartServerGroupMessage.fromString(rawMessage);
             if (!message._groupName().equals(_serverGroupName) && !message._groupName().equals("*"))
             {
                 return;
@@ -325,7 +325,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
                                                                 {
                                                                     updateServerCache();
                                                                 }
-                                                                catch (final JedisException ex)
+                                                                catch (JedisException ex)
                                                                 {
                                                                     logSevere(ex);
                                                                 }
@@ -349,13 +349,13 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
             _updateServerCacheTask.cancel();
         }
 
-        final Server server = _hexusPlugin.getServer();
+        Server server = _hexusPlugin.getServer();
 
-        final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
-                                                                                       server.getPort()).getAddress(),
-                                                                 server.getMotd(),
-                                                                 server.getOnlinePlayers().size(),
-                                                                 server.getMaxPlayers());
+        ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
+                                                                                 server.getPort()).getAddress(),
+                                                           server.getMotd(),
+                                                           server.getOnlinePlayers().size(),
+                                                           server.getMaxPlayers());
         server.getPluginManager().callEvent(ping);
 
         new ServerData(_serverName,
@@ -373,16 +373,16 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
 
     public void updateServerData()
     {
-        final Server server = _hexusPlugin.getServer();
+        Server server = _hexusPlugin.getServer();
 
-        final ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
-                                                                                       server.getPort()).getAddress(),
-                                                                 server.getMotd(),
-                                                                 server.getOnlinePlayers().size(),
-                                                                 server.getMaxPlayers());
+        ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
+                                                                                 server.getPort()).getAddress(),
+                                                           server.getMotd(),
+                                                           server.getOnlinePlayers().size(),
+                                                           server.getMaxPlayers());
         server.getPluginManager().callEvent(ping);
 
-        final OptionalDouble
+        OptionalDouble
                 averageTps
                 = OptionalDouble.of(20); //Arrays.stream(MinecraftServer.getServer().recentTps).average();
 
@@ -401,8 +401,8 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
 
     public void updateServerCache()
     {
-        final ServerGroupData[] groupCache = ServerQueries.getServerGroups(_coreDatabase._database._jedis);
-        final ServerData[] serverCache = ServerQueries.getServers(_coreDatabase._database._jedis);
+        ServerGroupData[] groupCache = ServerQueries.getServerGroups(_coreDatabase._database._jedis);
+        ServerData[] serverCache = ServerQueries.getServers(_coreDatabase._database._jedis);
 
         _serverGroupCache.clear();
         _serverGroupCache.addAll(Arrays.asList(groupCache));
@@ -411,15 +411,15 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
     }
 
     @Override
-    public void onPluginMessageReceived(final String channel, final Player player, final byte[] message)
+    public void onPluginMessageReceived(String channel, Player player, byte[] message)
     {
         // TODO: Change from bungeecord channels to redis channels. Implement behaviour on proxy.
         //noinspection UnstableApiUsage
-        final ByteArrayDataInput in = ByteStreams.newDataInput(message);
+        ByteArrayDataInput in = ByteStreams.newDataInput(message);
 
         if (channel.equals(PROXY_CHANNEL))
         {
-            final String subChannel = in.readUTF();
+            String subChannel = in.readUTF();
             if (!_callbacks.containsKey(subChannel))
             {
                 return;
@@ -432,7 +432,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         }
     }
 
-    public void teleport(final Player player, final String serverName)
+    public void teleport(Player player, String serverName)
     {
         if (serverName.equals(_serverName))
         {
@@ -449,20 +449,20 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
 
         // TODO: Change from bungeecord channels to redis channels. Implement behaviour on proxy.
         //noinspection UnstableApiUsage
-        final ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
         out.writeUTF(serverName);
         player.sendPluginMessage(_hexusPlugin, PROXY_CHANNEL, out.toByteArray());
     }
 
-    public BukkitTask teleportAsync(final UUID targetUUID, final String serverName)
+    public BukkitTask teleportAsync(UUID targetUUID, String serverName)
     {
         return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalTeleportMessage.CHANNEL_NAME,
                                                                                   new PortalTeleportMessage(targetUUID,
                                                                                                             serverName).stringify()));
     }
 
-    public BukkitTask teleportAsync(final UUID targetUUID, final String serverName, final UUID senderUUID)
+    public BukkitTask teleportAsync(UUID targetUUID, String serverName, UUID senderUUID)
     {
         return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalTeleportStaffMessage.CHANNEL_NAME,
                                                                                   new PortalTeleportStaffMessage(
@@ -471,13 +471,13 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
                                                                                           senderUUID).stringify()));
     }
 
-    public void teleportPlayerToRandomServer(final Player player, final String serverGroupName)
+    public void teleportPlayerToRandomServer(Player player, String serverGroupName)
     {
-        final ServerData[] availableServers = _serverCache.stream()
-                                                          .filter(serverData -> serverData._group.equals(serverGroupName))
-                                                          .filter(serverData -> !serverData._updatedByMonitor)
-                                                          .filter(serverData -> !serverData._name.equals(_serverName))
-                                                          .toArray(ServerData[]::new);
+        ServerData[] availableServers = _serverCache.stream()
+                                                    .filter(serverData -> serverData._group.equals(serverGroupName))
+                                                    .filter(serverData -> !serverData._updatedByMonitor)
+                                                    .filter(serverData -> !serverData._name.equals(_serverName))
+                                                    .toArray(ServerData[]::new);
         if (availableServers.length == 0)
         {
             player.sendMessage(F.fMain(this,
@@ -495,7 +495,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         return _serverCache.stream().filter(serverData -> !serverData._updatedByMonitor).toArray(ServerData[]::new);
     }
 
-    public ServerData[] getServers(final String serverGroupName)
+    public ServerData[] getServers(String serverGroupName)
     {
         return Arrays.stream(getServers())
                      .filter(serverData -> serverData._group.equalsIgnoreCase(serverGroupName))
@@ -510,12 +510,12 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
                      .toArray(String[]::new);
     }
 
-    public String[] getServerNames(final String serverGroupName)
+    public String[] getServerNames(String serverGroupName)
     {
         return Arrays.stream(getServers(serverGroupName)).map(serverData -> serverData._name).toArray(String[]::new);
     }
 
-    public ServerData getServer(final String serverName)
+    public ServerData getServer(String serverName)
     {
         return Arrays.stream(getServers())
                      .filter(serverData -> serverData._name.equalsIgnoreCase(serverName))
@@ -528,7 +528,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         return _serverGroupCache.toArray(ServerGroupData[]::new);
     }
 
-    public ServerGroupData getServerGroup(final String serverGroupName)
+    public ServerGroupData getServerGroup(String serverGroupName)
     {
         return Arrays.stream(getServerGroups())
                      .filter(serverGroupData -> serverGroupData._name.equalsIgnoreCase(serverGroupName))
@@ -544,14 +544,14 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
                                 .toArray(String[]::new);
     }
 
-    public BukkitTask restartServerAsync(final String serverName)
+    public BukkitTask restartServerAsync(String serverName)
     {
         return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalRestartServerMessage.CHANNEL_NAME,
                                                                                   new PortalRestartServerMessage(
                                                                                           serverName).toString()));
     }
 
-    public BukkitTask restartServerGroupAsync(final String groupName)
+    public BukkitTask restartServerGroupAsync(String groupName)
     {
         return _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(PortalRestartServerGroupMessage.CHANNEL_NAME,
                                                                                   new PortalRestartServerGroupMessage(
@@ -570,9 +570,9 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
         return 0;
     }
 
-    public UUID registerCallback(final String channelName, final ByteArrayDataInputRunnable callback)
+    public UUID registerCallback(String channelName, ByteArrayDataInputRunnable callback)
     {
-        final UUID id = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
         if (!_callbacks.containsKey(channelName))
         {
             _callbacks.put(channelName, new HashMap<>());
@@ -606,7 +606,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    private void onPlayerLogin(final PlayerLoginEvent event)
+    private void onPlayerLogin(PlayerLoginEvent event)
     {
         if (!event.getResult().equals(PlayerLoginEvent.Result.KICK_FULL))
         {
@@ -620,7 +620,7 @@ public final class CorePortal extends MiniPlugin<HexusPlugin> implements PluginM
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event)
+    private void onPlayerQuit(PlayerQuitEvent event)
     {
         _networkChannelSpies.remove(event.getPlayer());
     }

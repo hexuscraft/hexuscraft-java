@@ -13,10 +13,10 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.Set;
 
-public final class CommandWorldCreate extends BaseCommand<BuildWorld>
+public class CommandWorldCreate extends BaseCommand<BuildWorld>
 {
 
-    public CommandWorldCreate(final BuildWorld buildWorld)
+    public CommandWorldCreate(BuildWorld buildWorld)
     {
         super(buildWorld,
               "create",
@@ -27,7 +27,7 @@ public final class CommandWorldCreate extends BaseCommand<BuildWorld>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length != 1)
         {
@@ -35,14 +35,14 @@ public final class CommandWorldCreate extends BaseCommand<BuildWorld>
             return;
         }
 
-        final WorldCreator worldCreator = new WorldCreator(args[0]);
+        WorldCreator worldCreator = new WorldCreator(args[0]);
         worldCreator.type(WorldType.FLAT);
         worldCreator.environment(World.Environment.NORMAL);
         worldCreator.generateStructures(false);
         worldCreator.generatorSettings("3;0");
         worldCreator.generator("3;0");
 
-        final World world = _miniPlugin._hexusPlugin.getServer().createWorld(worldCreator);
+        World world = _miniPlugin._hexusPlugin.getServer().createWorld(worldCreator);
         world.setSpawnLocation(0, 100, 0);
         world.setDifficulty(Difficulty.NORMAL);
         world.setAutoSave(false);

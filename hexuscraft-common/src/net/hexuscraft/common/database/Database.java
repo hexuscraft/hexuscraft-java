@@ -14,21 +14,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public final class Database
+public class Database
 {
 
-    public static final String KEY_DELIMITER = ":";
-
-    public final UnifiedJedis _jedis;
+    public static String KEY_DELIMITER = ":";
     private final Map<String, Map<PubSubConsumer, JedisPubSub>> _consumers;
+    public UnifiedJedis _jedis;
 
     // TODO::::::::: https://redis.io/docs/latest/develop/clients/jedis/produsage/
 
-    public Database(final String host,
-                    final int port,
-                    final String username,
-                    final String password,
-                    final String clientName) throws JedisException
+    public Database(String host, int port, String username, String password, String clientName) throws JedisException
     {
         _consumers = new HashMap<>();
         _jedis = buildUnifiedJedis(host, port, username, password, clientName);
@@ -36,13 +31,13 @@ public final class Database
 
     public Database()
     {
-        final AtomicReference<String> atomicHost = new AtomicReference<>("127.0.0.1");
-        final AtomicInteger atomicPort = new AtomicInteger(6379);
-        final AtomicReference<String> atomicUsername = new AtomicReference<>("default");
-        final AtomicReference<String> atomicPassword = new AtomicReference<>("");
+        AtomicReference<String> atomicHost = new AtomicReference<>("127.0.0.1");
+        AtomicInteger atomicPort = new AtomicInteger(6379);
+        AtomicReference<String> atomicUsername = new AtomicReference<>("default");
+        AtomicReference<String> atomicPassword = new AtomicReference<>("");
 
-        final File redisFile = new File("_redis.dat");
-        try (final Scanner scanner = new Scanner(redisFile))
+        File redisFile = new File("_redis.dat");
+        try (Scanner scanner = new Scanner(redisFile))
         {
             ((Runnable) () ->
             {
@@ -71,7 +66,7 @@ public final class Database
                 atomicPassword.set(scanner.nextLine());
             }).run();
         }
-        catch (final FileNotFoundException ex)
+        catch (FileNotFoundException ex)
         {
             System.out.println("WARNING: Could not locate '" +
                                redisFile.getName() +
@@ -86,13 +81,13 @@ public final class Database
                                "'.");
         }
 
-        final AtomicReference<String> clientName = new AtomicReference<>();
-        final File nameFile = new File("_name.dat");
-        try (final Scanner scanner = new Scanner(nameFile))
+        AtomicReference<String> clientName = new AtomicReference<>();
+        File nameFile = new File("_name.dat");
+        try (Scanner scanner = new Scanner(nameFile))
         {
             clientName.set(scanner.nextLine());
         }
-        catch (final FileNotFoundException ex)
+        catch (FileNotFoundException ex)
         {
             clientName.set(new Random().ints(16, 0, 36)
                                        .mapToObj("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"::charAt)
@@ -115,20 +110,16 @@ public final class Database
         java.security.Security.setProperty("networkaddress.cache.negative.ttl", "0");
     }
 
-    public static String buildQuery(final String... args)
+    public static String buildQuery(String... args)
     {
         return String.join(KEY_DELIMITER, args);
     }
 
-    private UnifiedJedis buildUnifiedJedis(final String host,
-                                           final int port,
-                                           final String username,
-                                           final String password,
-                                           final String clientName)
+    private UnifiedJedis buildUnifiedJedis(String host, int port, String username, String password, String clientName)
     {
-        final HostAndPort hostAndPort = new HostAndPort(host, port);
+        HostAndPort hostAndPort = new HostAndPort(host, port);
 
-        final ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
+        ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
         connectionPoolConfig.setMaxTotal(32);
         connectionPoolConfig.setMaxIdle(connectionPoolConfig.getMaxTotal());
         connectionPoolConfig.setMinIdle(0);
@@ -137,12 +128,12 @@ public final class Database
         connectionPoolConfig.setTestWhileIdle(true);
         connectionPoolConfig.setTimeBetweenEvictionRuns(Duration.ofSeconds(1));
 
-        final JedisClientConfig jedisClientConfig = DefaultJedisClientConfig.builder()
-                                                                            .clientName(clientName)
-                                                                            .database(0)
-                                                                            .user(username)
-                                                                            .password(password)
-                                                                            .build();
+        JedisClientConfig jedisClientConfig = DefaultJedisClientConfig.builder()
+                                                                      .clientName(clientName)
+                                                                      .database(0)
+                                                                      .user(username)
+                                                                      .password(password)
+                                                                      .build();
 
         return RedisClient.builder()
                           .clientConfig(jedisClientConfig)
@@ -151,9 +142,9 @@ public final class Database
                           .build();
     }
 
-    public void registerConsumer(final String pattern, final PubSubConsumer consumer)
+    public void registerConsumer(String pattern, PubSubConsumer consumer)
     {
-        final Map<PubSubConsumer, JedisPubSub> consumerMap;
+        Map<PubSubConsumer, JedisPubSub> consumerMap;
         if (_consumers.containsKey(pattern))
         {
             consumerMap = _consumers.get(pattern);
@@ -164,10 +155,10 @@ public final class Database
             _consumers.put(pattern, consumerMap);
         }
 
-        final JedisPubSub jedisPubSub = new JedisPubSub()
+        JedisPubSub jedisPubSub = new JedisPubSub()
         {
             @Override
-            public void onPMessage(final String pattern, final String channelName, final String rawMessage)
+            public void onPMessage(String pattern, String channelName, String rawMessage)
             {
                 consumer.accept(pattern, channelName, rawMessage);
             }
@@ -177,7 +168,7 @@ public final class Database
         new Thread(() -> _jedis.psubscribe(jedisPubSub, pattern)).start();
     }
 
-    public void unregisterConsumer(final PubSubConsumer consumer)
+    public void unregisterConsumer(PubSubConsumer consumer)
     {
         _consumers.forEach((pattern, consumerMap) ->
                            {

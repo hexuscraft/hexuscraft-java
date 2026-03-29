@@ -5,10 +5,10 @@ import net.hexuscraft.core.command.BaseCommand;
 
 import java.util.Set;
 
-public final class CommandGameStart extends BaseCommand<ArcadeManager>
+public class CommandGameStart extends BaseCommand<ArcadeManager>
 {
 
-    CommandGameStart(final ArcadeManager arcadeManager)
+    CommandGameStart(ArcadeManager arcadeManager)
     {
         super(arcadeManager,
               "start",

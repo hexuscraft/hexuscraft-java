@@ -11,10 +11,10 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandSpawn extends BaseCommand<HubPlayer>
+public class CommandSpawn extends BaseCommand<HubPlayer>
 {
 
-    public CommandSpawn(final HubPlayer hubPlayer)
+    public CommandSpawn(HubPlayer hubPlayer)
     {
         super(hubPlayer,
               "spawn",
@@ -25,7 +25,7 @@ public final class CommandSpawn extends BaseCommand<HubPlayer>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 1)
         {
@@ -73,7 +73,7 @@ public final class CommandSpawn extends BaseCommand<HubPlayer>
 
         target.sendMessage(F.fMain(this) +
                            "You were teleported to spawn by " +
-                           F.fItem(sender instanceof final Player player ? player.getDisplayName() : sender.getName()) +
+                           F.fItem(sender instanceof Player player ? player.getDisplayName() : sender.getName()) +
                            ".");
         sender.sendMessage(F.fMain(this) + "Teleported " + F.fItem(target.getDisplayName()) + " to spawn.");
         _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(staff ->
@@ -83,7 +83,7 @@ public final class CommandSpawn extends BaseCommand<HubPlayer>
                                                                                 return;
                                                                             }
                                                                             staff.sendMessage(F.fStaff(this,
-                                                                                                       F.fItem(sender instanceof final Player player ?
+                                                                                                       F.fItem(sender instanceof Player player ?
                                                                                                                player.getDisplayName() :
                                                                                                                sender.getName()),
                                                                                                        " teleported ",

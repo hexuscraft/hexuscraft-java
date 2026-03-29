@@ -9,12 +9,12 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandHub extends BaseCommand<ArcadeManager>
+public class CommandHub extends BaseCommand<ArcadeManager>
 {
 
     private final CorePortal _corePortal;
 
-    public CommandHub(final ArcadeManager arcadeManager, final CorePortal corePortal)
+    public CommandHub(ArcadeManager arcadeManager, CorePortal corePortal)
     {
         super(arcadeManager,
               "hub",
@@ -26,9 +26,9 @@ public final class CommandHub extends BaseCommand<ArcadeManager>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
-        if (!(sender instanceof final Player player))
+        if (!(sender instanceof Player player))
         {
             sender.sendMessage(F.fMain(this, "Only players can execute this command."));
             return;

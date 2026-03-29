@@ -10,7 +10,7 @@ import net.hexuscraft.core.item.command.CommandGive;
 
 import java.util.Map;
 
-public final class CoreItem extends MiniPlugin<HexusPlugin>
+public class CoreItem extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -21,7 +21,7 @@ public final class CoreItem extends MiniPlugin<HexusPlugin>
 
     CoreCommand _pluginCommand;
 
-    public CoreItem(final HexusPlugin plugin)
+    public CoreItem(HexusPlugin plugin)
     {
         super(plugin, "Item");
 
@@ -30,7 +30,7 @@ public final class CoreItem extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }

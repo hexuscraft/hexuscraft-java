@@ -19,13 +19,13 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
-public final class CoreBossBar extends MiniPlugin<HexusPlugin>
+public class CoreBossBar extends MiniPlugin<HexusPlugin>
 {
 
-    final Map<Player, Set<BossBar>> _bossBarMap;
-    final Map<Player, Wither> _witherMap;
+    Map<Player, Set<BossBar>> _bossBarMap;
+    Map<Player, Wither> _witherMap;
 
-    public CoreBossBar(final HexusPlugin plugin)
+    public CoreBossBar(HexusPlugin plugin)
     {
         super(plugin, "Boss Bar");
         _bossBarMap = new HashMap<>();
@@ -41,13 +41,13 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin>
                                                                  {
                                                                      return;
                                                                  }
-                                                                 final BossBar activeBossBar = bossBars.stream()
-                                                                                                       .max(Comparator.comparing(
-                                                                                                               bossBar -> bossBar.weight()
-                                                                                                                                 .get()))
-                                                                                                       .orElse(null);
+                                                                 BossBar activeBossBar = bossBars.stream()
+                                                                                                 .max(Comparator.comparing(
+                                                                                                         bossBar -> bossBar.weight()
+                                                                                                                           .get()))
+                                                                                                 .orElse(null);
 
-                                                                 final Wither wither = _witherMap.get(player);
+                                                                 Wither wither = _witherMap.get(player);
                                                                  wither.setCustomName(activeBossBar.message().get());
                                                                  wither.getWorld()
                                                                        .getPlayers()
@@ -58,11 +58,11 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin>
                                                              }), 0, 1);
     }
 
-    public BossBar registerBossBar(final BossBar bossBar)
+    public BossBar registerBossBar(BossBar bossBar)
     {
         if (!_witherMap.containsKey(bossBar.player()))
         {
-            final Wither wither = bossBar.player().getWorld().spawn(bossBar.player().getLocation(), Wither.class);
+            Wither wither = bossBar.player().getWorld().spawn(bossBar.player().getLocation(), Wither.class);
             wither.setCanPickupItems(false);
             wither.setFallDistance(0f);
             wither.setFireTicks(0);
@@ -77,15 +77,15 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin>
             wither.setVelocity(new Vector());
 
             //            We need to add the invisibility via NBT as Entity::addPotionEffect does mot work, and neither does /effect for that matter! Seriously, try making a wither invisible without modifying NBT. Why does this have to be so difficult??
-            final NBTTagCompound nbtInvisibilityEffect = new NBTTagCompound();
+            NBTTagCompound nbtInvisibilityEffect = new NBTTagCompound();
             nbtInvisibilityEffect.setByte("Id", (byte) 14);
             nbtInvisibilityEffect.setInt("Duration", Integer.MAX_VALUE);
             nbtInvisibilityEffect.setByte("ShowParticles", (byte) 0);
 
-            final NBTTagList nbtActiveEffects = new NBTTagList();
+            NBTTagList nbtActiveEffects = new NBTTagList();
             nbtActiveEffects.add(nbtInvisibilityEffect);
 
-            final NBTTagCompound nbt = UtilEntity.getNBTTagCompound(wither);
+            NBTTagCompound nbt = UtilEntity.getNBTTagCompound(wither);
             nbt.setByte("Invulnerable", (byte) 1);
             nbt.setByte("NoAI", (byte) 1);
             nbt.setByte("Silent", (byte) 1);
@@ -95,7 +95,7 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin>
             _witherMap.put(bossBar.player(), wither);
         }
 
-        final Set<BossBar> bossBars;
+        Set<BossBar> bossBars;
         if (_bossBarMap.containsKey(bossBar.player()))
         {
             bossBars = _bossBarMap.get(bossBar.player());
@@ -110,13 +110,13 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin>
         return bossBar;
     }
 
-    public void unregisterBossBar(final BossBar bossBar)
+    public void unregisterBossBar(BossBar bossBar)
     {
-        final Player player = bossBar.player();
+        Player player = bossBar.player();
 
         if (_bossBarMap.containsKey(player))
         {
-            final Set<BossBar> bossBars = _bossBarMap.get(player);
+            Set<BossBar> bossBars = _bossBarMap.get(player);
             bossBars.remove(bossBar);
 
             if (!bossBars.isEmpty())
@@ -134,7 +134,7 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onEntityTarget(final EntityTargetEvent event)
+    private void onEntityTarget(EntityTargetEvent event)
     {
         if (!event.getEntity().hasMetadata("BossBarNPC"))
         {
@@ -144,15 +144,15 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerMove(final PlayerMoveEvent event)
+    private void onPlayerMove(PlayerMoveEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         if (!_witherMap.containsKey(player))
         {
             return;
         }
 
-        final Location location = player.getLocation();
+        Location location = player.getLocation();
         location.add(player.getEyeLocation().getDirection().multiply(20));
         location.add(player.getVelocity().multiply(10));
         location.setY(Math.clamp(location.getY(), 1, 255));
@@ -163,9 +163,9 @@ public final class CoreBossBar extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event)
+    private void onPlayerQuit(PlayerQuitEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         if (!_bossBarMap.containsKey(player))
         {
             return;

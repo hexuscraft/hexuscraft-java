@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public final class WebTranslator extends HexusPlugin
+public class WebTranslator extends HexusPlugin
 {
 
     public WebTranslator()
@@ -31,9 +31,9 @@ public final class WebTranslator extends HexusPlugin
     }
 
     @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event)
+    private void onPlayerJoin(PlayerJoinEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
 
         event.setJoinMessage(F.fSub("Join", player.getName()));
         player.teleport(new Location(getServer().getWorlds().getFirst(), 0, 0, 0, 0, 0));
@@ -41,13 +41,13 @@ public final class WebTranslator extends HexusPlugin
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event)
+    private void onPlayerQuit(PlayerQuitEvent event)
     {
         event.setQuitMessage(F.fSub("Quit", event.getPlayer().getName()));
     }
 
     @EventHandler
-    private void onEntityDamage(final EntityDamageEvent event)
+    private void onEntityDamage(EntityDamageEvent event)
     {
         if (!(event.getEntity() instanceof Player))
         {
@@ -57,7 +57,7 @@ public final class WebTranslator extends HexusPlugin
     }
 
     @EventHandler
-    private void onPlayerMove(final PlayerMoveEvent event)
+    private void onPlayerMove(PlayerMoveEvent event)
     {
         event.setTo(new Location(getServer().getWorlds().getFirst(), 0, 0, 0, 0, 0));
     }

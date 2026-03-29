@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class CoreAntiCheat extends MiniPlugin<HexusPlugin>
+public class CoreAntiCheat extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -32,7 +32,7 @@ public final class CoreAntiCheat extends MiniPlugin<HexusPlugin>
     private CorePortal _corePortal;
     private CorePunish _corePunish;
 
-    public CoreAntiCheat(final HexusPlugin plugin)
+    public CoreAntiCheat(HexusPlugin plugin)
     {
         super(plugin, "Anti Cheat");
 
@@ -42,7 +42,7 @@ public final class CoreAntiCheat extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
         _corePunish = (CorePunish) dependencies.get(CorePunish.class);
@@ -61,27 +61,27 @@ public final class CoreAntiCheat extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event)
+    private void onPlayerJoin(PlayerJoinEvent event)
     {
         _violations.put(event.getPlayer(), new HashMap<>());
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event)
+    private void onPlayerQuit(PlayerQuitEvent event)
     {
         _violations.remove(event.getPlayer());
     }
 
     @EventHandler
-    private void onPlayerInteractAtEntity(final PlayerInteractAtEntityEvent event)
+    private void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.CREATIVE)
         {
             return;
         }
 
-        final double distance = player.getLocation().distance(event.getRightClicked().getLocation());
+        double distance = player.getLocation().distance(event.getRightClicked().getLocation());
         if (distance > 4)
         {
             event.setCancelled(true);
@@ -101,7 +101,7 @@ public final class CoreAntiCheat extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onEntityDamageByEntity(final EntityDamageByEntityEvent event)
+    private void onEntityDamageByEntity(EntityDamageByEntityEvent event)
     {
         if (!(event.getDamager() instanceof Player))
         {
@@ -134,7 +134,7 @@ public final class CoreAntiCheat extends MiniPlugin<HexusPlugin>
         }
     }
 
-    public void alert(final Player player, final String reason, final CheatSeverity severity)
+    public void alert(Player player, String reason, CheatSeverity severity)
     {
         _hexusPlugin.getServer()
                     .getOnlinePlayers()
@@ -146,22 +146,22 @@ public final class CoreAntiCheat extends MiniPlugin<HexusPlugin>
                                                                  _corePortal._serverName)));
     }
 
-    public void kick(final Player player, final String reason)
+    public void kick(Player player, String reason)
     {
         _corePunish.punishAsync(player.getUniqueId(), null, PunishType.KICK, 0, reason);
     }
 
-    public void flag(final Player player, final String reason, final CheatSeverity severity)
+    public void flag(Player player, String reason, CheatSeverity severity)
     {
-        final String keyName = reason + ":" + severity.name();
+        String keyName = reason + ":" + severity.name();
 
-        final Map<String, Integer> playerViolations = _violations.get(player);
+        Map<String, Integer> playerViolations = _violations.get(player);
 
         if (!playerViolations.containsKey(keyName))
         {
             playerViolations.put(keyName, 0);
         }
-        final int newCount = playerViolations.get(keyName) + 1;
+        int newCount = playerViolations.get(keyName) + 1;
         playerViolations.put(keyName, newCount);
 
         alert(player, newCount + " " + reason, severity);

@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Map;
 
-public final class CoreDisguise extends MiniPlugin<HexusPlugin>
+public class CoreDisguise extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -20,13 +20,13 @@ public final class CoreDisguise extends MiniPlugin<HexusPlugin>
 
     private CoreCommand _coreCommand;
 
-    public CoreDisguise(final HexusPlugin plugin)
+    public CoreDisguise(HexusPlugin plugin)
     {
         super(plugin, "Disguise");
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }
@@ -37,7 +37,7 @@ public final class CoreDisguise extends MiniPlugin<HexusPlugin>
         _coreCommand.register(new CommandDisguise(this));
     }
 
-    public void disguise(final Player targetPlayer, final OfflinePlayer disguiseOfflinePlayer)
+    public void disguise(Player targetPlayer, OfflinePlayer disguiseOfflinePlayer)
     {
         targetPlayer.setDisplayName(disguiseOfflinePlayer.getName());
         targetPlayer.setCustomName(disguiseOfflinePlayer.getName());

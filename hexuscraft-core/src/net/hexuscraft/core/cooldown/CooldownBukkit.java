@@ -7,19 +7,19 @@ import org.bukkit.command.CommandSender;
 public class CooldownBukkit
 {
 
-    private Long calculateRemaining(final Long now, final Long start, final Long delay)
+    private Long calculateRemaining(Long now, Long start, Long delay)
     {
         return delay - (now - start);
     }
 
-    public boolean use(final Object parent, final String name, final Long delayMs, final CommandSender sender)
+    public boolean use(Object parent, String name, Long delayMs, CommandSender sender)
     {
         if (UtilCooldown.use(parent, name, delayMs))
         {
             return true;
         }
 
-        final UtilCooldown.Cooldown cooldown = UtilCooldown.getCooldown(parent, name);
+        UtilCooldown.Cooldown cooldown = UtilCooldown.getCooldown(parent, name);
         if (cooldown == null)
         {
             sender.sendMessage(F.fMain(this, "Please wait before trying to use ", F.fItem(name), " again."));

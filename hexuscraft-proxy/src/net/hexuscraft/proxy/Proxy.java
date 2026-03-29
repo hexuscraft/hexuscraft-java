@@ -42,14 +42,14 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Plugin(id = "hexuscraft-proxy", name = "Proxy", version = "1.0.0")
-public final class Proxy
+public class Proxy
 {
 
     private final String MOTD_PREFIX = String.join("\n",
                                                    "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8]§r",
                                                    " §f§l▶§r ");
 
-    //    private final String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8 & 26.1]§r",
+    //    private String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8 & 26.1]§r",
     //            " §f§l▶§r ");
 
     private final Database _database;
@@ -60,7 +60,7 @@ public final class Proxy
     private final AtomicInteger _capacityCount;
 
     @Inject
-    public Proxy(final ProxyServer server, final Logger logger)
+    public Proxy(ProxyServer server, Logger logger)
     {
         _database = new Database();
         _server = server;
@@ -71,9 +71,9 @@ public final class Proxy
     }
 
     @Subscribe
-    public void onProxyInitialize(final ProxyInitializeEvent event)
+    public void onProxyInitialize(ProxyInitializeEvent event)
     {
-        final CommandManager commandManager = _server.getCommandManager();
+        CommandManager commandManager = _server.getCommandManager();
         commandManager.getAliases().forEach(commandManager::unregister);
 
         _server.getScheduler()
@@ -89,19 +89,16 @@ public final class Proxy
 
         _database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            final PunishPunishmentAppliedMessage
-                    punishPunishmentAppliedMessage
-                    = PunishPunishmentAppliedMessage.fromString(rawMessage);
-            final Optional<Player>
-                    optionalPlayer
-                    = _server.getPlayer(punishPunishmentAppliedMessage.punishData.targetUUID);
+            PunishPunishmentAppliedMessage punishPunishmentAppliedMessage = PunishPunishmentAppliedMessage.fromString(
+                    rawMessage);
+            Optional<Player> optionalPlayer = _server.getPlayer(punishPunishmentAppliedMessage.punishData._targetUUID);
             optionalPlayer.ifPresent(player -> _server.getScheduler().buildTask(this, () ->
             {
-                final Map<String, String> rawData = new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(
-                        punishPunishmentAppliedMessage.punishData.uuid)));
-                rawData.put("id", punishPunishmentAppliedMessage.punishData.uuid.toString());
-                final PunishData punishData = new PunishData(rawData);
-                if (punishData.type != PunishType.BAN)
+                Map<String, String> rawData = new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(
+                        punishPunishmentAppliedMessage.punishData._uuid)));
+                rawData.put("id", punishPunishmentAppliedMessage.punishData._uuid.toString());
+                PunishData punishData = new PunishData(rawData);
+                if (punishData._type != PunishType.BAN)
                 {
                     return;
                 }
@@ -112,17 +109,17 @@ public final class Proxy
 
     private void updateMOTD()
     {
-        final UnifiedJedis jedis = _database._jedis;
+        UnifiedJedis jedis = _database._jedis;
         _motd.set(MOTD_PREFIX + ServerQueries.getMotd(jedis));
 
     }
 
     private void updateServers()
     {
-        final List<ServerInfo> allServers = new ArrayList<>();
-        final List<String> fallbackServers = new ArrayList<>();
-        final AtomicInteger playerCount = new AtomicInteger();
-        final AtomicInteger capacityCount = new AtomicInteger();
+        List<ServerInfo> allServers = new ArrayList<>();
+        List<String> fallbackServers = new ArrayList<>();
+        AtomicInteger playerCount = new AtomicInteger();
+        AtomicInteger capacityCount = new AtomicInteger();
 
         Arrays.stream(ServerQueries.getServers(_database._jedis)).forEach(serverData ->
                                                                           {
@@ -131,12 +128,10 @@ public final class Proxy
                                                                                   return;
                                                                               }
 
-                                                                              final ServerInfo
-                                                                                      serverInfo
-                                                                                      = new ServerInfo(serverData._name,
-                                                                                                       new InetSocketAddress(
-                                                                                                               serverData._address,
-                                                                                                               serverData._port));
+                                                                              ServerInfo serverInfo = new ServerInfo(
+                                                                                      serverData._name,
+                                                                                      new InetSocketAddress(serverData._address,
+                                                                                                            serverData._port));
                                                                               allServers.add(serverInfo);
 
                                                                               if (serverData._group.equals("Lobby"))
@@ -153,7 +148,7 @@ public final class Proxy
 
         allServers.forEach(_server::registerServer);
 
-        final List<String> fallbackServerConfig = _server.getConfiguration().getAttemptConnectionOrder();
+        List<String> fallbackServerConfig = _server.getConfiguration().getAttemptConnectionOrder();
         fallbackServerConfig.addAll(fallbackServers);
         fallbackServerConfig.sort(String::compareTo);
 
@@ -162,9 +157,9 @@ public final class Proxy
     }
 
     @Subscribe
-    private void onProxyQuery(final ProxyQueryEvent event)
+    private void onProxyQuery(ProxyQueryEvent event)
     {
-        final QueryResponse.Builder builder = QueryResponse.builder();
+        QueryResponse.Builder builder = QueryResponse.builder();
         builder.players("§r",
                         "    §6§lHexuscraft§r §f§lNetwork§r    ",
                         "§r",
@@ -181,9 +176,9 @@ public final class Proxy
     }
 
     @Subscribe
-    private void onProxyPing(final ProxyPingEvent event)
+    private void onProxyPing(ProxyPingEvent event)
     {
-        final ServerPing.Builder builder = ServerPing.builder();
+        ServerPing.Builder builder = ServerPing.builder();
 
         builder.onlinePlayers(_playerCount.get());
         builder.maximumPlayers(_capacityCount.get());
@@ -203,7 +198,7 @@ public final class Proxy
         {
             builder.favicon(Favicon.create(Path.of("server-icon.png")));
         }
-        catch (final IOException ex)
+        catch (IOException ex)
         {
             throw new RuntimeException(ex);
         }
@@ -211,47 +206,47 @@ public final class Proxy
     }
 
     @Subscribe
-    private void onLogin(final LoginEvent event)
+    private void onLogin(LoginEvent event)
     {
         try
         {
-            final UnifiedJedis jedis = _database._jedis;
-            final Set<UUID> punishmentIds = jedis.smembers(PunishQueries.RECEIVED(event.getPlayer().getUniqueId()))
-                                                 .stream()
-                                                 .map(UUID::fromString)
-                                                 .collect(Collectors.toSet());
+            UnifiedJedis jedis = _database._jedis;
+            Set<UUID> punishmentIds = jedis.smembers(PunishQueries.RECEIVED(event.getPlayer().getUniqueId()))
+                                           .stream()
+                                           .map(UUID::fromString)
+                                           .collect(Collectors.toSet());
 
             // We want to display the longest ban remaining.
             // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most recent ban.
             // If there are multiple bans matching this and were also applied at the EXACT same time (??), fate decides the displayed message.
 
-            final Set<PunishData> activePunishments = new HashSet<>();
+            Set<PunishData> activePunishments = new HashSet<>();
 
-            for (final UUID punishmentUniqueId : punishmentIds)
+            for (UUID punishmentUniqueId : punishmentIds)
             {
                 try
                 {
-                    final Map<String, String> rawData = new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(
+                    Map<String, String> rawData = new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(
                             punishmentUniqueId)));
                     rawData.put("id", punishmentUniqueId.toString());
 
-                    final PunishData punishData = new PunishData(rawData);
-                    if (!punishData.active)
+                    PunishData punishData = new PunishData(rawData);
+                    if (!punishData._active)
                     {
                         continue;
                     }
-                    if (!punishData.type.equals(PunishType.BAN))
+                    if (!punishData._type.equals(PunishType.BAN))
                     {
                         continue;
                     }
 
-                    if (punishData.length == -1)
+                    if (punishData._length == -1)
                     { // permanent ban
                         activePunishments.add(punishData);
                         continue;
                     }
 
-                    final long remaining = punishData.getRemaining();
+                    long remaining = punishData.getRemaining();
                     if (remaining <= 0)
                     {
                         _database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
@@ -272,7 +267,7 @@ public final class Proxy
 
                     activePunishments.add(punishData);
                 }
-                catch (final JedisException ex)
+                catch (JedisException ex)
                 {
                     _logger.warning("Error while checking punish punish for '" +
                                     event.getPlayer().getUsername() +
@@ -286,7 +281,7 @@ public final class Proxy
                 return;
             }
 
-            final AtomicReference<PunishData> punishData = new AtomicReference<>();
+            AtomicReference<PunishData> punishData = new AtomicReference<>();
             if (activePunishments.size() > 1)
             {
                 for (PunishData data : activePunishments)
@@ -306,7 +301,7 @@ public final class Proxy
 
             event.setResult(ResultedEvent.ComponentResult.denied(Component.text(F.fPunish(punishData.get()))));
         }
-        catch (final JedisException ex)
+        catch (JedisException ex)
         {
             _logger.warning("Error while fetching punishment punish for '" +
                             event.getPlayer().getUsername() +
@@ -317,9 +312,9 @@ public final class Proxy
     }
 
     @Subscribe
-    private void onPlayerChooseInitialServer(final PlayerChooseInitialServerEvent event)
+    private void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
 
         if (player.getProtocolVersion().getProtocol() < ProtocolVersion.MINECRAFT_1_8.getProtocol())
         {
@@ -334,13 +329,13 @@ public final class Proxy
             return;
         }
 
-        final RegisteredServer[] lobbyServers = _server.getAllServers()
-                                                       .stream()
-                                                       .filter(registeredServer -> registeredServer.getServerInfo()
-                                                                                                   .getName()
-                                                                                                   .split("-(?=[^-]*$)")[0].equals(
-                                                               "Lobby"))
-                                                       .toArray(RegisteredServer[]::new);
+        RegisteredServer[] lobbyServers = _server.getAllServers()
+                                                 .stream()
+                                                 .filter(registeredServer -> registeredServer.getServerInfo()
+                                                                                             .getName()
+                                                                                             .split("-(?=[^-]*$)")[0].equals(
+                                                         "Lobby"))
+                                                 .toArray(RegisteredServer[]::new);
         if (lobbyServers.length == 0)
         {
             player.disconnect(Component.text()

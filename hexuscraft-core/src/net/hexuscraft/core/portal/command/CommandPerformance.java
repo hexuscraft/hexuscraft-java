@@ -5,10 +5,10 @@ import net.hexuscraft.core.portal.CorePortal;
 
 import java.util.Set;
 
-public final class CommandPerformance extends BaseCommand<CorePortal>
+public class CommandPerformance extends BaseCommand<CorePortal>
 {
 
-    public CommandPerformance(final CorePortal corePortal)
+    public CommandPerformance(CorePortal corePortal)
     {
         super(corePortal,
               "performance",

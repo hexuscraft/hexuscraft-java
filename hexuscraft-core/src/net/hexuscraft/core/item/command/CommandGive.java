@@ -16,10 +16,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-public final class CommandGive extends BaseCommand<CoreItem>
+public class CommandGive extends BaseCommand<CoreItem>
 {
 
-    public CommandGive(final CoreItem itemCenter)
+    public CommandGive(CoreItem itemCenter)
     {
         super(itemCenter,
               "give",
@@ -30,7 +30,7 @@ public final class CommandGive extends BaseCommand<CoreItem>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length < 2)
         {
@@ -38,17 +38,16 @@ public final class CommandGive extends BaseCommand<CoreItem>
             return;
         }
 
-        final Player[] matches = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
-                                                                                         .getOnlinePlayers(),
-                                                                 args[0],
-                                                                 sender,
-                                                                 predicateMatches -> predicateMatches.length == 0);
+        Player[] matches = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
+                                                           args[0],
+                                                           sender,
+                                                           predicateMatches -> predicateMatches.length == 0);
         if (matches.length == 0)
         {
             return;
         }
 
-        final String[] materialNames = args[1].split(",");
+        String[] materialNames = args[1].split(",");
         if (materialNames.length > 36)
         {
             // There are only 36 slots in a player inventory! (9 * 4)
@@ -56,14 +55,14 @@ public final class CommandGive extends BaseCommand<CoreItem>
             return;
         }
 
-        final AtomicInteger amount = new AtomicInteger(1);
+        AtomicInteger amount = new AtomicInteger(1);
         if (args.length > 2)
         {
             try
             {
                 amount.set(Integer.parseInt(args[2]));
             }
-            catch (final NumberFormatException ex)
+            catch (NumberFormatException ex)
             {
                 sender.sendMessage(F.fMain(this,
                                            F.fError("Invalid amount, expected a positive integer. "),
@@ -86,7 +85,7 @@ public final class CommandGive extends BaseCommand<CoreItem>
             return;
         }
 
-        final HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
+        HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
         if (args.length > 3)
         {
             Arrays.stream(Arrays.copyOfRange(args, 3, args.length)).map(s -> s.split(":")).forEach(strings ->
@@ -112,7 +111,7 @@ public final class CommandGive extends BaseCommand<CoreItem>
                                                                                                            return;
                                                                                                        }
 
-                                                                                                       final AtomicInteger
+                                                                                                       AtomicInteger
                                                                                                                enchantmentLevel
                                                                                                                = new AtomicInteger(
                                                                                                                1);
@@ -147,15 +146,15 @@ public final class CommandGive extends BaseCommand<CoreItem>
                                                                                                    });
         }
 
-        for (final String arg : args[1].split(","))
+        for (String arg : args[1].split(","))
         {
-            final String[] argSplitted = arg.split(":", 2);
-            final String materialName = argSplitted.length > 0 ? argSplitted[0] : null;
-            final AtomicReference<Byte> data = new AtomicReference<>((byte) 0);
+            String[] argSplitted = arg.split(":", 2);
+            String materialName = argSplitted.length > 0 ? argSplitted[0] : null;
+            AtomicReference<Byte> data = new AtomicReference<>((byte) 0);
 
-            final Material[] targetMaterials = ItemSearch.itemSearch(materialName,
-                                                                     sender,
-                                                                     materials -> materials.length != 1);
+            Material[] targetMaterials = ItemSearch.itemSearch(materialName,
+                                                               sender,
+                                                               materials -> materials.length != 1);
             if (targetMaterials.length != 1)
             {
                 continue;
@@ -167,7 +166,7 @@ public final class CommandGive extends BaseCommand<CoreItem>
                 {
                     data.set(Byte.parseByte(argSplitted[1]));
                 }
-                catch (final NumberFormatException ex)
+                catch (NumberFormatException ex)
                 {
                     sender.sendMessage(F.fMain(this,
                                                F.fError("Invalid material punish for ",
@@ -179,15 +178,13 @@ public final class CommandGive extends BaseCommand<CoreItem>
                 }
             }
 
-            final AtomicInteger remainingAmount = new AtomicInteger(amount.get());
+            AtomicInteger remainingAmount = new AtomicInteger(amount.get());
             while (remainingAmount.get() > 0)
             {
-                final ItemStack stack = new ItemStack(targetMaterials[0],
-                                                      Math.min(remainingAmount.get(), 64),
-                                                      data.get());
+                ItemStack stack = new ItemStack(targetMaterials[0], Math.min(remainingAmount.get(), 64), data.get());
                 stack.addUnsafeEnchantments(enchantmentMap);
 
-                for (final Player target : matches)
+                for (Player target : matches)
                 {
                     target.getInventory().addItem(stack);
                 }
@@ -205,7 +202,7 @@ public final class CommandGive extends BaseCommand<CoreItem>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         List<String> names = new ArrayList<>();
         switch (args.length)
@@ -216,7 +213,7 @@ public final class CommandGive extends BaseCommand<CoreItem>
                 Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
                                                                                          .getOnlinePlayers()
                                                                                          .stream();
-                if (sender instanceof final Player player)
+                if (sender instanceof Player player)
                 {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
                 }

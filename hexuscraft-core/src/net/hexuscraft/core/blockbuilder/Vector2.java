@@ -1,6 +1,6 @@
 package net.hexuscraft.core.blockbuilder;
 
-public final class Vector2
+public class Vector2
 {
 
     public int _x;

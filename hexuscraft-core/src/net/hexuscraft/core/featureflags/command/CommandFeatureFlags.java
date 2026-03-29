@@ -5,10 +5,10 @@ import net.hexuscraft.core.featureflags.CoreFeatureFlags;
 
 import java.util.Set;
 
-public final class CommandFeatureFlags extends BaseMultiCommand<CoreFeatureFlags>
+public class CommandFeatureFlags extends BaseMultiCommand<CoreFeatureFlags>
 {
 
-    public CommandFeatureFlags(final CoreFeatureFlags miniPlugin)
+    public CommandFeatureFlags(CoreFeatureFlags miniPlugin)
     {
         super(miniPlugin,
               "featureflags",

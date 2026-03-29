@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class UtilItem
+public class UtilItem
 {
 
     public static ItemStack createItem(Material material, String displayName, String... lore)

@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public final class CorePunish extends MiniPlugin<HexusPlugin>
+public class CorePunish extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -62,13 +62,13 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
     private CoreDatabase _coreDatabase;
     private CorePortal _corePortal;
 
-    public CorePunish(final HexusPlugin plugin)
+    public CorePunish(HexusPlugin plugin)
     {
         super(plugin, "Punish");
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
@@ -96,27 +96,27 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
 
         _coreDatabase._database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            final PunishData punishData = PunishPunishmentAppliedMessage.fromString(rawMessage).punishData;
+            PunishData punishData = PunishPunishmentAppliedMessage.fromString(rawMessage).punishData;
 
             _hexusPlugin.runAsync(() ->
                                   {
-                                      final OfflinePlayer target;
+                                      OfflinePlayer target;
                                       try
                                       {
-                                          target = PlayerSearch.offlinePlayerSearch(punishData.targetUUID);
+                                          target = PlayerSearch.offlinePlayerSearch(punishData._targetUUID);
                                           assert (target != null);
                                       }
-                                      catch (final IOException | AssertionError ex)
+                                      catch (IOException | AssertionError ex)
                                       {
                                           logWarning("Could not fetch offline player for punish target '" +
-                                                     punishData.targetUUID +
+                                                     punishData._targetUUID +
                                                      "': " +
                                                      ex.getMessage());
                                           return;
                                       }
 
-                                      final AtomicReference<String> staffName = new AtomicReference<>();
-                                      if (punishData.staffUUID.equals(UtilUniqueId.EMPTY_UUID))
+                                      AtomicReference<String> staffName = new AtomicReference<>();
+                                      if (punishData._staffUUID.equals(UtilUniqueId.EMPTY_UUID))
                                       {
                                           staffName.set(_hexusPlugin.getServer().getConsoleSender().getName());
                                       }
@@ -125,18 +125,18 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
                                           try
                                           {
                                               staffName.set(Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(
-                                                      punishData.staffUUID)).getName());
+                                                      punishData._staffUUID)).getName());
                                           }
-                                          catch (final IOException | NullPointerException ex)
+                                          catch (IOException | NullPointerException ex)
                                           {
                                               logSevere(ex);
                                               return;
                                           }
                                       }
 
-                                      Optional.ofNullable(target.getPlayer()).ifPresent((final Player targetPlayer) ->
+                                      Optional.ofNullable(target.getPlayer()).ifPresent((Player targetPlayer) ->
                                                                                         {
-                                                                                            final String
+                                                                                            String
                                                                                                     punishMessage
                                                                                                     = F.fPunish(
                                                                                                     punishData);
@@ -152,10 +152,10 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
                                       _hexusPlugin.getServer()
                                                   .getOnlinePlayers()
                                                   .stream()
-                                                  .filter((final Player staff) -> staff.hasPermission(PERM.PUNISH_ALERTS.name()))
-                                                  .forEach((final Player staff) ->
+                                                  .filter((Player staff) -> staff.hasPermission(PERM.PUNISH_ALERTS.name()))
+                                                  .forEach((Player staff) ->
                                                            {
-                                                               switch (punishData.type)
+                                                               switch (punishData._type)
                                                                {
                                                                    case PunishType.WARNING ->
                                                                            staff.sendMessage(F.fStaff(this,
@@ -166,7 +166,7 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
                                                                                                       F.fStaff("",
                                                                                                                "Reason: ",
                                                                                                                C.cWhite +
-                                                                                                               punishData.reason)));
+                                                                                                               punishData._reason)));
                                                                    case PunishType.KICK -> staff.sendMessage(F.fStaff(
                                                                            this,
                                                                            F.fItem(staffName.get()),
@@ -175,7 +175,7 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
                                                                            ".\n",
                                                                            F.fStaff("",
                                                                                     "Reason: ",
-                                                                                    C.cWhite + punishData.reason)));
+                                                                                    C.cWhite + punishData._reason)));
                                                                    case PunishType.MUTE -> staff.sendMessage(F.fStaff(
                                                                            this,
                                                                            F.fItem(staffName.get()),
@@ -185,11 +185,11 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
                                                                            F.fStaff("",
                                                                                     "Duration: ",
                                                                                     C.cWhite +
-                                                                                    F.fTime(punishData.length)),
+                                                                                    F.fTime(punishData._length)),
                                                                            "\n",
                                                                            F.fStaff("",
                                                                                     "Reason: ",
-                                                                                    C.cWhite + punishData.reason)));
+                                                                                    C.cWhite + punishData._reason)));
                                                                    case PunishType.BAN -> staff.sendMessage(F.fStaff(
                                                                            this,
                                                                            F.fItem(staffName.get()),
@@ -199,11 +199,11 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
                                                                            F.fStaff("",
                                                                                     "Duration: ",
                                                                                     C.cWhite +
-                                                                                    F.fTime(punishData.length)),
+                                                                                    F.fTime(punishData._length)),
                                                                            "\n",
                                                                            F.fStaff("",
                                                                                     "Reason: ",
-                                                                                    C.cWhite + punishData.reason)));
+                                                                                    C.cWhite + punishData._reason)));
                                                                }
                                                                staff.playSound(staff.getLocation(),
                                                                                Sound.CAT_MEOW,
@@ -215,7 +215,7 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    private void onConnect(final AsyncPlayerPreLoginEvent event)
+    private void onConnect(AsyncPlayerPreLoginEvent event)
     {
         if (!event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.ALLOWED))
         {
@@ -224,43 +224,43 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
 
         try
         {
-            final UnifiedJedis jedis = _coreDatabase._database._jedis;
-            final Set<UUID> punishmentIds = jedis.smembers(PunishQueries.RECEIVED(event.getUniqueId()))
-                                                 .stream()
-                                                 .map(UUID::fromString)
-                                                 .collect(Collectors.toSet());
+            UnifiedJedis jedis = _coreDatabase._database._jedis;
+            Set<UUID> punishmentIds = jedis.smembers(PunishQueries.RECEIVED(event.getUniqueId()))
+                                           .stream()
+                                           .map(UUID::fromString)
+                                           .collect(Collectors.toSet());
 
             // We want to display the longest ban remaining.
             // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most recent ban.
             // If there are multiple bans matching this and were also applied at the EXACT same time (??), fate decides the displayed message.
 
-            final Set<PunishData> activePunishments = new HashSet<>();
+            Set<PunishData> activePunishments = new HashSet<>();
 
-            for (final UUID punishmentUniqueId : punishmentIds)
+            for (UUID punishmentUniqueId : punishmentIds)
             {
                 try
                 {
-                    final Map<String, String> rawData = new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(
+                    Map<String, String> rawData = new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(
                             punishmentUniqueId)));
                     rawData.put("id", punishmentUniqueId.toString());
 
-                    final PunishData punishData = new PunishData(rawData);
-                    if (!punishData.active)
+                    PunishData punishData = new PunishData(rawData);
+                    if (!punishData._active)
                     {
                         continue;
                     }
-                    if (!punishData.type.equals(PunishType.BAN))
+                    if (!punishData._type.equals(PunishType.BAN))
                     {
                         continue;
                     }
 
-                    if (punishData.length == -1)
+                    if (punishData._length == -1)
                     { // permanent ban
                         activePunishments.add(punishData);
                         continue;
                     }
 
-                    final long remaining = punishData.getRemaining();
+                    long remaining = punishData.getRemaining();
                     if (remaining <= 0)
                     {
                         _coreDatabase._database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
@@ -281,7 +281,7 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
 
                     activePunishments.add(punishData);
                 }
-                catch (final JedisException ex)
+                catch (JedisException ex)
                 {
                     logWarning("Error while checking punish punish player");
                 }
@@ -292,7 +292,7 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
                 return;
             }
 
-            final AtomicReference<PunishData> punishData = new AtomicReference<>();
+            AtomicReference<PunishData> punishData = new AtomicReference<>();
             if (activePunishments.size() > 1)
             {
                 for (PunishData data : activePunishments)
@@ -312,41 +312,41 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
 
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, F.fPunish(punishData.get()));
         }
-        catch (final JedisException ex)
+        catch (JedisException ex)
         {
             logWarning("Error while fetching punishment punish for '" + event.getName() + "': " + ex.getMessage());
         }
     }
 
-    public BukkitTask punishAsync(final UUID targetUUID,
-                                  final UUID staffUUID,
-                                  final PunishType punishType,
-                                  final long lengthMillis,
-                                  final String reason)
+    public BukkitTask punishAsync(UUID targetUUID,
+                                  UUID staffUUID,
+                                  PunishType punishType,
+                                  long lengthMillis,
+                                  String reason)
     {
         return punishAsync(targetUUID, staffUUID, punishType, lengthMillis, reason, null);
     }
 
-    public BukkitTask punishAsync(final UUID targetUUID,
-                                  final UUID staffUUID,
-                                  final PunishType punishType,
-                                  final long lengthMillis,
-                                  final String reason,
-                                  final Consumer<PunishData> callback)
+    public BukkitTask punishAsync(UUID targetUUID,
+                                  UUID staffUUID,
+                                  PunishType punishType,
+                                  long lengthMillis,
+                                  String reason,
+                                  Consumer<PunishData> callback)
     {
-        final PunishData punishData = new PunishData(Map.ofEntries(Map.entry("id", UUID.randomUUID().toString()),
-                                                                   Map.entry("type", punishType.name()),
-                                                                   Map.entry("active", "true"),
-                                                                   Map.entry("origin",
-                                                                             Long.toString(System.currentTimeMillis())),
-                                                                   Map.entry("length", Long.toString(lengthMillis)),
-                                                                   Map.entry("reason", reason),
-                                                                   Map.entry("server", _corePortal._serverName),
-                                                                   Map.entry("staffId",
-                                                                             (staffUUID == null ?
-                                                                              UtilUniqueId.EMPTY_UUID :
-                                                                              staffUUID).toString()),
-                                                                   Map.entry("staffServer", _corePortal._serverName)));
+        PunishData punishData = new PunishData(Map.ofEntries(Map.entry("id", UUID.randomUUID().toString()),
+                                                             Map.entry("type", punishType.name()),
+                                                             Map.entry("active", "true"),
+                                                             Map.entry("origin",
+                                                                       Long.toString(System.currentTimeMillis())),
+                                                             Map.entry("length", Long.toString(lengthMillis)),
+                                                             Map.entry("reason", reason),
+                                                             Map.entry("server", _corePortal._serverName),
+                                                             Map.entry("staffId",
+                                                                       (staffUUID == null ?
+                                                                        UtilUniqueId.EMPTY_UUID :
+                                                                        staffUUID).toString()),
+                                                             Map.entry("staffServer", _corePortal._serverName)));
         return _hexusPlugin.runAsync(() ->
                                      {
                                          punishData.publish(_coreDatabase._database._jedis);
@@ -360,19 +360,19 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
     @EventHandler
     private void onInventoryClick(InventoryClickEvent event)
     {
-        if (!(event.getWhoClicked() instanceof final Player staff))
+        if (!(event.getWhoClicked() instanceof Player staff))
         {
             return;
         }
 
-        final Inventory inventory = event.getInventory();
-        final String inventoryName = inventory.getName();
+        Inventory inventory = event.getInventory();
+        String inventoryName = inventory.getName();
 
         if (inventory.getName().contains("Punish "))
         {
             event.setCancelled(true);
 
-            final ItemStack currentItem = event.getCurrentItem();
+            ItemStack currentItem = event.getCurrentItem();
             if (currentItem == null)
             {
                 return;
@@ -382,22 +382,22 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
                 return;
             }
 
-            final ItemMeta itemMeta = currentItem.getItemMeta();
+            ItemMeta itemMeta = currentItem.getItemMeta();
             if (!itemMeta.hasDisplayName())
             {
                 return;
             }
 
-            final List<String> skullLore = inventory.getItem(4).getItemMeta().getLore();
+            List<String> skullLore = inventory.getItem(4).getItemMeta().getLore();
 
-            final OfflinePlayer target;
+            OfflinePlayer target;
             try
             {
                 target = PlayerSearch.offlinePlayerSearch(UUID.fromString(ChatColor.stripColor(skullLore.getFirst())),
                                                           staff);
                 assert (target != null);
             }
-            catch (final IOException | AssertionError ex)
+            catch (IOException | AssertionError ex)
             {
                 logSevere(ex);
                 staff.sendMessage(F.fMain(this,
@@ -406,8 +406,8 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
                 return;
             }
 
-            final AtomicReference<PunishType> punishType = new AtomicReference<>();
-            final AtomicLong punishLengthMillis = new AtomicLong(-1);
+            AtomicReference<PunishType> punishType = new AtomicReference<>();
+            AtomicLong punishLengthMillis = new AtomicLong(-1);
             switch (ChatColor.stripColor(itemMeta.getDisplayName()))
             {
                 case "Punishment History" ->
@@ -538,7 +538,7 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
         {
             event.setCancelled(true);
 
-            final ItemStack currentItem = event.getCurrentItem();
+            ItemStack currentItem = event.getCurrentItem();
             if (currentItem == null)
             {
                 return;
@@ -548,22 +548,22 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
                 return;
             }
 
-            final ItemMeta itemMeta = currentItem.getItemMeta();
+            ItemMeta itemMeta = currentItem.getItemMeta();
             if (!itemMeta.hasDisplayName())
             {
                 return;
             }
 
-            final List<String> skullLore = inventory.getItem(4).getItemMeta().getLore();
+            List<String> skullLore = inventory.getItem(4).getItemMeta().getLore();
 
-            final OfflinePlayer target;
+            OfflinePlayer target;
             try
             {
                 target = PlayerSearch.offlinePlayerSearch(UUID.fromString(ChatColor.stripColor(skullLore.getFirst())),
                                                           staff);
                 assert (target != null);
             }
-            catch (final IOException | AssertionError ex)
+            catch (IOException | AssertionError ex)
             {
                 logSevere(ex);
                 staff.sendMessage(F.fMain(this,
@@ -573,88 +573,85 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
         }
     }
 
-    public void openPunishGui(final Player staff, final OfflinePlayer target, final String reason)
+    public void openPunishGui(Player staff, OfflinePlayer target, String reason)
     {
-        final Inventory inventory = _hexusPlugin.getServer()
-                                                .createInventory(staff, 6 * 9, "Punish - " + target.getName());
+        Inventory inventory = _hexusPlugin.getServer().createInventory(staff, 6 * 9, "Punish - " + target.getName());
 
-        final ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
-                                                               C.cGreen + C.fBold + target.getName(),
-                                                               target.getUniqueId().toString(),
-                                                               "",
-                                                               C.cWhite + reason);
+        ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
+                                                         C.cGreen + C.fBold + target.getName(),
+                                                         target.getUniqueId().toString(),
+                                                         "",
+                                                         C.cWhite + reason);
 
-        final ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG,
-                                                          C.cBlue + C.fBold + "Punishment History",
-                                                          "View the punishment history of " +
-                                                          F.fItem(target.getName()));
+        ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG,
+                                                    C.cBlue + C.fBold + "Punishment History",
+                                                    "View the punishment history of " + F.fItem(target.getName()));
 
-        final ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
-        final ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME,
-                                                        C.cGreen + C.fBold + "Chat Severity 1",
-                                                        "1 Day Mute",
-                                                        "",
-                                                        "Light chat offense");
-        final ItemStack chat2 = UtilItem.createItemWool(DyeColor.YELLOW,
-                                                        C.cYellow + C.fBold + "Chat Severity 2",
-                                                        "3 Days Mute",
-                                                        "",
-                                                        "Moderate chat offense");
-        final ItemStack chat3 = UtilItem.createItemWool(DyeColor.ORANGE,
-                                                        C.cGold + C.fBold + "Chat Severity 3",
-                                                        "5 Days Mute",
-                                                        "",
-                                                        "Heavy chat offense");
+        ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
+        ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME,
+                                                  C.cGreen + C.fBold + "Chat Severity 1",
+                                                  "1 Day Mute",
+                                                  "",
+                                                  "Light chat offense");
+        ItemStack chat2 = UtilItem.createItemWool(DyeColor.YELLOW,
+                                                  C.cYellow + C.fBold + "Chat Severity 2",
+                                                  "3 Days Mute",
+                                                  "",
+                                                  "Moderate chat offense");
+        ItemStack chat3 = UtilItem.createItemWool(DyeColor.ORANGE,
+                                                  C.cGold + C.fBold + "Chat Severity 3",
+                                                  "5 Days Mute",
+                                                  "",
+                                                  "Heavy chat offense");
 
-        final ItemStack gameplayHeader = UtilItem.createItem(Material.IRON_BLOCK,
-                                                             C.cBlue + C.fBold + "Gameplay Offenses");
-        final ItemStack gameplay1 = UtilItem.createItemWool(DyeColor.LIME,
-                                                            C.cGreen + C.fBold + "Gameplay Severity 1",
-                                                            "1 Day Ban",
-                                                            "",
-                                                            "Light gameplay offense");
-        final ItemStack gameplay2 = UtilItem.createItemWool(DyeColor.YELLOW,
-                                                            C.cYellow + C.fBold + "Gameplay Severity 2",
-                                                            "3 Days Ban",
-                                                            "",
-                                                            "Moderate gameplay offense");
-        final ItemStack gameplay3 = UtilItem.createItemWool(DyeColor.ORANGE,
-                                                            C.cGold + C.fBold + "Gameplay Severity 3",
-                                                            "5 Days Ban",
-                                                            "",
-                                                            "Heavy gameplay offense");
-
-        final ItemStack clientHeader = UtilItem.createItem(Material.IRON_SWORD, C.cBlue + C.fBold + "Client Offenses");
-        final ItemStack client1 = UtilItem.createItemWool(DyeColor.LIME,
-                                                          C.cGreen + C.fBold + "Client Severity 1",
-                                                          "7 Days Ban",
-                                                          "",
-                                                          "Light client offense");
-        final ItemStack client2 = UtilItem.createItemWool(DyeColor.YELLOW,
-                                                          C.cYellow + C.fBold + "Client Severity 2",
-                                                          "14 Days Ban",
-                                                          "",
-                                                          "Moderate client offense");
-        final ItemStack client3 = UtilItem.createItemWool(DyeColor.ORANGE,
-                                                          C.cGold + C.fBold + "Client Severity 3",
-                                                          "28 Days Ban",
-                                                          "",
-                                                          "Heavy client offense");
-
-        final ItemStack miscHeader = UtilItem.createItem(Material.LEVER, C.cBlue + C.fBold + "Miscellaneous");
-        final ItemStack miscWarn = UtilItem.createItem(Material.PAPER,
-                                                       C.cGreen + C.fBold + "Friendly Warning",
-                                                       "Inform someone that they are breaking the rules");
-        final ItemStack miscMute = UtilItem.createItem(Material.BOOK,
-                                                       C.cRed + C.fBold + "Permanent Mute",
-                                                       "Severity 4",
-                                                       "",
-                                                       "Severe chat offense");
-        final ItemStack miscBan = UtilItem.createItem(Material.REDSTONE_BLOCK,
-                                                      C.cRed + C.fBold + "Permanent Ban",
-                                                      "Severity 4",
+        ItemStack gameplayHeader = UtilItem.createItem(Material.IRON_BLOCK, C.cBlue + C.fBold + "Gameplay Offenses");
+        ItemStack gameplay1 = UtilItem.createItemWool(DyeColor.LIME,
+                                                      C.cGreen + C.fBold + "Gameplay Severity 1",
+                                                      "1 Day Ban",
                                                       "",
-                                                      "Severe gameplay/client offense");
+                                                      "Light gameplay offense");
+        ItemStack gameplay2 = UtilItem.createItemWool(DyeColor.YELLOW,
+                                                      C.cYellow + C.fBold + "Gameplay Severity 2",
+                                                      "3 Days Ban",
+                                                      "",
+                                                      "Moderate gameplay offense");
+        ItemStack gameplay3 = UtilItem.createItemWool(DyeColor.ORANGE,
+                                                      C.cGold + C.fBold + "Gameplay Severity 3",
+                                                      "5 Days Ban",
+                                                      "",
+                                                      "Heavy gameplay offense");
+
+        ItemStack clientHeader = UtilItem.createItem(Material.IRON_SWORD, C.cBlue + C.fBold + "Client Offenses");
+        ItemStack client1 = UtilItem.createItemWool(DyeColor.LIME,
+                                                    C.cGreen + C.fBold + "Client Severity 1",
+                                                    "7 Days Ban",
+                                                    "",
+                                                    "Light client offense");
+        ItemStack client2 = UtilItem.createItemWool(DyeColor.YELLOW,
+                                                    C.cYellow + C.fBold + "Client Severity 2",
+                                                    "14 Days Ban",
+                                                    "",
+                                                    "Moderate client offense");
+        ItemStack client3 = UtilItem.createItemWool(DyeColor.ORANGE,
+                                                    C.cGold + C.fBold + "Client Severity 3",
+                                                    "28 Days Ban",
+                                                    "",
+                                                    "Heavy client offense");
+
+        ItemStack miscHeader = UtilItem.createItem(Material.LEVER, C.cBlue + C.fBold + "Miscellaneous");
+        ItemStack miscWarn = UtilItem.createItem(Material.PAPER,
+                                                 C.cGreen + C.fBold + "Friendly Warning",
+                                                 "Inform someone that they are breaking the rules");
+        ItemStack miscMute = UtilItem.createItem(Material.BOOK,
+                                                 C.cRed + C.fBold + "Permanent Mute",
+                                                 "Severity 4",
+                                                 "",
+                                                 "Severe chat offense");
+        ItemStack miscBan = UtilItem.createItem(Material.REDSTONE_BLOCK,
+                                                C.cRed + C.fBold + "Permanent Ban",
+                                                "Severity 4",
+                                                "",
+                                                "Severe gameplay/client offense");
 
         inventory.setItem(4, targetSkull);
         inventory.setItem(10, chatHeader);
@@ -698,20 +695,19 @@ public final class CorePunish extends MiniPlugin<HexusPlugin>
         staff.openInventory(inventory);
     }
 
-    public void openHistoryGui(final Player viewer, final OfflinePlayer target)
+    public void openHistoryGui(Player viewer, OfflinePlayer target)
     {
-        final boolean viewerCanPunish = viewer.hasPermission(PERM.COMMAND_PUNISH.name());
+        boolean viewerCanPunish = viewer.hasPermission(PERM.COMMAND_PUNISH.name());
 
-        final Inventory gui = _hexusPlugin.getServer()
-                                          .createInventory(viewer, 6 * 9, "Punish History - " + target.getName());
+        Inventory gui = _hexusPlugin.getServer().createInventory(viewer, 6 * 9, "Punish History - " + target.getName());
 
-        final ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
-                                                               C.cGreen + C.fBold + target.getName(),
-                                                               target.getUniqueId().toString(),
-                                                               "",
-                                                               C.cWhite + "Viewing punishment history");
+        ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
+                                                         C.cGreen + C.fBold + target.getName(),
+                                                         target.getUniqueId().toString(),
+                                                         "",
+                                                         C.cWhite + "Viewing punishment history");
 
-        //        final ItemStack openPunishGui = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Apply Punishment",
+        //        ItemStack openPunishGui = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Apply Punishment",
         //                "Open the punishment menu for " + F.fItem(target.getName()));
         //
         //        if (viewerCanPunish) gui.setItem(53, openPunishGui);

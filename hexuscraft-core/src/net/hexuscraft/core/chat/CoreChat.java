@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public final class CoreChat extends MiniPlugin<HexusPlugin>
+public class CoreChat extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -45,15 +45,15 @@ public final class CoreChat extends MiniPlugin<HexusPlugin>
         BYPASS_SILENCE
     }
 
-    public final String CHANNEL_ANNOUNCEMENT = "ChatAnnouncement";
-    public final Set<CommandSender> _receivedTipSet;
+    public String CHANNEL_ANNOUNCEMENT = "ChatAnnouncement";
+    public Set<CommandSender> _receivedTipSet;
     private CoreCommand _coreCommand;
     private CoreDatabase _coreDatabase;
     private CorePermission _corePermission;
     private CorePortal _corePortal;
     private boolean _chatMuted = false;
 
-    public CoreChat(final HexusPlugin plugin)
+    public CoreChat(HexusPlugin plugin)
     {
         super(plugin, "Chat");
 
@@ -75,7 +75,7 @@ public final class CoreChat extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _corePermission = (CorePermission) dependencies.get(CorePermission.class);
@@ -95,17 +95,17 @@ public final class CoreChat extends MiniPlugin<HexusPlugin>
 
         _coreDatabase._database.registerConsumer(ChatAnnouncementMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            final ChatAnnouncementMessage parsedMessage = ChatAnnouncementMessage.fromString(rawMessage);
+            ChatAnnouncementMessage parsedMessage = ChatAnnouncementMessage.fromString(rawMessage);
 
             _hexusPlugin.runAsync(() ->
                                   {
-                                      final String senderName;
+                                      String senderName;
                                       try
                                       {
                                           senderName = Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(
                                                   parsedMessage._senderUniqueId())).getName();
                                       }
-                                      catch (final IOException | NullPointerException ex)
+                                      catch (IOException | NullPointerException ex)
                                       {
                                           logSevere(ex);
                                           return;
@@ -142,7 +142,7 @@ public final class CoreChat extends MiniPlugin<HexusPlugin>
 
         _coreDatabase._database.registerConsumer(ChatSupportMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            final ChatSupportMessage messageData = ChatSupportMessage.fromString(rawMessage);
+            ChatSupportMessage messageData = ChatSupportMessage.fromString(rawMessage);
 
             _hexusPlugin.getServer()
                         .getOnlinePlayers()
@@ -188,9 +188,9 @@ public final class CoreChat extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onAsyncPlayerChat(final AsyncPlayerChatEvent event)
+    private void onAsyncPlayerChat(AsyncPlayerChatEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
 
         if (player.hasPermission(PERM.CHAT_PREFIX.name()))
         {
@@ -211,7 +211,7 @@ public final class CoreChat extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event)
+    private void onPlayerQuit(PlayerQuitEvent event)
     {
         _receivedTipSet.remove(event.getPlayer());
     }

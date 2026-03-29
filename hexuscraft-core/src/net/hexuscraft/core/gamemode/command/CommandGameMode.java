@@ -12,10 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandGameMode extends BaseCommand<CoreGameMode>
+public class CommandGameMode extends BaseCommand<CoreGameMode>
 {
 
-    public CommandGameMode(final CoreGameMode coreGameMode)
+    public CommandGameMode(CoreGameMode coreGameMode)
     {
         super(coreGameMode,
               "gamemode",
@@ -26,7 +26,7 @@ public final class CommandGameMode extends BaseCommand<CoreGameMode>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 2)
         {
@@ -34,7 +34,7 @@ public final class CommandGameMode extends BaseCommand<CoreGameMode>
             return;
         }
 
-        final Player[] targets;
+        Player[] targets;
 
         if (args.length > 0)
         {
@@ -66,7 +66,7 @@ public final class CommandGameMode extends BaseCommand<CoreGameMode>
                 return;
             }
 
-            for (final Player target : targets)
+            for (Player target : targets)
             {
                 if (target.equals(sender))
                 {
@@ -77,7 +77,7 @@ public final class CommandGameMode extends BaseCommand<CoreGameMode>
             }
         }
 
-        final GameMode newGameMode;
+        GameMode newGameMode;
 
         if (targets.length > 1)
         {
@@ -107,7 +107,7 @@ public final class CommandGameMode extends BaseCommand<CoreGameMode>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 1)
         {
@@ -118,7 +118,7 @@ public final class CommandGameMode extends BaseCommand<CoreGameMode>
         return List.of();
     }
 
-    private GameMode getGameModeFromToggle(final String toggle)
+    private GameMode getGameModeFromToggle(String toggle)
     {
         if (Arrays.stream(new String[]{"0", "false"}).toList().contains(toggle.toLowerCase()))
         {

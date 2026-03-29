@@ -8,11 +8,11 @@ import java.util.UUID;
 public record ChatSupportResponseMessage(UUID _senderUniqueId, UUID _targetUniqueId, String _message)
 {
 
-    public final static String CHANNEL_NAME = "chat.supportResponse";
+    public static String CHANNEL_NAME = "chat.supportResponse";
 
-    public static ChatSupportResponseMessage fromString(final String jsonString)
+    public static ChatSupportResponseMessage fromString(String jsonString)
     {
-        final JSONObject jsonObject = new JSONObject(jsonString);
+        JSONObject jsonObject = new JSONObject(jsonString);
         return new ChatSupportResponseMessage(UUID.fromString(jsonObject.getString("senderUniqueId")),
                                               UUID.fromString(jsonObject.getString("targetUniqueId")),
                                               jsonObject.getString("message"));

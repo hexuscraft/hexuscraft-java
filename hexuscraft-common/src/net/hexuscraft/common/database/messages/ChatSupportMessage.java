@@ -15,12 +15,12 @@ public record ChatSupportMessage(UUID _senderUniqueId,
                                  String _message)
 {
 
-    public final static String CHANNEL_NAME = "chat.support";
+    public static String CHANNEL_NAME = "chat.support";
 
-    public static ChatSupportMessage fromString(final String jsonString)
+    public static ChatSupportMessage fromString(String jsonString)
     {
-        final JSONObject jsonObject = new JSONObject(jsonString);
-        final JSONArray permissionGroups = jsonObject.getJSONArray("permissionGroups");
+        JSONObject jsonObject = new JSONObject(jsonString);
+        JSONArray permissionGroups = jsonObject.getJSONArray("permissionGroups");
         return new ChatSupportMessage(UUID.fromString(jsonObject.getString("senderUniqueId")),
                                       jsonObject.getString("username"),
                                       IntStream.range(0, permissionGroups.length())

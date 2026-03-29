@@ -5,10 +5,10 @@ import net.hexuscraft.core.command.BaseCommand;
 
 import java.util.Set;
 
-public final class CommandGameStop extends BaseCommand<ArcadeManager>
+public class CommandGameStop extends BaseCommand<ArcadeManager>
 {
 
-    CommandGameStop(final ArcadeManager arcadeManager)
+    CommandGameStop(ArcadeManager arcadeManager)
     {
         super(arcadeManager,
               "stop",

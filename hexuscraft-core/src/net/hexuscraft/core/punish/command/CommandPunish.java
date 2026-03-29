@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public final class CommandPunish extends BaseCommand<CorePunish>
+public class CommandPunish extends BaseCommand<CorePunish>
 {
 
     public CommandPunish(CorePunish corePunish)
@@ -28,7 +28,7 @@ public final class CommandPunish extends BaseCommand<CorePunish>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length < 2)
         {
@@ -36,7 +36,7 @@ public final class CommandPunish extends BaseCommand<CorePunish>
             return;
         }
 
-        if (!(sender instanceof final Player player))
+        if (!(sender instanceof Player player))
         {
             sender.sendMessage(F.fMain(this) + "Only players can run this command.");
             return;
@@ -44,34 +44,33 @@ public final class CommandPunish extends BaseCommand<CorePunish>
 
         _miniPlugin._hexusPlugin.runAsync(() ->
                                           {
-                                              final OfflinePlayer
-                                                      offlinePlayer
-                                                      = PlayerSearch.offlinePlayerSearch(args[0], sender);
+                                              OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
+                                                                                                             sender);
                                               if (offlinePlayer == null)
                                               {
                                                   sender.sendMessage(F.fMatches(new String[]{}, args[0]));
                                                   return;
                                               }
 
-                                              final String reasonMessage = String.join(" ",
-                                                                                       Arrays.stream(args)
-                                                                                             .skip(1)
-                                                                                             .toArray(String[]::new));
+                                              String reasonMessage = String.join(" ",
+                                                                                 Arrays.stream(args)
+                                                                                       .skip(1)
+                                                                                       .toArray(String[]::new));
                                               _miniPlugin.openPunishGui(player, offlinePlayer, reasonMessage);
                                           });
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
-        final List<String> names = new ArrayList<>();
+        List<String> names = new ArrayList<>();
         if (args.length == 1)
         {
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
                                                                                      .getOnlinePlayers()
                                                                                      .stream();
-            if (sender instanceof final Player player)
+            if (sender instanceof Player player)
             {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }

@@ -10,24 +10,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public final class ReportData
+public class ReportData
 {
 
-    public final UUID reportUUID; // part of the key name
-    public final UUID senderUUID;
-    public final UUID targetUUID;
-    public final ReportSubmitReason reason;
-    public final Boolean active;
-    public final Long origin;
-    public final String server;
+    public UUID reportUUID; // part of the key name
+    public UUID senderUUID;
+    public UUID targetUUID;
+    public ReportSubmitReason reason;
+    public Boolean active;
+    public Long origin;
+    public String server;
 
     // these cannot be guaranteed to exist unless 'active' is false. ye be warned!
-    public final Long removeOrigin;
-    public final ReportCloseReason removeReason;
-    public final String removeServer;
-    public final UUID removeStaffUUID;
+    public Long removeOrigin;
+    public ReportCloseReason removeReason;
+    public String removeServer;
+    public UUID removeStaffUUID;
 
-    public ReportData(final Map<String, String> rawData)
+    public ReportData(Map<String, String> rawData)
     {
         reportUUID = UUID.fromString(rawData.get("reportUUID"));
         senderUUID = UUID.fromString(rawData.get("senderUUID"));
@@ -73,7 +73,7 @@ public final class ReportData
         return map;
     }
 
-    public void submit(final UnifiedJedis jedis)
+    public void submit(UnifiedJedis jedis)
     {
         jedis.hset(ReportQueries.REPORT(reportUUID), toMap());
         jedis.sadd(ReportQueries.LIST_SUBMITTED(senderUUID), reportUUID.toString());

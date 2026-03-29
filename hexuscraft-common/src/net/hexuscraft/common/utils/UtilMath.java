@@ -3,27 +3,27 @@ package net.hexuscraft.common.utils;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-public final class UtilMath
+public class UtilMath
 {
 
-    public static double trim(final double n, final int degree, final RoundingMode mode)
+    public static double trim(double n, int degree, RoundingMode mode)
     {
-        final DecimalFormat format = new DecimalFormat("#." + "#".repeat(Math.max(0, degree)));
+        DecimalFormat format = new DecimalFormat("#." + "#".repeat(Math.max(0, degree)));
         format.setRoundingMode(mode);
         return Double.parseDouble(format.format(n));
     }
 
-    public static double trim(final double n, final int degree)
+    public static double trim(double n, int degree)
     {
         return trim(n, degree, RoundingMode.FLOOR);
     }
 
-    public static double trim(final double n, final RoundingMode mode)
+    public static double trim(double n, RoundingMode mode)
     {
         return trim(n, 1, mode);
     }
 
-    public static double trim(final double n)
+    public static double trim(double n)
     {
         return trim(n, 1);
     }

@@ -9,10 +9,10 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import java.util.Map;
 import java.util.Set;
 
-public final class CommandBuildVersion extends BaseCommand<CoreBuildVersion>
+public class CommandBuildVersion extends BaseCommand<CoreBuildVersion>
 {
 
-    public CommandBuildVersion(final CoreBuildVersion plugin)
+    public CommandBuildVersion(CoreBuildVersion plugin)
     {
         super(plugin,
               "buildversion",
@@ -23,7 +23,7 @@ public final class CommandBuildVersion extends BaseCommand<CoreBuildVersion>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 0)
         {
@@ -31,11 +31,11 @@ public final class CommandBuildVersion extends BaseCommand<CoreBuildVersion>
             return;
         }
 
-        final CoreBuildVersion plugin = _miniPlugin;
-        final PluginDescriptionFile description = plugin._hexusPlugin.getDescription();
-        final long lastModified = plugin.getLastModifiedMillis();
+        CoreBuildVersion plugin = _miniPlugin;
+        PluginDescriptionFile description = plugin._hexusPlugin.getDescription();
+        long lastModified = plugin.getLastModifiedMillis();
 
-        final StringBuilder builder = new StringBuilder(F.fMain(this, "Plugin Information:\n"));
+        StringBuilder builder = new StringBuilder(F.fMain(this, "Plugin Information:\n"));
         Map.of("Name",
                description.getName(),
                "Main",

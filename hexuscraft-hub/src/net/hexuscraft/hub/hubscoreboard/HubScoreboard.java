@@ -19,22 +19,22 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
 
-public final class HubScoreboard extends MiniPlugin<Hub>
+public class HubScoreboard extends MiniPlugin<Hub>
 {
 
     private final Map<Player, BukkitTask> _sidebarUpdateTasks;
     private CorePortal _corePortal;
     private CorePermission _corePermission;
 
-    public HubScoreboard(final Hub hub)
+    public HubScoreboard(Hub hub)
     {
-        super(hub, "Hub Scoreboard");
+        super(hub, "Scoreboard");
 
         _sidebarUpdateTasks = new HashMap<>();
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
         _corePermission = (CorePermission) dependencies.get(CorePermission.class);
@@ -58,15 +58,15 @@ public final class HubScoreboard extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event)
+    private void onPlayerJoin(PlayerJoinEvent event)
     {
-        final Player player = event.getPlayer();
-        final Scoreboard scoreboard = player.getScoreboard(); // Player's scoreboard is set by core MiniPluginScoreboard
+        Player player = event.getPlayer();
+        Scoreboard scoreboard = player.getScoreboard(); // Player's scoreboard is set by core MiniPluginScoreboard
 
-        final Objective sidebarObjective = scoreboard.registerNewObjective("§6§lHEXUSCRAFT", "dummy");
+        Objective sidebarObjective = scoreboard.registerNewObjective("§6§lHEXUSCRAFT", "dummy");
         sidebarObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        final List<Score> sidebarScores = new ArrayList<>();
+        List<Score> sidebarScores = new ArrayList<>();
         _sidebarUpdateTasks.put(player, _hexusPlugin.runSyncTimer(() ->
                                                                   {
                                                                       sidebarScores.stream()
@@ -74,16 +74,14 @@ public final class HubScoreboard extends MiniPlugin<Hub>
                                                                                    .forEach(scoreboard::resetScores);
                                                                       sidebarScores.clear();
 
-                                                                      final String[]
-                                                                              lines
-                                                                              = generateSidebarLines(player);
+                                                                      String[] lines = generateSidebarLines(player);
                                                                       for (int i = 0; i < lines.length; i++)
                                                                       {
-                                                                          final String line = lines[lines.length -
-                                                                                                    i -
-                                                                                                    1];
-                                                                          final Score score = sidebarObjective.getScore(
-                                                                                  C.hexMap.get(i) + C.fReset + line);
+                                                                          String line = lines[lines.length - i - 1];
+                                                                          Score
+                                                                                  score
+                                                                                  = sidebarObjective.getScore(C.hexMap.get(
+                                                                                  i) + C.fReset + line);
                                                                           score.setScore(i);
                                                                           sidebarScores.add(score);
                                                                       }
@@ -91,9 +89,9 @@ public final class HubScoreboard extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event)
+    private void onPlayerQuit(PlayerQuitEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         if (!_sidebarUpdateTasks.containsKey(player))
         {
             return;
@@ -103,7 +101,7 @@ public final class HubScoreboard extends MiniPlugin<Hub>
         _sidebarUpdateTasks.remove(player);
     }
 
-    private String[] generateSidebarLines(final Player player)
+    private String[] generateSidebarLines(Player player)
     {
         return new String[]{C.cAqua + C.fBold + "Server",
                             _corePortal._serverName,

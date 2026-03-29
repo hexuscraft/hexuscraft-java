@@ -19,12 +19,12 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public final class CommandHostServer extends BaseCommand<CorePortal>
+public class CommandHostServer extends BaseCommand<CorePortal>
 {
 
     private final CoreDatabase _coreDatabase;
 
-    public CommandHostServer(final CorePortal corePortal, final CoreDatabase coreDatabase)
+    public CommandHostServer(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
               "hostserver",
@@ -37,7 +37,7 @@ public final class CommandHostServer extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 0)
         {
@@ -45,12 +45,12 @@ public final class CommandHostServer extends BaseCommand<CorePortal>
             return;
         }
 
-        final String serverGroupName = "_" + sender.getName();
+        String serverGroupName = "_" + sender.getName();
 
-        final ServerData[] existingServers = _miniPlugin.getServers(serverGroupName);
+        ServerData[] existingServers = _miniPlugin.getServers(serverGroupName);
         if (existingServers.length > 0)
         {
-            if (!(sender instanceof final Player player))
+            if (!(sender instanceof Player player))
             {
                 sender.sendMessage(F.fMain(this, F.fError("Only players can teleport to their private server.")));
                 return;
@@ -67,10 +67,10 @@ public final class CommandHostServer extends BaseCommand<CorePortal>
             return;
         }
 
-        final Set<Integer> portsInUse = Arrays.stream(_miniPlugin.getServerGroups())
-                                              .filter(serverGroupData -> serverGroupData._name.startsWith("_"))
-                                              .map(serverGroupData -> serverGroupData._minPort)
-                                              .collect(Collectors.toUnmodifiableSet());
+        Set<Integer> portsInUse = Arrays.stream(_miniPlugin.getServerGroups())
+                                        .filter(serverGroupData -> serverGroupData._name.startsWith("_"))
+                                        .map(serverGroupData -> serverGroupData._minPort)
+                                        .collect(Collectors.toUnmodifiableSet());
         if (portsInUse.size() > CorePortal.MAX_PORT_PRIVATE_SERVERS - CorePortal.MIN_PORT_PRIVATE_SERVERS)
         {
             sender.sendMessage(F.fMain(this,
@@ -117,11 +117,11 @@ public final class CommandHostServer extends BaseCommand<CorePortal>
                                                                       false,
                                                                       10000,
                                                                       new GameType[]{GameType.SURVIVAL_GAMES},
-                                                                      sender instanceof final Player player ?
+                                                                      sender instanceof Player player ?
                                                                       player.getUniqueId() :
                                                                       UtilUniqueId.EMPTY_UUID).update(_coreDatabase._database._jedis);
                                               }
-                                              catch (final JedisException ex)
+                                              catch (JedisException ex)
                                               {
                                                   sender.sendMessage(F.fMain(this,
                                                                              F.fError(

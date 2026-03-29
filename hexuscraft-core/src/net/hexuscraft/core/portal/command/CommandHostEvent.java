@@ -15,12 +15,12 @@ import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.Set;
 
-public final class CommandHostEvent extends BaseCommand<CorePortal>
+public class CommandHostEvent extends BaseCommand<CorePortal>
 {
 
     private final CoreDatabase _coreDatabase;
 
-    public CommandHostEvent(final CorePortal corePortal, final CoreDatabase coreDatabase)
+    public CommandHostEvent(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
               "hostevent",
@@ -33,7 +33,7 @@ public final class CommandHostEvent extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 0)
         {
@@ -41,12 +41,12 @@ public final class CommandHostEvent extends BaseCommand<CorePortal>
             return;
         }
 
-        final String serverGroupName = "Event";
+        String serverGroupName = "Event";
 
-        final ServerData[] existingServers = _miniPlugin.getServers(serverGroupName);
+        ServerData[] existingServers = _miniPlugin.getServers(serverGroupName);
         if (existingServers.length > 0)
         {
-            if (!(sender instanceof final Player player))
+            if (!(sender instanceof Player player))
             {
                 sender.sendMessage(F.fMain(this, F.fError("Only players can teleport to their private server.")));
                 return;
@@ -80,11 +80,11 @@ public final class CommandHostEvent extends BaseCommand<CorePortal>
                                                                       false,
                                                                       10000,
                                                                       new GameType[]{GameType.SURVIVAL_GAMES},
-                                                                      sender instanceof final Player player ?
+                                                                      sender instanceof Player player ?
                                                                       player.getUniqueId() :
                                                                       UtilUniqueId.EMPTY_UUID).update(_coreDatabase._database._jedis);
                                               }
-                                              catch (final JedisException ex)
+                                              catch (JedisException ex)
                                               {
                                                   sender.sendMessage(F.fMain(this,
                                                                              F.fError(

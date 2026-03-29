@@ -13,17 +13,17 @@ import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.Set;
 
-public final class CommandSupport extends BaseCommand<CoreChat>
+public class CommandSupport extends BaseCommand<CoreChat>
 {
 
     private final CorePortal _corePortal;
     private final CorePermission _corePermission;
     private final CoreDatabase _coreDatabase;
 
-    public CommandSupport(final CoreChat coreChat,
-                          final CorePermission corePermission,
-                          final CoreDatabase coreDatabase,
-                          final CorePortal corePortal)
+    public CommandSupport(CoreChat coreChat,
+                          CorePermission corePermission,
+                          CoreDatabase coreDatabase,
+                          CorePortal corePortal)
     {
         super(coreChat,
               "support",
@@ -37,7 +37,7 @@ public final class CommandSupport extends BaseCommand<CoreChat>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 0)
         {
@@ -45,7 +45,7 @@ public final class CommandSupport extends BaseCommand<CoreChat>
             return;
         }
 
-        if (!(sender instanceof final Player player))
+        if (!(sender instanceof Player player))
         {
             sender.sendMessage(F.fMain(this, F.fError("Only players can execute this command.")));
             return;
@@ -75,7 +75,7 @@ public final class CommandSupport extends BaseCommand<CoreChat>
                                                                                                                         " ",
                                                                                                                         args)).toString());
                                               }
-                                              catch (final JedisException ex)
+                                              catch (JedisException ex)
                                               {
                                                   sender.sendMessage(F.fMain(this,
                                                                              F.fError(

@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 
-public final class PlayerTabInfo
+public class PlayerTabInfo
 {
 
     public static void setHeaderFooter(Player player, String header, String footer)

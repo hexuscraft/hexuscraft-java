@@ -6,10 +6,10 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandLocatePlayer extends BaseCommand<CorePortal>
+public class CommandLocatePlayer extends BaseCommand<CorePortal>
 {
 
-    public CommandLocatePlayer(final CorePortal corePortal)
+    public CommandLocatePlayer(CorePortal corePortal)
     {
         super(corePortal,
               "player",
@@ -20,7 +20,7 @@ public final class CommandLocatePlayer extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
 
     }

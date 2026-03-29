@@ -11,26 +11,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public final class ServerGroupData
+public class ServerGroupData
 {
 
-    public final String _name;
+    public String _name;
 
-    public final int _capacity;
-    public final GameType[] _games;
-    public final UUID _hostUniqueId;
-    public final int _joinableServers;
-    public final int _maxPort;
-    public final int _minPort;
-    public final String _plugin;
-    public final int _ram;
-    public final PermissionGroup _requiredPermission;
-    public final int _totalServers;
-    public final int _timeoutMillis;
-    public final boolean _worldEdit;
-    public final String _worldZip;
+    public int _capacity;
+    public GameType[] _games;
+    public UUID _hostUniqueId;
+    public int _joinableServers;
+    public int _maxPort;
+    public int _minPort;
+    public String _plugin;
+    public int _ram;
+    public PermissionGroup _requiredPermission;
+    public int _totalServers;
+    public int _timeoutMillis;
+    public boolean _worldEdit;
+    public String _worldZip;
 
-    public ServerGroupData(final String name, final Map<String, String> serverGroupData)
+    public ServerGroupData(String name, Map<String, String> serverGroupData)
     {
         _name = name;
 
@@ -54,20 +54,20 @@ public final class ServerGroupData
                                                                      UtilUniqueId.EMPTY_UUID.toString()));
     }
 
-    public ServerGroupData(final String name,
-                           final PermissionGroup requiredPermission,
-                           final int minPort,
-                           final int maxPort,
-                           final int totalServers,
-                           final int joinableServers,
-                           final String plugin,
-                           final String worldZip,
-                           final int ram,
-                           final int capacity,
-                           final boolean worldEdit,
-                           final int timeoutMillis,
-                           final GameType[] games,
-                           final UUID hostUniqueId)
+    public ServerGroupData(String name,
+                           PermissionGroup requiredPermission,
+                           int minPort,
+                           int maxPort,
+                           int totalServers,
+                           int joinableServers,
+                           String plugin,
+                           String worldZip,
+                           int ram,
+                           int capacity,
+                           boolean worldEdit,
+                           int timeoutMillis,
+                           GameType[] games,
+                           UUID hostUniqueId)
     {
         _name = name;
 
@@ -88,7 +88,7 @@ public final class ServerGroupData
 
     public Map<String, String> toMap()
     {
-        final Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         map.put("requiredPermission", _requiredPermission.name());
         map.put("minPort", Integer.toString(_minPort));
         map.put("maxPort", Integer.toString(_maxPort));
@@ -105,12 +105,12 @@ public final class ServerGroupData
         return map;
     }
 
-    public void update(final UnifiedJedis jedis)
+    public void update(UnifiedJedis jedis)
     {
         jedis.hset(ServerQueries.SERVERGROUP(_name), toMap());
     }
 
-    public ServerData[] getServers(final UnifiedJedis jedis)
+    public ServerData[] getServers(UnifiedJedis jedis)
     {
         return ServerQueries.getServers(jedis, this);
     }

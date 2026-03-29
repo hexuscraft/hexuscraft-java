@@ -12,16 +12,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandNpcList extends BaseCommand<CoreNpc>
+public class CommandNpcList extends BaseCommand<CoreNpc>
 {
 
-    CommandNpcList(final CoreNpc coreNpc)
+    CommandNpcList(CoreNpc coreNpc)
     {
         super(coreNpc, "list", "", "List all NPCs.", Set.of("ls", "l"), CoreNpc.PERM.COMMAND_ENTITY_LIST);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 0)
         {
@@ -29,9 +29,9 @@ public final class CommandNpcList extends BaseCommand<CoreNpc>
             return;
         }
 
-        final Entity[] entities = _miniPlugin.list();
+        Entity[] entities = _miniPlugin.list();
 
-        final List<String> response = new ArrayList<>();
+        List<String> response = new ArrayList<>();
         response.add(F.fMain(this, "Listing ", F.fItem(entities.length + " Entities")));
         response.addAll(Arrays.stream(entities)
                               .map(entity -> F.fMain("",

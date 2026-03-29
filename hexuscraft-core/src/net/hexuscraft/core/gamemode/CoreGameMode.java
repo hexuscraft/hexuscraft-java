@@ -9,7 +9,7 @@ import net.hexuscraft.core.gamemode.command.CommandGameMode;
 
 import java.util.Map;
 
-public final class CoreGameMode extends MiniPlugin<HexusPlugin>
+public class CoreGameMode extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -20,7 +20,7 @@ public final class CoreGameMode extends MiniPlugin<HexusPlugin>
 
     private CoreCommand _coreCommand;
 
-    public CoreGameMode(final HexusPlugin plugin)
+    public CoreGameMode(HexusPlugin plugin)
     {
         super(plugin, "Game Mode");
 
@@ -30,7 +30,7 @@ public final class CoreGameMode extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }

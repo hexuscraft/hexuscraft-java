@@ -5,10 +5,10 @@ import net.hexuscraft.core.portal.CorePortal;
 
 import java.util.Set;
 
-public final class CommandLocate extends BaseMultiCommand<CorePortal>
+public class CommandLocate extends BaseMultiCommand<CorePortal>
 {
 
-    public CommandLocate(final CorePortal corePortal)
+    public CommandLocate(CorePortal corePortal)
     {
         super(corePortal,
               "list",

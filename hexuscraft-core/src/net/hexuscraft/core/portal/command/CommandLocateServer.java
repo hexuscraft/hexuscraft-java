@@ -8,10 +8,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandLocateServer extends BaseCommand<CorePortal>
+public class CommandLocateServer extends BaseCommand<CorePortal>
 {
 
-    public CommandLocateServer(final CorePortal corePortal)
+    public CommandLocateServer(CorePortal corePortal)
     {
         super(corePortal,
               "server",
@@ -22,13 +22,13 @@ public final class CommandLocateServer extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         super.run(sender, alias, args);
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 1)
         {

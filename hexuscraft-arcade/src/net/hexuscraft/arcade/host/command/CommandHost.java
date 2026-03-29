@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class CommandHost extends BaseMultiCommand<ArcadeHost>
 {
-    public CommandHost(final ArcadeHost arcadeHost)
+    public CommandHost(ArcadeHost arcadeHost)
     {
         super(arcadeHost,
               "host",

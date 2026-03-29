@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
-public final class CoreBuildVersion extends MiniPlugin<HexusPlugin>
+public class CoreBuildVersion extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -20,13 +20,13 @@ public final class CoreBuildVersion extends MiniPlugin<HexusPlugin>
 
     private CoreCommand _pluginCommand;
 
-    public CoreBuildVersion(final HexusPlugin plugin)
+    public CoreBuildVersion(HexusPlugin plugin)
     {
         super(plugin, "Build Version");
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }

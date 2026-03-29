@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public record BossBar(Player player, AtomicInteger weight, AtomicReference<String> message)
 {
 
-    public BossBar(final Player player, final int weight, final String message)
+    public BossBar(Player player, int weight, String message)
     {
         this(player, new AtomicInteger(weight), new AtomicReference<>(message));
     }

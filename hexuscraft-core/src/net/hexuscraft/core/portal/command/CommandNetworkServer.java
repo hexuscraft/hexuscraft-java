@@ -6,10 +6,10 @@ import net.hexuscraft.core.portal.CorePortal;
 
 import java.util.Set;
 
-public final class CommandNetworkServer extends BaseMultiCommand<CorePortal>
+public class CommandNetworkServer extends BaseMultiCommand<CorePortal>
 {
 
-    public CommandNetworkServer(final CorePortal corePortal, final CoreDatabase coreDatabase)
+    public CommandNetworkServer(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
               "server",

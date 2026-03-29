@@ -24,32 +24,32 @@ public class HubTeam extends MiniPlugin<Hub>
 
     public HubTeam(Hub hub)
     {
-        super(hub, "Teams");
+        super(hub, "Team");
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _corePermission = (CorePermission) dependencies.get(CorePermission.class);
     }
 
     @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event)
+    private void onPlayerJoin(PlayerJoinEvent event)
     {
-        final Player eventPlayer = event.getPlayer();
-        final Scoreboard eventPlayerScoreboard = eventPlayer.getScoreboard();
+        Player eventPlayer = event.getPlayer();
+        Scoreboard eventPlayerScoreboard = eventPlayer.getScoreboard();
 
         Arrays.stream(PermissionGroup.values())
               .filter(permissionGroup -> eventPlayerScoreboard.getTeam(permissionGroup._prefix) == null)
-              .forEach((final PermissionGroup group) ->
+              .forEach((PermissionGroup group) ->
                        {
-                           final Team team = eventPlayerScoreboard.registerNewTeam(group._prefix);
+                           Team team = eventPlayerScoreboard.registerNewTeam(group._prefix);
                            team.setPrefix(F.fPermissionGroup(group, true, true) + C.fReset + " ");
                        });
 
-        _corePermission._permissionProfiles.forEach((final Player target, final PermissionProfile permissionProfile) ->
+        _corePermission._permissionProfiles.forEach((Player target, PermissionProfile permissionProfile) ->
                                                     {
-                                                        final PermissionGroup
+                                                        PermissionGroup
                                                                 highestGroup
                                                                 = PermissionGroup.getGroupWithHighestWeight(
                                                                 permissionProfile._groups());

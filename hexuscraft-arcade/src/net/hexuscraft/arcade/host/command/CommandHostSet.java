@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 public class CommandHostSet extends BaseCommand<ArcadeHost>
 {
-    public CommandHostSet(final ArcadeHost arcadeHost)
+    public CommandHostSet(ArcadeHost arcadeHost)
     {
         super(arcadeHost,
               "set",
@@ -41,7 +41,7 @@ public class CommandHostSet extends BaseCommand<ArcadeHost>
             return;
         }
 
-        final Consumer<Player> sendHostRemovalMessage = (final Player player) ->
+        Consumer<Player> sendHostRemovalMessage = (Player player) ->
         {
             //noinspection deprecation
             player.sendTitle(C.cYellow + "Server Host", "You are no longer the host of this server.");
@@ -51,7 +51,7 @@ public class CommandHostSet extends BaseCommand<ArcadeHost>
 
         if (args.length == 0)
         {
-            final OfflinePlayer oldHost = _miniPlugin._host.getAndSet(null);
+            OfflinePlayer oldHost = _miniPlugin._host.getAndSet(null);
             sender.sendMessage(F.fMain(this, "There is no longer a server host."));
             if (oldHost.isOnline())
             {
@@ -60,18 +60,17 @@ public class CommandHostSet extends BaseCommand<ArcadeHost>
             return;
         }
 
-        final Player[] matches = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
-                                                                                         .getOnlinePlayers(),
-                                                                 args[0],
-                                                                 sender,
-                                                                 players -> players.length != 1);
+        Player[] matches = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
+                                                           args[0],
+                                                           sender,
+                                                           players -> players.length != 1);
         if (matches.length != 1)
         {
             return;
         }
 
-        final Player newHost = matches[0];
-        final OfflinePlayer oldHost = _miniPlugin._host.getAndSet(newHost);
+        Player newHost = matches[0];
+        OfflinePlayer oldHost = _miniPlugin._host.getAndSet(newHost);
 
         if (newHost == oldHost)
         {

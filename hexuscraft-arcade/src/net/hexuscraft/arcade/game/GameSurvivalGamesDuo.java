@@ -7,10 +7,10 @@ import net.hexuscraft.arcade.manager.TeamGame;
 import net.hexuscraft.common.enums.GameType;
 import net.hexuscraft.common.utils.C;
 
-public final class GameSurvivalGamesDuo extends TeamGame
+public class GameSurvivalGamesDuo extends TeamGame
 {
 
-    private GameSurvivalGamesDuo(final ArcadeManager arcadeManager)
+    private GameSurvivalGamesDuo(ArcadeManager arcadeManager)
     {
         super(GameType.SURVIVAL_GAMES,
               new GameKit[]{},

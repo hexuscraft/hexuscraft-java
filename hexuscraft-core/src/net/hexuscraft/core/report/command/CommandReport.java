@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public final class CommandReport extends BaseCommand<CoreReport>
+public class CommandReport extends BaseCommand<CoreReport>
 {
 
     public CommandReport(CoreReport coreReport)
@@ -27,7 +27,7 @@ public final class CommandReport extends BaseCommand<CoreReport>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length < 1)
         {
@@ -35,13 +35,13 @@ public final class CommandReport extends BaseCommand<CoreReport>
             return;
         }
 
-        if (!(sender instanceof final Player player))
+        if (!(sender instanceof Player player))
         {
             sender.sendMessage(F.fMain(this) + "Only players can use this command.");
             return;
         }
 
-        final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], player);
+        OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], player);
         if (offlinePlayer == null)
         {
             sender.sendMessage(F.fMatches(new String[]{}, args[0]));
@@ -52,9 +52,9 @@ public final class CommandReport extends BaseCommand<CoreReport>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
-        final List<String> names = new ArrayList<>();
+        List<String> names = new ArrayList<>();
         if (args.length == 1)
         {
 
@@ -62,7 +62,7 @@ public final class CommandReport extends BaseCommand<CoreReport>
             Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
                                                                                      .getOnlinePlayers()
                                                                                      .stream();
-            if (sender instanceof final Player player)
+            if (sender instanceof Player player)
             {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }

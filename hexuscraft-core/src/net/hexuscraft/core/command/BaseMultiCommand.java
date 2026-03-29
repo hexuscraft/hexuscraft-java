@@ -14,7 +14,7 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
 
     private final Set<BaseCommand<T>> _commands;
 
-    public BaseMultiCommand(final T miniPlugin,
+    public BaseMultiCommand(T miniPlugin,
                             String name,
                             String description,
                             Set<String> aliases,
@@ -26,11 +26,11 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 0)
         {
-            for (final BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands)
+            for (BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands)
             {
                 if (!command.isAlias(args[0]))
                 {
@@ -45,7 +45,7 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
             }
         }
 
-        final StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         builder.append(help(alias));
 
         _commands.stream().sorted(Comparator.comparing(Command::getName)).forEach(command ->
@@ -67,11 +67,11 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
     }
 
     @Override
-    public final List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 1)
         {
-            for (final BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands)
+            for (BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands)
             {
                 if (!command.getName().equals(args[0]) && !command.getAliases().contains(args[0]))
                 {
@@ -87,7 +87,7 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
             return List.of();
         }
 
-        final List<String> completions = new ArrayList<>();
+        List<String> completions = new ArrayList<>();
         _commands.forEach(commandBase ->
                           {
                               if (!commandBase.testPermissionSilent(sender))

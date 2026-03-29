@@ -11,12 +11,12 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandNetworkMotdSet extends BaseCommand<CorePortal>
+public class CommandNetworkMotdSet extends BaseCommand<CorePortal>
 {
 
     private final CoreDatabase _coreDatabase;
 
-    CommandNetworkMotdSet(final CorePortal corePortal, final CoreDatabase coreDatabase)
+    CommandNetworkMotdSet(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal, "set", "<Message>", "Set the current MOTD.", Set.of("s"), CorePortal.PERM.COMMAND_MOTD_SET);
 
@@ -24,9 +24,9 @@ public final class CommandNetworkMotdSet extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
-        final String message = ChatColor.translateAlternateColorCodes('&', String.join(" ", args));
+        String message = ChatColor.translateAlternateColorCodes('&', String.join(" ", args));
         sender.sendMessage(F.fMain(this, "Please wait... Updating the MOTD to:\n", C.fReset + message));
 
         _miniPlugin._hexusPlugin.runAsync(() ->

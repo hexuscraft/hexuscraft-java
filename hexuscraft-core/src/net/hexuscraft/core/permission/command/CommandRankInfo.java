@@ -16,12 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandRankInfo extends BaseCommand<CorePermission>
+public class CommandRankInfo extends BaseCommand<CorePermission>
 {
 
-    final CoreDatabase _coreDatabase;
+    CoreDatabase _coreDatabase;
 
-    CommandRankInfo(final CorePermission corePermission, final CoreDatabase coreDatabase)
+    CommandRankInfo(CorePermission corePermission, CoreDatabase coreDatabase)
     {
         super(corePermission,
               "info",
@@ -33,7 +33,7 @@ public final class CommandRankInfo extends BaseCommand<CorePermission>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length != 1)
         {
@@ -43,9 +43,8 @@ public final class CommandRankInfo extends BaseCommand<CorePermission>
 
         _miniPlugin._hexusPlugin.runAsync(() ->
                                           {
-                                              final OfflinePlayer
-                                                      offlinePlayer
-                                                      = PlayerSearch.offlinePlayerSearch(args[0], sender);
+                                              OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
+                                                                                                             sender);
                                               if (offlinePlayer == null)
                                               {
                                                   sender.sendMessage(F.fMatches(new String[]{}, args[0]));
@@ -54,7 +53,7 @@ public final class CommandRankInfo extends BaseCommand<CorePermission>
 
                                               if (offlinePlayer.isOnline())
                                               {
-                                                  final Player player = offlinePlayer.getPlayer();
+                                                  Player player = offlinePlayer.getPlayer();
                                                   if (_miniPlugin._permissionProfiles.containsKey(player))
                                                   {
                                                       sender.sendMessage(F.fMain(this,
@@ -68,14 +67,14 @@ public final class CommandRankInfo extends BaseCommand<CorePermission>
                                                   }
                                               }
 
-                                              final Set<String> groupNames;
+                                              Set<String> groupNames;
                                               try
                                               {
                                                   groupNames
                                                           = _coreDatabase._database._jedis.smembers(PermissionQueries.GROUPS(
                                                           offlinePlayer.getUniqueId()));
                                               }
-                                              catch (final JedisException ex)
+                                              catch (JedisException ex)
                                               {
                                                   sender.sendMessage(F.fMain(this,
                                                                              F.fError(
@@ -97,7 +96,7 @@ public final class CommandRankInfo extends BaseCommand<CorePermission>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 1)
         {

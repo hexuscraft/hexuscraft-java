@@ -11,12 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandNetworkGroupDelete extends BaseCommand<CorePortal>
+public class CommandNetworkGroupDelete extends BaseCommand<CorePortal>
 {
 
     private final CoreDatabase _coreDatabase;
 
-    CommandNetworkGroupDelete(final CorePortal corePortal, final CoreDatabase coreDatabase)
+    CommandNetworkGroupDelete(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
               "delete",
@@ -28,7 +28,7 @@ public final class CommandNetworkGroupDelete extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length != 1)
         {
@@ -36,13 +36,13 @@ public final class CommandNetworkGroupDelete extends BaseCommand<CorePortal>
             return;
         }
 
-        final String key = ServerQueries.SERVERGROUP(args[0]);
+        String key = ServerQueries.SERVERGROUP(args[0]);
         _coreDatabase._database._jedis.del(key);
         sender.sendMessage(F.fMain(this, "Deleted ", F.fItem(key)));
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 1)
         {

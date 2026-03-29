@@ -6,10 +6,10 @@ import net.hexuscraft.core.portal.CorePortal;
 
 import java.util.Set;
 
-public final class CommandNetworkMotd extends BaseMultiCommand<CorePortal>
+public class CommandNetworkMotd extends BaseMultiCommand<CorePortal>
 {
 
-    public CommandNetworkMotd(final CorePortal corePortal, final CoreDatabase coreDatabase)
+    public CommandNetworkMotd(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
               "messageoftheday",

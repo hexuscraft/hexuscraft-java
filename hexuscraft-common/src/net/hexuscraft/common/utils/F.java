@@ -7,7 +7,7 @@ import net.hexuscraft.common.enums.PermissionGroup;
 
 import java.util.concurrent.TimeUnit;
 
-public final class F
+public class F
 {
 
     private static final double MILLIS_PER_SECOND = 1000;
@@ -16,28 +16,28 @@ public final class F
     private static final double MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
 
 
-    private static String f(final String prefix, final String... text)
+    private static String f(String prefix, String... text)
     {
         return prefix + ">" + C.cGray + " " + String.join(C.cGray, text);
     }
 
-    public static String fMain(final Object prefix, final String... text)
+    public static String fMain(Object prefix, String... text)
     {
         return f(C.cBlue + prefix.toString(), text);
     }
 
-    public static String fSub(final Object prefix, final String... text)
+    public static String fSub(Object prefix, String... text)
     {
         return f(C.cDGray + prefix.toString(), text);
     }
 
-    public static String fStaff(final Object prefix, final String... text)
+    public static String fStaff(Object prefix, String... text)
     {
         return f(C.cDAqua + prefix.toString(), text);
     }
 
 
-    public static String fItem(final String... args)
+    public static String fItem(String... args)
     {
         if (args.length == 0)
         {
@@ -51,21 +51,18 @@ public final class F
     }
 
 
-    public static String fCurrency(final String color,
-                                   final String nameSingular,
-                                   final String namePlural,
-                                   final int amount)
+    public static String fCurrency(String color, String nameSingular, String namePlural, int amount)
     {
         return color + amount + " " + (amount == 1 ? nameSingular : namePlural);
     }
 
-    public static String fCurrency(final CurrencyType currencyType, final int amount)
+    public static String fCurrency(CurrencyType currencyType, int amount)
     {
         return fCurrency(currencyType._color, currencyType._nameSingular, currencyType._namePlural, amount);
     }
 
 
-    public static String fMatches(final String[] matches, final String searchName)
+    public static String fMatches(String[] matches, String searchName)
     {
         return F.fItem(matches.length + (matches.length == 1 ? " Match" : " Matches")) +
                C.cGray +
@@ -76,9 +73,9 @@ public final class F
     }
 
 
-    public static String fCommand(final String alias, final String usage, final String description, final String prefix)
+    public static String fCommand(String alias, String usage, String description, String prefix)
     {
-        final StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         builder.append(prefix).append("/").append(alias);
         if (!usage.isEmpty())
         {
@@ -88,18 +85,18 @@ public final class F
         return builder.toString();
     }
 
-    public static String fCommand(final String alias, final String usage, final String description)
+    public static String fCommand(String alias, String usage, String description)
     {
         return fCommand(alias, usage, description, C.cWhite);
     }
 
 
-    public static String fChat(final int level)
+    public static String fChat(int level)
     {
         return C.cGray + level + C.cYellow + " %s" + C.fReset + " " + "%s";
     }
 
-    public static String fChat(final int level, final PermissionGroup permissionGroup)
+    public static String fChat(int level, PermissionGroup permissionGroup)
     {
         return C.cGray +
                level +
@@ -113,12 +110,12 @@ public final class F
     }
 
 
-    public static String fPermissionGroup(final PermissionGroup group, final boolean uppercase, final boolean bold)
+    public static String fPermissionGroup(PermissionGroup group, boolean uppercase, boolean bold)
     {
         return group._color + (bold ? C.fBold : "") + (uppercase ? group._prefix.toUpperCase() : group._prefix);
     }
 
-    public static String fPermissionGroup(final PermissionGroup group)
+    public static String fPermissionGroup(PermissionGroup group)
     {
         return fPermissionGroup(group, false, false);
     }
@@ -128,7 +125,7 @@ public final class F
         return fMain("Permissions", "You have insufficient permissions to do this.");
     }
 
-    public static String fInsufficientPermissions(final String... messages)
+    public static String fInsufficientPermissions(String... messages)
     {
         if (messages.length > 0)
         {
@@ -138,31 +135,31 @@ public final class F
     }
 
 
-    public static String fBoolean(final boolean toggle)
+    public static String fBoolean(boolean toggle)
     {
         return (toggle ? C.cGreen : C.cRed) + (toggle ? "True" : "False");
     }
 
-    public static String fSuccess(final String... text)
+    public static String fSuccess(String... text)
     {
         return C.cGreen + String.join(C.cGreen, text);
     }
 
-    public static String fError(final String... text)
+    public static String fError(String... text)
     {
         return C.cRed + String.join(C.cRed, text);
     }
 
 
-    public static String fPunish(final PunishData punishData)
+    public static String fPunish(PunishData punishData)
     {
-        switch (punishData.type)
+        switch (punishData._type)
         {
             case WARNING ->
             {
                 return F.fMain("Punish", "You received a warning.") +
                        "\n" +
-                       F.fMain("", "Reason: ", F.fItem(punishData.reason));
+                       F.fMain("", "Reason: ", F.fItem(punishData._reason));
             }
             case KICK ->
             {
@@ -170,13 +167,13 @@ public final class F
                        C.fBold +
                        "You were kicked from the server\n" +
                        C.cWhite +
-                       punishData.reason +
+                       punishData._reason +
                        C.cDGreen +
                        "\nUnfairly removed? Let us know at " +
                        C.cGreen +
                        "www.hexuscraft.net\n\n" +
                        C.cDGray +
-                       punishData.uuid.toString();
+                       punishData._uuid.toString();
             }
             case BAN ->
             {
@@ -186,35 +183,32 @@ public final class F
                        F.fTime(punishData.getRemaining()) +
                        "\n" +
                        C.cWhite +
-                       punishData.reason +
+                       punishData._reason +
                        C.cDGreen +
                        "\nUnfairly banned? Appeal at " +
                        C.cGreen +
                        "www.hexuscraft.net\n\n" +
                        C.cDGray +
-                       punishData.uuid.toString();
+                       punishData._uuid.toString();
             }
             case MUTE ->
             {
-                return F.fMain("Punish", "You are muted for ", F.fItem(F.fTime(punishData.length))) +
+                return F.fMain("Punish", "You are muted for ", F.fItem(F.fTime(punishData._length))) +
                        "\n" +
-                       F.fMain("", "Reason: ", F.fItem(punishData.reason));
+                       F.fMain("", "Reason: ", F.fItem(punishData._reason));
             }
         }
         return "<unknown PunishData.type>";
     }
 
 
-    public static String fCheat(final String playerName, final CheatSeverity severity, final String reason)
+    public static String fCheat(String playerName, CheatSeverity severity, String reason)
     {
         return F.fStaff(severity._color) +
                F.fMain("AC", F.fItem(playerName), " failed ", severity._color + reason + C.cGray, ".");
     }
 
-    public static String fCheat(final String playerName,
-                                final CheatSeverity severity,
-                                final String reason,
-                                final String serverName)
+    public static String fCheat(String playerName, CheatSeverity severity, String reason, String serverName)
     {
         return F.fStaff(severity._color) +
                F.fMain("AC",
@@ -227,15 +221,15 @@ public final class F
     }
 
 
-    public static String fTime(final long millis, final int trim, final TimeUnit unit)
+    public static String fTime(long millis, int trim, TimeUnit unit)
     {
         if (millis == -1)
         {
             return "Permanent";
         }
 
-        final String text;
-        final double time;
+        String text;
+        double time;
         if (unit == TimeUnit.DAYS)
         {
             text = (time = UtilMath.trim(millis / MILLIS_PER_DAY, trim)) + " Day";
@@ -265,7 +259,7 @@ public final class F
         return text;
     }
 
-    public static String fTime(final long millis, final int trim)
+    public static String fTime(long millis, int trim)
     {
         if (millis < MILLIS_PER_MINUTE)
         {
@@ -282,17 +276,17 @@ public final class F
         return fTime(millis, trim, TimeUnit.DAYS);
     }
 
-    public static String fTime(final long millis)
+    public static String fTime(long millis)
     {
         return fTime(millis, 1);
     }
 
-    public static String fTabHeader(final String server)
+    public static String fTabHeader(String server)
     {
         return "\n     " + C.fBold + "Hexuscraft Network" + C.fReset + "     \n     " + C.cGreen + server + "     \n";
     }
 
-    public static String fWelcomeMessage(final String playerName)
+    public static String fWelcomeMessage(String playerName)
     {
         return String.join("§r\n",
                            " ",

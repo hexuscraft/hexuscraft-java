@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public final class CommandRankRemove extends BaseCommand<CorePermission>
+public class CommandRankRemove extends BaseCommand<CorePermission>
 {
 
     private final CoreDatabase _coreDatabase;
 
-    CommandRankRemove(final CorePermission corePermission, final CoreDatabase coreDatabase)
+    CommandRankRemove(CorePermission corePermission, CoreDatabase coreDatabase)
     {
         super(corePermission,
               "remove",
@@ -34,7 +34,7 @@ public final class CommandRankRemove extends BaseCommand<CorePermission>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length != 2)
         {
@@ -42,12 +42,12 @@ public final class CommandRankRemove extends BaseCommand<CorePermission>
             return;
         }
 
-        final PermissionGroup targetGroup;
+        PermissionGroup targetGroup;
         try
         {
             targetGroup = PermissionGroup.valueOf(args[1]);
         }
-        catch (final IllegalArgumentException ex)
+        catch (IllegalArgumentException ex)
         {
             sender.sendMessage(F.fMain(this,
                                        F.fError("Invalid group. Groups: ",
@@ -70,9 +70,8 @@ public final class CommandRankRemove extends BaseCommand<CorePermission>
 
         _miniPlugin._hexusPlugin.runAsync(() ->
                                           {
-                                              final OfflinePlayer
-                                                      offlinePlayer
-                                                      = PlayerSearch.offlinePlayerSearch(args[0], sender);
+                                              OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0],
+                                                                                                             sender);
                                               if (offlinePlayer == null)
                                               {
                                                   sender.sendMessage(F.fMatches(new String[]{}, args[0]));
@@ -91,9 +90,9 @@ public final class CommandRankRemove extends BaseCommand<CorePermission>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
-        final List<String> names = new ArrayList<>();
+        List<String> names = new ArrayList<>();
         switch (args.length)
         {
             case 1 ->
@@ -102,7 +101,7 @@ public final class CommandRankRemove extends BaseCommand<CorePermission>
                 Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
                                                                                          .getOnlinePlayers()
                                                                                          .stream();
-                if (sender instanceof final Player player)
+                if (sender instanceof Player player)
                 {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
                 }

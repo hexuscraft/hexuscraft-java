@@ -18,31 +18,31 @@ import org.bukkit.util.Vector;
 
 import java.util.Map;
 
-public final class ArcadeLobby extends MiniPlugin<Arcade>
+public class ArcadeLobby extends MiniPlugin<Arcade>
 {
 
     private ArcadeManager _arcadeManager;
 
-    public ArcadeLobby(final Arcade arcade)
+    public ArcadeLobby(Arcade arcade)
     {
         super(arcade, "Game Lobby");
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _arcadeManager = (ArcadeManager) dependencies.get(ArcadeManager.class);
     }
 
     @EventHandler
-    public void onPlayerJoin(final PlayerJoinEvent event)
+    public void onPlayerJoin(PlayerJoinEvent event)
     {
         if (_arcadeManager.getGameState() == GameState.IN_PROGRESS)
         {
             return;
         }
 
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         player.teleport(_hexusPlugin.getServer()
                                     .getWorlds()
                                     .getFirst()
@@ -69,9 +69,9 @@ public final class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onEntityDamageByEntity(final EntityDamageByEntityEvent event)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event)
     {
-        if (!(event.getEntity() instanceof final Player player))
+        if (!(event.getEntity() instanceof Player player))
         {
             return;
         }
@@ -80,7 +80,7 @@ public final class ArcadeLobby extends MiniPlugin<Arcade>
             return;
         }
 
-        if (event.getDamager() instanceof final Player damager && damager.getGameMode().equals(GameMode.CREATIVE))
+        if (event.getDamager() instanceof Player damager && damager.getGameMode().equals(GameMode.CREATIVE))
         {
             return;
         }
@@ -89,9 +89,9 @@ public final class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onEntityDamage(final EntityDamageEvent event)
+    public void onEntityDamage(EntityDamageEvent event)
     {
-        if (!(event.getEntity() instanceof final Player player))
+        if (!(event.getEntity() instanceof Player player))
         {
             return;
         }
@@ -116,7 +116,7 @@ public final class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onWeatherChange(final WeatherChangeEvent event)
+    public void onWeatherChange(WeatherChangeEvent event)
     {
         if (!event.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst()))
         {
@@ -126,7 +126,7 @@ public final class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onFoodLevelChange(final FoodLevelChangeEvent event)
+    public void onFoodLevelChange(FoodLevelChangeEvent event)
     {
         if (!event.getEntity().getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst()))
         {

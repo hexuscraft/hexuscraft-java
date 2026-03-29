@@ -10,10 +10,10 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandBroadcast extends BaseCommand<CoreChat>
+public class CommandBroadcast extends BaseCommand<CoreChat>
 {
 
-    public CommandBroadcast(final CoreChat coreChat)
+    public CommandBroadcast(CoreChat coreChat)
     {
         super(coreChat,
               "s",
@@ -24,7 +24,7 @@ public final class CommandBroadcast extends BaseCommand<CoreChat>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 0)
         {
@@ -32,7 +32,7 @@ public final class CommandBroadcast extends BaseCommand<CoreChat>
             return;
         }
 
-        final String message = ChatColor.translateAlternateColorCodes('&', String.join(" ", args));
+        String message = ChatColor.translateAlternateColorCodes('&', String.join(" ", args));
 
         _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player ->
                                                                         {

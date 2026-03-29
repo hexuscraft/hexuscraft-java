@@ -10,20 +10,20 @@ import java.util.stream.Stream;
 public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMiniPlugin
 {
 
-    public final T _hexusPlugin;
-    public final String _prefix;
+    public T _hexusPlugin;
+    public String _prefix;
 
-    public MiniPlugin(final T plugin, final String prefix)
+    public MiniPlugin(T plugin, String prefix)
     {
-        final long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         _hexusPlugin = plugin;
         _prefix = prefix;
         logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void load(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap)
+    public void load(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap)
     {
-        final long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         logInfo("Loading...");
 
         onLoad(miniPluginClassMap);
@@ -31,7 +31,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         logInfo("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void enable()
+    public void enable()
     {
         long start = System.currentTimeMillis();
         logInfo("Enabling...");
@@ -47,7 +47,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         logInfo("String.valueOf " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void disable()
+    public void disable()
     {
         long start = System.currentTimeMillis();
         logInfo("Disabling...");
@@ -69,12 +69,12 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         return _prefix;
     }
 
-    public final void logInfo(final String message)
+    public void logInfo(String message)
     {
         _hexusPlugin.logInfo("[" + _prefix + "] " + message);
     }
 
-    public final void logInfo(final Throwable ex)
+    public void logInfo(Throwable ex)
     {
         logInfo("[" +
                 ex.getClass().getName() +
@@ -85,12 +85,12 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
                                   .toArray(String[]::new)));
     }
 
-    public final void logWarning(final String message)
+    public void logWarning(String message)
     {
         _hexusPlugin.logWarning("[" + _prefix + "] " + message);
     }
 
-    public final void logWarning(final Throwable ex)
+    public void logWarning(Throwable ex)
     {
         logWarning("[" +
                    ex.getClass().getName() +
@@ -101,12 +101,12 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
                                      .toArray(String[]::new)));
     }
 
-    public final void logSevere(final String message)
+    public void logSevere(String message)
     {
         _hexusPlugin.logSevere("[" + _prefix + "] " + message);
     }
 
-    public final void logSevere(final Throwable ex)
+    public void logSevere(Throwable ex)
     {
         logSevere("[" +
                   ex.getClass().getName() +

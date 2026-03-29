@@ -7,10 +7,10 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandNetworkSpy extends BaseCommand<CorePortal>
+public class CommandNetworkSpy extends BaseCommand<CorePortal>
 {
 
-    CommandNetworkSpy(final CorePortal corePortal)
+    CommandNetworkSpy(CorePortal corePortal)
     {
         super(corePortal,
               "spy",
@@ -21,7 +21,7 @@ public final class CommandNetworkSpy extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (_miniPlugin._networkChannelSpies.contains(sender))
         {

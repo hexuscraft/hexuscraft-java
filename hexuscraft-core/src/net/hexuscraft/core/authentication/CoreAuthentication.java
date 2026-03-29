@@ -7,7 +7,7 @@ import net.hexuscraft.core.MiniPlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-public final class CoreAuthentication extends MiniPlugin<HexusPlugin>
+public class CoreAuthentication extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -15,7 +15,7 @@ public final class CoreAuthentication extends MiniPlugin<HexusPlugin>
         REQUIRE_AUTHENTICATION
     }
 
-    public CoreAuthentication(final HexusPlugin plugin)
+    public CoreAuthentication(HexusPlugin plugin)
     {
         super(plugin, "Authentication");
 
@@ -23,7 +23,7 @@ public final class CoreAuthentication extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event)
+    private void onPlayerJoin(PlayerJoinEvent event)
     {
         if (!event.getPlayer().hasPermission(PERM.REQUIRE_AUTHENTICATION.name()))
         {

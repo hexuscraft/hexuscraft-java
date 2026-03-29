@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public final class CoreReport extends MiniPlugin<HexusPlugin>
+public class CoreReport extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -45,12 +45,12 @@ public final class CoreReport extends MiniPlugin<HexusPlugin>
         REPORT_ALERTS
     }
 
-    final Map<HumanEntity, ReportGui> _reportGuis;
+    Map<HumanEntity, ReportGui> _reportGuis;
     CoreCommand _coreCommand;
     CoreDatabase _coreDatabase;
     CorePortal _corePortal;
 
-    public CoreReport(final HexusPlugin plugin)
+    public CoreReport(HexusPlugin plugin)
     {
         super(plugin, "Reports");
         _reportGuis = new HashMap<>();
@@ -62,7 +62,7 @@ public final class CoreReport extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
@@ -76,26 +76,26 @@ public final class CoreReport extends MiniPlugin<HexusPlugin>
 
         _coreDatabase._database.registerConsumer(ReportSubmittedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            final ReportSubmittedMessage parsedMessage = ReportSubmittedMessage.fromString(rawMessage);
+            ReportSubmittedMessage parsedMessage = ReportSubmittedMessage.fromString(rawMessage);
 
             _hexusPlugin.runAsync(() ->
                                   {
-                                      final Map<String, String>
+                                      Map<String, String>
                                               rawData
                                               = new HashMap<>(_coreDatabase._database._jedis.hgetAll(ReportQueries.REPORT(
                                               parsedMessage.reportUUID())));
                                       rawData.put("reportUUID", parsedMessage.reportUUID().toString());
 
-                                      final ReportData reportData = new ReportData(rawData);
+                                      ReportData reportData = new ReportData(rawData);
 
-                                      final OfflinePlayer sender, target;
+                                      OfflinePlayer sender, target;
 
                                       try
                                       {
                                           sender = PlayerSearch.offlinePlayerSearch(reportData.senderUUID);
                                           assert (sender != null);
                                       }
-                                      catch (final IOException | AssertionError ex)
+                                      catch (IOException | AssertionError ex)
                                       {
                                           logSevere(ex);
                                           return;
@@ -106,7 +106,7 @@ public final class CoreReport extends MiniPlugin<HexusPlugin>
                                           target = PlayerSearch.offlinePlayerSearch(reportData.targetUUID);
                                           assert (target != null);
                                       }
-                                      catch (final IOException | AssertionError ex)
+                                      catch (IOException | AssertionError ex)
                                       {
                                           logSevere(ex);
                                           return;
@@ -148,18 +148,18 @@ public final class CoreReport extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    public void onPlayerQuit(final PlayerQuitEvent event)
+    public void onPlayerQuit(PlayerQuitEvent event)
     {
         _reportGuis.remove(event.getPlayer());
     }
 
     @EventHandler
-    public void onInventoryClose(final InventoryCloseEvent event)
+    public void onInventoryClose(InventoryCloseEvent event)
     {
         _reportGuis.remove(event.getPlayer());
     }
 
-    public void submitReport(final Player reporter, final OfflinePlayer target, final ReportSubmitReason reason)
+    public void submitReport(Player reporter, OfflinePlayer target, ReportSubmitReason reason)
     {
         new ReportData(Map.ofEntries(Map.entry("reportUUID", UUID.randomUUID().toString()),
                                      Map.entry("senderUUID", reporter.getUniqueId().toString()),
@@ -171,38 +171,37 @@ public final class CoreReport extends MiniPlugin<HexusPlugin>
                                                _corePortal._serverName))).submit(_coreDatabase._database._jedis);
     }
 
-    public void openReportGui(final Player reporter, final OfflinePlayer target)
+    public void openReportGui(Player reporter, OfflinePlayer target)
     {
-        final Inventory inventory = _hexusPlugin.getServer()
-                                                .createInventory(reporter, 3 * 9, "Report - " + target.getName());
+        Inventory inventory = _hexusPlugin.getServer().createInventory(reporter, 3 * 9, "Report - " + target.getName());
 
-        final ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
-                                                               C.cGreen + C.fBold + target.getName(),
-                                                               target.getUniqueId().toString());
+        ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
+                                                         C.cGreen + C.fBold + target.getName(),
+                                                         target.getUniqueId().toString());
 
-        final ItemStack history = UtilItem.createItem(Material.NAME_TAG,
-                                                      C.cBlue + C.fBold + "Report History",
-                                                      "View the report history of " + F.fItem(target.getName()));
+        ItemStack history = UtilItem.createItem(Material.NAME_TAG,
+                                                C.cBlue + C.fBold + "Report History",
+                                                "View the report history of " + F.fItem(target.getName()));
 
-        final ItemStack chat = UtilItem.createItem(Material.BOOK_AND_QUILL,
-                                                   C.cGreen + C.fBold + "Breaking Chat Rules",
-                                                   "Spamming",
-                                                   "Bigotry",
-                                                   "etc.");
-        final ItemStack gameplay = UtilItem.createItem(Material.IRON_BLOCK,
-                                                       C.cGreen + C.fBold + "Breaking Gameplay Rules",
-                                                       "Map Exploits",
-                                                       "Abusing Bugs",
-                                                       "etc.");
-        final ItemStack client = UtilItem.createItem(Material.IRON_SWORD,
-                                                     C.cGreen + C.fBold + "Unapproved Client Modifications",
-                                                     "Flying",
-                                                     "Xray",
-                                                     "etc.");
-        final ItemStack misc = UtilItem.createItem(Material.PAPER,
-                                                   C.cGreen + C.fBold + "Other Rule Violation",
-                                                   "User is breaking our rules in another way not listed here",
-                                                   "(We recommend also submitting a support ticket in this scenario)");
+        ItemStack chat = UtilItem.createItem(Material.BOOK_AND_QUILL,
+                                             C.cGreen + C.fBold + "Breaking Chat Rules",
+                                             "Spamming",
+                                             "Bigotry",
+                                             "etc.");
+        ItemStack gameplay = UtilItem.createItem(Material.IRON_BLOCK,
+                                                 C.cGreen + C.fBold + "Breaking Gameplay Rules",
+                                                 "Map Exploits",
+                                                 "Abusing Bugs",
+                                                 "etc.");
+        ItemStack client = UtilItem.createItem(Material.IRON_SWORD,
+                                               C.cGreen + C.fBold + "Unapproved Client Modifications",
+                                               "Flying",
+                                               "Xray",
+                                               "etc.");
+        ItemStack misc = UtilItem.createItem(Material.PAPER,
+                                             C.cGreen + C.fBold + "Other Rule Violation",
+                                             "User is breaking our rules in another way not listed here",
+                                             "(We recommend also submitting a support ticket in this scenario)");
 
         inventory.setItem(4, targetSkull);
         inventory.setItem(10, chat);
@@ -219,21 +218,21 @@ public final class CoreReport extends MiniPlugin<HexusPlugin>
         reporter.openInventory(inventory);
     }
 
-    public void openHistoryGui(final Player reporter, final OfflinePlayer target)
+    public void openHistoryGui(Player reporter, OfflinePlayer target)
     {
         // TODO: Paginated report history
         reporter.sendMessage(F.fMain(this, "The report history GUI is still work in progress."));
     }
 
     @EventHandler
-    public void onInventoryClick(final InventoryClickEvent event)
+    public void onInventoryClick(InventoryClickEvent event)
     {
-        if (!(event.getWhoClicked() instanceof final Player reporter))
+        if (!(event.getWhoClicked() instanceof Player reporter))
         {
             return;
         }
 
-        final ReportGui reportGui = _reportGuis.get(reporter);
+        ReportGui reportGui = _reportGuis.get(reporter);
         if (reportGui == null)
         {
             return;
@@ -251,7 +250,7 @@ public final class CoreReport extends MiniPlugin<HexusPlugin>
             return;
         }
 
-        final AtomicReference<ReportSubmitReason> reportReason = new AtomicReference<>();
+        AtomicReference<ReportSubmitReason> reportReason = new AtomicReference<>();
         if (event.getCurrentItem().equals(reportGui.chat()))
         {
             reportReason.set(ReportSubmitReason.CHAT);
@@ -279,7 +278,7 @@ public final class CoreReport extends MiniPlugin<HexusPlugin>
                                   {
                                       submitReport(reporter, reportGui._target(), reportReason.get());
                                   }
-                                  catch (final JedisException ex)
+                                  catch (JedisException ex)
                                   {
                                       reporter.sendMessage(F.fMain(this,
                                                                    F.fError(

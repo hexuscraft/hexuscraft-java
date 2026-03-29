@@ -14,12 +14,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandAnnouncement extends BaseCommand<CoreChat>
+public class CommandAnnouncement extends BaseCommand<CoreChat>
 {
 
-    final CoreDatabase _coreDatabase;
+    CoreDatabase _coreDatabase;
 
-    public CommandAnnouncement(final CoreChat coreChat, final CoreDatabase coreDatabase)
+    public CommandAnnouncement(CoreChat coreChat, CoreDatabase coreDatabase)
     {
         super(coreChat,
               "announce",
@@ -31,7 +31,7 @@ public final class CommandAnnouncement extends BaseCommand<CoreChat>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length < 2)
         {
@@ -39,7 +39,7 @@ public final class CommandAnnouncement extends BaseCommand<CoreChat>
             return;
         }
 
-        final PermissionGroup permissionGroup;
+        PermissionGroup permissionGroup;
         try
         {
             permissionGroup = PermissionGroup.valueOf(args[0]);
@@ -67,7 +67,7 @@ public final class CommandAnnouncement extends BaseCommand<CoreChat>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 1)
         {

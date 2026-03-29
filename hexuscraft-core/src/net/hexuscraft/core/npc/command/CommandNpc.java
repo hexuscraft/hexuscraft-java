@@ -5,10 +5,10 @@ import net.hexuscraft.core.npc.CoreNpc;
 
 import java.util.Set;
 
-public final class CommandNpc extends BaseMultiCommand<CoreNpc>
+public class CommandNpc extends BaseMultiCommand<CoreNpc>
 {
 
-    public CommandNpc(final CoreNpc coreNpc)
+    public CommandNpc(CoreNpc coreNpc)
     {
         super(coreNpc,
               "npc",

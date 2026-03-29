@@ -37,21 +37,21 @@ import java.util.stream.Stream;
 public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Listener
 {
 
-    public final Server _server;
-    public final BukkitScheduler _scheduler;
-    public final Logger _logger;
     private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>>
             _miniPlugins;
     private final boolean _isDebug;
+    public Server _server;
+    public BukkitScheduler _scheduler;
+    public Logger _logger;
 
     public HexusPlugin()
     {
         this(true);
     }
 
-    public HexusPlugin(final boolean shouldRequireCorePlugins)
+    public HexusPlugin(boolean shouldRequireCorePlugins)
     {
-        final long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         _server = getServer();
         _scheduler = _server.getScheduler();
         _logger = getLogger();
@@ -69,14 +69,14 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
 
     private boolean getIsDebug()
     {
-        final File debugFile = new File("_debug.dat");
+        File debugFile = new File("_debug.dat");
         if (debugFile.exists())
         {
             try
             {
                 return Boolean.parseBoolean(readFile(debugFile)[0]);
             }
-            catch (final FileNotFoundException ex)
+            catch (FileNotFoundException ex)
             {
                 throw new RuntimeException(ex);
             }
@@ -84,7 +84,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         return false;
     }
 
-    public final void requireCorePlugins()
+    public void requireCorePlugins()
     {
         require(new CoreAntiCheat(this));
         require(new CoreAuthentication(this));
@@ -109,9 +109,9 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     @Override
-    public final void onLoad()
+    public void onLoad()
     {
-        final AtomicLong start = new AtomicLong(System.currentTimeMillis());
+        AtomicLong start = new AtomicLong(System.currentTimeMillis());
         logInfo("Loading...");
 
         load();
@@ -121,7 +121,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     @Override
-    public final void onEnable()
+    public void onEnable()
     {
         long start = System.currentTimeMillis();
         logInfo("Enabling...");
@@ -134,7 +134,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     @Override
-    public final void onDisable()
+    public void onDisable()
     {
         long start = System.currentTimeMillis();
         logInfo("Disabling...");
@@ -148,8 +148,8 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
 
     public String[] readFile(File file) throws FileNotFoundException
     {
-        final List<String> lines = new ArrayList<>();
-        try (final Scanner scanner = new Scanner(file))
+        List<String> lines = new ArrayList<>();
+        try (Scanner scanner = new Scanner(file))
         {
             while (scanner.hasNextLine())
                 lines.add(scanner.nextLine());
@@ -157,13 +157,13 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         return lines.toArray(String[]::new);
     }
 
-    public final void require(final MiniPlugin<? extends HexusPlugin> miniPlugin)
+    public void require(MiniPlugin<? extends HexusPlugin> miniPlugin)
     {
         //noinspection unchecked
         _miniPlugins.put((Class<? extends MiniPlugin<? extends HexusPlugin>>) miniPlugin.getClass(), miniPlugin);
     }
 
-    public final void logInfo(final String message)
+    public void logInfo(String message)
     {
         if (!_isDebug)
         {
@@ -172,7 +172,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         _logger.log(Level.INFO, message);
     }
 
-    public final void logInfo(final Throwable ex)
+    public void logInfo(Throwable ex)
     {
         logInfo("[" +
                 ex.getClass().getName() +
@@ -183,12 +183,12 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
                                   .toArray(String[]::new)));
     }
 
-    public final void logWarning(final String message)
+    public void logWarning(String message)
     {
         _logger.log(Level.WARNING, "[WARNING] " + message);
     }
 
-    public final void logWarning(final Throwable ex)
+    public void logWarning(Throwable ex)
     {
         logWarning("[" +
                    ex.getClass().getName() +
@@ -199,12 +199,12 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
                                      .toArray(String[]::new)));
     }
 
-    public final void logSevere(final String message)
+    public void logSevere(String message)
     {
         _logger.log(Level.SEVERE, "[SEVERE] " + message);
     }
 
-    public final void logSevere(final Throwable ex)
+    public void logSevere(Throwable ex)
     {
         logSevere("[" +
                   ex.getClass().getName() +
@@ -215,47 +215,43 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
                                     .toArray(String[]::new)));
     }
 
-    public final File getFile()
+    public File getFile()
     {
         return super.getFile();
     }
 
     @Override
-    public final String toString()
+    public String toString()
     {
         return getName();
     }
 
-    public final BukkitTask runSync(final Runnable runnable)
+    public BukkitTask runSync(Runnable runnable)
     {
         return _scheduler.runTask(this, runnable);
     }
 
-    public final BukkitTask runSyncLater(final Runnable runnable, final long delayTicks)
+    public BukkitTask runSyncLater(Runnable runnable, long delayTicks)
     {
         return _scheduler.runTaskLater(this, runnable, delayTicks);
     }
 
-    public final BukkitTask runSyncTimer(final Runnable runnable,
-                                         final long initialDelayTicks,
-                                         final long repeatEveryTicks)
+    public BukkitTask runSyncTimer(Runnable runnable, long initialDelayTicks, long repeatEveryTicks)
     {
         return _scheduler.runTaskTimer(this, runnable, initialDelayTicks, repeatEveryTicks);
     }
 
-    public final BukkitTask runAsync(final Runnable runnable)
+    public BukkitTask runAsync(Runnable runnable)
     {
         return _scheduler.runTaskAsynchronously(this, runnable);
     }
 
-    public final BukkitTask runAsyncLater(final Runnable runnable, final long delayTicks)
+    public BukkitTask runAsyncLater(Runnable runnable, long delayTicks)
     {
         return _scheduler.runTaskLaterAsynchronously(this, runnable, delayTicks);
     }
 
-    public final BukkitTask runAsyncTimer(final Runnable runnable,
-                                          final long initialDelayTicks,
-                                          final long repeatEveryTicks)
+    public BukkitTask runAsyncTimer(Runnable runnable, long initialDelayTicks, long repeatEveryTicks)
     {
         return _scheduler.runTaskTimerAsynchronously(this, runnable, initialDelayTicks, repeatEveryTicks);
     }

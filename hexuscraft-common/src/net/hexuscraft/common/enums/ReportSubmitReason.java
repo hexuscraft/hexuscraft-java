@@ -8,9 +8,9 @@ public enum ReportSubmitReason
     CLIENT("Client Offense"),
     MISC("Miscellaneous");
 
-    public final String _friendlyName;
+    public String _friendlyName;
 
-    ReportSubmitReason(final String friendlyName)
+    ReportSubmitReason(String friendlyName)
     {
         _friendlyName = friendlyName;
     }

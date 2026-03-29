@@ -8,9 +8,9 @@ import java.util.Map;
 public record PortalRestartServerMessage(String _serverName)
 {
 
-    public final static String CHANNEL_NAME = "portal.restartServer";
+    public static String CHANNEL_NAME = "portal.restartServer";
 
-    public static PortalRestartServerMessage fromString(final String jsonString)
+    public static PortalRestartServerMessage fromString(String jsonString)
     {
         return new PortalRestartServerMessage(new JSONObject(jsonString).getString("serverName"));
     }
@@ -22,7 +22,7 @@ public record PortalRestartServerMessage(String _serverName)
         return new JSONObject(Map.of("serverName", _serverName)).toString();
     }
 
-    public void send(final UnifiedJedis jedis)
+    public void send(UnifiedJedis jedis)
     {
         jedis.publish(CHANNEL_NAME, toString());
     }

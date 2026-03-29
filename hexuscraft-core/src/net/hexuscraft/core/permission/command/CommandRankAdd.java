@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-public final class CommandRankAdd extends BaseCommand<CorePermission>
+public class CommandRankAdd extends BaseCommand<CorePermission>
 {
 
-    final CoreDatabase _coreDatabase;
+    CoreDatabase _coreDatabase;
 
-    CommandRankAdd(final CorePermission corePermission, final CoreDatabase coreDatabase)
+    CommandRankAdd(CorePermission corePermission, CoreDatabase coreDatabase)
     {
         super(corePermission,
               "add",
@@ -33,7 +33,7 @@ public final class CommandRankAdd extends BaseCommand<CorePermission>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length != 2)
         {
@@ -41,7 +41,7 @@ public final class CommandRankAdd extends BaseCommand<CorePermission>
             return;
         }
 
-        final PermissionGroup targetGroup;
+        PermissionGroup targetGroup;
         try
         {
             targetGroup = Arrays.stream(PermissionGroup.values())
@@ -49,7 +49,7 @@ public final class CommandRankAdd extends BaseCommand<CorePermission>
                                 .findFirst()
                                 .orElseThrow();
         }
-        catch (final NoSuchElementException ex)
+        catch (NoSuchElementException ex)
         {
             sender.sendMessage(F.fMain(this, F.fError("You specified an invalid group name: ", F.fItem(args[1]))) +
                                "\n" +
@@ -71,10 +71,10 @@ public final class CommandRankAdd extends BaseCommand<CorePermission>
             return;
         }
 
-        final BukkitScheduler scheduler = _miniPlugin._hexusPlugin.getServer().getScheduler();
+        BukkitScheduler scheduler = _miniPlugin._hexusPlugin.getServer().getScheduler();
         scheduler.runTaskAsynchronously(_miniPlugin._hexusPlugin, () ->
         {
-            final OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+            OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
             if (offlinePlayer == null)
             {
                 return;
@@ -99,7 +99,7 @@ public final class CommandRankAdd extends BaseCommand<CorePermission>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 1)
         {

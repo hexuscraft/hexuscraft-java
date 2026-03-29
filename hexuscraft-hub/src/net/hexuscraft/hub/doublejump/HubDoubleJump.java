@@ -11,22 +11,22 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 
-public final class HubDoubleJump extends MiniPlugin<Hub>
+public class HubDoubleJump extends MiniPlugin<Hub>
 {
 
-    public HubDoubleJump(final Hub hub)
+    public HubDoubleJump(Hub hub)
     {
         super(hub, "Double Jump");
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerJoin(final PlayerJoinEvent event)
+    public void onPlayerJoin(PlayerJoinEvent event)
     {
         event.getPlayer().setAllowFlight(true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onGameModeChanged(final PlayerGameModeChangeEvent event)
+    public void onGameModeChanged(PlayerGameModeChangeEvent event)
     {
         // For some reason we need to delay this by a tick even though EventPriority.MONITOR should be the last to fire.
         // Probably some quirky nms logic when changing game mode.
@@ -34,9 +34,9 @@ public final class HubDoubleJump extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    public void onFlight(final PlayerToggleFlightEvent event)
+    public void onFlight(PlayerToggleFlightEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
 
         if (player.getGameMode().equals(GameMode.CREATIVE))
         {

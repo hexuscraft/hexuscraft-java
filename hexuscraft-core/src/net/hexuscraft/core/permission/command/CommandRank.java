@@ -6,10 +6,10 @@ import net.hexuscraft.core.permission.CorePermission;
 
 import java.util.Set;
 
-public final class CommandRank extends BaseMultiCommand<CorePermission>
+public class CommandRank extends BaseMultiCommand<CorePermission>
 {
 
-    public CommandRank(final CorePermission corePermission, final CoreDatabase coreDatabase)
+    public CommandRank(CorePermission corePermission, CoreDatabase coreDatabase)
     {
         super(corePermission,
               "rank",

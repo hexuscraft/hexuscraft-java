@@ -12,10 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandClear extends BaseCommand<CoreItem>
+public class CommandClear extends BaseCommand<CoreItem>
 {
 
-    public CommandClear(final CoreItem coreItem)
+    public CommandClear(CoreItem coreItem)
     {
         super(coreItem,
               "clear",
@@ -26,7 +26,7 @@ public final class CommandClear extends BaseCommand<CoreItem>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length != 1)
         {
@@ -34,11 +34,10 @@ public final class CommandClear extends BaseCommand<CoreItem>
             return;
         }
 
-        final Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
-                                                                                         .getOnlinePlayers(),
-                                                                 args[0],
-                                                                 sender,
-                                                                 matches -> matches.length == 0);
+        Player[] targets = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
+                                                           args[0],
+                                                           sender,
+                                                           matches -> matches.length == 0);
         if (targets.length == 0)
         {
             return;
@@ -52,9 +51,9 @@ public final class CommandClear extends BaseCommand<CoreItem>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
-        final List<String> completions = new ArrayList<>(List.of("*", "**", "."));
+        List<String> completions = new ArrayList<>(List.of("*", "**", "."));
         completions.addAll(_miniPlugin._hexusPlugin.getServer()
                                                    .getOnlinePlayers()
                                                    .stream()

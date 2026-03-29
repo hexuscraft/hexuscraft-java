@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-public final class ArcadeManager extends MiniPlugin<Arcade>
+public class ArcadeManager extends MiniPlugin<Arcade>
 {
 
     public enum PERM implements IPermission
@@ -34,9 +34,6 @@ public final class ArcadeManager extends MiniPlugin<Arcade>
         COMMAND_GAME_STOP,
         COMMAND_HUB
     }
-
-    public final AtomicReference<Game> _game = new AtomicReference<>();
-    public final AtomicReference<GameMap> _gameMap = new AtomicReference<>();
     private final Map<GameType, Class<? extends Game>> GAME_CLASS_MAP = Map.ofEntries(Map.entry(GameType.SURVIVAL_GAMES,
                                                                                                 GameSurvivalGames.class),
                                                                                       Map.entry(GameType.SURVIVAL_GAMES_2,
@@ -45,11 +42,13 @@ public final class ArcadeManager extends MiniPlugin<Arcade>
                                                                                                 GameTheBridges.class));
     private final Random _nextBestGameRandom = new Random();
     private final AtomicReference<BukkitTask> _gameTickTask = new AtomicReference<>();
+    public AtomicReference<Game> _game = new AtomicReference<>();
+    public AtomicReference<GameMap> _gameMap = new AtomicReference<>();
     private CoreCommand _coreCommand;
     private CoreDatabase _coreDatabase;
     private CorePortal _corePortal;
 
-    public ArcadeManager(final Arcade arcade)
+    public ArcadeManager(Arcade arcade)
     {
         super(arcade, "Game");
 
@@ -59,7 +58,7 @@ public final class ArcadeManager extends MiniPlugin<Arcade>
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
@@ -78,7 +77,7 @@ public final class ArcadeManager extends MiniPlugin<Arcade>
     @Override
     public void onDisable()
     {
-        final BukkitTask oldTask = _gameTickTask.getAndSet(null);
+        BukkitTask oldTask = _gameTickTask.getAndSet(null);
         if (oldTask == null)
         {
             return;
@@ -90,7 +89,7 @@ public final class ArcadeManager extends MiniPlugin<Arcade>
     {
         if (_game.get() == null)
         {
-            final GameType nextBestGametype = selectNextBestGame();
+            GameType nextBestGametype = selectNextBestGame();
             if (nextBestGametype == null)
             {
                 logWarning("Could not select next best game!");
@@ -105,15 +104,15 @@ public final class ArcadeManager extends MiniPlugin<Arcade>
 
             try
             {
-                final Constructor<? extends Game> constructor = GAME_CLASS_MAP.get(nextBestGametype)
-                                                                              .getDeclaredConstructor(ArcadeManager.class);
+                Constructor<? extends Game> constructor = GAME_CLASS_MAP.get(nextBestGametype)
+                                                                        .getDeclaredConstructor(ArcadeManager.class);
                 constructor.setAccessible(true);
                 _game.set(constructor.newInstance(this));
             }
-            catch (final InstantiationException |
-                         IllegalAccessException |
-                         InvocationTargetException |
-                         NoSuchMethodException ex)
+            catch (InstantiationException |
+                   IllegalAccessException |
+                   InvocationTargetException |
+                   NoSuchMethodException ex)
             {
                 logSevere(ex);
                 return;
@@ -161,13 +160,13 @@ public final class ArcadeManager extends MiniPlugin<Arcade>
 
     public GameState getGameState()
     {
-        final Game game = _game.get();
+        Game game = _game.get();
         return game == null ? null : game._state.get();
     }
 
-    private boolean setGameState(final GameState newState)
+    private boolean setGameState(GameState newState)
     {
-        final GameStateChangedEvent event = new GameStateChangedEvent(_game.get()._state.get(), newState);
+        GameStateChangedEvent event = new GameStateChangedEvent(_game.get()._state.get(), newState);
         _hexusPlugin.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled())
         {
@@ -179,7 +178,7 @@ public final class ArcadeManager extends MiniPlugin<Arcade>
 
     private GameType selectNextBestGame()
     {
-        final GameType[] games = _corePortal.getServerGroup(_corePortal._serverGroupName)._games;
+        GameType[] games = _corePortal.getServerGroup(_corePortal._serverGroupName)._games;
         if (games.length == 0)
         {
             return null;

@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class CommandNewsAdd extends BaseCommand<HubNews>
+public class CommandNewsAdd extends BaseCommand<HubNews>
 {
 
     private final Set<String> POSITIVES = Set.of("true", "yes", "1");
@@ -23,7 +23,7 @@ public final class CommandNewsAdd extends BaseCommand<HubNews>
 
     private final CoreDatabase _coreDatabase;
 
-    public CommandNewsAdd(final HubNews hubNews, final CoreDatabase coreDatabase)
+    public CommandNewsAdd(HubNews hubNews, CoreDatabase coreDatabase)
     {
         super(hubNews,
               "add",
@@ -35,7 +35,7 @@ public final class CommandNewsAdd extends BaseCommand<HubNews>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length < 3)
         {
@@ -43,7 +43,7 @@ public final class CommandNewsAdd extends BaseCommand<HubNews>
             return;
         }
 
-        final AtomicBoolean active = new AtomicBoolean(false);
+        AtomicBoolean active = new AtomicBoolean(false);
         if (POSITIVES.contains(args[0].toLowerCase()))
         {
             active.set(true);
@@ -54,12 +54,12 @@ public final class CommandNewsAdd extends BaseCommand<HubNews>
             return;
         }
 
-        final AtomicInteger weight = new AtomicInteger(0);
+        AtomicInteger weight = new AtomicInteger(0);
         try
         {
             weight.set(Integer.parseInt(args[1]));
         }
-        catch (final NumberFormatException ex)
+        catch (NumberFormatException ex)
         {
             sender.sendMessage(F.fMain(this,
                                        F.fError("There was an error while parsing weight ",
@@ -69,19 +69,19 @@ public final class CommandNewsAdd extends BaseCommand<HubNews>
                                                 ".")));
         }
 
-        final String message = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
+        String message = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
-        final NewsData newsData = new NewsData(UUID.randomUUID(),
-                                               Map.ofEntries(Map.entry("active", Boolean.toString(active.get())),
-                                                             Map.entry("weight", Integer.toString(weight.get())),
-                                                             Map.entry("message", message)));
+        NewsData newsData = new NewsData(UUID.randomUUID(),
+                                         Map.ofEntries(Map.entry("active", Boolean.toString(active.get())),
+                                                       Map.entry("weight", Integer.toString(weight.get())),
+                                                       Map.entry("message", message)));
 
         try
         {
             newsData.publish(_coreDatabase._database._jedis);
             sender.sendMessage(F.fMain(this, F.fSuccess("Successfully added news line.")));
         }
-        catch (final JedisException ex)
+        catch (JedisException ex)
         {
             sender.sendMessage(F.fMain(this,
                                        F.fError(

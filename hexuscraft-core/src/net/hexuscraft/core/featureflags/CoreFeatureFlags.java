@@ -4,7 +4,7 @@ import net.hexuscraft.common.IPermission;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 
-public final class CoreFeatureFlags extends MiniPlugin<HexusPlugin>
+public class CoreFeatureFlags extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -17,7 +17,7 @@ public final class CoreFeatureFlags extends MiniPlugin<HexusPlugin>
 
     }
 
-    public CoreFeatureFlags(final HexusPlugin plugin)
+    public CoreFeatureFlags(HexusPlugin plugin)
     {
         super(plugin, "Feature Flags");
     }

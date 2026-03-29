@@ -8,18 +8,18 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandSpawn extends BaseCommand<BuildWorld>
+public class CommandSpawn extends BaseCommand<BuildWorld>
 {
 
-    public CommandSpawn(final BuildWorld buildWorld)
+    public CommandSpawn(BuildWorld buildWorld)
     {
         super(buildWorld, "spawn", "", "Teleport to the spawn location", Set.of(), BuildWorld.PERM.COMMAND_SPAWN);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
-        if (!(sender instanceof final Player player))
+        if (!(sender instanceof Player player))
         {
             sender.sendMessage(F.fMain(this, F.fError("Only players can execute this command")));
             return;

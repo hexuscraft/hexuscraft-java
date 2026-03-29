@@ -12,13 +12,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-public final class CoreCommand extends MiniPlugin<HexusPlugin>
+public class CoreCommand extends MiniPlugin<HexusPlugin>
 {
 
-    public final Set<Command> _commands;
     private final AtomicReference<SimpleCommandMap> _commandMap;
+    public Set<Command> _commands;
 
-    public CoreCommand(final HexusPlugin plugin)
+    public CoreCommand(HexusPlugin plugin)
     {
         super(plugin, "Command");
 
@@ -27,7 +27,7 @@ public final class CoreCommand extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _commandMap.set(((CraftServer) _hexusPlugin.getServer()).getCommandMap());
     }
@@ -45,13 +45,13 @@ public final class CoreCommand extends MiniPlugin<HexusPlugin>
         _commands.clear();
     }
 
-    public void register(final Command command)
+    public void register(Command command)
     {
         _commands.add(command);
         _commandMap.get().register("", command);
     }
 
-    public void unregister(final Command command)
+    public void unregister(Command command)
     {
         command.unregister(_commandMap.get());
     }

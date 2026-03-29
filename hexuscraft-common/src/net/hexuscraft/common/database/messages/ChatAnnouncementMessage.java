@@ -9,11 +9,11 @@ import java.util.UUID;
 public record ChatAnnouncementMessage(UUID _senderUniqueId, String _message, PermissionGroup _permissionGroup)
 {
 
-    public final static String CHANNEL_NAME = "chat.announcement";
+    public static String CHANNEL_NAME = "chat.announcement";
 
-    public static ChatAnnouncementMessage fromString(final String jsonString)
+    public static ChatAnnouncementMessage fromString(String jsonString)
     {
-        final JSONObject jsonObject = new JSONObject(jsonString);
+        JSONObject jsonObject = new JSONObject(jsonString);
 
         return new ChatAnnouncementMessage(UUID.fromString(jsonObject.getString("senderUniqueId")),
                                            jsonObject.getString("message"),

@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class CommandHostView extends BaseCommand<ArcadeHost>
 {
-    public CommandHostView(final ArcadeHost arcadeHost)
+    public CommandHostView(ArcadeHost arcadeHost)
     {
         super(arcadeHost, "view", "", "View the current server host.", Set.of("v"), ArcadeHost.PERM.COMMAND_HOST_VIEW);
     }
@@ -24,7 +24,7 @@ public class CommandHostView extends BaseCommand<ArcadeHost>
             return;
         }
 
-        final OfflinePlayer host = _miniPlugin._host.get();
+        OfflinePlayer host = _miniPlugin._host.get();
         if (host == null)
         {
             sender.sendMessage(F.fMain(this, "There is currently no server host."));

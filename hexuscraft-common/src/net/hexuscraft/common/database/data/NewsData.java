@@ -9,15 +9,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public final class NewsData
+public class NewsData
 {
 
-    public final UUID _id; // part of the key name
-    public final boolean _active;
-    public final int _weight;
-    public final String _message;
+    public UUID _id; // part of the key name
+    public boolean _active;
+    public int _weight;
+    public String _message;
 
-    public NewsData(final UUID id, final Map<String, String> data)
+    public NewsData(UUID id, Map<String, String> data)
     {
         _id = id;
         _active = Boolean.parseBoolean(data.get("active"));
@@ -27,20 +27,20 @@ public final class NewsData
 
     public Map<String, String> toMap()
     {
-        final Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         map.put("active", Boolean.toString(_active));
         map.put("weight", Integer.toString(_weight));
         map.put("message", _message);
         return map;
     }
 
-    public void publish(final UnifiedJedis jedis)
+    public void publish(UnifiedJedis jedis)
     {
         jedis.hset(NewsQueries.NEWS(_id), toMap());
         jedis.publish(NewsUpdatedMessage.CHANNEL_NAME, new NewsUpdatedMessage(_id).stringify());
     }
 
-    public void delete(final UnifiedJedis jedis)
+    public void delete(UnifiedJedis jedis)
     {
         jedis.del(NewsQueries.NEWS(_id));
         jedis.publish(NewsDeletedMessage.CHANNEL_NAME, new NewsDeletedMessage(_id).stringify());

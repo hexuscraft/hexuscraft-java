@@ -15,12 +15,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandSupportResponse extends BaseCommand<CoreChat>
+public class CommandSupportResponse extends BaseCommand<CoreChat>
 {
 
-    final CorePermission _corePermission;
+    CorePermission _corePermission;
 
-    public CommandSupportResponse(final CoreChat coreChat, final CorePermission corePermission)
+    public CommandSupportResponse(CoreChat coreChat, CorePermission corePermission)
     {
         super(coreChat,
               "supportresponse",
@@ -32,7 +32,7 @@ public final class CommandSupportResponse extends BaseCommand<CoreChat>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 1)
         {
@@ -43,10 +43,10 @@ public final class CommandSupportResponse extends BaseCommand<CoreChat>
                 return;
             }
 
-            final PermissionGroup permissionGroup = sender instanceof Player ?
-                                                    PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(
-                                                            (Player) sender)._groups()) :
-                                                    null;
+            PermissionGroup permissionGroup = sender instanceof Player ?
+                                              PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(
+                                                      (Player) sender)._groups()) :
+                                              null;
 
             for (Player player : _miniPlugin._hexusPlugin.getServer().getOnlinePlayers())
             {
@@ -54,13 +54,13 @@ public final class CommandSupportResponse extends BaseCommand<CoreChat>
                     player.equals(target) ||
                     player.hasPermission(PermissionGroup.TRAINEE.name()))
                 {
-                    final PermissionGroup
+                    PermissionGroup
                             targetGroup
                             = PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(player)
                                                                                                            ._groups());
 
-                    final String sourceStr = F.fPermissionGroup(permissionGroup) + " " + sender.getName();
-                    final String targetStr = F.fPermissionGroup(targetGroup) + " " + player.getName();
+                    String sourceStr = F.fPermissionGroup(permissionGroup) + " " + sender.getName();
+                    String targetStr = F.fPermissionGroup(targetGroup) + " " + player.getName();
 
                     player.sendMessage(sourceStr +
                                        C.fReset +
@@ -86,7 +86,7 @@ public final class CommandSupportResponse extends BaseCommand<CoreChat>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 1)
         {

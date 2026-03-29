@@ -12,12 +12,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.Map;
 
-public final class ArcadeTab extends MiniPlugin<Arcade>
+public class ArcadeTab extends MiniPlugin<Arcade>
 {
 
     CorePortal _corePortal;
 
-    public ArcadeTab(final Arcade arcade)
+    public ArcadeTab(Arcade arcade)
     {
         super(arcade, "Tab");
     }
@@ -29,9 +29,9 @@ public final class ArcadeTab extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onPlayerJoin(final PlayerJoinEvent event)
+    public void onPlayerJoin(PlayerJoinEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_corePortal._serverName), " ");
     }
 

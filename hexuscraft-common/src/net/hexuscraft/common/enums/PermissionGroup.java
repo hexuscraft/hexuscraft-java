@@ -66,19 +66,15 @@ public enum PermissionGroup
 
     ;
 
-    public final String _prefix;
-    public final String _color;
-    public final int _weight;
-    public final String _description;
-    public final PermissionGroup[] _inherits;
+    public String _prefix;
+    public String _color;
+    public int _weight;
+    public String _description;
+    public PermissionGroup[] _inherits;
 
-    public final List<IPermission> _permissions;
+    public List<IPermission> _permissions;
 
-    PermissionGroup(final String prefix,
-                    final String color,
-                    final int weight,
-                    final String description,
-                    final PermissionGroup... inherits)
+    PermissionGroup(String prefix, String color, int weight, String description, PermissionGroup... inherits)
     {
         _prefix = prefix;
         _color = color;
@@ -88,12 +84,12 @@ public enum PermissionGroup
         _permissions = new ArrayList<>();
     }
 
-    public static String[] getColoredNames(final boolean skipServerGroups)
+    public static String[] getColoredNames(boolean skipServerGroups)
     {
-        final List<String> names = new ArrayList<>();
-        for (final PermissionGroup group : PermissionGroup.values())
+        List<String> names = new ArrayList<>();
+        for (PermissionGroup group : PermissionGroup.values())
         {
-            final String groupName = group.name();
+            String groupName = group.name();
             if (skipServerGroups && groupName.startsWith("_"))
             {
                 continue;
@@ -108,28 +104,28 @@ public enum PermissionGroup
         return getColoredNames(true);
     }
 
-    public static PermissionGroup getGroupWithLowestWeight(final PermissionGroup[] potentialGroups)
+    public static PermissionGroup getGroupWithLowestWeight(PermissionGroup[] potentialGroups)
     {
         return Arrays.stream(potentialGroups).min(Comparator.comparingInt(group -> group._weight)).orElse(null);
     }
 
-    public static PermissionGroup getGroupWithHighestWeight(final PermissionGroup[] potentialGroups)
+    public static PermissionGroup getGroupWithHighestWeight(PermissionGroup[] potentialGroups)
     {
         return Arrays.stream(potentialGroups).max(Comparator.comparingInt(group -> group._weight)).orElse(null);
     }
 
-    public static PermissionGroup valueOfSafe(final String name)
+    public static PermissionGroup valueOfSafe(String name)
     {
         return valueOfElse(name, PermissionGroup._PLAYER);
     }
 
-    public static PermissionGroup valueOfElse(final String name, final PermissionGroup fallback)
+    public static PermissionGroup valueOfElse(String name, PermissionGroup fallback)
     {
         try
         {
             return PermissionGroup.valueOf(name);
         }
-        catch (final IllegalArgumentException | NullPointerException ex)
+        catch (IllegalArgumentException | NullPointerException ex)
         {
             return fallback;
         }

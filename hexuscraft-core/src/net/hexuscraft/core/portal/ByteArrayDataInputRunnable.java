@@ -12,7 +12,7 @@ public abstract class ByteArrayDataInputRunnable implements Runnable
         return this.in;
     }
 
-    public void setIn(final ByteArrayDataInput in)
+    public void setIn(ByteArrayDataInput in)
     {
         this.in = in;
     }

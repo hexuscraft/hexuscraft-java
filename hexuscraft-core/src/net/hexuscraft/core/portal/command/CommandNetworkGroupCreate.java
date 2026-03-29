@@ -16,14 +16,14 @@ import java.util.Set;
 
 // TODO: Make this into a "builder" style command: Open a GUI where you can click items to modify properties before creating.
 
-public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
+public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
 {
 
     private final String[] DISALLOWED_CHARACTERS = new String[]{":", "//", "\\\\", ".."};
 
     private final CoreDatabase _coreDatabase;
 
-    CommandNetworkGroupCreate(final CorePortal corePortal, final CoreDatabase coreDatabase)
+    CommandNetworkGroupCreate(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
               "create",
@@ -35,7 +35,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length < 12)
         {
@@ -43,19 +43,19 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             return;
         }
 
-        final String name;
-        final PermissionGroup requiredPermission;
-        final int minPort;
-        final int maxPort;
-        final int totalServers;
-        final int joinableServers;
-        final String plugin;
-        final String worldZip;
-        final int ram;
-        final int capacity;
-        final boolean worldEdit;
-        final int timeoutMillis;
-        final GameType[] games;
+        String name;
+        PermissionGroup requiredPermission;
+        int minPort;
+        int maxPort;
+        int totalServers;
+        int joinableServers;
+        String plugin;
+        String worldZip;
+        int ram;
+        int capacity;
+        boolean worldEdit;
+        int timeoutMillis;
+        GameType[] games;
 
         try
         {
@@ -77,7 +77,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             {
                 requiredPermission = PermissionGroup.valueOf(args[1]);
             }
-            catch (final IllegalArgumentException ignored)
+            catch (IllegalArgumentException ignored)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
                                                                      "Required Permission",
@@ -88,7 +88,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             {
                 minPort = Integer.parseInt(args[2]);
             }
-            catch (final NumberFormatException ex)
+            catch (NumberFormatException ex)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
                                                                      "Min Port #",
@@ -111,7 +111,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             {
                 maxPort = Integer.parseInt(args[3]);
             }
-            catch (final NumberFormatException ex)
+            catch (NumberFormatException ex)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
                                                                      "Max Port #",
@@ -134,7 +134,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             {
                 totalServers = Integer.parseInt(args[4]);
             }
-            catch (final NumberFormatException ex)
+            catch (NumberFormatException ex)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
                                                                      "Total Servers",
@@ -151,7 +151,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             {
                 joinableServers = Integer.parseInt(args[5]);
             }
-            catch (final NumberFormatException ex)
+            catch (NumberFormatException ex)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
                                                                      "Joinable Servers",
@@ -177,7 +177,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
                                                                      "Plugin",
                                                                      "Length too short (must be between 1-100 characters)");
             }
-            for (final String characters : DISALLOWED_CHARACTERS)
+            for (String characters : DISALLOWED_CHARACTERS)
             {
                 if (!plugin.contains(characters))
                 {
@@ -201,7 +201,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
                                                                      "World Zip",
                                                                      "Length too short (must be between 1-100 characters)");
             }
-            for (final String characters : DISALLOWED_CHARACTERS)
+            for (String characters : DISALLOWED_CHARACTERS)
             {
                 if (!worldZip.contains(characters))
                 {
@@ -216,7 +216,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             {
                 ram = Integer.parseInt(args[8]);
             }
-            catch (final NumberFormatException ignored)
+            catch (NumberFormatException ignored)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "Ram", "Invalid or unrecognised integer");
             }
@@ -231,7 +231,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             {
                 capacity = Integer.parseInt(args[9]);
             }
-            catch (final NumberFormatException ignored)
+            catch (NumberFormatException ignored)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
                                                                      "Capacity",
@@ -248,7 +248,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             {
                 worldEdit = Boolean.parseBoolean(args[10]);
             }
-            catch (final Throwable ignored)
+            catch (Throwable ignored)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this, "World Edit", "Must be TRUE or FALSE");
             }
@@ -257,7 +257,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             {
                 timeoutMillis = Integer.parseInt(args[11]);
             }
-            catch (final NumberFormatException ignored)
+            catch (NumberFormatException ignored)
             {
                 throw new InvalidNetStatGroupCreateArgumentException(this,
                                                                      "Server Timeout",
@@ -276,7 +276,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             }
 
         }
-        catch (final InvalidNetStatGroupCreateArgumentException ex)
+        catch (InvalidNetStatGroupCreateArgumentException ex)
         {
             sender.sendMessage(ex.constructMessage());
             return;
@@ -301,7 +301,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
                                                                       games,
                                                                       null).update(_coreDatabase._database._jedis);
                                               }
-                                              catch (final JedisException ex)
+                                              catch (JedisException ex)
                                               {
                                                   sender.sendMessage(F.fMain(this,
                                                                              F.fError(
@@ -349,7 +349,7 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 2)
         {
@@ -358,16 +358,16 @@ public final class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
         return List.of();
     }
 
-    private static final class InvalidNetStatGroupCreateArgumentException extends Exception
+    private static class InvalidNetStatGroupCreateArgumentException extends Exception
     {
 
         private final CommandNetworkGroupCreate _command;
         private final String _argument;
         private final String _reason;
 
-        public InvalidNetStatGroupCreateArgumentException(final CommandNetworkGroupCreate command,
-                                                          final String argument,
-                                                          final String reason)
+        public InvalidNetStatGroupCreateArgumentException(CommandNetworkGroupCreate command,
+                                                          String argument,
+                                                          String reason)
         {
             _command = command;
             _argument = argument;

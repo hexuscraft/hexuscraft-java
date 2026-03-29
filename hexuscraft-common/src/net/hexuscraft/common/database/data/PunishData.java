@@ -12,23 +12,23 @@ import java.util.UUID;
 public class PunishData
 {
 
-    public UUID uuid;
-    public PunishType type;
-    public Boolean active;
-    public Long origin;
-    public Long length;
-    public String reason;
-    public UUID targetUUID;
-    public String targetServer;
-    public UUID staffUUID;
-    public String staffServer;
+    public UUID _uuid;
+    public PunishType _type;
+    public Boolean _active;
+    public Long _origin;
+    public Long _length;
+    public String _reason;
+    public UUID _targetUUID;
+    public String _targetServer;
+    public UUID _staffUUID;
+    public String _staffServer;
 
     // these cannot be guaranteed to be set unless 'active' is FALSE. ye be warned!
-    public Long removeOrigin;
-    public String removeReason;
-    public String removeTargetServer;
-    public UUID removeStaffUUID;
-    public String removeStaffServer;
+    public Long _removeOrigin;
+    public String _removeReason;
+    public String _removeTargetServer;
+    public UUID _removeStaffUUID;
+    public String _removeStaffServer;
 
     public PunishData(UUID uuid,
                       PunishType type,
@@ -41,16 +41,16 @@ public class PunishData
                       UUID staffUUID,
                       String staffServer)
     {
-        this.uuid = uuid;
-        this.type = type;
-        this.active = active;
-        this.origin = origin;
-        this.length = length;
-        this.reason = reason;
-        this.targetUUID = targetUUID;
-        this.targetServer = targetServer;
-        this.staffUUID = staffUUID;
-        this.staffServer = staffServer;
+        _uuid = uuid;
+        _type = type;
+        _active = active;
+        _origin = origin;
+        _length = length;
+        _reason = reason;
+        _targetUUID = targetUUID;
+        _targetServer = targetServer;
+        _staffUUID = staffUUID;
+        _staffServer = staffServer;
     }
 
     public PunishData(UUID uuid,
@@ -70,69 +70,69 @@ public class PunishData
                       UUID removeStaffUUID,
                       String removeStaffServer)
     {
-        this.uuid = uuid;
-        this.type = type;
-        this.active = active;
-        this.origin = origin;
-        this.length = length;
-        this.reason = reason;
-        this.targetUUID = targetUUID;
-        this.targetServer = targetServer;
-        this.staffUUID = staffUUID;
-        this.staffServer = staffServer;
+        _uuid = uuid;
+        _type = type;
+        _active = active;
+        _origin = origin;
+        _length = length;
+        _reason = reason;
+        _targetUUID = targetUUID;
+        _targetServer = targetServer;
+        _staffUUID = staffUUID;
+        _staffServer = staffServer;
 
-        this.removeOrigin = removeOrigin;
-        this.removeReason = removeReason;
-        this.removeTargetServer = removeTargetServer;
-        this.removeStaffUUID = removeStaffUUID;
-        this.removeStaffServer = removeStaffServer;
+        _removeOrigin = removeOrigin;
+        _removeReason = removeReason;
+        _removeTargetServer = removeTargetServer;
+        _removeStaffUUID = removeStaffUUID;
+        _removeStaffServer = removeStaffServer;
     }
 
     public PunishData(Map<String, String> map)
     {
-        this.uuid = UUID.fromString(map.get("uuid"));
-        this.type = PunishType.valueOf(map.get("type"));
-        this.active = Boolean.parseBoolean(map.get("active"));
-        this.origin = Long.parseLong(map.get("origin"));
-        this.length = Long.parseLong(map.get("length"));
-        this.reason = map.get("reason");
-        this.targetUUID = UUID.fromString(map.get("targetUUID"));
-        this.targetServer = map.get("targetServer");
-        this.staffUUID = UUID.fromString(map.get("staffUUID"));
-        this.staffServer = map.get("staffServer");
+        _uuid = UUID.fromString(map.get("uuid"));
+        _type = PunishType.valueOf(map.get("type"));
+        _active = Boolean.parseBoolean(map.get("active"));
+        _origin = Long.parseLong(map.get("origin"));
+        _length = Long.parseLong(map.get("length"));
+        _reason = map.get("reason");
+        _targetUUID = UUID.fromString(map.get("targetUUID"));
+        _targetServer = map.get("targetServer");
+        _staffUUID = UUID.fromString(map.get("staffUUID"));
+        _staffServer = map.get("staffServer");
 
-        if (this.active)
+        if (_active)
         {
             return;
         }
-        this.removeOrigin = Long.parseLong(map.get("removeOrigin"));
-        this.removeReason = map.get("removeReason");
-        this.removeTargetServer = map.get("removeTargetServer");
-        this.removeStaffUUID = UUID.fromString(map.get("removeStaffUUID"));
-        this.removeStaffServer = map.get("removeStaffServer");
+        _removeOrigin = Long.parseLong(map.get("removeOrigin"));
+        _removeReason = map.get("removeReason");
+        _removeTargetServer = map.get("removeTargetServer");
+        _removeStaffUUID = UUID.fromString(map.get("removeStaffUUID"));
+        _removeStaffServer = map.get("removeStaffServer");
     }
 
     public Map<String, String> toMap()
     {
         Map<String, String> map = new HashMap<>();
-        map.put("uuid", uuid.toString());
-        map.put("type", type.name());
-        map.put("active", active.toString());
-        map.put("origin", origin.toString());
-        map.put("length", length.toString());
-        map.put("reason", reason);
-        map.put("targetUUID", targetUUID.toString());
-        map.put("targetServer", targetServer);
-        map.put("staffUUID", staffUUID.toString());
-        map.put("staffServer", staffServer);
+        map.put("uuid", _uuid.toString());
+        map.put("type", _type.name());
+        map.put("active", _active.toString());
+        map.put("origin", _origin.toString());
+        map.put("length", _length.toString());
+        map.put("reason", _reason);
+        map.put("targetUUID", _targetUUID.toString());
+        map.put("targetServer", _targetServer);
+        map.put("staffUUID", _staffUUID.toString());
+        map.put("staffServer", _staffServer);
 
-        if (!active)
+        if (!_active)
         {
-            map.put("removeOrigin", removeOrigin.toString());
-            map.put("removeReason", removeReason);
-            map.put("removeTargetServer", removeTargetServer);
-            map.put("removeStaffUUID", removeStaffUUID.toString());
-            map.put("removeStaffServer", removeStaffServer);
+            map.put("removeOrigin", _removeOrigin.toString());
+            map.put("removeReason", _removeReason);
+            map.put("removeTargetServer", _removeTargetServer);
+            map.put("removeStaffUUID", _removeStaffUUID.toString());
+            map.put("removeStaffServer", _removeStaffServer);
         }
 
         return map;
@@ -145,27 +145,27 @@ public class PunishData
 
     public Long getRemaining(Long now)
     {
-        if (length == -1)
+        if (_length == -1)
         {
             return -1L;
         }
 
-        return length - (now - origin);
+        return _length - (now - _origin);
     }
 
     public PunishData compare(PunishData punishData)
     {
 
         // Permanent comparison
-        if (length == -1)
+        if (_length == -1)
         {
-            if (punishData.length == -1)
+            if (punishData._length == -1)
             {
-                return origin > punishData.origin ? this : punishData;
+                return _origin > punishData._origin ? this : punishData;
             }
             return this;
         }
-        if (punishData.length == -1)
+        if (punishData._length == -1)
         {
             return punishData;
         }
@@ -176,12 +176,12 @@ public class PunishData
 
     public void publish(UnifiedJedis jedis)
     {
-        jedis.hset(PunishQueries.PUNISHMENT(uuid), toMap());
-        jedis.sadd(PunishQueries.RECEIVED(targetUUID), uuid.toString());
-        jedis.sadd(PunishQueries.ISSUED(staffUUID), uuid.toString());
-        if (!active)
+        jedis.hset(PunishQueries.PUNISHMENT(_uuid), toMap());
+        jedis.sadd(PunishQueries.RECEIVED(_targetUUID), _uuid.toString());
+        jedis.sadd(PunishQueries.ISSUED(_staffUUID), _uuid.toString());
+        if (!_active)
         {
-            jedis.sadd(PunishQueries.ISSUED(removeStaffUUID), uuid.toString());
+            jedis.sadd(PunishQueries.ISSUED(_removeStaffUUID), _uuid.toString());
         }
         jedis.publish(PunishPunishmentAppliedMessage.CHANNEL_NAME, new PunishPunishmentAppliedMessage(this).toString());
     }

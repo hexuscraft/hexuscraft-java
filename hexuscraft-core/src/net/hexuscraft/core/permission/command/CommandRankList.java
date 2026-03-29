@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.Set;
 
-public final class CommandRankList extends BaseCommand<CorePermission>
+public class CommandRankList extends BaseCommand<CorePermission>
 {
 
     CommandRankList(CorePermission corePermission)
@@ -23,7 +23,7 @@ public final class CommandRankList extends BaseCommand<CorePermission>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length != 0)
         {

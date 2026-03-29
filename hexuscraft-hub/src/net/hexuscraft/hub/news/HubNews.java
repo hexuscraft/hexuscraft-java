@@ -22,7 +22,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class HubNews extends MiniPlugin<Hub>
+public class HubNews extends MiniPlugin<Hub>
 {
 
     public enum PERM implements IPermission
@@ -46,13 +46,13 @@ public final class HubNews extends MiniPlugin<Hub>
     private List<NewsData> _activeNews;
     private AtomicInteger _activeNewsIndex;
 
-    public HubNews(final Hub hub)
+    public HubNews(Hub hub)
     {
         super(hub, "News");
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _coreBossBar = (CoreBossBar) dependencies.get(CoreBossBar.class);
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
@@ -68,12 +68,12 @@ public final class HubNews extends MiniPlugin<Hub>
     {
         _coreDatabase._database.registerConsumer(NewsUpdatedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            final NewsUpdatedMessage parsedMessage = NewsUpdatedMessage.parse(rawMessage);
+            NewsUpdatedMessage parsedMessage = NewsUpdatedMessage.parse(rawMessage);
 
             _hexusPlugin.runAsync(() ->
                                   {
-                                      final NewsData newNewsData = NewsQueries.getNews(_coreDatabase._database._jedis,
-                                                                                       parsedMessage._id);
+                                      NewsData newNewsData = NewsQueries.getNews(_coreDatabase._database._jedis,
+                                                                                 parsedMessage._id);
                                       if (newNewsData == null)
                                       {
                                           return; // silences the linter
@@ -87,13 +87,13 @@ public final class HubNews extends MiniPlugin<Hub>
 
         _coreDatabase._database.registerConsumer(NewsDeletedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            final NewsDeletedMessage parsedMessage = NewsDeletedMessage.parse(rawMessage);
+            NewsDeletedMessage parsedMessage = NewsDeletedMessage.parse(rawMessage);
             _newsDatas.removeIf(newsData -> newsData._id.equals(parsedMessage._id));
         });
 
         _hexusPlugin.runAsync(() ->
                               {
-                                  final NewsData[] news = NewsQueries.getNews(_coreDatabase._database._jedis);
+                                  NewsData[] news = NewsQueries.getNews(_coreDatabase._database._jedis);
                                   _newsDatas.clear();
                                   _newsDatas.addAll(Arrays.asList(news));
                                   _newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
@@ -128,16 +128,16 @@ public final class HubNews extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    private void onPlayerJoin(final PlayerJoinEvent event)
+    private void onPlayerJoin(PlayerJoinEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         _bossBars.put(player, _coreBossBar.registerBossBar(new BossBar(player, 0, "<news loading>")));
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event)
+    private void onPlayerQuit(PlayerQuitEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         if (!_bossBars.containsKey(player))
         {
             return;

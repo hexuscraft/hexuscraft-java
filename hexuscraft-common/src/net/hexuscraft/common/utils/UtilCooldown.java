@@ -5,20 +5,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public final class UtilCooldown
+public class UtilCooldown
 {
 
     private static final Map<Object, Set<Cooldown>> _cooldownMap = new HashMap<>();
 
-    public static Cooldown getCooldown(final Object rawParent, final String name)
+    public static Cooldown getCooldown(Object rawParent, String name)
     {
-        final Object parent = rawParent == null ? UtilCooldown.class : rawParent;
+        Object parent = rawParent == null ? UtilCooldown.class : rawParent;
 
         if (!_cooldownMap.containsKey(parent))
         {
             return null;
         }
-        for (final Cooldown cooldown : _cooldownMap.get(parent))
+        for (Cooldown cooldown : _cooldownMap.get(parent))
         {
             if (!cooldown._name().equals(name))
             {
@@ -29,16 +29,16 @@ public final class UtilCooldown
         return null;
     }
 
-    private static void addCooldown(final Object rawParent, final Cooldown cooldown)
+    private static void addCooldown(Object rawParent, Cooldown cooldown)
     {
-        final Object parent = rawParent == null ? UtilCooldown.class : rawParent;
+        Object parent = rawParent == null ? UtilCooldown.class : rawParent;
 
         if (!_cooldownMap.containsKey(parent))
         {
             _cooldownMap.put(parent, new HashSet<>());
         }
 
-        final Set<Cooldown> parentList = _cooldownMap.get(parent);
+        Set<Cooldown> parentList = _cooldownMap.get(parent);
         parentList.add(cooldown);
         new Thread(() ->
                    {
@@ -47,16 +47,16 @@ public final class UtilCooldown
                            Thread.sleep(cooldown._delayMs);
                            parentList.remove(cooldown);
                        }
-                       catch (final InterruptedException ex)
+                       catch (InterruptedException ex)
                        {
                            ex.printStackTrace();
                        }
                    }).start();
     }
 
-    public static boolean use(final Object parent, final String name, final Long delayMs)
+    public static boolean use(Object parent, String name, Long delayMs)
     {
-        final Cooldown cooldown = getCooldown(parent, name);
+        Cooldown cooldown = getCooldown(parent, name);
         if (cooldown != null)
         {
             return false;

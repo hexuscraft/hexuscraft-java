@@ -18,7 +18,7 @@ import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.*;
 
-public final class CorePermission extends MiniPlugin<HexusPlugin>
+public class CorePermission extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -33,11 +33,11 @@ public final class CorePermission extends MiniPlugin<HexusPlugin>
         OPERATOR
     }
 
-    public final HashMap<Player, PermissionProfile> _permissionProfiles;
+    public HashMap<Player, PermissionProfile> _permissionProfiles;
     private CoreCommand _coreCommand;
     private CoreDatabase _coreDatabase;
 
-    public CorePermission(final HexusPlugin plugin)
+    public CorePermission(HexusPlugin plugin)
     {
         super(plugin, "Permissions");
 
@@ -55,7 +55,7 @@ public final class CorePermission extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
@@ -76,17 +76,17 @@ public final class CorePermission extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerLogin(final PlayerLoginEvent event)
+    public void onPlayerLogin(PlayerLoginEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
 
-        final Set<String> permissionGroupNames;
+        Set<String> permissionGroupNames;
         try
         {
             permissionGroupNames
                     = _coreDatabase._database._jedis.smembers(PermissionQueries.GROUPS(player.getUniqueId()));
         }
-        catch (final JedisException ex)
+        catch (JedisException ex)
         {
             logSevere(ex);
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
@@ -95,9 +95,9 @@ public final class CorePermission extends MiniPlugin<HexusPlugin>
             return;
         }
 
-        final Set<PermissionGroup> permissionGroups = new HashSet<>(permissionGroupNames.stream()
-                                                                                        .map(PermissionGroup::valueOf)
-                                                                                        .toList());
+        Set<PermissionGroup> permissionGroups = new HashSet<>(permissionGroupNames.stream()
+                                                                                  .map(PermissionGroup::valueOf)
+                                                                                  .toList());
 
         permissionGroups.add(PermissionGroup._PLAYER);
 
@@ -108,18 +108,18 @@ public final class CorePermission extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerQuit(final PlayerQuitEvent event)
+    private void onPlayerQuit(PlayerQuitEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         clearPermissions(player);
         _permissionProfiles.remove(player);
     }
 
-    public void refreshPermissions(final Player player)
+    public void refreshPermissions(Player player)
     {
         clearPermissions(player);
 
-        final PermissionProfile profile = _permissionProfiles.get(player);
+        PermissionProfile profile = _permissionProfiles.get(player);
         if (profile == null)
         {
             logWarning("Unable to grant permissions for player '" +
@@ -128,7 +128,7 @@ public final class CorePermission extends MiniPlugin<HexusPlugin>
             return;
         }
 
-        final PermissionAttachment attachment = profile._attachment();
+        PermissionAttachment attachment = profile._attachment();
         Arrays.stream(profile._groups()).forEach(group -> grantPermissions(attachment, group));
 
         if (player.hasPermission(PERM.OPERATOR.name()))
@@ -141,11 +141,11 @@ public final class CorePermission extends MiniPlugin<HexusPlugin>
         }
     }
 
-    private void clearPermissions(final Player player)
+    private void clearPermissions(Player player)
     {
         player.setOp(false);
 
-        final PermissionProfile profile = _permissionProfiles.get(player);
+        PermissionProfile profile = _permissionProfiles.get(player);
         if (profile == null)
         {
             logWarning("Unable to clear permissions for player '" +
@@ -154,11 +154,11 @@ public final class CorePermission extends MiniPlugin<HexusPlugin>
             return;
         }
 
-        final PermissionAttachment attachment = profile._attachment();
+        PermissionAttachment attachment = profile._attachment();
         attachment.getPermissions().forEach((s, _) -> attachment.unsetPermission(s));
     }
 
-    private void denyBukkitPermissions(final PermissionAttachment attachment)
+    private void denyBukkitPermissions(PermissionAttachment attachment)
     {
         attachment.setPermission("minecraft.command.me", false);
         attachment.setPermission("minecraft.command.tell", false);
@@ -167,7 +167,7 @@ public final class CorePermission extends MiniPlugin<HexusPlugin>
         attachment.setPermission("bukkit.command.version", false);
     }
 
-    private void grantPermissions(final PermissionAttachment attachment, final PermissionGroup group)
+    private void grantPermissions(PermissionAttachment attachment, PermissionGroup group)
     {
         attachment.setPermission(group.name(), true);
         group._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(), true));

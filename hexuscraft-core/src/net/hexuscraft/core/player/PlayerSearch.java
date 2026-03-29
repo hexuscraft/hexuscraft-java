@@ -21,20 +21,20 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public final class PlayerSearch
+public class PlayerSearch
 {
 
-    public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers, final String searchName)
+    public static Player[] onlinePlayerSearch(Collection<? extends Player> onlinePlayers, String searchName)
     {
         if (searchName.equals("*") || searchName.equals("**"))
         {
             return onlinePlayers.toArray(Player[]::new);
         }
 
-        final List<Player> matches = new ArrayList<>();
+        List<Player> matches = new ArrayList<>();
         for (Player target : onlinePlayers)
         {
-            final String targetName = target.getDisplayName();
+            String targetName = target.getDisplayName();
             if (targetName.equals(searchName))
             {
                 return new Player[]{target};
@@ -49,23 +49,23 @@ public final class PlayerSearch
         return matches.toArray(Player[]::new);
     }
 
-    public static Player[] onlinePlayerSearch(final Collection<? extends Player> onlinePlayers,
-                                              final String searchName,
-                                              final CommandSender sender,
-                                              final Predicate<Player[]> shouldSendMatches)
+    public static Player[] onlinePlayerSearch(Collection<? extends Player> onlinePlayers,
+                                              String searchName,
+                                              CommandSender sender,
+                                              Predicate<Player[]> shouldSendMatches)
     {
-        if (searchName.equals(".") && sender instanceof final Player player)
+        if (searchName.equals(".") && sender instanceof Player player)
         {
             return new Player[]{player};
         }
 
-        final List<? extends Player> onlinePlayersList = new ArrayList<>(onlinePlayers);
-        if (searchName.equals("**") && sender instanceof final Player player)
+        List<? extends Player> onlinePlayersList = new ArrayList<>(onlinePlayers);
+        if (searchName.equals("**") && sender instanceof Player player)
         {
             onlinePlayersList.remove(player);
         }
 
-        final Player[] matches = onlinePlayerSearch(onlinePlayersList, searchName);
+        Player[] matches = onlinePlayerSearch(onlinePlayersList, searchName);
         if (shouldSendMatches.test(matches))
         {
             sender.sendMessage(F.fMain("Online Player Search",
@@ -76,12 +76,12 @@ public final class PlayerSearch
         return matches;
     }
 
-    public static List<String> onlinePlayerCompletions(final Collection<? extends Player> onlinePlayers,
-                                                       final CommandSender sender,
-                                                       final boolean showSelectors)
+    public static List<String> onlinePlayerCompletions(Collection<? extends Player> onlinePlayers,
+                                                       CommandSender sender,
+                                                       boolean showSelectors)
     {
-        final List<String> completions = new ArrayList<>();
-        if (sender instanceof final Player player)
+        List<String> completions = new ArrayList<>();
+        if (sender instanceof Player player)
         {
             completions.add(".");
             if (showSelectors)
@@ -102,19 +102,19 @@ public final class PlayerSearch
     }
 
     @Deprecated(since = "2026-01-17")
-    public static OfflinePlayer offlinePlayerSearch(final String searchName)
+    public static OfflinePlayer offlinePlayerSearch(String searchName)
     {
         //noinspection deprecation
         return Bukkit.getOfflinePlayer(searchName);
     }
 
-    public static OfflinePlayer offlinePlayerSearch(final String searchName, final CommandSender sender)
+    public static OfflinePlayer offlinePlayerSearch(String searchName, CommandSender sender)
     {
-        if (searchName.equals(".") && sender instanceof final Player player)
+        if (searchName.equals(".") && sender instanceof Player player)
         {
             return player;
         }
-        final OfflinePlayer targetOfflinePlayer = offlinePlayerSearch(searchName);
+        OfflinePlayer targetOfflinePlayer = offlinePlayerSearch(searchName);
         if (targetOfflinePlayer == null)
         {
             sender.sendMessage(F.fMain("Offline Player Search", F.fMatches(new String[0], searchName)));
@@ -122,14 +122,14 @@ public final class PlayerSearch
         return targetOfflinePlayer;
     }
 
-    public static OfflinePlayer offlinePlayerSearch(final UUID uniqueId) throws IOException
+    public static OfflinePlayer offlinePlayerSearch(UUID uniqueId) throws IOException
     {
         if (uniqueId.equals(UtilUniqueId.EMPTY_UUID))
         {
             return null;
         }
 
-        final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uniqueId);
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uniqueId);
         if (offlinePlayer.getName() != null && !offlinePlayer.getName().equals(uniqueId.toString()))
         {
             return offlinePlayer;
@@ -138,9 +138,9 @@ public final class PlayerSearch
         return offlinePlayerSearch(fetchMojangSession(uniqueId)._name());
     }
 
-    public static OfflinePlayer offlinePlayerSearch(final UUID uniqueId, final CommandSender sender) throws IOException
+    public static OfflinePlayer offlinePlayerSearch(UUID uniqueId, CommandSender sender) throws IOException
     {
-        final OfflinePlayer targetOfflinePlayer = offlinePlayerSearch(uniqueId);
+        OfflinePlayer targetOfflinePlayer = offlinePlayerSearch(uniqueId);
         if (targetOfflinePlayer == null)
         {
             sender.sendMessage(F.fMain("Offline Player Search", F.fMatches(new String[0], uniqueId.toString())));
@@ -148,9 +148,9 @@ public final class PlayerSearch
         return targetOfflinePlayer;
     }
 
-    public static MojangSession fetchMojangSession(final UUID uuid) throws IOException
+    public static MojangSession fetchMojangSession(UUID uuid) throws IOException
     {
-        final URL url;
+        URL url;
         try
         {
             url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" +
@@ -161,24 +161,24 @@ public final class PlayerSearch
             throw new RuntimeException(e);
         }
 
-        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setInstanceFollowRedirects(false);
 
-        final String content;
-        try (final BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream())))
+        String content;
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream())))
         {
             content = in.lines().collect(Collectors.joining());
         }
 
-        final JSONObject jsonObject = new JSONObject(content);
+        JSONObject jsonObject = new JSONObject(content);
         if (connection.getResponseCode() != 200)
         {
             throw new IOException(jsonObject.getString("errorMessage"));
         }
 
-        final JSONArray propertiesArray = jsonObject.getJSONArray("properties");
+        JSONArray propertiesArray = jsonObject.getJSONArray("properties");
         return new MojangSession(UUID.fromString(new StringBuilder(jsonObject.getString("id")).insert(20, '-')
                                                                                               .insert(16, '-')
                                                                                               .insert(12, '-')

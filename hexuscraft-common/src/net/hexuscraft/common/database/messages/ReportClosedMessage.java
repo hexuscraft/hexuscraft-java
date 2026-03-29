@@ -8,11 +8,11 @@ import java.util.UUID;
 public record ReportClosedMessage(UUID reportUUID)
 {
 
-    public final static String CHANNEL_NAME = "report.closed";
+    public static String CHANNEL_NAME = "report.closed";
 
-    public static ReportClosedMessage fromString(final String jsonString)
+    public static ReportClosedMessage fromString(String jsonString)
     {
-        final JSONObject jsonObject = new JSONObject(jsonString);
+        JSONObject jsonObject = new JSONObject(jsonString);
         return new ReportClosedMessage(UUID.fromString(jsonObject.getString("reportUUID")));
     }
 

@@ -8,11 +8,11 @@ public enum CurrencyType
     COIN("Coin", "Coins", C.cGold),
     XP("XP", "XP", C.cGold);
 
-    public final String _nameSingular;
-    public final String _namePlural;
-    public final String _color;
+    public String _nameSingular;
+    public String _namePlural;
+    public String _color;
 
-    CurrencyType(final String nameSingular, final String namePlural, final String color)
+    CurrencyType(String nameSingular, String namePlural, String color)
     {
         _nameSingular = nameSingular;
         _namePlural = namePlural;

@@ -9,13 +9,13 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class CommandParse extends BaseCommand<BuildParse>
+public class CommandParse extends BaseCommand<BuildParse>
 {
 
     @SuppressWarnings("FieldCanBeLocal")
     private final Integer MINIMUM_RADIUS = 1;
 
-    public CommandParse(final BuildParse parse)
+    public CommandParse(BuildParse parse)
     {
         super(parse,
               "parse",
@@ -26,42 +26,42 @@ public final class CommandParse extends BaseCommand<BuildParse>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         try
         {
             runLogic(sender, args);
         }
-        catch (final ExInvalidSender ex)
+        catch (ExInvalidSender ex)
         {
             sender.sendMessage(F.fMain(this, F.fError("Only players can execute this command.")));
         }
-        catch (final ExInvalidRadius ex)
+        catch (ExInvalidRadius ex)
         {
             sender.sendMessage(F.fMain(this, F.fError("Invalid radius.")));
         }
-        catch (final ExRadiusTooSmall ex)
+        catch (ExRadiusTooSmall ex)
         {
             sender.sendMessage(F.fMain(this,
                                        F.fError("Radius too small."),
                                        "Minimum radius: ",
                                        F.fItem(Integer.toString(ex._minimumRadius))));
         }
-        catch (final ExInvalidWorld ex)
+        catch (ExInvalidWorld ex)
         {
             sender.sendMessage(F.fMain(this, F.fError("You cannot parse the default world.")));
         }
     }
 
-    private void runLogic(final CommandSender sender, final String[] args)
+    private void runLogic(CommandSender sender, String[] args)
             throws ExInvalidRadius, ExInvalidSender, ExInvalidWorld, ExRadiusTooSmall
     {
-        if (!(sender instanceof final Player player))
+        if (!(sender instanceof Player player))
         {
             throw new ExInvalidSender();
         }
 
-        final int radius;
+        int radius;
         try
         {
             radius = Integer.parseInt(args[0]);
@@ -76,7 +76,7 @@ public final class CommandParse extends BaseCommand<BuildParse>
             throw new ExRadiusTooSmall(MINIMUM_RADIUS);
         }
 
-        final World world = player.getWorld();
+        World world = player.getWorld();
         if (world.getName().equals("world"))
         {
             throw new ExInvalidWorld();
@@ -85,23 +85,23 @@ public final class CommandParse extends BaseCommand<BuildParse>
         _miniPlugin.parse(world, radius);
     }
 
-    private static final class ExInvalidSender extends Exception
+    private static class ExInvalidSender extends Exception
     {
     }
 
-    private static final class ExInvalidRadius extends Exception
+    private static class ExInvalidRadius extends Exception
     {
     }
 
-    private static final class ExInvalidWorld extends Exception
+    private static class ExInvalidWorld extends Exception
     {
     }
 
-    private static final class ExRadiusTooSmall extends Exception
+    private static class ExRadiusTooSmall extends Exception
     {
-        public final Integer _minimumRadius;
+        public Integer _minimumRadius;
 
-        public ExRadiusTooSmall(final Integer minimumRadius)
+        public ExRadiusTooSmall(Integer minimumRadius)
         {
             _minimumRadius = minimumRadius;
         }

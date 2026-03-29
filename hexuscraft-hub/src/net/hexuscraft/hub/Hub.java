@@ -16,7 +16,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.Scanner;
 
-public final class Hub extends HexusPlugin
+public class Hub extends HexusPlugin
 {
 
     public Location _spawn = null;
@@ -39,9 +39,9 @@ public final class Hub extends HexusPlugin
     }
 
     @EventHandler
-    public void onWorldLoad(final WorldLoadEvent event)
+    public void onWorldLoad(WorldLoadEvent event)
     {
-        final World world = event.getWorld();
+        World world = event.getWorld();
         logInfo("WORLD NAME: '" + world.getName() + "'");
         if (!world.getName().equals("world"))
         {
@@ -52,7 +52,7 @@ public final class Hub extends HexusPlugin
 
         try
         {
-            final Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_spawn.dat").toFile());
+            Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_spawn.dat").toFile());
             _spawn = new Location(event.getWorld(),
                                   scanner.nextDouble(),
                                   scanner.nextDouble(),

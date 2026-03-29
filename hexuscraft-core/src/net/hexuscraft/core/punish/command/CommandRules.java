@@ -7,16 +7,16 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public final class CommandRules extends BaseCommand<CorePunish>
+public class CommandRules extends BaseCommand<CorePunish>
 {
 
-    public CommandRules(final CorePunish plugin)
+    public CommandRules(CorePunish plugin)
     {
         super(plugin, "rules", "", "View our server rules.", Set.of(), CorePunish.PERM.COMMAND_RULES);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length > 0)
         {

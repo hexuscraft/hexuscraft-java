@@ -13,12 +13,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandServer extends BaseCommand<CorePortal>
+public class CommandServer extends BaseCommand<CorePortal>
 {
 
     private final CoreDatabase _coreDatabase;
 
-    public CommandServer(final CorePortal corePortal, final CoreDatabase coreDatabase)
+    public CommandServer(CorePortal corePortal, CoreDatabase coreDatabase)
     {
         super(corePortal,
               "server",
@@ -30,18 +30,18 @@ public final class CommandServer extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 1)
         {
-            if (!(sender instanceof final Player player))
+            if (!(sender instanceof Player player))
             {
                 sender.sendMessage(F.fMain(this, "Only players can teleport to a server."));
                 return;
             }
-            final String serverName = args[0];
+            String serverName = args[0];
 
-            final ServerData serverData = _miniPlugin.getServer(serverName);
+            ServerData serverData = _miniPlugin.getServer(serverName);
             if (serverData == null)
             {
                 sender.sendMessage(F.fMain(this,
@@ -49,7 +49,7 @@ public final class CommandServer extends BaseCommand<CorePortal>
                 return;
             }
 
-            final ServerGroupData serverGroupData = _miniPlugin.getServerGroup(serverData._group);
+            ServerGroupData serverGroupData = _miniPlugin.getServerGroup(serverData._group);
             if (serverGroupData == null)
             {
                 sender.sendMessage(F.fMain(this,
@@ -77,7 +77,7 @@ public final class CommandServer extends BaseCommand<CorePortal>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 1)
         {

@@ -10,16 +10,16 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.Set;
 
-public final class CommandSilence extends BaseCommand<CoreChat>
+public class CommandSilence extends BaseCommand<CoreChat>
 {
 
-    public CommandSilence(final CoreChat coreChat)
+    public CommandSilence(CoreChat coreChat)
     {
         super(coreChat, "silence", "", "Mute the global chat.", Set.of("mutechat"), CoreChat.PERM.COMMAND_SILENCE);
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 0)
         {
@@ -39,7 +39,7 @@ public final class CommandSilence extends BaseCommand<CoreChat>
                                                                                             "text",
                                                                                             F.fStaff(this,
                                                                                                      F.fSuccess(F.fItem(
-                                                                                                                        sender instanceof final Player senderPlayer ?
+                                                                                                                        sender instanceof Player senderPlayer ?
                                                                                                                         senderPlayer.getDisplayName() :
                                                                                                                         sender.getName()),
                                                                                                                 " un-muted the global chat."))));
@@ -56,7 +56,7 @@ public final class CommandSilence extends BaseCommand<CoreChat>
                                                                                 }
                                                                                 player.sendMessage(F.fStaff(this,
                                                                                                             F.fError(F.fItem(
-                                                                                                                             sender instanceof final Player senderPlayer ?
+                                                                                                                             sender instanceof Player senderPlayer ?
                                                                                                                              senderPlayer.getDisplayName() :
                                                                                                                              sender.getName()),
                                                                                                                      " muted the global chat")));

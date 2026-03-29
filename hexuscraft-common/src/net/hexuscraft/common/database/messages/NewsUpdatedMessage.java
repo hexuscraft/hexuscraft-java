@@ -5,21 +5,21 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.UUID;
 
-public final class NewsUpdatedMessage extends BaseMessage
+public class NewsUpdatedMessage extends BaseMessage
 {
 
-    public final static String CHANNEL_NAME = "news.updated";
+    public static String CHANNEL_NAME = "news.updated";
 
-    public final UUID _id;
+    public UUID _id;
 
-    public NewsUpdatedMessage(final UUID id)
+    public NewsUpdatedMessage(UUID id)
     {
         _id = id;
     }
 
-    public static NewsUpdatedMessage parse(final String jsonString)
+    public static NewsUpdatedMessage parse(String jsonString)
     {
-        final JSONObject jsonObject = new JSONObject(jsonString);
+        JSONObject jsonObject = new JSONObject(jsonString);
         return new NewsUpdatedMessage(UUID.fromString(jsonObject.getString("id")));
     }
 

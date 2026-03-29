@@ -14,12 +14,12 @@ import org.bukkit.scoreboard.Team;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class CoreScoreboard extends MiniPlugin<HexusPlugin>
+public class CoreScoreboard extends MiniPlugin<HexusPlugin>
 {
 
     private final Map<Player, Scoreboard> _scoreboardMap;
 
-    public CoreScoreboard(final HexusPlugin plugin)
+    public CoreScoreboard(HexusPlugin plugin)
     {
         super(plugin, "Scoreboard");
 
@@ -46,25 +46,25 @@ public final class CoreScoreboard extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoin(final PlayerJoinEvent event)
+    public void onPlayerJoin(PlayerJoinEvent event)
     {
-        final Player player = event.getPlayer();
-        final Scoreboard scoreboard = _hexusPlugin.getServer().getScoreboardManager().getNewScoreboard();
+        Player player = event.getPlayer();
+        Scoreboard scoreboard = _hexusPlugin.getServer().getScoreboardManager().getNewScoreboard();
         player.setScoreboard(scoreboard);
         _scoreboardMap.put(player, scoreboard);
     }
 
     @EventHandler
-    public void onPlayerQuit(final PlayerQuitEvent event)
+    public void onPlayerQuit(PlayerQuitEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         player.setScoreboard(_hexusPlugin.getServer().getScoreboardManager().getMainScoreboard());
 
         if (!_scoreboardMap.containsKey(player))
         {
             return;
         }
-        final Scoreboard scoreboard = _scoreboardMap.get(player);
+        Scoreboard scoreboard = _scoreboardMap.get(player);
         scoreboard.getTeams().forEach(Team::unregister);
         scoreboard.getEntries().forEach(scoreboard::resetScores);
         scoreboard.getObjectives().forEach(Objective::unregister);

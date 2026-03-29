@@ -9,9 +9,9 @@ public enum CheatSeverity
     MEDIUM(C.cGold),
     HIGH(C.cRed);
 
-    public final String _color;
+    public String _color;
 
-    CheatSeverity(final String color)
+    CheatSeverity(String color)
     {
         _color = color;
     }

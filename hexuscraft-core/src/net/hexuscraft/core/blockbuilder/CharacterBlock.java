@@ -75,7 +75,7 @@ public enum CharacterBlock
 
               new Vector2(0, 4), new Vector2(1, 4), new Vector2(2, 4), new Vector2(3, 4)));
 
-    public final List<Vector2> _blocks;
+    public List<Vector2> _blocks;
 
     CharacterBlock(List<Vector2> blocks)
     {

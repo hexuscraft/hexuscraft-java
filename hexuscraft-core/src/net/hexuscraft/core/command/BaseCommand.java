@@ -15,14 +15,14 @@ import java.util.Set;
 public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> extends Command
 {
 
-    public final T _miniPlugin;
+    public T _miniPlugin;
 
-    public BaseCommand(final T miniPlugin,
-                       final String name,
-                       final String usage,
-                       final String description,
-                       final Set<String> aliases,
-                       final IPermission permission)
+    public BaseCommand(T miniPlugin,
+                       String name,
+                       String usage,
+                       String description,
+                       Set<String> aliases,
+                       IPermission permission)
     {
         super(name.toLowerCase(), description, usage, aliases.stream().map(String::toLowerCase).toList());
 
@@ -32,25 +32,25 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
         _miniPlugin = miniPlugin;
     }
 
-    public String help(final String alias)
+    public String help(String alias)
     {
         return F.fMain(this, "Command Usage:\n", F.fCommand(alias, getUsage(), getDescription()));
     }
 
-    public final boolean isAlias(final String alias)
+    public boolean isAlias(String alias)
     {
         return getName().equalsIgnoreCase(alias) ||
                getAliases().stream().map(String::toLowerCase).toList().contains(alias.toLowerCase());
     }
 
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         sender.sendMessage(F.fMain(this,
                                    F.fError(
                                            "This command has no implementation. Please contact a staff member if this issue persists.")));
     }
 
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         return List.of();
     }
@@ -62,7 +62,7 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
     }
 
     @Override
-    public final boolean execute(final CommandSender sender, final String alias, final String[] args)
+    public boolean execute(CommandSender sender, String alias, String[] args)
     {
         if (!testPermission(sender))
         {
@@ -72,7 +72,7 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
         {
             run(sender, alias, args);
         }
-        catch (final Throwable ex)
+        catch (Throwable ex)
         {
             _miniPlugin.logInfo("An exception occurred while CommandSender '" +
                                 sender.getName() +
@@ -95,7 +95,7 @@ public abstract class BaseCommand<T extends MiniPlugin<? extends HexusPlugin>> e
     }
 
     @Override
-    public final List<String> tabComplete(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args)
     {
         if (!testPermission(sender))
         {

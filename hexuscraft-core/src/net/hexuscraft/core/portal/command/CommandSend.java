@@ -12,10 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandSend extends BaseCommand<CorePortal>
+public class CommandSend extends BaseCommand<CorePortal>
 {
 
-    public CommandSend(final CorePortal corePortal)
+    public CommandSend(CorePortal corePortal)
     {
         super(corePortal,
               "send",
@@ -26,7 +26,7 @@ public final class CommandSend extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length != 2)
         {
@@ -34,10 +34,10 @@ public final class CommandSend extends BaseCommand<CorePortal>
             return;
         }
 
-        final String targetName = args[0];
-        final String serverName = args[1];
+        String targetName = args[0];
+        String serverName = args[1];
 
-        final OfflinePlayer targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(targetName, sender);
+        OfflinePlayer targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(targetName, sender);
         if (targetOfflinePlayer == null)
         {
             return;
@@ -49,7 +49,7 @@ public final class CommandSend extends BaseCommand<CorePortal>
             return;
         }
 
-        if (sender instanceof final Player player)
+        if (sender instanceof Player player)
         {
             _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(),
                                                                               serverName,
@@ -62,7 +62,7 @@ public final class CommandSend extends BaseCommand<CorePortal>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 1)
         {

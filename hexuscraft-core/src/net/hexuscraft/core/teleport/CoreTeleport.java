@@ -9,7 +9,7 @@ import net.hexuscraft.core.teleport.command.CommandTeleport;
 
 import java.util.Map;
 
-public final class CoreTeleport extends MiniPlugin<HexusPlugin>
+public class CoreTeleport extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -21,7 +21,7 @@ public final class CoreTeleport extends MiniPlugin<HexusPlugin>
 
     private CoreCommand _pluginCommand;
 
-    public CoreTeleport(final HexusPlugin plugin)
+    public CoreTeleport(HexusPlugin plugin)
     {
         super(plugin, "Teleport");
 
@@ -31,7 +31,7 @@ public final class CoreTeleport extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }

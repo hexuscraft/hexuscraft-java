@@ -6,23 +6,23 @@ import redis.clients.jedis.UnifiedJedis;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class ServerData
+public class ServerData
 {
 
-    public final String _name;
+    public String _name;
 
-    public final String _address;
-    public final int _capacity;
-    public final long _createdMillis;
-    public final String _group;
-    public final String _motd;
-    public final int _players;
-    public final int _port;
-    public final double _tps;
-    public final long _updated;
-    public final boolean _updatedByMonitor;
+    public String _address;
+    public int _capacity;
+    public long _createdMillis;
+    public String _group;
+    public String _motd;
+    public int _players;
+    public int _port;
+    public double _tps;
+    public long _updated;
+    public boolean _updatedByMonitor;
 
-    public ServerData(final String name, final Map<String, String> serverData)
+    public ServerData(String name, Map<String, String> serverData)
     {
         _name = name;
 
@@ -38,17 +38,17 @@ public final class ServerData
         _updatedByMonitor = Boolean.parseBoolean(serverData.getOrDefault("updatedByMonitor", "false"));
     }
 
-    public ServerData(final String name,
-                      final String address,
-                      final int capacity,
-                      final long createdMillis,
-                      final String group,
-                      final String motd,
-                      final int players,
-                      final int port,
-                      final double tps,
-                      final long updated,
-                      final boolean updatedByMonitor)
+    public ServerData(String name,
+                      String address,
+                      int capacity,
+                      long createdMillis,
+                      String group,
+                      String motd,
+                      int players,
+                      int port,
+                      double tps,
+                      long updated,
+                      boolean updatedByMonitor)
     {
         _name = name;
 
@@ -66,7 +66,7 @@ public final class ServerData
 
     public Map<String, String> toMap()
     {
-        final Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         map.put("address", _address);
         map.put("capacity", Integer.toString(_capacity));
         map.put("createdMillis", Long.toString(_createdMillis));
@@ -80,7 +80,7 @@ public final class ServerData
         return map;
     }
 
-    public void update(final UnifiedJedis jedis)
+    public void update(UnifiedJedis jedis)
     {
         jedis.hset(ServerQueries.SERVER(_name), toMap());
     }

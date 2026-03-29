@@ -11,7 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
-public final class Build extends HexusPlugin
+public class Build extends HexusPlugin
 {
 
     public Build()
@@ -32,13 +32,13 @@ public final class Build extends HexusPlugin
     }
 
     @EventHandler
-    public void onWorldLoad(final WorldLoadEvent event)
+    public void onWorldLoad(WorldLoadEvent event)
     {
         event.getWorld().setSpawnLocation(0, 100, 0);
     }
 
     @EventHandler
-    public void onPlayerJoin(final PlayerJoinEvent event)
+    public void onPlayerJoin(PlayerJoinEvent event)
     {
         event.getPlayer().teleport(getSpawn());
         event.getPlayer().setGameMode(GameMode.CREATIVE);

@@ -40,17 +40,16 @@ public class ArcadeHost extends MiniPlugin<Arcade>
         COMMAND_HOST_SET,
         COMMAND_HOST_VIEW
     }
-
-    public final AtomicReference<OfflinePlayer> _host;
     private final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5).toMillis();
     private final AtomicReference<BukkitTask> _hostAbandonedTask;
     private final AtomicLong _hostLastSeenMillis;
+    public AtomicReference<OfflinePlayer> _host;
     private CoreCommand _coreCommand;
     private CoreDatabase _coreDatabase;
     private CorePortal _corePortal;
     private PermissionAttachment _hostPermissionAttachment;
 
-    public ArcadeHost(final Arcade arcade)
+    public ArcadeHost(Arcade arcade)
     {
         super(arcade, "Server Host");
 
@@ -64,7 +63,7 @@ public class ArcadeHost extends MiniPlugin<Arcade>
     }
 
     @Override
-    public void onLoad(final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
@@ -82,7 +81,7 @@ public class ArcadeHost extends MiniPlugin<Arcade>
                                   {
                                       _host.set(PlayerSearch.offlinePlayerSearch(_corePortal.getServerGroup(_corePortal._serverGroupName)._hostUniqueId));
                                   }
-                                  catch (final IOException ex)
+                                  catch (IOException ex)
                                   {
                                       logSevere(ex);
                                   }
@@ -102,7 +101,7 @@ public class ArcadeHost extends MiniPlugin<Arcade>
         _hostAbandonedTask.set(_hexusPlugin.runSyncTimer(() ->
                                                          {
                                                              // We want to run the host check even if the server was started with no host, as an admin can become the host of any existing server.
-                                                             final OfflinePlayer host = _host.get();
+                                                             OfflinePlayer host = _host.get();
                                                              if (host == null)
                                                              {
                                                                  return;
@@ -140,9 +139,9 @@ public class ArcadeHost extends MiniPlugin<Arcade>
                                                          }, 0, 20L));
     }
 
-    public void setHost(final OfflinePlayer newHost)
+    public void setHost(OfflinePlayer newHost)
     {
-        final OfflinePlayer oldHost = _host.getAndSet(newHost);
+        OfflinePlayer oldHost = _host.getAndSet(newHost);
 
         if (_hostPermissionAttachment != null)
         {
@@ -158,7 +157,7 @@ public class ArcadeHost extends MiniPlugin<Arcade>
         {
             return;
         }
-        final Player newHostPlayer = newHost.getPlayer();
+        Player newHostPlayer = newHost.getPlayer();
         _hostPermissionAttachment = newHostPlayer.addAttachment(_hexusPlugin);
         _hostPermissionAttachment.setPermission(ArcadeManager.PERM.COMMAND_GAME.name(), true);
         _hostPermissionAttachment.setPermission(ArcadeManager.PERM.COMMAND_GAME_SET.name(), true);
@@ -168,9 +167,9 @@ public class ArcadeHost extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onPlayerJoin(final PlayerJoinEvent event)
+    public void onPlayerJoin(PlayerJoinEvent event)
     {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         if (!_host.get().equals(player))
         {
             return;
@@ -184,7 +183,7 @@ public class ArcadeHost extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onPlayerQuit(final PlayerQuitEvent event)
+    public void onPlayerQuit(PlayerQuitEvent event)
     {
         if (!event.getPlayer().equals(_host.get()))
         {
@@ -201,7 +200,7 @@ public class ArcadeHost extends MiniPlugin<Arcade>
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onAsyncPlayerChat(final AsyncPlayerChatEvent event)
+    public void onAsyncPlayerChat(AsyncPlayerChatEvent event)
     {
         if (!event.getPlayer().equals(_host.get()))
         {

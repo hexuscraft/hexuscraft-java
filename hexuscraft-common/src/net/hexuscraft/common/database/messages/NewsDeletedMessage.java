@@ -5,21 +5,21 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.UUID;
 
-public final class NewsDeletedMessage extends BaseMessage
+public class NewsDeletedMessage extends BaseMessage
 {
 
-    public final static String CHANNEL_NAME = "news.deleted";
+    public static String CHANNEL_NAME = "news.deleted";
 
-    public final UUID _id;
+    public UUID _id;
 
-    public NewsDeletedMessage(final UUID id)
+    public NewsDeletedMessage(UUID id)
     {
         this._id = id;
     }
 
-    public static NewsDeletedMessage parse(final String jsonString)
+    public static NewsDeletedMessage parse(String jsonString)
     {
-        final JSONObject jsonObject = new JSONObject(jsonString);
+        JSONObject jsonObject = new JSONObject(jsonString);
         return new NewsDeletedMessage(UUID.fromString(jsonObject.getString("id")));
     }
 

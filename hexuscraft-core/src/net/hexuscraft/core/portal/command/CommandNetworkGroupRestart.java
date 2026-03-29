@@ -11,10 +11,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
+public class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
 {
 
-    public CommandNetworkGroupRestart(final CorePortal corePortal)
+    public CommandNetworkGroupRestart(CorePortal corePortal)
     {
         super(corePortal,
               "restart",
@@ -25,7 +25,7 @@ public final class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(final CommandSender sender, final String alias, final String[] args)
+    public void run(CommandSender sender, String alias, String[] args)
     {
         if (args.length != 1)
         {
@@ -43,12 +43,12 @@ public final class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
 
         _miniPlugin._hexusPlugin.runAsync(() ->
                                           {
-                                              final ServerGroupData serverGroupData;
+                                              ServerGroupData serverGroupData;
                                               try
                                               {
                                                   serverGroupData = _miniPlugin.getServerGroup(args[0]);
                                               }
-                                              catch (final JedisException ex)
+                                              catch (JedisException ex)
                                               {
                                                   sender.sendMessage(F.fMain(this,
                                                                              F.fError(
@@ -73,7 +73,7 @@ public final class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
                                                                                         _miniPlugin.restartServerGroupAsync(
                                                                                                 serverGroupData._name);
                                                                                     }
-                                                                                    catch (final JedisException ex)
+                                                                                    catch (JedisException ex)
                                                                                     {
                                                                                         sender.sendMessage(F.fMain(this,
                                                                                                                    F.fError(
@@ -89,7 +89,7 @@ public final class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
     }
 
     @Override
-    public List<String> tab(final CommandSender sender, final String alias, final String[] args)
+    public List<String> tab(CommandSender sender, String alias, String[] args)
     {
         if (args.length == 1)
         {

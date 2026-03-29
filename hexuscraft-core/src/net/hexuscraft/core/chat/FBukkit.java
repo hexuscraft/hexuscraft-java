@@ -6,7 +6,7 @@ import org.bukkit.Location;
 public class FBukkit
 {
 
-    public static String fItem(final Location location)
+    public static String fItem(Location location)
     {
         return F.fItem(Double.toString(location.getX()),
                        Double.toString(location.getY()),
