@@ -34,6 +34,7 @@ public class ArcadeManager extends MiniPlugin<Arcade>
         COMMAND_GAME_STOP,
         COMMAND_HUB
     }
+
     private final Map<GameType, Class<? extends Game>> GAME_CLASS_MAP = Map.ofEntries(Map.entry(GameType.SURVIVAL_GAMES,
                                                                                                 GameSurvivalGames.class),
                                                                                       Map.entry(GameType.SURVIVAL_GAMES_2,

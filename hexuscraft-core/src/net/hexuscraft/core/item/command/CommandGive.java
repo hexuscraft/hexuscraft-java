@@ -124,8 +124,7 @@ public class CommandGive extends BaseCommand<CoreItem>
                                                                                                                        Integer.parseInt(
                                                                                                                                strings[1]));
                                                                                                            }
-                                                                                                           catch (final
-                                                                                                           NumberFormatException ex)
+                                                                                                           catch (NumberFormatException ex)
                                                                                                            {
                                                                                                                sender.sendMessage(
                                                                                                                        F.fMain(this,
