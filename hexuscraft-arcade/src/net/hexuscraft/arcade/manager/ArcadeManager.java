@@ -35,14 +35,14 @@ public class ArcadeManager extends MiniPlugin<Arcade>
         COMMAND_HUB
     }
 
-    public AtomicReference<Game> _game = new AtomicReference<>();
-    public AtomicReference<GameMap> _gameMap = new AtomicReference<>();
     private final Map<GameType, Class<? extends Game>> GAME_CLASS_MAP = Map.ofEntries(Map.entry(GameType.SURVIVAL_GAMES,
                     GameSurvivalGames.class),
             Map.entry(GameType.SURVIVAL_GAMES_2, GameSurvivalGamesDuo.class),
             Map.entry(GameType.THE_BRIDGES, GameTheBridges.class));
     private final Random _nextBestGameRandom = new Random();
     private final AtomicReference<BukkitTask> _gameTickTask = new AtomicReference<>();
+    public AtomicReference<Game> _game = new AtomicReference<>();
+    public AtomicReference<GameMap> _gameMap = new AtomicReference<>();
     private CoreCommand _coreCommand;
     private CoreDatabase _coreDatabase;
     private CorePortal _corePortal;

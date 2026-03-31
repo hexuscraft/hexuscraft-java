@@ -18,8 +18,8 @@ public class Database
 {
 
     public static String KEY_DELIMITER = ":";
-    public UnifiedJedis _jedis;
     private final Map<String, Map<PubSubConsumer, JedisPubSub>> _consumers;
+    public UnifiedJedis _jedis;
 
     // TODO::::::::: https://redis.io/docs/latest/develop/clients/jedis/produsage/
 

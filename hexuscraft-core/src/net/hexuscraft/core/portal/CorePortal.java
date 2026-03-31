@@ -83,14 +83,14 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     public static int MIN_PORT_PRIVATE_SERVERS = 39900;
     public static int MAX_PORT_PRIVATE_SERVERS = 39999;
     public static int EVENT_SERVER_PORT = 30003;
-    public Set<CommandSender> _networkChannelSpies;
-    public long _createdMillis;
-    public String _serverName;
-    public String _serverGroupName;
     private final Messenger _messenger;
     private final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
     private final Set<ServerGroupData> _serverGroupCache;
     private final Set<ServerData> _serverCache;
+    public Set<CommandSender> _networkChannelSpies;
+    public long _createdMillis;
+    public String _serverName;
+    public String _serverGroupName;
     private CoreCommand _coreCommand;
     private CoreDatabase _coreDatabase;
     private BukkitTask _updateServerDataTask;

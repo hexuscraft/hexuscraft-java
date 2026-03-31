@@ -37,11 +37,12 @@ import java.util.stream.Stream;
 public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Listener
 {
 
+    private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>>
+            _miniPlugins;
+    private final boolean _isDebug;
     public Server _server;
     public BukkitScheduler _scheduler;
     public Logger _logger;
-    private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPlugins;
-    private final boolean _isDebug;
 
     public HexusPlugin()
     {
