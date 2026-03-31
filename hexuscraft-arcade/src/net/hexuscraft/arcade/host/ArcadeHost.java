@@ -41,10 +41,10 @@ public class ArcadeHost extends MiniPlugin<Arcade>
         COMMAND_HOST_VIEW
     }
 
+    public AtomicReference<OfflinePlayer> _host;
     private final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5).toMillis();
     private final AtomicReference<BukkitTask> _hostAbandonedTask;
     private final AtomicLong _hostLastSeenMillis;
-    public AtomicReference<OfflinePlayer> _host;
     private CoreCommand _coreCommand;
     private CoreDatabase _coreDatabase;
     private CorePortal _corePortal;

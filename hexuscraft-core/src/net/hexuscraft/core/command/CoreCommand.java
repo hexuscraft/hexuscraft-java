@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class CoreCommand extends MiniPlugin<HexusPlugin>
 {
 
-    private final AtomicReference<SimpleCommandMap> _commandMap;
     public Set<Command> _commands;
+    private final AtomicReference<SimpleCommandMap> _commandMap;
 
     public CoreCommand(HexusPlugin plugin)
     {

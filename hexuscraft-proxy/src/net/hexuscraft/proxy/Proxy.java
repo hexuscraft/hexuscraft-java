@@ -45,9 +45,7 @@ import java.util.stream.Collectors;
 public class Proxy
 {
 
-    private final String MOTD_PREFIX = String.join("\n",
-            "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8]§r",
-            " §f§l▶§r ");
+    private final String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8]§r", " §f§l▶§r ");
 
     //    private String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8 & 26.1]§r",
     //            " §f§l▶§r ");
