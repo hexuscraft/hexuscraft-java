@@ -13,7 +13,6 @@ public enum PermissionGroup
 
     //    Base Ranks
 
-    _CONSOLE("Console", C.cWhite, 0, "Used exclusively for console commands."),
     _PLAYER("Player", C.cWhite, 1, "A normal Hexian player. Thanks for playing our server!"),
     VIP("VIP", C.cGreen, 2, "The first purchasable rank, available at store.hexuscraft.net.", _PLAYER),
     MVP("MVP", C.cAqua, 3, "The second purchasable rank, available at store.hexuscraft.net.", VIP),
@@ -68,6 +67,7 @@ public enum PermissionGroup
             203,
             "Administrators lead a team. They are responsible for managing their team ",
             SENIOR_MODERATOR),
+    _CONSOLE("*", C.cWhite, Integer.MAX_VALUE, "Used exclusively for console commands."),
 
     ;
 
