@@ -34,6 +34,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -49,11 +51,22 @@ public class HubPlayer extends MiniPlugin<Hub>
     CoreCommand _pluginCommand;
     CorePortal _corePortal;
 
+    String _welcomeMessage = "";
+
     public HubPlayer(Hub hub)
     {
         super(hub, "Player");
 
         PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_SPAWN);
+
+        try
+        {
+            _welcomeMessage = String.join("\n", hub.readFile(new File("_welcome.dat")));
+        }
+        catch (FileNotFoundException ex)
+        {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
@@ -102,7 +115,12 @@ public class HubPlayer extends MiniPlugin<Hub>
 
         UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), " ");
 
-        player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
+        sendWelcomeMessage(player);
+    }
+
+    void sendWelcomeMessage(Player player)
+    {
+        player.sendMessage(_welcomeMessage.replace("%player%", player.getDisplayName()));
     }
 
     @EventHandler
