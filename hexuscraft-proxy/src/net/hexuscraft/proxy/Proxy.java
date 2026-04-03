@@ -20,7 +20,7 @@ import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.util.Favicon;
 import net.hexuscraft.common.database.Database;
 import net.hexuscraft.common.database.data.PunishData;
-import net.hexuscraft.common.database.messages.PunishPunishmentAppliedMessage;
+import net.hexuscraft.common.database.messages.PunishAppliedMessage;
 import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.enums.PunishType;
@@ -85,16 +85,15 @@ public class Proxy
                 .delay(Duration.ofSeconds(0))
                 .schedule();
 
-        _database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
+        _database.registerConsumer(PunishAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            PunishPunishmentAppliedMessage punishPunishmentAppliedMessage =
-                    PunishPunishmentAppliedMessage.fromString(rawMessage);
-            Optional<Player> optionalPlayer = _server.getPlayer(punishPunishmentAppliedMessage._punishData._targetUUID);
+            PunishAppliedMessage punishAppliedMessage = PunishAppliedMessage.fromString(rawMessage);
+            Optional<Player> optionalPlayer = _server.getPlayer(punishAppliedMessage._punishData._targetUUID);
             optionalPlayer.ifPresent(player -> _server.getScheduler().buildTask(this, () ->
             {
                 Map<String, String> rawData =
-                        new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(punishPunishmentAppliedMessage._punishData._uuid)));
-                rawData.put("uuid", punishPunishmentAppliedMessage._punishData._uuid.toString());
+                        new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(punishAppliedMessage._punishData._uuid)));
+                rawData.put("uuid", punishAppliedMessage._punishData._uuid.toString());
                 PunishData punishData = new PunishData(rawData);
                 if (punishData._type != PunishType.BAN)
                 {

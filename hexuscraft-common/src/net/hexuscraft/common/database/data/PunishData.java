@@ -1,6 +1,6 @@
 package net.hexuscraft.common.database.data;
 
-import net.hexuscraft.common.database.messages.PunishPunishmentAppliedMessage;
+import net.hexuscraft.common.database.messages.PunishAppliedMessage;
 import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.enums.PunishType;
 import redis.clients.jedis.UnifiedJedis;
@@ -183,7 +183,7 @@ public class PunishData
         {
             jedis.sadd(PunishQueries.REVOKED(_removeStaffUUID), _uuid.toString());
         }
-        jedis.publish(PunishPunishmentAppliedMessage.CHANNEL_NAME, new PunishPunishmentAppliedMessage(this).toString());
+        jedis.publish(PunishAppliedMessage.CHANNEL_NAME, new PunishAppliedMessage(this).toString());
     }
 
 }

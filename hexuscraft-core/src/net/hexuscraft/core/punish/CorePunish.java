@@ -2,7 +2,7 @@ package net.hexuscraft.core.punish;
 
 import net.hexuscraft.common.IPermission;
 import net.hexuscraft.common.database.data.PunishData;
-import net.hexuscraft.common.database.messages.PunishPunishmentAppliedMessage;
+import net.hexuscraft.common.database.messages.PunishAppliedMessage;
 import net.hexuscraft.common.database.queries.PunishQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.enums.PunishType;
@@ -11,6 +11,8 @@ import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
+import net.hexuscraft.core.actionbar.ActionBar;
+import net.hexuscraft.core.actionbar.CoreActionBar;
 import net.hexuscraft.core.command.CoreCommand;
 import net.hexuscraft.core.database.CoreDatabase;
 import net.hexuscraft.core.item.UtilItem;
@@ -39,6 +41,7 @@ import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -63,6 +66,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
     CoreCommand _pluginCommand;
     CoreDatabase _coreDatabase;
     CorePortal _corePortal;
+    CoreActionBar _coreActionBar;
     Map<HumanEntity, PunishGui> _punishGuis;
 
     public CorePunish(HexusPlugin plugin)
@@ -76,6 +80,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
+        _coreActionBar = (CoreActionBar) dependencies.get(CoreActionBar.class);
 
         PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_PUNISH_HISTORY);
         PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_RULES);
@@ -99,9 +104,9 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         _pluginCommand.register(new CommandPunish(this));
         _pluginCommand.register(new CommandPunishHistory(this));
 
-        _coreDatabase._database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
+        _coreDatabase._database.registerConsumer(PunishAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            PunishData punishData = PunishPunishmentAppliedMessage.fromString(rawMessage)._punishData;
+            PunishData punishData = PunishAppliedMessage.fromString(rawMessage)._punishData;
 
             _hexusPlugin.runAsync(() ->
             {
@@ -311,18 +316,29 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             String reason,
             Consumer<PunishData> callback)
     {
-        PunishData punishData = new PunishData(Map.ofEntries(Map.entry("uuid", UUID.randomUUID().toString()),
-                Map.entry("type", punishType.name()),
-                Map.entry("active", "true"),
-                Map.entry("origin", Long.toString(System.currentTimeMillis())),
-                Map.entry("length", Long.toString(lengthMillis)),
-                Map.entry("reason", reason),
-                Map.entry("server", _corePortal._serverName),
-                Map.entry("staffId", (staffUUID == null ? UtilUniqueId.EMPTY_UUID : staffUUID).toString()),
-                Map.entry("staffServer", _corePortal._serverName)));
+        PunishData punishData = new PunishData(UUID.randomUUID(),
+                punishType,
+                true,
+                System.currentTimeMillis(),
+                lengthMillis,
+                reason,
+                targetUUID,
+                _corePortal._serverName,
+                staffUUID,
+                _corePortal._serverName);
+
         return _hexusPlugin.runAsync(() ->
         {
-            punishData.publish(_coreDatabase._database._jedis);
+            try
+            {
+                punishData.publish(_coreDatabase._database._jedis);
+            }
+            catch (JedisException ex)
+            {
+                logSevere(ex);
+                callback.accept(null);
+                return;
+            }
             if (callback != null)
             {
                 callback.accept(punishData);
@@ -512,173 +528,165 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         {
             event.setCancelled(true);
 
+            AtomicReference<PunishType> type = new AtomicReference<>();
+            AtomicLong lengthMillis = new AtomicLong(-1);
+
             if (event.getCurrentItem().equals(punishGui._viewHistory()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_HISTORY.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 openHistoryGui(staff, punishGui._target());
-                return;
             }
             else if (event.getCurrentItem().equals(punishGui._warning()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.WARNING,
-                        -1,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.WARNING);
             }
             else if (event.getCurrentItem().equals(punishGui._chatSev1()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.MUTE,
-                        ONE_DAY_MILLIS,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.MUTE);
+                lengthMillis.set(ONE_DAY_MILLIS);
             }
             else if (event.getCurrentItem().equals(punishGui._gameplaySev1()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.BAN,
-                        ONE_DAY_MILLIS,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.BAN);
+                lengthMillis.set(ONE_DAY_MILLIS);
             }
             else if (event.getCurrentItem().equals(punishGui._clientSev1()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.BAN,
-                        ONE_DAY_MILLIS * 7,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.BAN);
+                lengthMillis.set(ONE_DAY_MILLIS * 7);
             }
             else if (event.getCurrentItem().equals(punishGui._chatSev2()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.MUTE,
-                        ONE_DAY_MILLIS * 3,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.MUTE);
+                lengthMillis.set(ONE_DAY_MILLIS * 3);
             }
             else if (event.getCurrentItem().equals(punishGui._gameplaySev2()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.BAN,
-                        ONE_DAY_MILLIS * 3,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.BAN);
+                lengthMillis.set(ONE_DAY_MILLIS * 3);
             }
             else if (event.getCurrentItem().equals(punishGui._clientSev2()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.BAN,
-                        ONE_DAY_MILLIS * 14,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.BAN);
+                lengthMillis.set(ONE_DAY_MILLIS * 14);
             }
             else if (event.getCurrentItem().equals(punishGui._chatSev3()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.MUTE,
-                        ONE_DAY_MILLIS * 5,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.MUTE);
+                lengthMillis.set(ONE_DAY_MILLIS * 5);
             }
             else if (event.getCurrentItem().equals(punishGui._gameplaySev3()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.BAN,
-                        ONE_DAY_MILLIS * 5,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.BAN);
+                lengthMillis.set(ONE_DAY_MILLIS * 5);
             }
             else if (event.getCurrentItem().equals(punishGui._clientSev3()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.MUTE,
-                        ONE_DAY_MILLIS * 28,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.BAN);
+                lengthMillis.set(ONE_DAY_MILLIS * 25);
             }
             else if (event.getCurrentItem().equals(punishGui._permanentMute()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.MUTE,
-                        -1,
-                        punishGui._reason());
-                return;
+                type.set(PunishType.MUTE);
             }
             else if (event.getCurrentItem().equals(punishGui._permanentBan()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
                 {
+                    staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
-                punishAsync(punishGui._target().getUniqueId(),
-                        staff.getUniqueId(),
-                        PunishType.BAN,
-                        -1,
-                        punishGui._reason());
+                type.set(PunishType.BAN);
+            }
+
+            if (type.get() == null)
+            {
                 return;
             }
 
+            ActionBar actionBar = _coreActionBar.registerActionBar(new ActionBar(staff,
+                    1,
+                    F.fMain(this,
+                            "Processing your punishment against ",
+                            F.fItem(punishGui._target().getName()),
+                            "...")));
+
             staff.closeInventory();
+            punishAsync(punishGui._target().getUniqueId(),
+                    staff.getUniqueId(),
+                    type.get(),
+                    lengthMillis.get(),
+                    punishGui._reason(),
+                    (punishData ->
+                    {
+                        _coreActionBar.unregisterActionBar(actionBar);
+                        if (punishData != null)
+                        {
+                            return;
+                        }
+                        staff.sendMessage(F.fMain(this,
+                                F.fError("There was an error while processing the punishment. Please try again " +
+                                        "later or contact an administrator if this issue persists.")));
+                    }));
         }
     }
 
