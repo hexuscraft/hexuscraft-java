@@ -16,17 +16,17 @@ import java.util.*;
 public class ServerMonitor implements Runnable
 {
 
-    private final String NETWORK_SPY_CHANNEL = "NetworkSpy";
+    final String NETWORK_SPY_CHANNEL = "NetworkSpy";
 
-    private final Console _console;
-    private final Database _database;
-    private final ServerManager _manager;
+    final Console _console;
+    final Database _database;
+    final ServerManager _manager;
     @SuppressWarnings("FieldCanBeLocal")
-    private final InetAddress _inetAddress;
-    private final Map<String, ServerData> _serverDataMap;
-    private final Map<String, ServerGroupData> _serverGroupDataMap;
+    final InetAddress _inetAddress;
+    final Map<String, ServerData> _serverDataMap;
+    final Map<String, ServerGroupData> _serverGroupDataMap;
 
-    private ServerMonitor(String[] args) throws UnknownHostException, FileNotFoundException
+    ServerMonitor(String[] args) throws UnknownHostException, FileNotFoundException
     {
         _console = System.console();
         _database = new Database();
@@ -58,7 +58,7 @@ public class ServerMonitor implements Runnable
         new Thread(() -> _database._jedis.publish(NETWORK_SPY_CHANNEL, message)).start();
     }
 
-    private void tick()
+    void tick()
     {
         _serverDataMap.clear();
         _serverDataMap.putAll(ServerQueries.getServersAsMap(_database._jedis));
@@ -158,7 +158,7 @@ public class ServerMonitor implements Runnable
 
     }
 
-    private ServerData getBestServerToKill(UnifiedJedis jedis, ServerGroupData serverGroupData)
+    ServerData getBestServerToKill(UnifiedJedis jedis, ServerGroupData serverGroupData)
     {
         for (ServerData serverData : ServerQueries.getServers(jedis, serverGroupData))
         {

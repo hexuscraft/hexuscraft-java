@@ -23,7 +23,7 @@ public class CoreAuthentication extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         if (!event.getPlayer().hasPermission(PERM.REQUIRE_AUTHENTICATION.name()))
         {

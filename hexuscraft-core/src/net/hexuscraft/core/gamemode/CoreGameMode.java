@@ -18,7 +18,7 @@ public class CoreGameMode extends MiniPlugin<HexusPlugin>
         COMMAND_GAMEMODE_OTHERS
     }
 
-    private CoreCommand _coreCommand;
+    CoreCommand _coreCommand;
 
     public CoreGameMode(HexusPlugin plugin)
     {

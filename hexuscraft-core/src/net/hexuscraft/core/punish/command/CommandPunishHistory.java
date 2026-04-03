@@ -21,7 +21,7 @@ public class CommandPunishHistory extends BaseCommand<CorePunish>
         super(corePunish,
                 "punishmenthistory",
                 "[Player]",
-                "View the history of punishments.",
+                "View the _history of punishments.",
                 Set.of("punishhistory", "xh"),
                 CorePunish.PERM.COMMAND_PUNISH_HISTORY);
     }
@@ -31,7 +31,7 @@ public class CommandPunishHistory extends BaseCommand<CorePunish>
     {
         if (!(sender instanceof Player senderPlayer))
         {
-            sender.sendMessage(F.fMain(this, F.fError("Only players can view punishment history.")));
+            sender.sendMessage(F.fMain(this, F.fError("Only players can view punishment _history.")));
             return;
         }
 
@@ -69,9 +69,8 @@ public class CommandPunishHistory extends BaseCommand<CorePunish>
         if (args.length == 1)
         {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                    .getOnlinePlayers()
-                    .stream();
+            Stream<? extends Player> streamedOnlinePlayers =
+                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
             if (sender instanceof Player player)
             {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));

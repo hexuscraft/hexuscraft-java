@@ -31,7 +31,7 @@ public class WebTranslator extends HexusPlugin
     }
 
     @EventHandler
-    private void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
 
@@ -41,13 +41,13 @@ public class WebTranslator extends HexusPlugin
     }
 
     @EventHandler
-    private void onPlayerQuit(PlayerQuitEvent event)
+    void onPlayerQuit(PlayerQuitEvent event)
     {
         event.setQuitMessage(F.fSub("Quit", event.getPlayer().getName()));
     }
 
     @EventHandler
-    private void onEntityDamage(EntityDamageEvent event)
+    void onEntityDamage(EntityDamageEvent event)
     {
         if (!(event.getEntity() instanceof Player))
         {
@@ -57,7 +57,7 @@ public class WebTranslator extends HexusPlugin
     }
 
     @EventHandler
-    private void onPlayerMove(PlayerMoveEvent event)
+    void onPlayerMove(PlayerMoveEvent event)
     {
         event.setTo(new Location(getServer().getWorlds().getFirst(), 0, 0, 0, 0, 0));
     }

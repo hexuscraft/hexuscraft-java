@@ -4,7 +4,7 @@ import net.hexuscraft.arcade.Arcade;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
-import net.hexuscraft.core.player.PlayerTabInfo;
+import net.hexuscraft.core.player.UtilTitleTab;
 import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,7 +32,7 @@ public class ArcadeTab extends MiniPlugin<Arcade>
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
-        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_corePortal._serverName), " ");
+        UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), " ");
     }
 
 

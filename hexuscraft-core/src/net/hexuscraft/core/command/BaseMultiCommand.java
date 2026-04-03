@@ -12,7 +12,7 @@ import java.util.*;
 public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugin>> extends BaseCommand<T>
 {
 
-    private final Set<BaseCommand<T>> _commands;
+    final Set<BaseCommand<T>> _commands;
 
     public BaseMultiCommand(T miniPlugin,
             String name,

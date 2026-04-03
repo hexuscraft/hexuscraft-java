@@ -13,7 +13,7 @@ import java.util.*;
 public class CommandHelp extends BaseCommand<CoreChat>
 {
 
-    private final CoreCommand _coreCommand;
+    final CoreCommand _coreCommand;
 
     public CommandHelp(CoreChat coreChat, CoreCommand coreCommand)
     {
@@ -78,7 +78,7 @@ public class CommandHelp extends BaseCommand<CoreChat>
                 String.join("\n", constructHelpStrings(alias)));
     }
 
-    private String[] constructHelpStrings(String alias)
+    String[] constructHelpStrings(String alias)
     {
         return new String[]{F.fMain("", "Visit our website: " + C.cGreen + "https://hexuscraft.net"),
                 F.fMain("", "Join our Discord: " + C.cPurple + "https://discord.gg/yusJMxrg3e"),

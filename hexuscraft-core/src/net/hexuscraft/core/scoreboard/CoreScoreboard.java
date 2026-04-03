@@ -17,7 +17,7 @@ import java.util.Map;
 public class CoreScoreboard extends MiniPlugin<HexusPlugin>
 {
 
-    private final Map<Player, Scoreboard> _scoreboardMap;
+    final Map<Player, Scoreboard> _scoreboardMap;
 
     public CoreScoreboard(HexusPlugin plugin)
     {

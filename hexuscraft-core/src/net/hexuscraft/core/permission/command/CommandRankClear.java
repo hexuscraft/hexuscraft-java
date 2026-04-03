@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 public class CommandRankClear extends BaseCommand<CorePermission>
 {
 
-    private final CoreDatabase _coreDatabase;
+    final CoreDatabase _coreDatabase;
 
     public CommandRankClear(CorePermission permission, CoreDatabase database)
     {
@@ -64,9 +64,8 @@ public class CommandRankClear extends BaseCommand<CorePermission>
         if (args.length == 1)
         {
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                    .getOnlinePlayers()
-                    .stream();
+            Stream<? extends Player> streamedOnlinePlayers =
+                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
             if (sender instanceof Player player)
             {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));

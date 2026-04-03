@@ -20,9 +20,9 @@ import java.util.Set;
 public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
 {
 
-    private final String[] DISALLOWED_CHARACTERS = new String[]{":", "//", "\\\\", ".."};
+    final String[] DISALLOWED_CHARACTERS = new String[]{":", "//", "\\\\", ".."};
 
-    private final CoreDatabase _coreDatabase;
+    final CoreDatabase _coreDatabase;
 
     CommandNetworkGroupCreate(CorePortal corePortal, CoreDatabase coreDatabase)
     {
@@ -346,12 +346,12 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
         return List.of();
     }
 
-    private static class InvalidNetStatGroupCreateArgumentException extends Exception
+    static class InvalidNetStatGroupCreateArgumentException extends Exception
     {
 
-        private final CommandNetworkGroupCreate _command;
-        private final String _argument;
-        private final String _reason;
+        final CommandNetworkGroupCreate _command;
+        final String _argument;
+        final String _reason;
 
         public InvalidNetStatGroupCreateArgumentException(CommandNetworkGroupCreate command,
                 String argument,
@@ -362,7 +362,7 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             _reason = reason;
         }
 
-        private String constructMessage()
+        String constructMessage()
         {
             return F.fMain(_command, F.fError("Invalid argument ", F.fItem(_argument), ": "), F.fItem(_reason));
         }

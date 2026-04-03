@@ -8,10 +8,10 @@ import org.bukkit.event.HandlerList;
 public class GameStateChangedEvent extends Event implements Cancellable
 {
 
-    private static final HandlerList _handlers = new HandlerList();
+    static final HandlerList _handlers = new HandlerList();
     public GameState _oldState;
     public GameState _newState;
-    private boolean _isCancelled;
+    boolean _isCancelled;
 
     public GameStateChangedEvent(GameState oldState, GameState newState)
     {

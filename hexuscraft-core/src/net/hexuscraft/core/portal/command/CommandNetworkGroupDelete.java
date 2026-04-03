@@ -14,7 +14,7 @@ import java.util.Set;
 public class CommandNetworkGroupDelete extends BaseCommand<CorePortal>
 {
 
-    private final CoreDatabase _coreDatabase;
+    final CoreDatabase _coreDatabase;
 
     CommandNetworkGroupDelete(CorePortal corePortal, CoreDatabase coreDatabase)
     {

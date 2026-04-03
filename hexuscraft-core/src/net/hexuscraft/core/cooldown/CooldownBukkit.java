@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 public class CooldownBukkit
 {
 
-    private Long calculateRemaining(Long now, Long start, Long delay)
+    Long calculateRemaining(Long now, Long start, Long delay)
     {
         return delay - (now - start);
     }

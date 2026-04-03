@@ -10,7 +10,7 @@ import net.hexuscraft.common.utils.C;
 public class GameTheBridges extends TeamGame
 {
 
-    private GameTheBridges(ArcadeManager arcadeManager)
+    GameTheBridges(ArcadeManager arcadeManager)
     {
         super(GameType.THE_BRIDGES,
                 new GameKit[]{},

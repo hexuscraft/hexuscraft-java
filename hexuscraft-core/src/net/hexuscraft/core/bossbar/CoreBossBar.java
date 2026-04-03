@@ -41,9 +41,8 @@ public class CoreBossBar extends MiniPlugin<HexusPlugin>
             {
                 return;
             }
-            BossBar activeBossBar = bossBars.stream()
-                    .max(Comparator.comparing(bossBar -> bossBar.weight().get()))
-                    .orElse(null);
+            BossBar activeBossBar =
+                    bossBars.stream().max(Comparator.comparing(bossBar -> bossBar.weight().get())).orElse(null);
 
             Wither wither = _witherMap.get(player);
             wither.setCustomName(activeBossBar.message().get());
@@ -134,7 +133,7 @@ public class CoreBossBar extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onEntityTarget(EntityTargetEvent event)
+    void onEntityTarget(EntityTargetEvent event)
     {
         if (!event.getEntity().hasMetadata("BossBarNPC"))
         {
@@ -144,7 +143,7 @@ public class CoreBossBar extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerMove(PlayerMoveEvent event)
+    void onPlayerMove(PlayerMoveEvent event)
     {
         Player player = event.getPlayer();
         if (!_witherMap.containsKey(player))
@@ -163,7 +162,7 @@ public class CoreBossBar extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerQuit(PlayerQuitEvent event)
+    void onPlayerQuit(PlayerQuitEvent event)
     {
         Player player = event.getPlayer();
         if (!_bossBarMap.containsKey(player))

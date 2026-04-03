@@ -18,10 +18,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CommandNewsAdd extends BaseCommand<HubNews>
 {
 
-    private final Set<String> POSITIVES = Set.of("true", "yes", "1");
-    private final Set<String> NEGATIVES = Set.of("false", "no", "0");
+    final Set<String> POSITIVES = Set.of("true", "yes", "1");
+    final Set<String> NEGATIVES = Set.of("false", "no", "0");
 
-    private final CoreDatabase _coreDatabase;
+    final CoreDatabase _coreDatabase;
 
     public CommandNewsAdd(HubNews hubNews, CoreDatabase coreDatabase)
     {
@@ -74,7 +74,7 @@ public class CommandNewsAdd extends BaseCommand<HubNews>
         NewsData newsData = new NewsData(UUID.randomUUID(),
                 Map.ofEntries(Map.entry("active", Boolean.toString(active.get())),
                         Map.entry("weight", Integer.toString(weight.get())),
-                        Map.entry("message", message)));
+                        Map.entry("_message", message)));
 
         try
         {

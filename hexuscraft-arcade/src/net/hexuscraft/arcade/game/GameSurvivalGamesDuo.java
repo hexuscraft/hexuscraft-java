@@ -10,7 +10,7 @@ import net.hexuscraft.common.utils.C;
 public class GameSurvivalGamesDuo extends TeamGame
 {
 
-    private GameSurvivalGamesDuo(ArcadeManager arcadeManager)
+    GameSurvivalGamesDuo(ArcadeManager arcadeManager)
     {
         super(GameType.SURVIVAL_GAMES,
                 new GameKit[]{},

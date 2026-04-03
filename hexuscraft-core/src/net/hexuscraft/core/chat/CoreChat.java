@@ -3,11 +3,14 @@ package net.hexuscraft.core.chat;
 import net.hexuscraft.common.IPermission;
 import net.hexuscraft.common.database.messages.ChatAnnouncementMessage;
 import net.hexuscraft.common.database.messages.ChatSupportMessage;
+import net.hexuscraft.common.database.messages.ChatSupportResponseReceivedMessage;
+import net.hexuscraft.common.database.messages.ChatSupportResponseSentMessage;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
+import net.hexuscraft.core.actionbar.CoreActionBar;
 import net.hexuscraft.core.chat.command.*;
 import net.hexuscraft.core.command.CoreCommand;
 import net.hexuscraft.core.database.CoreDatabase;
@@ -21,7 +24,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -47,11 +49,12 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
 
     public String CHANNEL_ANNOUNCEMENT = "ChatAnnouncement";
     public Set<CommandSender> _receivedTipSet;
-    private CoreCommand _coreCommand;
-    private CoreDatabase _coreDatabase;
-    private CorePermission _corePermission;
-    private CorePortal _corePortal;
-    private boolean _chatMuted = false;
+    boolean _chatMuted = false;
+    CoreCommand _coreCommand;
+    CoreDatabase _coreDatabase;
+    CorePermission _corePermission;
+    CorePortal _corePortal;
+    CoreActionBar _coreActionBar;
 
     public CoreChat(HexusPlugin plugin)
     {
@@ -81,6 +84,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
         _corePermission = (CorePermission) dependencies.get(CorePermission.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
+        _coreActionBar = (CoreActionBar) dependencies.get(CoreActionBar.class);
     }
 
     @Override
@@ -90,7 +94,11 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
         _coreCommand.register(new CommandBroadcast(this));
         _coreCommand.register(new CommandSilence(this));
         _coreCommand.register(new CommandSupport(this, _corePermission, _coreDatabase, _corePortal));
-        _coreCommand.register(new CommandSupportResponse(this, _corePermission));
+        _coreCommand.register(new CommandSupportResponse(this,
+                _corePermission,
+                _coreDatabase,
+                _corePortal,
+                _coreActionBar));
         _coreCommand.register(new CommandHelp(this, _coreCommand));
 
         _coreDatabase._database.registerConsumer(ChatAnnouncementMessage.CHANNEL_NAME, (_, _, rawMessage) ->
@@ -102,11 +110,11 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
                 String senderName;
                 try
                 {
-                    senderName
-                            = Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(parsedMessage._senderUniqueId()))
-                            .getName();
+                    senderName =
+                            Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(parsedMessage._senderUniqueId()))
+                                    .getName();
                 }
-                catch (IOException | NullPointerException ex)
+                catch (NullPointerException ex)
                 {
                     logSevere(ex);
                     return;
@@ -148,22 +156,118 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
                     .getOnlinePlayers()
                     .stream()
                     .filter(player -> player.getUniqueId().equals(messageData._senderUniqueId()) ||
-                            player.hasPermission(PermissionGroup.TRAINEE.name()))
+                            player.hasPermission(PERM.COMMAND_SUPPORT_STAFF.name()))
                     .forEach(player ->
                     {
                         player.sendMessage(C.cPurple +
-                                messageData._serverName() +
+                                messageData._senderServerName() +
                                 " " +
-                                F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(messageData._permissionGroups())) +
+                                F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(messageData._senderPermissionGroups())) +
                                 " " +
-                                messageData._username() +
+                                messageData._senderName() +
                                 C.cPurple +
                                 " " +
                                 messageData._message());
                         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
                     });
         });
+
+        _coreDatabase._database.registerConsumer(ChatSupportResponseSentMessage.CHANNEL_NAME, (_, _, rawMessage) ->
+        {
+            ChatSupportResponseSentMessage parsedMessage = ChatSupportResponseSentMessage.fromString(rawMessage);
+
+            Player target = _hexusPlugin.getServer().getPlayer(parsedMessage._targetUniqueId());
+            if (target == null)
+            {
+                return;
+            }
+
+            PermissionGroup[] targetPermissionGroups = _corePermission._permissionProfiles.containsKey(target) ?
+                    _corePermission._permissionProfiles.get(target)._groups() :
+                    new PermissionGroup[0];
+
+            _hexusPlugin.runAsync(() ->
+            {
+                _coreDatabase._database._jedis.publish(ChatSupportResponseReceivedMessage.CHANNEL_NAME,
+                        new ChatSupportResponseReceivedMessage(parsedMessage._uuid(),
+                                parsedMessage._senderUniqueId(),
+                                parsedMessage._senderName(),
+                                parsedMessage._senderServerName(),
+                                parsedMessage._senderPermissionGroups(),
+                                target.getUniqueId(),
+                                target.getName(),
+                                _corePortal._serverName,
+                                targetPermissionGroups,
+                                parsedMessage._message()).toString());
+            });
+        });
+
+        _coreDatabase._database.registerConsumer(ChatSupportResponseReceivedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
+        {
+            ChatSupportResponseReceivedMessage parsedMessage =
+                    ChatSupportResponseReceivedMessage.fromString(rawMessage);
+            _hexusPlugin.getServer()
+                    .getOnlinePlayers()
+                    .stream()
+                    .filter(player -> player.getUniqueId().equals(parsedMessage._senderUniqueId()) ||
+                            player.getUniqueId().equals(parsedMessage._targetUniqueId()) ||
+                            player.hasPermission(PERM.COMMAND_SUPPORT_STAFF.name()))
+                    .forEach(player ->
+                    {
+                        if (player.getUniqueId().equals(parsedMessage._senderUniqueId()))
+                        {
+                            player.sendMessage(C.cDPurple +
+                                    "-> " +
+                                    C.cPurple +
+                                    parsedMessage._targetServerName() +
+                                    " " +
+                                    F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(parsedMessage._targetPermissionGroups())) +
+                                    " " +
+                                    parsedMessage._targetName() +
+                                    " " +
+                                    C.cPurple +
+                                    parsedMessage._message());
+                        }
+                        else if (player.getUniqueId().equals(parsedMessage._targetUniqueId()))
+                        {
+                            player.sendMessage(C.cDPurple +
+                                    "<- " +
+                                    C.cPurple +
+                                    parsedMessage._senderServerName() +
+                                    " " +
+                                    F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(parsedMessage._senderPermissionGroups())) +
+                                    " " +
+                                    parsedMessage._senderName() +
+                                    " " +
+                                    C.cPurple +
+                                    parsedMessage._message());
+                        }
+                        else
+                        {
+                            player.sendMessage(C.cPurple +
+                                    parsedMessage._senderServerName() +
+                                    " " +
+                                    F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(parsedMessage._senderPermissionGroups())) +
+                                    " " +
+                                    parsedMessage._senderName() +
+                                    C.cDPurple +
+                                    " -> " +
+                                    C.cPurple +
+                                    parsedMessage._targetServerName() +
+                                    " " +
+                                    F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(parsedMessage._targetPermissionGroups())) +
+                                    " " +
+                                    parsedMessage._targetName() +
+                                    " " +
+                                    C.cPurple +
+                                    parsedMessage._message());
+                        }
+
+                        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+                    });
+        });
     }
+
 
     @Override
     public void onDisable()
@@ -187,7 +291,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onAsyncPlayerChat(AsyncPlayerChatEvent event)
+    void onAsyncPlayerChat(AsyncPlayerChatEvent event)
     {
         Player player = event.getPlayer();
 
@@ -210,7 +314,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerQuit(PlayerQuitEvent event)
+    void onPlayerQuit(PlayerQuitEvent event)
     {
         _receivedTipSet.remove(event.getPlayer());
     }

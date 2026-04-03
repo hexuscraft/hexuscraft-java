@@ -11,7 +11,7 @@ public class GameSurvivalGames extends SoloGame
     public int _minPlayers = 1;
     public int _maxPlayers = 1;
 
-    private GameSurvivalGames(ArcadeManager arcadeManager)
+    GameSurvivalGames(ArcadeManager arcadeManager)
     {
         super(GameType.SURVIVAL_GAMES, new GameKit[]{});
     }

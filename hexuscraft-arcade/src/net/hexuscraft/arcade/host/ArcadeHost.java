@@ -25,7 +25,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -41,14 +40,14 @@ public class ArcadeHost extends MiniPlugin<Arcade>
         COMMAND_HOST_VIEW
     }
 
-    private final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5).toMillis();
-    private final AtomicReference<BukkitTask> _hostAbandonedTask;
-    private final AtomicLong _hostLastSeenMillis;
+    final Long MAX_HOST_LAST_SEEN_MILLIS = Duration.ofMinutes(5).toMillis();
+    final AtomicReference<BukkitTask> _hostAbandonedTask;
+    final AtomicLong _hostLastSeenMillis;
     public AtomicReference<OfflinePlayer> _host;
-    private CoreCommand _coreCommand;
-    private CoreDatabase _coreDatabase;
-    private CorePortal _corePortal;
-    private PermissionAttachment _hostPermissionAttachment;
+    CoreCommand _coreCommand;
+    CoreDatabase _coreDatabase;
+    CorePortal _corePortal;
+    PermissionAttachment _hostPermissionAttachment;
 
     public ArcadeHost(Arcade arcade)
     {
@@ -78,14 +77,15 @@ public class ArcadeHost extends MiniPlugin<Arcade>
 
         _hexusPlugin.runAsync(() ->
         {
-            try
+            OfflinePlayer host =
+                    PlayerSearch.offlinePlayerSearch(_corePortal.getServerGroup(_corePortal._serverGroupName)._hostUniqueId);
+            if (host == null)
             {
-                _host.set(PlayerSearch.offlinePlayerSearch(_corePortal.getServerGroup(_corePortal._serverGroupName)._hostUniqueId));
+                return;
             }
-            catch (IOException ex)
-            {
-                logSevere(ex);
-            }
+
+            _host.set(host);
+
 
             // We want to wait a little bit before attempting to teleport the server host so the proxies and
             // notchians have time to update their server cache

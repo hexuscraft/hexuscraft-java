@@ -8,7 +8,7 @@ import java.util.Map;
 public record PortalRestartServerGroupMessage(String _groupName)
 {
 
-    public static String CHANNEL_NAME = "portal.restartGroup";
+    public static String CHANNEL_NAME = "portal.restart.group";
 
     public static PortalRestartServerGroupMessage fromString(String jsonString)
     {

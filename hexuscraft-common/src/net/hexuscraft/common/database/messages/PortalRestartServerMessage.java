@@ -8,7 +8,7 @@ import java.util.Map;
 public record PortalRestartServerMessage(String _serverName)
 {
 
-    public static String CHANNEL_NAME = "portal.restartServer";
+    public static String CHANNEL_NAME = "portal.restart.server";
 
     public static PortalRestartServerMessage fromString(String jsonString)
     {

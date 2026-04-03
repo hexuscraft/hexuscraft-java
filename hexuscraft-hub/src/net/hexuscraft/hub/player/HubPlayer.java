@@ -9,8 +9,7 @@ import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import net.hexuscraft.core.command.CoreCommand;
 import net.hexuscraft.core.item.UtilItem;
-import net.hexuscraft.core.permission.CorePermission;
-import net.hexuscraft.core.player.PlayerTabInfo;
+import net.hexuscraft.core.player.UtilTitleTab;
 import net.hexuscraft.core.portal.CorePortal;
 import net.hexuscraft.hub.Hub;
 import net.hexuscraft.hub.player.command.CommandSpawn;
@@ -31,7 +30,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -46,10 +46,8 @@ public class HubPlayer extends MiniPlugin<Hub>
         COMMAND_SPAWN
     }
 
-    private CoreCommand _pluginCommand;
-    private CorePortal _corePortal;
-    private CorePermission _corePermission;
-    private BukkitTask _actionTextTask;
+    CoreCommand _pluginCommand;
+    CorePortal _corePortal;
 
     public HubPlayer(Hub hub)
     {
@@ -63,35 +61,16 @@ public class HubPlayer extends MiniPlugin<Hub>
     {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
-        _corePermission = (CorePermission) dependencies.get(CorePermission.class);
     }
 
     @Override
     public void onEnable()
     {
         _pluginCommand.register(new CommandSpawn(this));
-        _actionTextTask = _hexusPlugin.getServer()
-                .getScheduler()
-                .runTaskTimer(_hexusPlugin,
-                        () -> _hexusPlugin.getServer()
-                                .getOnlinePlayers()
-                                .forEach(player -> PlayerTabInfo.sendActionText(player,
-                                        C.cYellow + C.fBold + "WWW.HEXUSCRAFT.NET")),
-                        0,
-                        40);
-    }
-
-    @Override
-    public void onDisable()
-    {
-        if (_actionTextTask != null)
-        {
-            _actionTextTask.cancel();
-        }
     }
 
     @EventHandler
-    private void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         event.setJoinMessage(F.fSub("Join", event.getPlayer().getDisplayName()));
 
@@ -111,6 +90,9 @@ public class HubPlayer extends MiniPlugin<Hub>
         player.setExp(0);
         player.setFallDistance(0);
 
+        player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
+
         if (_hexusPlugin._spawn != null)
         {
             player.teleport(_hexusPlugin._spawn);
@@ -118,7 +100,7 @@ public class HubPlayer extends MiniPlugin<Hub>
 
         refreshInventory(player);
 
-        PlayerTabInfo.setHeaderFooter(player, F.fTabHeader(_corePortal._serverName), " ");
+        UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), " ");
 
         player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
     }
@@ -129,25 +111,22 @@ public class HubPlayer extends MiniPlugin<Hub>
         event.setQuitMessage(F.fSub("Quit", event.getPlayer().getDisplayName()));
     }
 
-    private void refreshInventory(Player player)
+    void refreshInventory(Player player)
     {
         PlayerInventory inventory = player.getInventory();
 
-        ItemStack gameCompass = UtilItem.createItem(Material.COMPASS,
-                C.cGreen + C.fBold + "Games",
-                "Click to open the Games Menu");
+        ItemStack gameCompass =
+                UtilItem.createItem(Material.COMPASS, C.cGreen + C.fBold + "Games", "Click to open the Games Menu");
         ItemStack profileSkull = UtilItem.createItemSkull(player.getName(),
                 C.cGreen + C.fBold + player.getName(),
                 "Click to open the Profile Menu");
         ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST,
                 C.cGreen + C.fBold + "Cosmetics",
                 "Click to open the Cosmetics Menu");
-        ItemStack storeEmerald = UtilItem.createItem(Material.EMERALD,
-                C.cGreen + C.fBold + "Store",
-                "Click to open the Store Menu");
-        ItemStack lobbyClock = UtilItem.createItem(Material.WATCH,
-                C.cGreen + C.fBold + "Lobbies",
-                "Click to open the Lobbies Menu");
+        ItemStack storeEmerald =
+                UtilItem.createItem(Material.EMERALD, C.cGreen + C.fBold + "Store", "Click to open the Store Menu");
+        ItemStack lobbyClock =
+                UtilItem.createItem(Material.WATCH, C.cGreen + C.fBold + "Lobbies", "Click to open the Lobbies Menu");
 
         inventory.clear();
         inventory.setItem(0, gameCompass);
@@ -158,7 +137,7 @@ public class HubPlayer extends MiniPlugin<Hub>
         inventory.setHeldItemSlot(0);
     }
 
-    private boolean onItemInteract(Player player, ItemStack itemStack)
+    boolean onItemInteract(Player player, ItemStack itemStack)
     {
         if (!itemStack.hasItemMeta())
         {
@@ -203,7 +182,7 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    private void onInventoryClick(InventoryClickEvent event)
+    void onInventoryClick(InventoryClickEvent event)
     {
         if (!(event.getWhoClicked() instanceof Player player))
         {
@@ -217,7 +196,6 @@ public class HubPlayer extends MiniPlugin<Hub>
         event.setCancelled(true);
 
         Inventory clickedInventory = event.getInventory();
-        logInfo(event.getInventory().getName() + " + " + event.getInventory().getTitle());
 
         if (clickedInventory.equals(player.getInventory()))
         {

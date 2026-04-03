@@ -24,12 +24,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.exceptions.JedisException;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -80,8 +78,8 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
 
             _hexusPlugin.runAsync(() ->
             {
-                Map<String, String> rawData = new HashMap<>(_coreDatabase._database._jedis.hgetAll(ReportQueries.REPORT(
-                        parsedMessage.reportUUID())));
+                Map<String, String> rawData =
+                        new HashMap<>(_coreDatabase._database._jedis.hgetAll(ReportQueries.REPORT(parsedMessage.reportUUID())));
                 rawData.put("reportUUID", parsedMessage.reportUUID().toString());
 
                 ReportData reportData = new ReportData(rawData);
@@ -93,7 +91,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
                     sender = PlayerSearch.offlinePlayerSearch(reportData.senderUUID);
                     assert (sender != null);
                 }
-                catch (IOException | AssertionError ex)
+                catch (AssertionError ex)
                 {
                     logSevere(ex);
                     return;
@@ -104,7 +102,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
                     target = PlayerSearch.offlinePlayerSearch(reportData.targetUUID);
                     assert (target != null);
                 }
-                catch (IOException | AssertionError ex)
+                catch (AssertionError ex)
                 {
                     logSevere(ex);
                     return;
@@ -120,11 +118,14 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
                                     F.fItem(sender.getName()),
                                     " reported ",
                                     F.fItem(target.getName()),
-                                    ":") +
-                                    "\n" +
-                                    F.fStaff("", "Reason: ", F.fItem(reportData.reason._friendlyName)) +
-                                    "\n" +
-                                    F.fStaff("", "Server: ", F.fItem(reportData.server)));
+                                    ":\n",
+                                    F.fStaff("", "Reason: ", F.fItem(reportData.reason._friendlyName)),
+                                    "\n",
+                                    F.fStaff("", "Server: ", F.fItem(reportData.server)),
+                                    "\n",
+                                    F.fStaff("",
+                                            "Message: ",
+                                            F.fItem(!reportData.message.isEmpty() ? reportData.message : "<empty>"))));
                             player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
                         });
             });
@@ -138,40 +139,29 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
         _reportGuis.clear();
     }
 
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event)
-    {
-        _reportGuis.remove(event.getPlayer());
-    }
-
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event)
-    {
-        _reportGuis.remove(event.getPlayer());
-    }
-
-    public void submitReport(Player reporter, OfflinePlayer target, ReportSubmitReason reason)
+    public void submitReport(Player reporter, OfflinePlayer target, String message, ReportSubmitReason reason)
     {
         new ReportData(Map.ofEntries(Map.entry("reportUUID", UUID.randomUUID().toString()),
                 Map.entry("senderUUID", reporter.getUniqueId().toString()),
                 Map.entry("targetUUID", target.getUniqueId().toString()),
+                Map.entry("message", message),
                 Map.entry("reason", reason.name()),
                 Map.entry("active", Boolean.toString(true)),
                 Map.entry("origin", Long.toString(System.currentTimeMillis())),
                 Map.entry("server", _corePortal._serverName))).submit(_coreDatabase._database._jedis);
     }
 
-    public void openReportGui(Player reporter, OfflinePlayer target)
+    public void openReportGui(Player reporter, OfflinePlayer target, String message)
     {
         Inventory inventory = _hexusPlugin.getServer().createInventory(reporter, 3 * 9, "Report - " + target.getName());
 
         ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
                 C.cGreen + C.fBold + target.getName(),
-                target.getUniqueId().toString());
+                target.getUniqueId().toString() + "\n\n" + C.cWhite + message);
 
         ItemStack history = UtilItem.createItem(Material.NAME_TAG,
                 C.cBlue + C.fBold + "Report History",
-                "View the report history of " + F.fItem(target.getName()));
+                "View the report _history of " + F.fItem(target.getName()));
 
         ItemStack chat = UtilItem.createItem(Material.BOOK_AND_QUILL,
                 C.cGreen + C.fBold + "Breaking Chat Rules",
@@ -190,8 +180,10 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
                 "etc.");
         ItemStack misc = UtilItem.createItem(Material.PAPER,
                 C.cGreen + C.fBold + "Other Rule Violation",
-                "User is breaking our rules in another way not listed here",
-                "(We recommend also submitting a support ticket in this scenario)");
+                "",
+                "Alt Account",
+                "Inappropriate Username/Skin",
+                "etc.");
 
         inventory.setItem(4, targetSkull);
         inventory.setItem(10, chat);
@@ -199,19 +191,25 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
         inventory.setItem(14, client);
         inventory.setItem(16, misc);
 
-        if (reporter.hasPermission(PermissionGroup.TRAINEE.name()))
+        if (reporter.hasPermission(PERM.COMMAND_REPORT_HISTORY.name()))
         {
             inventory.setItem(26, history);
         }
 
-        _reportGuis.put(reporter, new ReportGui(inventory, target, chat, gameplay, client, misc, history));
+        _reportGuis.put(reporter, new ReportGui(inventory, target, message, chat, gameplay, client, misc, history));
         reporter.openInventory(inventory);
     }
 
     public void openHistoryGui(Player reporter, OfflinePlayer target)
     {
-        // TODO: Paginated report history
-        reporter.sendMessage(F.fMain(this, "The report history GUI is still work in progress."));
+        // TODO: Paginated report _history
+        reporter.sendMessage(F.fMain(this, "The report _history GUI is still work in progress."));
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event)
+    {
+        _reportGuis.remove(event.getPlayer());
     }
 
     @EventHandler
@@ -227,33 +225,33 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
         {
             return;
         }
-        if (!reportGui.inventory().equals(event.getInventory()))
+        if (!reportGui._inventory().equals(event.getInventory()))
         {
             return;
         }
 
         event.setCancelled(true);
 
-        if (event.getCurrentItem().equals(reportGui.history()))
+        if (event.getCurrentItem().equals(reportGui._history()))
         {
             openHistoryGui(reporter, reportGui._target());
             return;
         }
 
         AtomicReference<ReportSubmitReason> reportReason = new AtomicReference<>();
-        if (event.getCurrentItem().equals(reportGui.chat()))
+        if (event.getCurrentItem().equals(reportGui._chat()))
         {
             reportReason.set(ReportSubmitReason.CHAT);
         }
-        else if (event.getCurrentItem().equals(reportGui.gameplay()))
+        else if (event.getCurrentItem().equals(reportGui._gameplay()))
         {
             reportReason.set(ReportSubmitReason.GAMEPLAY);
         }
-        else if (event.getCurrentItem().equals(reportGui.client()))
+        else if (event.getCurrentItem().equals(reportGui._client()))
         {
             reportReason.set(ReportSubmitReason.CLIENT);
         }
-        else if (event.getCurrentItem().equals(reportGui.misc()))
+        else if (event.getCurrentItem().equals(reportGui._misc()))
         {
             reportReason.set(ReportSubmitReason.MISC);
         }
@@ -266,7 +264,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
         {
             try
             {
-                submitReport(reporter, reportGui._target(), reportReason.get());
+                submitReport(reporter, reportGui._target(), reportGui._message(), reportReason.get());
             }
             catch (JedisException ex)
             {

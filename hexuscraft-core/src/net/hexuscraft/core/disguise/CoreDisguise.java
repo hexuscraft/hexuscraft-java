@@ -18,7 +18,7 @@ public class CoreDisguise extends MiniPlugin<HexusPlugin>
         COMMAND_DISGUISE
     }
 
-    private CoreCommand _coreCommand;
+    CoreCommand _coreCommand;
 
     public CoreDisguise(HexusPlugin plugin)
     {

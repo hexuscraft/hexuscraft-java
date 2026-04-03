@@ -8,7 +8,7 @@ import java.util.Set;
 public class UtilCooldown
 {
 
-    private static final Map<Object, Set<Cooldown>> _cooldownMap = new HashMap<>();
+    static final Map<Object, Set<Cooldown>> _cooldownMap = new HashMap<>();
 
     public static Cooldown getCooldown(Object rawParent, String name)
     {
@@ -29,7 +29,7 @@ public class UtilCooldown
         return null;
     }
 
-    private static void addCooldown(Object rawParent, Cooldown cooldown)
+    static void addCooldown(Object rawParent, Cooldown cooldown)
     {
         Object parent = rawParent == null ? UtilCooldown.class : rawParent;
 

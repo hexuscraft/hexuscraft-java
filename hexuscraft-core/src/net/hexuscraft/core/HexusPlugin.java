@@ -1,5 +1,6 @@
 package net.hexuscraft.core;
 
+import net.hexuscraft.core.actionbar.CoreActionBar;
 import net.hexuscraft.core.anticheat.CoreAntiCheat;
 import net.hexuscraft.core.authentication.CoreAuthentication;
 import net.hexuscraft.core.bossbar.CoreBossBar;
@@ -37,9 +38,8 @@ import java.util.stream.Stream;
 public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Listener
 {
 
-    private final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>>
-            _miniPlugins;
-    private final boolean _isDebug;
+    final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPlugins;
+    final boolean _isDebug;
     public Server _server;
     public BukkitScheduler _scheduler;
     public Logger _logger;
@@ -67,7 +67,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    private boolean getIsDebug()
+    boolean getIsDebug()
     {
         File debugFile = new File("_debug.dat");
         if (debugFile.exists())
@@ -86,6 +86,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
 
     public void requireCorePlugins()
     {
+        require(new CoreActionBar(this));
         require(new CoreAntiCheat(this));
         require(new CoreAuthentication(this));
         require(new CoreBossBar(this));
@@ -165,10 +166,6 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
 
     public void logInfo(String message)
     {
-        if (!_isDebug)
-        {
-            return;
-        }
         _logger.log(Level.INFO, message);
     }
 

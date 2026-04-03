@@ -12,7 +12,7 @@ import java.util.Set;
 public class CommandHub extends BaseCommand<ArcadeManager>
 {
 
-    private final CorePortal _corePortal;
+    final CorePortal _corePortal;
 
     public CommandHub(ArcadeManager arcadeManager, CorePortal corePortal)
     {

@@ -118,7 +118,7 @@ public class CommandGameMode extends BaseCommand<CoreGameMode>
         return List.of();
     }
 
-    private GameMode getGameModeFromToggle(String toggle)
+    GameMode getGameModeFromToggle(String toggle)
     {
         if (Arrays.stream(new String[]{"0", "false"}).toList().contains(toggle.toLowerCase()))
         {

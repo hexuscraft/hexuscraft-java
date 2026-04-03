@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
 public class CommandHostServer extends BaseCommand<CorePortal>
 {
 
-    private final CoreDatabase _coreDatabase;
+    final CoreDatabase _coreDatabase;
 
     public CommandHostServer(CorePortal corePortal, CoreDatabase coreDatabase)
     {

@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -20,8 +21,8 @@ public class CommandReport extends BaseCommand<CoreReport>
     {
         super(coreReport,
                 "report",
-                "<Player>",
-                "Report a player breaking rules.",
+                "<Player> [Message]",
+                "Report a player breaking rules with an optional message.",
                 Set.of(),
                 CoreReport.PERM.COMMAND_REPORT);
     }
@@ -48,7 +49,9 @@ public class CommandReport extends BaseCommand<CoreReport>
             return;
         }
 
-        _miniPlugin.openReportGui(player, offlinePlayer);
+        _miniPlugin.openReportGui(player,
+                offlinePlayer,
+                String.join(" ", Arrays.stream(args).skip(1).toArray(String[]::new)));
     }
 
     @Override
@@ -59,9 +62,8 @@ public class CommandReport extends BaseCommand<CoreReport>
         {
 
             //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                    .getOnlinePlayers()
-                    .stream();
+            Stream<? extends Player> streamedOnlinePlayers =
+                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
             if (sender instanceof Player player)
             {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));

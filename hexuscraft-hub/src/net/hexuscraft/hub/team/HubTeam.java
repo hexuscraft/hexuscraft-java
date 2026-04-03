@@ -20,7 +20,7 @@ import java.util.Map;
 public class HubTeam extends MiniPlugin<Hub>
 {
 
-    private CorePermission _corePermission;
+    CorePermission _corePermission;
 
     public HubTeam(Hub hub)
     {
@@ -34,7 +34,7 @@ public class HubTeam extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    private void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         Player eventPlayer = event.getPlayer();
         Scoreboard eventPlayerScoreboard = eventPlayer.getScoreboard();

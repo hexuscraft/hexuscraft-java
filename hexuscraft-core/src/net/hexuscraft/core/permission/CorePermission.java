@@ -34,8 +34,8 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
     }
 
     public HashMap<Player, PermissionProfile> _permissionProfiles;
-    private CoreCommand _coreCommand;
-    private CoreDatabase _coreDatabase;
+    CoreCommand _coreCommand;
+    CoreDatabase _coreDatabase;
 
     public CorePermission(HexusPlugin plugin)
     {
@@ -83,8 +83,8 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         Set<String> permissionGroupNames;
         try
         {
-            permissionGroupNames
-                    = _coreDatabase._database._jedis.smembers(PermissionQueries.GROUPS(player.getUniqueId()));
+            permissionGroupNames =
+                    _coreDatabase._database._jedis.smembers(PermissionQueries.GROUPS(player.getUniqueId()));
         }
         catch (JedisException ex)
         {
@@ -96,9 +96,8 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
             return;
         }
 
-        Set<PermissionGroup> permissionGroups = new HashSet<>(permissionGroupNames.stream()
-                .map(PermissionGroup::valueOf)
-                .toList());
+        Set<PermissionGroup> permissionGroups =
+                new HashSet<>(permissionGroupNames.stream().map(PermissionGroup::valueOf).toList());
 
         permissionGroups.add(PermissionGroup._PLAYER);
 
@@ -109,7 +108,7 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerQuit(PlayerQuitEvent event)
+    void onPlayerQuit(PlayerQuitEvent event)
     {
         Player player = event.getPlayer();
         clearPermissions(player);
@@ -142,7 +141,7 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         }
     }
 
-    private void clearPermissions(Player player)
+    void clearPermissions(Player player)
     {
         player.setOp(false);
 
@@ -159,7 +158,7 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         attachment.getPermissions().forEach((s, _) -> attachment.unsetPermission(s));
     }
 
-    private void denyBukkitPermissions(PermissionAttachment attachment)
+    void denyBukkitPermissions(PermissionAttachment attachment)
     {
         attachment.setPermission("minecraft.command.me", false);
         attachment.setPermission("minecraft.command.tell", false);
@@ -168,7 +167,7 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         attachment.setPermission("bukkit.command.version", false);
     }
 
-    private void grantPermissions(PermissionAttachment attachment, PermissionGroup group)
+    void grantPermissions(PermissionAttachment attachment, PermissionGroup group)
     {
         attachment.setPermission(group.name(), true);
         group._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(), true));

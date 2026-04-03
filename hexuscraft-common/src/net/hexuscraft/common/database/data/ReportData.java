@@ -16,6 +16,7 @@ public class ReportData
     public UUID reportUUID; // part of the key name
     public UUID senderUUID;
     public UUID targetUUID;
+    public String message;
     public ReportSubmitReason reason;
     public Boolean active;
     public Long origin;
@@ -32,6 +33,7 @@ public class ReportData
         reportUUID = UUID.fromString(rawData.get("reportUUID"));
         senderUUID = UUID.fromString(rawData.get("senderUUID"));
         targetUUID = UUID.fromString(rawData.get("targetUUID"));
+        message = rawData.get("message");
         reason = ReportSubmitReason.valueOf(rawData.get("reason"));
         active = rawData.get("active").equals("true");
         origin = Long.parseLong(rawData.get("origin"));
@@ -57,6 +59,7 @@ public class ReportData
         Map<String, String> map = new HashMap<>();
         map.put("senderUUID", senderUUID.toString());
         map.put("targetUUID", targetUUID.toString());
+        map.put("message", message);
         map.put("reason", reason.name());
         map.put("active", Boolean.toString(active));
         map.put("origin", origin.toString());

@@ -28,9 +28,9 @@ public class CoreAntiCheat extends MiniPlugin<HexusPlugin>
         CHEAT_ALERTS
     }
 
-    private final Map<Player, Map<String, Integer>> _violations;
-    private CorePortal _corePortal;
-    private CorePunish _corePunish;
+    final Map<Player, Map<String, Integer>> _violations;
+    CorePortal _corePortal;
+    CorePunish _corePunish;
 
     public CoreAntiCheat(HexusPlugin plugin)
     {
@@ -61,19 +61,19 @@ public class CoreAntiCheat extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         _violations.put(event.getPlayer(), new HashMap<>());
     }
 
     @EventHandler
-    private void onPlayerQuit(PlayerQuitEvent event)
+    void onPlayerQuit(PlayerQuitEvent event)
     {
         _violations.remove(event.getPlayer());
     }
 
     @EventHandler
-    private void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event)
+    void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event)
     {
         Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.CREATIVE)
@@ -101,7 +101,7 @@ public class CoreAntiCheat extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    private void onEntityDamageByEntity(EntityDamageByEntityEvent event)
+    void onEntityDamageByEntity(EntityDamageByEntityEvent event)
     {
         if (!(event.getDamager() instanceof Player))
         {

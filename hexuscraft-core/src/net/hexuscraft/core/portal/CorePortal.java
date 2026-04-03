@@ -36,7 +36,6 @@ import redis.clients.jedis.exceptions.JedisException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -83,18 +82,18 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     public static int MIN_PORT_PRIVATE_SERVERS = 39900;
     public static int MAX_PORT_PRIVATE_SERVERS = 39999;
     public static int EVENT_SERVER_PORT = 30003;
-    private final Messenger _messenger;
-    private final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
-    private final Set<ServerGroupData> _serverGroupCache;
-    private final Set<ServerData> _serverCache;
+    final Messenger _messenger;
+    final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
+    final Set<ServerGroupData> _serverGroupCache;
+    final Set<ServerData> _serverCache;
     public Set<CommandSender> _networkChannelSpies;
     public long _createdMillis;
     public String _serverName;
     public String _serverGroupName;
-    private CoreCommand _coreCommand;
-    private CoreDatabase _coreDatabase;
-    private BukkitTask _updateServerDataTask;
-    private BukkitTask _updateServerCacheTask;
+    CoreCommand _coreCommand;
+    CoreDatabase _coreDatabase;
+    BukkitTask _updateServerDataTask;
+    BukkitTask _updateServerCacheTask;
 
     public CorePortal(HexusPlugin plugin)
     {
@@ -207,34 +206,12 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
 
                     if (targetName.get() == null)
                     {
-                        try
-                        {
-                            targetName.set(PlayerSearch.offlinePlayerSearch(message._targetUUID).getName());
-                        }
-                        catch (IOException ex)
-                        {
-                            logWarning("IOException while fetching unique id of portal teleport target '" +
-                                    message._targetUUID +
-                                    "': " +
-                                    ex.getMessage());
-                            return;
-                        }
+                        targetName.set(PlayerSearch.offlinePlayerSearch(message._targetUUID).getName());
                     }
 
                     if (senderName.get() == null)
                     {
-                        try
-                        {
-                            senderName.set(PlayerSearch.offlinePlayerSearch(message._senderUUID).getName());
-                        }
-                        catch (IOException ex)
-                        {
-                            logWarning("IOException while fetching unique id of portal teleport sender '" +
-                                    message._senderUUID +
-                                    "': " +
-                                    ex.getMessage());
-                            return;
-                        }
+                        senderName.set(PlayerSearch.offlinePlayerSearch(message._senderUUID).getName());
                     }
 
                     _hexusPlugin.getServer()
@@ -308,11 +285,11 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
 
         Server server = _hexusPlugin.getServer();
 
-        ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
-                server.getPort()).getAddress(),
-                server.getMotd(),
-                server.getOnlinePlayers().size(),
-                server.getMaxPlayers());
+        ServerListPingEvent ping =
+                new ServerListPingEvent(new InetSocketAddress(server.getIp(), server.getPort()).getAddress(),
+                        server.getMotd(),
+                        server.getOnlinePlayers().size(),
+                        server.getMaxPlayers());
         server.getPluginManager().callEvent(ping);
 
         new ServerData(_serverName,
@@ -332,16 +309,15 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     {
         Server server = _hexusPlugin.getServer();
 
-        ServerListPingEvent ping = new ServerListPingEvent(new InetSocketAddress(server.getIp(),
-                server.getPort()).getAddress(),
-                server.getMotd(),
-                server.getOnlinePlayers().size(),
-                server.getMaxPlayers());
+        ServerListPingEvent ping =
+                new ServerListPingEvent(new InetSocketAddress(server.getIp(), server.getPort()).getAddress(),
+                        server.getMotd(),
+                        server.getOnlinePlayers().size(),
+                        server.getMaxPlayers());
         server.getPluginManager().callEvent(ping);
 
-        OptionalDouble
-                averageTps
-                = OptionalDouble.of(20); //Arrays.stream(MinecraftServer.getServer().recentTps).average();
+        OptionalDouble averageTps =
+                OptionalDouble.of(20); //Arrays.stream(MinecraftServer.getServer().recentTps).average();
 
         new ServerData(_serverName,
                 server.getIp(),
@@ -558,7 +534,7 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    private void onPlayerLogin(PlayerLoginEvent event)
+    void onPlayerLogin(PlayerLoginEvent event)
     {
         if (!event.getResult().equals(PlayerLoginEvent.Result.KICK_FULL))
         {
@@ -572,7 +548,7 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     }
 
     @EventHandler
-    private void onPlayerQuit(PlayerQuitEvent event)
+    void onPlayerQuit(PlayerQuitEvent event)
     {
         _networkChannelSpies.remove(event.getPlayer());
     }

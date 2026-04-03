@@ -21,7 +21,7 @@ import java.util.Map;
 public class ArcadeLobby extends MiniPlugin<Arcade>
 {
 
-    private ArcadeManager _arcadeManager;
+    ArcadeManager _arcadeManager;
 
     public ArcadeLobby(Arcade arcade)
     {

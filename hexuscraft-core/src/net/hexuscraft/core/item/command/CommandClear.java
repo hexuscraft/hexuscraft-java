@@ -20,7 +20,7 @@ public class CommandClear extends BaseCommand<CoreItem>
         super(coreItem,
                 "clear",
                 "[Players]",
-                "Clear the inventory of targets.",
+                "Clear the _inventory of targets.",
                 Set.of("clearinventory"),
                 CoreItem.PERM.COMMAND_CLEAR);
     }

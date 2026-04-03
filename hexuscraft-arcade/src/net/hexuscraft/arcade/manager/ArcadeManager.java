@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,17 +36,17 @@ public class ArcadeManager extends MiniPlugin<Arcade>
         COMMAND_HUB
     }
 
-    private final Map<GameType, Class<? extends Game>> GAME_CLASS_MAP = Map.ofEntries(Map.entry(GameType.SURVIVAL_GAMES,
-                    GameSurvivalGames.class),
-            Map.entry(GameType.SURVIVAL_GAMES_2, GameSurvivalGamesDuo.class),
-            Map.entry(GameType.THE_BRIDGES, GameTheBridges.class));
-    private final Random _nextBestGameRandom = new Random();
-    private final AtomicReference<BukkitTask> _gameTickTask = new AtomicReference<>();
+    final Map<GameType, Class<? extends Game>> GAME_CLASS_MAP =
+            Map.ofEntries(Map.entry(GameType.SURVIVAL_GAMES, GameSurvivalGames.class),
+                    Map.entry(GameType.SURVIVAL_GAMES_2, GameSurvivalGamesDuo.class),
+                    Map.entry(GameType.THE_BRIDGES, GameTheBridges.class));
+    final Random _nextBestGameRandom = new Random();
+    final AtomicReference<BukkitTask> _gameTickTask = new AtomicReference<>();
     public AtomicReference<Game> _game = new AtomicReference<>();
     public AtomicReference<GameMap> _gameMap = new AtomicReference<>();
-    private CoreCommand _coreCommand;
-    private CoreDatabase _coreDatabase;
-    private CorePortal _corePortal;
+    CoreCommand _coreCommand;
+    CoreDatabase _coreDatabase;
+    CorePortal _corePortal;
 
     public ArcadeManager(Arcade arcade)
     {
@@ -84,7 +85,7 @@ public class ArcadeManager extends MiniPlugin<Arcade>
         oldTask.cancel();
     }
 
-    private void tick()
+    void tick()
     {
         if (_game.get() == null)
         {
@@ -103,8 +104,8 @@ public class ArcadeManager extends MiniPlugin<Arcade>
 
             try
             {
-                Constructor<? extends Game> constructor = GAME_CLASS_MAP.get(nextBestGametype)
-                        .getDeclaredConstructor(ArcadeManager.class);
+                Constructor<? extends Game> constructor =
+                        GAME_CLASS_MAP.get(nextBestGametype).getDeclaredConstructor(ArcadeManager.class);
                 constructor.setAccessible(true);
                 _game.set(constructor.newInstance(this));
             }
@@ -120,10 +121,7 @@ public class ArcadeManager extends MiniPlugin<Arcade>
 
         switch (getGameState())
         {
-            case null ->
-            {
-                setGameState(GameState.LOADING_MAP);
-            }
+            case null -> setGameState(GameState.LOADING_MAP);
             case LOADING_MAP ->
             {
                 if (_gameMap.get() != null)
@@ -134,26 +132,11 @@ public class ArcadeManager extends MiniPlugin<Arcade>
 
                 setGameState(GameState.WAITING_FOR_PLAYERS);
             }
-            case WAITING_FOR_PLAYERS ->
-            {
-                setGameState(GameState.START_COUNTDOWN);
-            }
-            case START_COUNTDOWN ->
-            {
-                setGameState(GameState.STARTING);
-            }
-            case STARTING ->
-            {
-                setGameState(GameState.IN_PROGRESS);
-            }
-            case IN_PROGRESS ->
-            {
-                setGameState(GameState.ENDING);
-            }
-            case ENDING ->
-            {
-                setGameState(GameState.LOADING_MAP);
-            }
+            case WAITING_FOR_PLAYERS -> setGameState(GameState.START_COUNTDOWN);
+            case START_COUNTDOWN -> setGameState(GameState.STARTING);
+            case STARTING -> setGameState(GameState.IN_PROGRESS);
+            case IN_PROGRESS -> setGameState(GameState.ENDING);
+            case ENDING -> setGameState(GameState.LOADING_MAP);
         }
     }
 
@@ -163,7 +146,7 @@ public class ArcadeManager extends MiniPlugin<Arcade>
         return game == null ? null : game._state.get();
     }
 
-    private boolean setGameState(GameState newState)
+    boolean setGameState(GameState newState)
     {
         GameStateChangedEvent event = new GameStateChangedEvent(_game.get()._state.get(), newState);
         _hexusPlugin.getServer().getPluginManager().callEvent(event);
@@ -175,12 +158,12 @@ public class ArcadeManager extends MiniPlugin<Arcade>
         return true;
     }
 
-    private GameType selectNextBestGame()
+    GameType selectNextBestGame()
     {
         GameType[] games = _corePortal.getServerGroup(_corePortal._serverGroupName)._games;
         if (games.length == 0)
         {
-            return null;
+            return Arrays.stream(GameType.values()).findAny().orElse(null);
         }
         if (games.length == 1)
         {

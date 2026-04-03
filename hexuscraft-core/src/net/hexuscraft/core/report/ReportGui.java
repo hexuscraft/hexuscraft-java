@@ -4,12 +4,13 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public record ReportGui(Inventory inventory,
+public record ReportGui(Inventory _inventory,
                         OfflinePlayer _target,
-                        ItemStack chat,
-                        ItemStack gameplay,
-                        ItemStack client,
-                        ItemStack misc,
-                        ItemStack history)
+                        String _message,
+                        ItemStack _chat,
+                        ItemStack _gameplay,
+                        ItemStack _client,
+                        ItemStack _misc,
+                        ItemStack _history)
 {
 }

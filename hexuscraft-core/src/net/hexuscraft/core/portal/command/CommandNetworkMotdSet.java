@@ -14,7 +14,7 @@ import java.util.Set;
 public class CommandNetworkMotdSet extends BaseCommand<CorePortal>
 {
 
-    private final CoreDatabase _coreDatabase;
+    final CoreDatabase _coreDatabase;
 
     CommandNetworkMotdSet(CorePortal corePortal, CoreDatabase coreDatabase)
     {

@@ -10,13 +10,13 @@ import java.util.concurrent.TimeUnit;
 public class F
 {
 
-    private static final double MILLIS_PER_SECOND = 1000;
-    private static final double MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60;
-    private static final double MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
-    private static final double MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
+    static final double MILLIS_PER_SECOND = 1000;
+    static final double MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60;
+    static final double MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
+    static final double MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
 
 
-    private static String f(String prefix, String... text)
+    static String f(String prefix, String... text)
     {
         return prefix + ">" + C.cGray + " " + String.join(C.cGray, text);
     }

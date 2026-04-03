@@ -19,24 +19,26 @@ import net.hexuscraft.core.portal.CorePortal;
 import net.hexuscraft.core.punish.command.CommandPunish;
 import net.hexuscraft.core.punish.command.CommandPunishHistory;
 import net.hexuscraft.core.punish.command.CommandRules;
-import org.bukkit.*;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.exceptions.JedisException;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -56,11 +58,12 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         PUNISH_ALERTS,
     }
 
-    private static final Logger log = LoggerFactory.getLogger(CorePunish.class);
-    private final long ONE_DAY_MILLIS = 86400000;
-    private CoreCommand _pluginCommand;
-    private CoreDatabase _coreDatabase;
-    private CorePortal _corePortal;
+    static final Logger log = LoggerFactory.getLogger(CorePunish.class);
+    final long ONE_DAY_MILLIS = 86400000;
+    CoreCommand _pluginCommand;
+    CoreDatabase _coreDatabase;
+    CorePortal _corePortal;
+    Map<HumanEntity, PunishGui> _punishGuis;
 
     public CorePunish(HexusPlugin plugin)
     {
@@ -85,6 +88,8 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_PUNISH_SEVERITY_3);
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_PUNISH_SEVERITY_4);
+
+        _punishGuis = new HashMap<>();
     }
 
     @Override
@@ -106,9 +111,9 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                     target = PlayerSearch.offlinePlayerSearch(punishData._targetUUID);
                     assert (target != null);
                 }
-                catch (IOException | AssertionError ex)
+                catch (AssertionError ex)
                 {
-                    logWarning("Could not fetch offline player for punish target '" +
+                    logWarning("Could not fetch offline player for punish _target '" +
                             punishData._targetUUID +
                             "': " +
                             ex.getMessage());
@@ -127,7 +132,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                         staffName.set(Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(punishData._staffUUID))
                                 .getName());
                     }
-                    catch (IOException | NullPointerException ex)
+                    catch (NullPointerException ex)
                     {
                         logSevere(ex);
                         return;
@@ -185,7 +190,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    private void onConnect(AsyncPlayerPreLoginEvent event)
+    void onConnect(AsyncPlayerPreLoginEvent event)
     {
         if (!event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.ALLOWED))
         {
@@ -204,7 +209,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most
             // recent ban.
             // If there are multiple bans matching this and were also applied at the EXACT same time (??), fate
-            // decides the displayed message.
+            // decides the displayed _message.
 
             Set<PunishData> activePunishments = new HashSet<>();
 
@@ -212,9 +217,9 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             {
                 try
                 {
-                    Map<String, String> rawData = new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(
-                            punishmentUniqueId)));
-                    rawData.put("id", punishmentUniqueId.toString());
+                    Map<String, String> rawData =
+                            new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
+                    rawData.put("uuid", punishmentUniqueId.toString());
 
                     PunishData punishData = new PunishData(rawData);
                     if (!punishData._active)
@@ -306,7 +311,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             String reason,
             Consumer<PunishData> callback)
     {
-        PunishData punishData = new PunishData(Map.ofEntries(Map.entry("id", UUID.randomUUID().toString()),
+        PunishData punishData = new PunishData(Map.ofEntries(Map.entry("uuid", UUID.randomUUID().toString()),
                 Map.entry("type", punishType.name()),
                 Map.entry("active", "true"),
                 Map.entry("origin", Long.toString(System.currentTimeMillis())),
@@ -325,224 +330,6 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         });
     }
 
-    @EventHandler
-    private void onInventoryClick(InventoryClickEvent event)
-    {
-        if (!(event.getWhoClicked() instanceof Player staff))
-        {
-            return;
-        }
-
-        Inventory inventory = event.getInventory();
-        String inventoryName = inventory.getName();
-
-        if (inventory.getName().contains("Punish "))
-        {
-            event.setCancelled(true);
-
-            ItemStack currentItem = event.getCurrentItem();
-            if (currentItem == null)
-            {
-                return;
-            }
-            if (!currentItem.hasItemMeta())
-            {
-                return;
-            }
-
-            ItemMeta itemMeta = currentItem.getItemMeta();
-            if (!itemMeta.hasDisplayName())
-            {
-                return;
-            }
-
-            List<String> skullLore = inventory.getItem(4).getItemMeta().getLore();
-
-            OfflinePlayer target;
-            try
-            {
-                target = PlayerSearch.offlinePlayerSearch(UUID.fromString(ChatColor.stripColor(skullLore.getFirst())),
-                        staff);
-                assert (target != null);
-            }
-            catch (IOException | AssertionError ex)
-            {
-                logSevere(ex);
-                staff.sendMessage(F.fMain(this,
-                        F.fError("There was an error while fetching your punishment target. Please try again later or" +
-                                " " +
-                                "contact an administrator if this issue persists.")));
-                return;
-            }
-
-            AtomicReference<PunishType> punishType = new AtomicReference<>();
-            AtomicLong punishLengthMillis = new AtomicLong(-1);
-            switch (ChatColor.stripColor(itemMeta.getDisplayName()))
-            {
-                case "Punishment History" ->
-                {
-                    openHistoryGui(staff, target);
-                    return;
-                }
-                case "Friendly Warning" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.WARNING);
-                }
-                case "Chat Severity 1" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.MUTE);
-                    punishLengthMillis.set(ONE_DAY_MILLIS);
-                }
-                case "Gameplay Severity 1" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.BAN);
-                    punishLengthMillis.set(ONE_DAY_MILLIS);
-                }
-                case "Client Severity 1" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.BAN);
-                    punishLengthMillis.set(ONE_DAY_MILLIS * 7);
-                }
-                case "Chat Severity 2" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.MUTE);
-                    punishLengthMillis.set(ONE_DAY_MILLIS * 3);
-                }
-                case "Gameplay Severity 2" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.BAN);
-                    punishLengthMillis.set(ONE_DAY_MILLIS * 3);
-                }
-                case "Client Severity 2" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.BAN);
-                    punishLengthMillis.set(ONE_DAY_MILLIS * 14);
-                }
-                case "Chat Severity 3" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.MUTE);
-                    punishLengthMillis.set(ONE_DAY_MILLIS * 5);
-                }
-                case "Gameplay Severity 3" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.BAN);
-                    punishLengthMillis.set(ONE_DAY_MILLIS * 5);
-                }
-                case "Client Severity 3" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.BAN);
-                    punishLengthMillis.set(ONE_DAY_MILLIS * 28);
-                }
-                case "Permanent Mute" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.MUTE);
-                }
-                case "Permanent Ban" ->
-                {
-                    if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
-                    {
-                        return;
-                    }
-                    punishType.set(PunishType.BAN);
-                }
-            }
-
-            if (punishType.get() == null)
-            {
-                return;
-            }
-
-            punishAsync(target.getUniqueId(),
-                    staff.getUniqueId(),
-                    punishType.get(),
-                    punishLengthMillis.get(),
-                    ChatColor.stripColor(skullLore.get(2)));
-            staff.closeInventory();
-        }
-        else if (inventoryName.contains("Punishment History "))
-        {
-            event.setCancelled(true);
-
-            ItemStack currentItem = event.getCurrentItem();
-            if (currentItem == null)
-            {
-                return;
-            }
-            if (!currentItem.hasItemMeta())
-            {
-                return;
-            }
-
-            ItemMeta itemMeta = currentItem.getItemMeta();
-            if (!itemMeta.hasDisplayName())
-            {
-                return;
-            }
-
-            List<String> skullLore = inventory.getItem(4).getItemMeta().getLore();
-
-            OfflinePlayer target;
-            try
-            {
-                target = PlayerSearch.offlinePlayerSearch(UUID.fromString(ChatColor.stripColor(skullLore.getFirst())),
-                        staff);
-                assert (target != null);
-            }
-            catch (IOException | AssertionError ex)
-            {
-                logSevere(ex);
-                staff.sendMessage(F.fMain(this,
-                        F.fError("There was an error while fetching your punishment target. Please try again later or" +
-                                " " +
-                                "contact an administrator if this issue persists.")));
-            }
-        }
-    }
-
     public void openPunishGui(Player staff, OfflinePlayer target, String reason)
     {
         Inventory inventory = _hexusPlugin.getServer().createInventory(staff, 6 * 9, "Punish - " + target.getName());
@@ -555,7 +342,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
 
         ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG,
                 C.cBlue + C.fBold + "Punishment History",
-                "View the punishment history of " + F.fItem(target.getName()));
+                "View the punishment _history of " + F.fItem(target.getName()));
 
         ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
         ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME,
@@ -628,13 +415,13 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         inventory.setItem(12, gameplayHeader);
         inventory.setItem(14, clientHeader);
         inventory.setItem(16, miscHeader);
+        inventory.setItem(25, miscWarn);
 
         if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
         {
             inventory.setItem(19, chat1);
             inventory.setItem(21, gameplay1);
             inventory.setItem(23, client1);
-            inventory.setItem(25, miscWarn);
         }
 
         if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
@@ -662,6 +449,23 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             inventory.setItem(53, viewHistory);
         }
 
+        _punishGuis.put(staff,
+                new PunishGui(inventory,
+                        target,
+                        reason,
+                        chat1,
+                        chat2,
+                        chat3,
+                        gameplay1,
+                        gameplay2,
+                        gameplay3,
+                        client1,
+                        client2,
+                        client3,
+                        miscWarn,
+                        miscMute,
+                        miscBan,
+                        viewHistory));
         staff.openInventory(inventory);
     }
 
@@ -675,11 +479,11 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                 C.cGreen + C.fBold + target.getName(),
                 target.getUniqueId().toString(),
                 "",
-                C.cWhite + "Viewing punishment history");
+                C.cWhite + "Viewing punishment _history");
 
         //        ItemStack openPunishGui = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Apply
         //        Punishment",
-        //                "Open the punishment menu for " + F.fItem(target.getName()));
+        //                "Open the punishment menu for " + F.fItem(_target.getName()));
         //
         //        if (viewerCanPunish) gui.setItem(53, openPunishGui);
 
@@ -687,6 +491,195 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
 
 
         viewer.openInventory(gui);
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event)
+    {
+        _punishGuis.remove(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event)
+    {
+        if (!(event.getWhoClicked() instanceof Player staff))
+        {
+            return;
+        }
+
+        PunishGui punishGui = _punishGuis.get(staff);
+        if (punishGui != null && punishGui._inventory().equals(event.getInventory()))
+        {
+            event.setCancelled(true);
+
+            if (event.getCurrentItem().equals(punishGui._viewHistory()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_HISTORY.name()))
+                {
+                    return;
+                }
+                openHistoryGui(staff, punishGui._target());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._warning()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.WARNING,
+                        -1,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._chatSev1()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.MUTE,
+                        ONE_DAY_MILLIS,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._gameplaySev1()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.BAN,
+                        ONE_DAY_MILLIS,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._clientSev1()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.BAN,
+                        ONE_DAY_MILLIS * 7,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._chatSev2()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.MUTE,
+                        ONE_DAY_MILLIS * 3,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._gameplaySev2()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.BAN,
+                        ONE_DAY_MILLIS * 3,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._clientSev2()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.BAN,
+                        ONE_DAY_MILLIS * 14,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._chatSev3()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.MUTE,
+                        ONE_DAY_MILLIS * 5,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._gameplaySev3()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.BAN,
+                        ONE_DAY_MILLIS * 5,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._clientSev3()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.MUTE,
+                        ONE_DAY_MILLIS * 28,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._permanentMute()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.MUTE,
+                        -1,
+                        punishGui._reason());
+                return;
+            }
+            else if (event.getCurrentItem().equals(punishGui._permanentBan()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
+                {
+                    return;
+                }
+                punishAsync(punishGui._target().getUniqueId(),
+                        staff.getUniqueId(),
+                        PunishType.BAN,
+                        -1,
+                        punishGui._reason());
+                return;
+            }
+
+            staff.closeInventory();
+        }
     }
 
 }

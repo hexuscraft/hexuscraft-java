@@ -19,7 +19,7 @@ public class CoreTeleport extends MiniPlugin<HexusPlugin>
         COMMAND_TELEPORT_OTHERS
     }
 
-    private CoreCommand _pluginCommand;
+    CoreCommand _pluginCommand;
 
     public CoreTeleport(HexusPlugin plugin)
     {

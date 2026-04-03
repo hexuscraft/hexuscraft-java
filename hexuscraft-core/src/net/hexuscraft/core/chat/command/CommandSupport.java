@@ -1,7 +1,9 @@
 package net.hexuscraft.core.chat.command;
 
 import net.hexuscraft.common.database.messages.ChatSupportMessage;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
+import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.chat.CoreChat;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.CoreDatabase;
@@ -16,9 +18,9 @@ import java.util.Set;
 public class CommandSupport extends BaseCommand<CoreChat>
 {
 
-    private final CorePortal _corePortal;
-    private final CorePermission _corePermission;
-    private final CoreDatabase _coreDatabase;
+    final CorePortal _corePortal;
+    final CorePermission _corePermission;
+    final CoreDatabase _coreDatabase;
 
     public CommandSupport(CoreChat coreChat,
             CorePermission corePermission,
@@ -45,16 +47,10 @@ public class CommandSupport extends BaseCommand<CoreChat>
             return;
         }
 
-        if (!(sender instanceof Player player))
+        if (!_miniPlugin._receivedTipSet.contains(sender))
         {
-            sender.sendMessage(F.fMain(this, F.fError("Only players can execute this command.")));
-            return;
-        }
-
-        if (!_miniPlugin._receivedTipSet.contains(player))
-        {
-            _miniPlugin._receivedTipSet.add(player);
-            player.sendMessage(F.fMain(this,
+            _miniPlugin._receivedTipSet.add(sender);
+            sender.sendMessage(F.fMain(this,
                     "You should receive a reply shortly if a staff member is available. You can also report " +
                             "rule-breakers with ",
                     F.fItem("/report"),
@@ -66,21 +62,21 @@ public class CommandSupport extends BaseCommand<CoreChat>
             try
             {
                 _coreDatabase._database._jedis.publish(ChatSupportMessage.CHANNEL_NAME,
-                        new ChatSupportMessage(player.getUniqueId(),
-                                player.getName(),
-                                _corePermission._permissionProfiles.get(player)._groups(),
+                        new ChatSupportMessage(sender instanceof Player player ?
+                                player.getUniqueId() :
+                                UtilUniqueId.EMPTY_UUID,
+                                sender.getName(),
                                 _corePortal._serverName,
+                                sender instanceof Player player ?
+                                        _corePermission._permissionProfiles.get(player)._groups() :
+                                        new PermissionGroup[]{PermissionGroup._CONSOLE},
                                 String.join(" ", args)).toString());
             }
             catch (JedisException ex)
             {
                 sender.sendMessage(F.fMain(this,
                         F.fError("An error occurred while sending your support message. Maybe try again later?")));
-
-                _miniPlugin.logWarning("JedisException while player '" +
-                        sender.getName() +
-                        "' sending support message: " +
-                        ex.getMessage());
+                _miniPlugin.logSevere(ex);
             }
         });
     }

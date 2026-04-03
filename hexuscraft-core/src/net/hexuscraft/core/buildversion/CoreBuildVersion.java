@@ -18,7 +18,7 @@ public class CoreBuildVersion extends MiniPlugin<HexusPlugin>
         COMMAND_BUILDVERSION
     }
 
-    private CoreCommand _pluginCommand;
+    CoreCommand _pluginCommand;
 
     public CoreBuildVersion(HexusPlugin plugin)
     {

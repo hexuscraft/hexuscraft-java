@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 public class CommandRankRemove extends BaseCommand<CorePermission>
 {
 
-    private final CoreDatabase _coreDatabase;
+    final CoreDatabase _coreDatabase;
 
     CommandRankRemove(CorePermission corePermission, CoreDatabase coreDatabase)
     {
@@ -95,9 +95,8 @@ public class CommandRankRemove extends BaseCommand<CorePermission>
             case 1 ->
             {
                 //noinspection ReassignedVariable
-                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                        .getOnlinePlayers()
-                        .stream();
+                Stream<? extends Player> streamedOnlinePlayers =
+                        _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
                 if (sender instanceof Player player)
                 {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));

@@ -14,7 +14,7 @@ import java.util.Set;
 public class CommandNetworkMotdView extends BaseCommand<CorePortal>
 {
 
-    private final CoreDatabase _coreDatabase;
+    final CoreDatabase _coreDatabase;
 
     CommandNetworkMotdView(CorePortal corePortal, CoreDatabase coreDatabase)
     {

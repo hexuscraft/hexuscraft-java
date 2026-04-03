@@ -12,10 +12,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -35,11 +32,11 @@ public class PlayerSearch
         for (Player target : onlinePlayers)
         {
             String targetName = target.getDisplayName();
-            if (targetName.equals(searchName))
+            if (targetName.equalsIgnoreCase(searchName))
             {
                 return new Player[]{target};
             }
-            if (!targetName.contains(searchName))
+            if (!targetName.toLowerCase().contains(searchName.toLowerCase()))
             {
                 continue;
             }
@@ -120,7 +117,7 @@ public class PlayerSearch
         return targetOfflinePlayer;
     }
 
-    public static OfflinePlayer offlinePlayerSearch(UUID uniqueId) throws IOException
+    public static OfflinePlayer offlinePlayerSearch(UUID uniqueId)
     {
         if (uniqueId.equals(UtilUniqueId.EMPTY_UUID))
         {
@@ -133,10 +130,16 @@ public class PlayerSearch
             return offlinePlayer;
         }
 
-        return offlinePlayerSearch(fetchMojangSession(uniqueId)._name());
+        MojangSession mojangSession = fetchMojangSession(uniqueId);
+        if (mojangSession == null)
+        {
+            return null;
+        }
+
+        return offlinePlayerSearch(mojangSession._name());
     }
 
-    public static OfflinePlayer offlinePlayerSearch(UUID uniqueId, CommandSender sender) throws IOException
+    public static OfflinePlayer offlinePlayerSearch(UUID uniqueId, CommandSender sender)
     {
         OfflinePlayer targetOfflinePlayer = offlinePlayerSearch(uniqueId);
         if (targetOfflinePlayer == null)
@@ -146,7 +149,7 @@ public class PlayerSearch
         return targetOfflinePlayer;
     }
 
-    public static MojangSession fetchMojangSession(UUID uuid) throws IOException
+    public static MojangSession fetchMojangSession(UUID uuid)
     {
         URL url;
         try
@@ -154,41 +157,48 @@ public class PlayerSearch
             url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" +
                     uuid.toString().replaceAll("-", "")).toURL();
         }
-        catch (URISyntaxException e)
+        catch (URISyntaxException | MalformedURLException ex)
         {
-            throw new RuntimeException(e);
+            throw new RuntimeException(ex);
         }
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setInstanceFollowRedirects(false);
-
-        String content;
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream())))
+        try
         {
-            content = in.lines().collect(Collectors.joining());
-        }
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setInstanceFollowRedirects(false);
 
-        JSONObject jsonObject = new JSONObject(content);
-        if (connection.getResponseCode() != 200)
+            String content;
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream())))
+            {
+                content = in.lines().collect(Collectors.joining());
+            }
+
+            JSONObject jsonObject = new JSONObject(content);
+            if (connection.getResponseCode() != 200)
+            {
+                throw new IOException(jsonObject.getString("errorMessage"));
+            }
+
+            JSONArray propertiesArray = jsonObject.getJSONArray("properties");
+            return new MojangSession(UUID.fromString(new StringBuilder(jsonObject.getString("id")).insert(20, '-')
+                    .insert(16, '-')
+                    .insert(12, '-')
+                    .insert(8, '-')
+                    .toString()),
+                    jsonObject.getString("name"),
+                    IntStream.range(0, propertiesArray.length())
+                            .mapToObj(propertiesArray::getJSONObject)
+                            .collect(Collectors.toMap(obj -> obj.getString("name"),
+                                    obj -> obj.getString("value"),
+                                    (_, replacement) -> replacement,
+                                    HashMap::new)));
+        }
+        catch (IOException ex)
         {
-            throw new IOException(jsonObject.getString("errorMessage"));
+            return null;
         }
-
-        JSONArray propertiesArray = jsonObject.getJSONArray("properties");
-        return new MojangSession(UUID.fromString(new StringBuilder(jsonObject.getString("id")).insert(20, '-')
-                .insert(16, '-')
-                .insert(12, '-')
-                .insert(8, '-')
-                .toString()),
-                jsonObject.getString("name"),
-                IntStream.range(0, propertiesArray.length())
-                        .mapToObj(propertiesArray::getJSONObject)
-                        .collect(Collectors.toMap(obj -> obj.getString("name"),
-                                obj -> obj.getString("value"),
-                                (_, replacement) -> replacement,
-                                HashMap::new)));
     }
 
 }

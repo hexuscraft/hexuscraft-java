@@ -45,19 +45,17 @@ import java.util.stream.Collectors;
 public class Proxy
 {
 
-    private final String MOTD_PREFIX = String.join("\n",
-            "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8]§r",
-            " §f§l▶§r ");
+    final String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8]§r", " §f§l▶§r ");
 
-    //    private String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8 & 26.1]§r",
+    //    String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8 & 26.1]§r",
     //            " §f§l▶§r ");
 
-    private final Database _database;
-    private final ProxyServer _server;
-    private final Logger _logger;
-    private final AtomicReference<String> _motd;
-    private final AtomicInteger _playerCount;
-    private final AtomicInteger _capacityCount;
+    final Database _database;
+    final ProxyServer _server;
+    final Logger _logger;
+    final AtomicReference<String> _motd;
+    final AtomicInteger _playerCount;
+    final AtomicInteger _capacityCount;
 
     @Inject
     public Proxy(ProxyServer server, Logger logger)
@@ -89,14 +87,14 @@ public class Proxy
 
         _database.registerConsumer(PunishPunishmentAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
-            PunishPunishmentAppliedMessage punishPunishmentAppliedMessage = PunishPunishmentAppliedMessage.fromString(
-                    rawMessage);
+            PunishPunishmentAppliedMessage punishPunishmentAppliedMessage =
+                    PunishPunishmentAppliedMessage.fromString(rawMessage);
             Optional<Player> optionalPlayer = _server.getPlayer(punishPunishmentAppliedMessage._punishData._targetUUID);
             optionalPlayer.ifPresent(player -> _server.getScheduler().buildTask(this, () ->
             {
-                Map<String, String> rawData = new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(
-                        punishPunishmentAppliedMessage._punishData._uuid)));
-                rawData.put("id", punishPunishmentAppliedMessage._punishData._uuid.toString());
+                Map<String, String> rawData =
+                        new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(punishPunishmentAppliedMessage._punishData._uuid)));
+                rawData.put("uuid", punishPunishmentAppliedMessage._punishData._uuid.toString());
                 PunishData punishData = new PunishData(rawData);
                 if (punishData._type != PunishType.BAN)
                 {
@@ -107,14 +105,14 @@ public class Proxy
         });
     }
 
-    private void updateMOTD()
+    void updateMOTD()
     {
         UnifiedJedis jedis = _database._jedis;
         _motd.set(MOTD_PREFIX + ServerQueries.getMotd(jedis));
 
     }
 
-    private void updateServers()
+    void updateServers()
     {
         List<ServerInfo> allServers = new ArrayList<>();
         List<String> fallbackServers = new ArrayList<>();
@@ -128,8 +126,8 @@ public class Proxy
                 return;
             }
 
-            ServerInfo serverInfo = new ServerInfo(serverData._name,
-                    new InetSocketAddress(serverData._address, serverData._port));
+            ServerInfo serverInfo =
+                    new ServerInfo(serverData._name, new InetSocketAddress(serverData._address, serverData._port));
             allServers.add(serverInfo);
 
             if (serverData._group.equals("Lobby"))
@@ -155,7 +153,7 @@ public class Proxy
     }
 
     @Subscribe
-    private void onProxyQuery(ProxyQueryEvent event)
+    void onProxyQuery(ProxyQueryEvent event)
     {
         QueryResponse.Builder builder = QueryResponse.builder();
         builder.players("§r",
@@ -174,7 +172,7 @@ public class Proxy
     }
 
     @Subscribe
-    private void onProxyPing(ProxyPingEvent event)
+    void onProxyPing(ProxyPingEvent event)
     {
         ServerPing.Builder builder = ServerPing.builder();
 
@@ -203,7 +201,7 @@ public class Proxy
     }
 
     @Subscribe
-    private void onLogin(LoginEvent event)
+    void onLogin(LoginEvent event)
     {
         try
         {
@@ -225,9 +223,9 @@ public class Proxy
             {
                 try
                 {
-                    Map<String, String> rawData = new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(
-                            punishmentUniqueId)));
-                    rawData.put("id", punishmentUniqueId.toString());
+                    Map<String, String> rawData =
+                            new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
+                    rawData.put("uuid", punishmentUniqueId.toString());
 
                     PunishData punishData = new PunishData(rawData);
                     if (!punishData._active)
@@ -311,7 +309,7 @@ public class Proxy
     }
 
     @Subscribe
-    private void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event)
+    void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event)
     {
         Player player = event.getPlayer();
 

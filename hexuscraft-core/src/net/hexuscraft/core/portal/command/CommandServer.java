@@ -16,7 +16,7 @@ import java.util.Set;
 public class CommandServer extends BaseCommand<CorePortal>
 {
 
-    private final CoreDatabase _coreDatabase;
+    final CoreDatabase _coreDatabase;
 
     public CommandServer(CorePortal corePortal, CoreDatabase coreDatabase)
     {

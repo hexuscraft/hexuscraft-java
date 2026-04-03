@@ -38,13 +38,13 @@ public class HubNews extends MiniPlugin<Hub>
         COMMAND_NEWS_SET_MESSAGE,
     }
 
-    private CoreBossBar _coreBossBar;
-    private CoreCommand _coreCommand;
-    private CoreDatabase _coreDatabase;
-    private Map<Player, BossBar> _bossBars;
-    private List<NewsData> _newsDatas;
-    private List<NewsData> _activeNews;
-    private AtomicInteger _activeNewsIndex;
+    CoreBossBar _coreBossBar;
+    CoreCommand _coreCommand;
+    CoreDatabase _coreDatabase;
+    Map<Player, BossBar> _bossBars;
+    List<NewsData> _newsDatas;
+    List<NewsData> _activeNews;
+    AtomicInteger _activeNewsIndex;
 
     public HubNews(Hub hub)
     {
@@ -122,14 +122,14 @@ public class HubNews extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    private void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
         _bossBars.put(player, _coreBossBar.registerBossBar(new BossBar(player, 0, "<news loading>")));
     }
 
     @EventHandler
-    private void onPlayerQuit(PlayerQuitEvent event)
+    void onPlayerQuit(PlayerQuitEvent event)
     {
         Player player = event.getPlayer();
         if (!_bossBars.containsKey(player))

@@ -13,7 +13,7 @@ public class CommandParse extends BaseCommand<BuildParse>
 {
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final Integer MINIMUM_RADIUS = 1;
+    final Integer MINIMUM_RADIUS = 1;
 
     public CommandParse(BuildParse parse)
     {
@@ -54,7 +54,7 @@ public class CommandParse extends BaseCommand<BuildParse>
         }
     }
 
-    private void runLogic(CommandSender sender, String[] args)
+    void runLogic(CommandSender sender, String[] args)
             throws ExInvalidRadius, ExInvalidSender, ExInvalidWorld, ExRadiusTooSmall
     {
         if (!(sender instanceof Player player))
@@ -86,19 +86,19 @@ public class CommandParse extends BaseCommand<BuildParse>
         _miniPlugin.parse(world, radius);
     }
 
-    private static class ExInvalidSender extends Exception
+    static class ExInvalidSender extends Exception
     {
     }
 
-    private static class ExInvalidRadius extends Exception
+    static class ExInvalidRadius extends Exception
     {
     }
 
-    private static class ExInvalidWorld extends Exception
+    static class ExInvalidWorld extends Exception
     {
     }
 
-    private static class ExRadiusTooSmall extends Exception
+    static class ExRadiusTooSmall extends Exception
     {
         public Integer _minimumRadius;
 

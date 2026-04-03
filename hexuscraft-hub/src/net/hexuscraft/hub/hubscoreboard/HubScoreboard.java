@@ -22,9 +22,9 @@ import java.util.*;
 public class HubScoreboard extends MiniPlugin<Hub>
 {
 
-    private final Map<Player, BukkitTask> _sidebarUpdateTasks;
-    private CorePortal _corePortal;
-    private CorePermission _corePermission;
+    final Map<Player, BukkitTask> _sidebarUpdateTasks;
+    CorePortal _corePortal;
+    CorePermission _corePermission;
 
     public HubScoreboard(Hub hub)
     {
@@ -58,7 +58,7 @@ public class HubScoreboard extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    private void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
         Scoreboard scoreboard = player.getScoreboard(); // Player's scoreboard is set by core MiniPluginScoreboard
@@ -84,7 +84,7 @@ public class HubScoreboard extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    private void onPlayerQuit(PlayerQuitEvent event)
+    void onPlayerQuit(PlayerQuitEvent event)
     {
         Player player = event.getPlayer();
         if (!_sidebarUpdateTasks.containsKey(player))
@@ -96,7 +96,7 @@ public class HubScoreboard extends MiniPlugin<Hub>
         _sidebarUpdateTasks.remove(player);
     }
 
-    private String[] generateSidebarLines(Player player)
+    String[] generateSidebarLines(Player player)
     {
         return new String[]{C.cAqua + C.fBold + "Server",
                 _corePortal._serverName,

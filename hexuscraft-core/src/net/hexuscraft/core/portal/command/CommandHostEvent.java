@@ -18,7 +18,7 @@ import java.util.Set;
 public class CommandHostEvent extends BaseCommand<CorePortal>
 {
 
-    private final CoreDatabase _coreDatabase;
+    final CoreDatabase _coreDatabase;
 
     public CommandHostEvent(CorePortal corePortal, CoreDatabase coreDatabase)
     {

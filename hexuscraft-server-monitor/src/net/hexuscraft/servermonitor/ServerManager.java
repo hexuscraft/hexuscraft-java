@@ -17,9 +17,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ServerManager
 {
 
-    private final ServerMonitor _monitor;
+    final ServerMonitor _monitor;
 
-    private final String _path;
+    final String _path;
 
     ServerManager(ServerMonitor serverMonitor, String path)
     {
@@ -182,9 +182,8 @@ public class ServerManager
 
         try
         {
-            Process process = new ProcessBuilder(_path + "/scripts/killServer.cmd",
-                    serverName,
-                    serverGroupName).start();
+            Process process =
+                    new ProcessBuilder(_path + "/scripts/killServer.cmd", serverName, serverGroupName).start();
             boolean finished = process.waitFor(10, TimeUnit.SECONDS);
 
             if (!finished)

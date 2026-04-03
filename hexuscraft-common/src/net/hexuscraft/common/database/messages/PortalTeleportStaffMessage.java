@@ -8,7 +8,7 @@ import java.util.UUID;
 public class PortalTeleportStaffMessage extends BaseMessage
 {
 
-    public static String CHANNEL_NAME = "portal.teleportStaff";
+    public static String CHANNEL_NAME = "portal.teleport.staff";
 
     public UUID _targetUUID;
     public String _serverName;

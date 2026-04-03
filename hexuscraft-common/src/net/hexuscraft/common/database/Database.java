@@ -18,7 +18,7 @@ public class Database
 {
 
     public static String KEY_DELIMITER = ":";
-    private final Map<String, Map<PubSubConsumer, JedisPubSub>> _consumers;
+    final Map<String, Map<PubSubConsumer, JedisPubSub>> _consumers;
     public UnifiedJedis _jedis;
 
     // TODO::::::::: https://redis.io/docs/latest/develop/clients/jedis/produsage/
@@ -115,7 +115,7 @@ public class Database
         return String.join(KEY_DELIMITER, args);
     }
 
-    private UnifiedJedis buildUnifiedJedis(String host, int port, String username, String password, String clientName)
+    UnifiedJedis buildUnifiedJedis(String host, int port, String username, String password, String clientName)
     {
         HostAndPort hostAndPort = new HostAndPort(host, port);
 
@@ -179,6 +179,11 @@ public class Database
             }
             _consumers.remove(pattern);
         });
+    }
+
+    public boolean isConsumerRegistered(PubSubConsumer consumer)
+    {
+        return _consumers.values().stream().anyMatch(map -> map.containsKey(consumer));
     }
 
     public void unregisterConsumers()

@@ -50,7 +50,7 @@ public class CommandGive extends BaseCommand<CoreItem>
         String[] materialNames = args[1].split(",");
         if (materialNames.length > 36)
         {
-            // There are only 36 slots in a player inventory! (9 * 4)
+            // There are only 36 slots in a player _inventory! (9 * 4)
             sender.sendMessage(F.fMain(this, F.fError("Cannot give more than 36 materials.")));
             return;
         }
@@ -80,7 +80,7 @@ public class CommandGive extends BaseCommand<CoreItem>
 
         if (materialNames.length * amount.get() > 2304)
         {
-            // A player can only carry up to 2304 items in their inventory. (64 * 9 * 4)
+            // A player can only carry up to 2304 items in their _inventory. (64 * 9 * 4)
             sender.sendMessage(F.fMain(this, F.fError("Cannot give more than 2304 items.")));
             return;
         }
@@ -131,9 +131,8 @@ public class CommandGive extends BaseCommand<CoreItem>
             String materialName = argSplitted.length > 0 ? argSplitted[0] : null;
             AtomicReference<Byte> data = new AtomicReference<>((byte) 0);
 
-            Material[] targetMaterials = ItemSearch.itemSearch(materialName,
-                    sender,
-                    materials -> materials.length != 1);
+            Material[] targetMaterials =
+                    ItemSearch.itemSearch(materialName, sender, materials -> materials.length != 1);
             if (targetMaterials.length != 1)
             {
                 continue;
@@ -189,9 +188,8 @@ public class CommandGive extends BaseCommand<CoreItem>
             case 1 ->
             {
                 //noinspection ReassignedVariable
-                Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer()
-                        .getOnlinePlayers()
-                        .stream();
+                Stream<? extends Player> streamedOnlinePlayers =
+                        _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
                 if (sender instanceof Player player)
                 {
                     streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));

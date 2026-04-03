@@ -13,7 +13,7 @@ public enum GameType
     CAKE_WARS_2("Cake Wars Duo"),
     ;
 
-    public String _name;
+    public final String _name;
 
     GameType(String name)
     {

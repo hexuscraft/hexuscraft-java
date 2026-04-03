@@ -9,7 +9,7 @@ import java.util.UUID;
 public class PunishPunishmentAppliedMessage
 {
 
-    public static String CHANNEL_NAME = "punish.punishmentApplied";
+    public static String CHANNEL_NAME = "punish.applied";
 
     public PunishData _punishData;
 

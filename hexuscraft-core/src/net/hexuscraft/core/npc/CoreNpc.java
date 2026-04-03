@@ -41,7 +41,7 @@ public class CoreNpc extends MiniPlugin<HexusPlugin>
         COMMAND_ENTITY_REFRESH
     }
 
-    private CoreCommand _pluginCommand;
+    CoreCommand _pluginCommand;
 
     public CoreNpc(HexusPlugin plugin)
     {
