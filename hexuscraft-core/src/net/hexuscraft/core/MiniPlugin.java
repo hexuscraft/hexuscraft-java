@@ -44,7 +44,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         {
             logWarning("Took " + (System.currentTimeMillis() - start) + "ms to enable. (>2s)");
         }
-        logInfo("String.valueOf " + (System.currentTimeMillis() - start) + "ms.");
+        logInfo("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public void disable()
