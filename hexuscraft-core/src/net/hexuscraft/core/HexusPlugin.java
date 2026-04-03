@@ -12,6 +12,7 @@ import net.hexuscraft.core.database.CoreDatabase;
 import net.hexuscraft.core.disguise.CoreDisguise;
 import net.hexuscraft.core.featureflags.CoreFeatureFlags;
 import net.hexuscraft.core.gamemode.CoreGameMode;
+import net.hexuscraft.core.gui.CoreGui;
 import net.hexuscraft.core.item.CoreItem;
 import net.hexuscraft.core.npc.CoreNpc;
 import net.hexuscraft.core.party.CoreParty;
@@ -98,6 +99,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         require(new CoreDisguise(this));
         require(new CoreFeatureFlags(this));
         require(new CoreGameMode(this));
+        require(new CoreGui(this));
         require(new CoreItem(this));
         require(new CoreNpc(this));
         require(new CoreParty(this));
