@@ -161,7 +161,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
 
         ItemStack history = UtilItem.createItem(Material.NAME_TAG,
                 C.cBlue + C.fBold + "Report History",
-                "View the report _history of " + F.fItem(target.getName()));
+                "View the report history of " + F.fItem(target.getName()));
 
         ItemStack chat = UtilItem.createItem(Material.BOOK_AND_QUILL,
                 C.cGreen + C.fBold + "Breaking Chat Rules",
@@ -203,7 +203,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
     public void openHistoryGui(Player reporter, OfflinePlayer target)
     {
         // TODO: Paginated report _history
-        reporter.sendMessage(F.fMain(this, "The report _history GUI is still work in progress."));
+        reporter.sendMessage(F.fMain(this, "The report history GUI is still work in progress."));
     }
 
     @EventHandler

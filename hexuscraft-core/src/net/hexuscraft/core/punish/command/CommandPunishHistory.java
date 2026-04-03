@@ -21,7 +21,7 @@ public class CommandPunishHistory extends BaseCommand<CorePunish>
         super(corePunish,
                 "punishmenthistory",
                 "[Player]",
-                "View the _history of punishments.",
+                "View the history of punishments.",
                 Set.of("punishhistory", "xh"),
                 CorePunish.PERM.COMMAND_PUNISH_HISTORY);
     }
@@ -31,7 +31,7 @@ public class CommandPunishHistory extends BaseCommand<CorePunish>
     {
         if (!(sender instanceof Player senderPlayer))
         {
-            sender.sendMessage(F.fMain(this, F.fError("Only players can view punishment _history.")));
+            sender.sendMessage(F.fMain(this, F.fError("Only players can view punishment history.")));
             return;
         }
 

@@ -342,7 +342,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
 
         ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG,
                 C.cBlue + C.fBold + "Punishment History",
-                "View the punishment _history of " + F.fItem(target.getName()));
+                "View the punishment history of " + F.fItem(target.getName()));
 
         ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
         ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME,
@@ -479,7 +479,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                 C.cGreen + C.fBold + target.getName(),
                 target.getUniqueId().toString(),
                 "",
-                C.cWhite + "Viewing punishment _history");
+                C.cWhite + "Viewing punishment history");
 
         //        ItemStack openPunishGui = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Apply
         //        Punishment",
