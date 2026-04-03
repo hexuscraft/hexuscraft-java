@@ -2,12 +2,13 @@ package net.hexuscraft.core.authentication;
 
 import net.hexuscraft.common.IPermission;
 import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-public class CoreAuthentication extends MiniPlugin<HexusPlugin>
+public class CoreTwoFactorAuthentication extends MiniPlugin<HexusPlugin>
 {
 
     public enum PERM implements IPermission
@@ -15,9 +16,9 @@ public class CoreAuthentication extends MiniPlugin<HexusPlugin>
         REQUIRE_AUTHENTICATION
     }
 
-    public CoreAuthentication(HexusPlugin plugin)
+    public CoreTwoFactorAuthentication(HexusPlugin plugin)
     {
-        super(plugin, "Authentication");
+        super(plugin, "2FA");
 
         PermissionGroup.TRAINEE._permissions.add(PERM.REQUIRE_AUTHENTICATION);
     }
@@ -25,10 +26,11 @@ public class CoreAuthentication extends MiniPlugin<HexusPlugin>
     @EventHandler
     void onPlayerJoin(PlayerJoinEvent event)
     {
+        // TODO: 2fa
         if (!event.getPlayer().hasPermission(PERM.REQUIRE_AUTHENTICATION.name()))
         {
+            event.getPlayer().sendMessage(F.fMain(this, "Authenticated!"));
         }
-        // TOOD: 2fa
     }
 
 }

@@ -99,7 +99,6 @@ public class PlayerSearch
     @Deprecated(since = "2026-01-17")
     public static OfflinePlayer offlinePlayerSearch(String searchName)
     {
-        //noinspection deprecation
         return Bukkit.getOfflinePlayer(searchName);
     }
 

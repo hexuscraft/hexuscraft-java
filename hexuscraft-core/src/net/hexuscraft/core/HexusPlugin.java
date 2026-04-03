@@ -2,7 +2,7 @@ package net.hexuscraft.core;
 
 import net.hexuscraft.core.actionbar.CoreActionBar;
 import net.hexuscraft.core.anticheat.CoreAntiCheat;
-import net.hexuscraft.core.authentication.CoreAuthentication;
+import net.hexuscraft.core.authentication.CoreTwoFactorAuthentication;
 import net.hexuscraft.core.bossbar.CoreBossBar;
 import net.hexuscraft.core.buildversion.CoreBuildVersion;
 import net.hexuscraft.core.chat.CoreChat;
@@ -88,7 +88,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     {
         require(new CoreActionBar(this));
         require(new CoreAntiCheat(this));
-        require(new CoreAuthentication(this));
+        require(new CoreTwoFactorAuthentication(this));
         require(new CoreBossBar(this));
         require(new CoreBuildVersion(this));
         require(new CoreChat(this));

@@ -404,10 +404,7 @@ public class CoreNpc extends MiniPlugin<HexusPlugin>
 
         List<MetadataValue> metadata = entity.getMetadata("NPC");
         player.sendMessage(F.fMain(this, "Metadata:"));
-        metadata.forEach(metadataValue ->
-        {
-            player.sendMessage(F.fMain("", metadataValue.value().toString()));
-        });
+        metadata.forEach(metadataValue -> player.sendMessage(F.fMain("", metadataValue.value().toString())));
     }
 
 }

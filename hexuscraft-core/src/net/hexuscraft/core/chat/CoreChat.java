@@ -124,15 +124,11 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
                         .getOnlinePlayers()
                         .stream()
                         .filter(player -> player.hasPermission(PermissionGroup.ADMINISTRATOR.name()))
-                        .forEach(player ->
-                        {
-
-                            player.sendMessage(F.fStaff(this,
-                                    F.fItem(senderName),
-                                    " sent an announcement to ",
-                                    F.fPermissionGroup(parsedMessage._permissionGroup()),
-                                    "."));
-                        });
+                        .forEach(player -> player.sendMessage(F.fStaff(this,
+                                F.fItem(senderName),
+                                " sent an announcement to ",
+                                F.fPermissionGroup(parsedMessage._permissionGroup()),
+                                ".")));
             });
 
             _hexusPlugin.getServer()
@@ -186,20 +182,17 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
                     _corePermission._permissionProfiles.get(target)._groups() :
                     new PermissionGroup[0];
 
-            _hexusPlugin.runAsync(() ->
-            {
-                _coreDatabase._database._jedis.publish(ChatSupportResponseReceivedMessage.CHANNEL_NAME,
-                        new ChatSupportResponseReceivedMessage(parsedMessage._uuid(),
-                                parsedMessage._senderUniqueId(),
-                                parsedMessage._senderName(),
-                                parsedMessage._senderServerName(),
-                                parsedMessage._senderPermissionGroups(),
-                                target.getUniqueId(),
-                                target.getName(),
-                                _corePortal._serverName,
-                                targetPermissionGroups,
-                                parsedMessage._message()).toString());
-            });
+            _hexusPlugin.runAsync(() -> _coreDatabase._database._jedis.publish(ChatSupportResponseReceivedMessage.CHANNEL_NAME,
+                    new ChatSupportResponseReceivedMessage(parsedMessage._uuid(),
+                            parsedMessage._senderUniqueId(),
+                            parsedMessage._senderName(),
+                            parsedMessage._senderServerName(),
+                            parsedMessage._senderPermissionGroups(),
+                            target.getUniqueId(),
+                            target.getName(),
+                            _corePortal._serverName,
+                            targetPermissionGroups,
+                            parsedMessage._message()).toString()));
         });
 
         _coreDatabase._database.registerConsumer(ChatSupportResponseReceivedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
