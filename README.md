@@ -4,22 +4,6 @@ Plugins for the Hexuscraft server on Minecraft Java Edition
 
 > **hexuscraft-server-monitor** scripts: https://github.com/hexuscraft/hexuscraft-scripts
 
-## Building
-
-### Dependencies
-
-You must provide your own CraftBukkit jar. The easiest way to do this is compiling CraftBukkit using BuildTools
-available at https://www.spigotmc.org/wiki/buildtools/
-
-Make sure to specify compilation of CraftBukkit 1.8.8
-
-Remember to add the file as a library to your local project. You can usually do this in your IDE but I prefer using a
-maven goal command:
-
-```
-mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -DartifactId=craftbukkit -Dversion=1.8.8-R0.1-SNAPSHOT -Dpackaging=jar -DgeneratePom=true
-```
-
 ## Enums
 
 ### CheatSeverity
