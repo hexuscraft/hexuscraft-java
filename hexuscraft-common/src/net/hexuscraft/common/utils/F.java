@@ -125,15 +125,6 @@ public class F
         return fMain("Permissions", "You have insufficient permissions to do this.");
     }
 
-    public static String fInsufficientPermissions(String... messages)
-    {
-        if (messages.length > 0)
-        {
-            return fMain("Permissions", "You have insufficient permissions to ", F.fItem(F.fItem(messages)), ".");
-        }
-        return fInsufficientPermissions();
-    }
-
 
     public static String fBoolean(boolean toggle)
     {
