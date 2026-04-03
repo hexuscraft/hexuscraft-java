@@ -2,11 +2,6 @@ package net.hexuscraft.webtranslator;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
-import net.hexuscraft.core.buildversion.CoreBuildVersion;
-import net.hexuscraft.core.command.CoreCommand;
-import net.hexuscraft.core.database.CoreDatabase;
-import net.hexuscraft.core.permission.CorePermission;
-import net.hexuscraft.core.portal.CorePortal;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -21,13 +16,7 @@ public class WebTranslator extends HexusPlugin
 
     public WebTranslator()
     {
-        super(false);
-
-        require(new CoreBuildVersion(this));
-        require(new CoreCommand(this));
-        require(new CoreDatabase(this));
-        require(new CorePermission(this));
-        require(new CorePortal(this));
+        super();
     }
 
     @EventHandler
