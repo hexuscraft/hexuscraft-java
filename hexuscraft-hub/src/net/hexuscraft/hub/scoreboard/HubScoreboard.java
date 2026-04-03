@@ -1,4 +1,4 @@
-package net.hexuscraft.hub.hubscoreboard;
+package net.hexuscraft.hub.scoreboard;
 
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.C;
@@ -61,7 +61,7 @@ public class HubScoreboard extends MiniPlugin<Hub>
     void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
-        Scoreboard scoreboard = player.getScoreboard(); // Player's scoreboard is set by core MiniPluginScoreboard
+        Scoreboard scoreboard = player.getScoreboard(); // Player's scoreboard is set by CoreScoreboard
 
         Objective sidebarObjective = scoreboard.registerNewObjective("§6§lHEXUSCRAFT", "dummy");
         sidebarObjective.setDisplaySlot(DisplaySlot.SIDEBAR);

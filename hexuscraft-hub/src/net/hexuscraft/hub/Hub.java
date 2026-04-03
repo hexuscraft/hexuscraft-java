@@ -2,9 +2,9 @@ package net.hexuscraft.hub;
 
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.hub.doublejump.HubDoubleJump;
-import net.hexuscraft.hub.hubscoreboard.HubScoreboard;
 import net.hexuscraft.hub.news.HubNews;
 import net.hexuscraft.hub.player.HubPlayer;
+import net.hexuscraft.hub.scoreboard.HubScoreboard;
 import net.hexuscraft.hub.team.HubTeam;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
