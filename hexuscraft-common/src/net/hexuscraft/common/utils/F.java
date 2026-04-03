@@ -286,17 +286,4 @@ public class F
         return "\n     " + C.fBold + "Hexuscraft Network" + C.fReset + "     \n     " + C.cGreen + server + "     \n";
     }
 
-    public static String fWelcomeMessage(String playerName)
-    {
-        return String.join("§r\n",
-                " ",
-                " §b§lWelcome " + playerName + " to Hexuscraft!",
-                "  §7A mini-game server inspired by the legacy Mineplex Network",
-                "   §7Type §e/help§7 to see available commands ",
-                " ",
-                "  §7We are open source! Contribute to help improve our server",
-                "   §e§nhttps://github.com/hexuscraft",
-                " ");
-    }
-
 }
