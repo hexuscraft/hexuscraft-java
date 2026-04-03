@@ -13,14 +13,14 @@ public record ReportSubmittedMessage(UUID reportUUID)
     public static ReportSubmittedMessage fromString(String jsonString)
     {
         JSONObject jsonObject = new JSONObject(jsonString);
-        return new ReportSubmittedMessage(UUID.fromString(jsonObject.getString("reportUUID")));
+        return new ReportSubmittedMessage(UUID.fromString(jsonObject.getString("uuid")));
     }
 
     @Override
     @SuppressWarnings("NullableProblems")
     public String toString()
     {
-        return new JSONObject(Map.ofEntries(Map.entry("reportUUID", reportUUID.toString()))).toString();
+        return new JSONObject(Map.ofEntries(Map.entry("uuid", reportUUID.toString()))).toString();
     }
 
 }

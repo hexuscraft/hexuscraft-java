@@ -80,7 +80,6 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
             {
                 Map<String, String> rawData =
                         new HashMap<>(_coreDatabase._database._jedis.hgetAll(ReportQueries.REPORT(parsedMessage.reportUUID())));
-                rawData.put("reportUUID", parsedMessage.reportUUID().toString());
 
                 ReportData reportData = new ReportData(rawData);
 
@@ -141,7 +140,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
 
     public void submitReport(Player reporter, OfflinePlayer target, String message, ReportSubmitReason reason)
     {
-        new ReportData(Map.ofEntries(Map.entry("reportUUID", UUID.randomUUID().toString()),
+        new ReportData(Map.ofEntries(Map.entry("uuid", UUID.randomUUID().toString()),
                 Map.entry("senderUUID", reporter.getUniqueId().toString()),
                 Map.entry("targetUUID", target.getUniqueId().toString()),
                 Map.entry("message", message),
@@ -202,7 +201,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
 
     public void openHistoryGui(Player reporter, OfflinePlayer target)
     {
-        // TODO: Paginated report _history
+        // TODO: Paginated report history
         reporter.sendMessage(F.fMain(this, "The report history GUI is still work in progress."));
     }
 

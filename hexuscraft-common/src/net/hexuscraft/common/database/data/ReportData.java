@@ -30,7 +30,7 @@ public class ReportData
 
     public ReportData(Map<String, String> rawData)
     {
-        reportUUID = UUID.fromString(rawData.get("reportUUID"));
+        reportUUID = UUID.fromString(rawData.get("uuid"));
         senderUUID = UUID.fromString(rawData.get("senderUUID"));
         targetUUID = UUID.fromString(rawData.get("targetUUID"));
         message = rawData.get("message");
