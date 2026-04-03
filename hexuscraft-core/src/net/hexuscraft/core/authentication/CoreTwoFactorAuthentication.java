@@ -29,8 +29,9 @@ public class CoreTwoFactorAuthentication extends MiniPlugin<HexusPlugin>
         // TODO: 2fa
         if (!event.getPlayer().hasPermission(PERM.REQUIRE_AUTHENTICATION.name()))
         {
-            event.getPlayer().sendMessage(F.fMain(this, "Authenticated!"));
+            return;
         }
+        event.getPlayer().sendMessage(F.fMain(this, "Authenticated!"));
     }
 
 }
