@@ -69,7 +69,7 @@ public class Proxy
     }
 
     @Subscribe
-    public void onProxyInitialize(ProxyInitializeEvent event)
+    void onProxyInitialize(ProxyInitializeEvent event)
     {
         CommandManager commandManager = _server.getCommandManager();
         commandManager.getAliases().forEach(commandManager::unregister);
@@ -138,12 +138,12 @@ public class Proxy
             capacityCount.addAndGet(serverData._capacity);
         });
 
-        _server.getConfiguration().getAttemptConnectionOrder().clear();
         _server.getAllServers().stream().map(RegisteredServer::getServerInfo).forEach(_server::unregisterServer);
 
         allServers.forEach(_server::registerServer);
 
         List<String> fallbackServerConfig = _server.getConfiguration().getAttemptConnectionOrder();
+        fallbackServerConfig.clear();
         fallbackServerConfig.addAll(fallbackServers);
         fallbackServerConfig.sort(String::compareTo);
 
@@ -317,7 +317,7 @@ public class Proxy
             event.setInitialServer(null);
             player.disconnect(Component.text()
                     .color(NamedTextColor.RED)
-                    .append(Component.text("Your manager client is too outdated."))
+                    .append(Component.text("Your game client is too outdated."))
                     .append(Component.text("\nPlease use Minecraft 1.8 or newer to join Hexuscraft.",
                             NamedTextColor.GRAY))
                     .append(Component.text("\n\nwww.hexuscraft.net", NamedTextColor.YELLOW))

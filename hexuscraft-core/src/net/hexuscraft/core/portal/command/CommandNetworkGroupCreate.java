@@ -307,7 +307,7 @@ public class CommandNetworkGroupCreate extends BaseCommand<CorePortal>
             catch (JedisException ex)
             {
                 sender.sendMessage(F.fMain(this,
-                        F.fError("JedisException while updating server group punish. Please  try again later or " +
+                        F.fError("JedisException while updating server group data. Please  try again later or " +
                                 "contact an administrator if this issue persists.")));
                 _miniPlugin._hexusPlugin.logWarning("JedisException while '" +
                         sender.getName() +

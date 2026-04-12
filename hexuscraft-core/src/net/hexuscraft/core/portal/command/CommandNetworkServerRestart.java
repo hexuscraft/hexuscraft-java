@@ -52,7 +52,7 @@ public class CommandNetworkServerRestart extends BaseCommand<CorePortal>
             catch (JedisException ex)
             {
                 sender.sendMessage(F.fMain(this,
-                        F.fError("JedisException while fetching server punish. Please try again later or contact an " +
+                        F.fError("JedisException while fetching server data. Please try again later or contact an " +
                                 "administrator if this issue persists.")));
                 return;
             }

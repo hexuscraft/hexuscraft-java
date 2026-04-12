@@ -89,7 +89,7 @@ public class ServerManager
         }
         catch (JedisException ex)
         {
-            _monitor.log("JedisException while creating template server punish for startServer(" +
+            _monitor.log("JedisException while creating template server data for startServer(" +
                     serverGroupData._name +
                     ": " +
                     reason +
