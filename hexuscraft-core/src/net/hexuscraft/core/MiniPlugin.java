@@ -21,7 +21,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public void load(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap)
+    public final void load(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap)
     {
         long start = System.currentTimeMillis();
         logInfo("Loading...");
@@ -31,7 +31,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         logInfo("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public void enable()
+    public final void enable()
     {
         long start = System.currentTimeMillis();
         logInfo("Enabling...");
@@ -47,7 +47,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         logInfo("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public void disable()
+    public final void disable()
     {
         long start = System.currentTimeMillis();
         logInfo("Disabling...");
