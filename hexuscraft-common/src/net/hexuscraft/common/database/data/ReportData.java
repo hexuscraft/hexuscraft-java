@@ -13,7 +13,7 @@ import java.util.UUID;
 public class ReportData
 {
 
-    public UUID reportUUID; // part of the key name
+    public UUID uuid;
     public UUID senderUUID;
     public UUID targetUUID;
     public String message;
@@ -30,7 +30,7 @@ public class ReportData
 
     public ReportData(Map<String, String> rawData)
     {
-        reportUUID = UUID.fromString(rawData.get("uuid"));
+        uuid = UUID.fromString(rawData.get("uuid"));
         senderUUID = UUID.fromString(rawData.get("senderUUID"));
         targetUUID = UUID.fromString(rawData.get("targetUUID"));
         message = rawData.get("message");
@@ -57,6 +57,7 @@ public class ReportData
     public Map<String, String> toMap()
     {
         Map<String, String> map = new HashMap<>();
+        map.put("uuid", uuid.toString());
         map.put("senderUUID", senderUUID.toString());
         map.put("targetUUID", targetUUID.toString());
         map.put("message", message);
@@ -78,10 +79,10 @@ public class ReportData
 
     public void submit(UnifiedJedis jedis)
     {
-        jedis.hset(ReportQueries.REPORT(reportUUID), toMap());
-        jedis.sadd(ReportQueries.LIST_SUBMITTED(senderUUID), reportUUID.toString());
-        jedis.sadd(ReportQueries.LIST_RECEIVED(targetUUID), reportUUID.toString());
-        jedis.publish(ReportSubmittedMessage.CHANNEL_NAME, new ReportSubmittedMessage(reportUUID).toString());
+        jedis.hset(ReportQueries.REPORT(uuid), toMap());
+        jedis.sadd(ReportQueries.LIST_SUBMITTED(senderUUID), uuid.toString());
+        jedis.sadd(ReportQueries.LIST_RECEIVED(targetUUID), uuid.toString());
+        jedis.publish(ReportSubmittedMessage.CHANNEL_NAME, new ReportSubmittedMessage(uuid).toString());
     }
 
 }
