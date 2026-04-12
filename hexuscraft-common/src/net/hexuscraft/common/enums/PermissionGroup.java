@@ -71,13 +71,13 @@ public enum PermissionGroup
 
     ;
 
-    public String _prefix;
-    public String _color;
-    public int _weight;
-    public String _description;
-    public PermissionGroup[] _inherits;
+    public final String _prefix;
+    public final String _color;
+    public final int _weight;
+    public final String _description;
+    public final PermissionGroup[] _inherits;
 
-    public List<IPermission> _permissions;
+    public final List<IPermission> _permissions;
 
     PermissionGroup(String prefix, String color, int weight, String description, PermissionGroup... inherits)
     {
@@ -134,6 +134,22 @@ public enum PermissionGroup
         {
             return fallback;
         }
+    }
+
+    public boolean hasPermission(IPermission permission)
+    {
+        if (_permissions.contains(permission))
+        {
+            return true;
+        }
+        for (PermissionGroup group1 : _inherits)
+        {
+            if (group1.hasPermission(permission))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
