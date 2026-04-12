@@ -36,6 +36,11 @@ public class F
         return f(C.cDAqua + prefix.toString(), text);
     }
 
+    public static String fActionBar(Object prefix, String... text)
+    {
+        return C.cBlue + prefix.toString() + ">" + C.cWhite + " " + String.join(C.cWhite, text);
+    }
+
 
     public static String fItem(String... args)
     {
@@ -275,6 +280,11 @@ public class F
     public static String fTabHeader(String server)
     {
         return "\n     " + C.fBold + "Hexuscraft Network" + C.fReset + "     \n     " + C.cGreen + server + "     \n";
+    }
+
+    public static String fTabFooter()
+    {
+        return " ";
     }
 
     public static String fWelcomeMessage(String playerName)
