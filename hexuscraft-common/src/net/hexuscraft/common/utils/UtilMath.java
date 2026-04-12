@@ -15,7 +15,7 @@ public class UtilMath
 
     public static double trim(double n, int degree)
     {
-        return trim(n, degree, RoundingMode.FLOOR);
+        return trim(n, degree, RoundingMode.UP);
     }
 
     public static double trim(double n, RoundingMode mode)
