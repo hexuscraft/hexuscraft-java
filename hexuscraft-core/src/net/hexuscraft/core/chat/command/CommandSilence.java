@@ -4,10 +4,7 @@ import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.chat.CoreChat;
 import net.hexuscraft.core.command.BaseCommand;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.json.JSONObject;
 
-import java.util.Map;
 import java.util.Set;
 
 public class CommandSilence extends BaseCommand<CoreChat>
@@ -33,12 +30,8 @@ public class CommandSilence extends BaseCommand<CoreChat>
                         return;
                     }
 
-                    JSONObject jsonObject = new JSONObject(Map.of("text",
-                            F.fStaff(this,
-                                    F.fSuccess(F.fItem(sender instanceof Player senderPlayer ?
-                                            senderPlayer.getDisplayName() :
-                                            sender.getName()), " un-muted the global chat."))));
-                    player.sendRawMessage(jsonObject.toString());
+                    player.sendMessage(F.fStaff(this,
+                            F.fSuccess(F.fItem(sender.getName()), " un-muted the global chat.")));
                 });
                 return;
             }
@@ -49,10 +42,7 @@ public class CommandSilence extends BaseCommand<CoreChat>
                 {
                     return;
                 }
-                player.sendMessage(F.fStaff(this,
-                        F.fError(F.fItem(sender instanceof Player senderPlayer ?
-                                senderPlayer.getDisplayName() :
-                                sender.getName()), " muted the global chat")));
+                player.sendMessage(F.fStaff(this, F.fError(F.fItem(sender.getName()), " muted the global chat")));
             });
 
             return;
