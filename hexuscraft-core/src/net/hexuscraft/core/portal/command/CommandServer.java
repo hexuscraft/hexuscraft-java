@@ -62,15 +62,16 @@ public class CommandServer extends BaseCommand<CorePortal>
                 return;
             }
 
-
             _miniPlugin.teleport(player, serverData._name);
             return;
         }
+
         if (args.length == 0)
         {
             sender.sendMessage(F.fMain(this, "You are connected to ", F.fItem(_miniPlugin._serverName), "."));
             return;
         }
+
         sender.sendMessage(help(alias));
     }
 
