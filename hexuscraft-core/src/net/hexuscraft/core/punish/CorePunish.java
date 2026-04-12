@@ -346,142 +346,154 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         });
     }
 
+    @SuppressWarnings("deprecation")
     public void openPunishGui(Player staff, OfflinePlayer target, String reason)
     {
         Inventory inventory = _hexusPlugin.getServer().createInventory(staff, 6 * 9, "Punish - " + target.getName());
 
-        ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
+        ItemStack skull = UtilItem.createPlayerSkull(target.getName(),
                 C.cGreen + C.fBold + target.getName(),
                 target.getUniqueId().toString(),
                 "",
-                C.cWhite + reason);
+                C.cWhite + reason,
+                "",
+                C.cYellow + C.fBold + "CLICK TO VIEW HISTORY");
 
-        ItemStack viewHistory = UtilItem.createItem(Material.NAME_TAG,
-                C.cBlue + C.fBold + "Punishment History",
-                "View the punishment history of " + F.fItem(target.getName()));
-
-        ItemStack chatHeader = UtilItem.createItem(Material.BOOK_AND_QUILL, C.cBlue + C.fBold + "Chat Offenses");
-        ItemStack chat1 = UtilItem.createItemWool(DyeColor.LIME,
-                C.cGreen + C.fBold + "Chat Severity 1",
-                "1 Day Mute",
+        ItemStack mute1d = UtilItem.createWool(DyeColor.LIME,
+                C.cGreen + C.fBold + "1 Day Mute",
+                "Severity 1",
                 "",
                 "Light chat offense");
-        ItemStack chat2 = UtilItem.createItemWool(DyeColor.YELLOW,
-                C.cYellow + C.fBold + "Chat Severity 2",
-                "3 Days Mute",
+        ItemStack mute3d = UtilItem.createWool(DyeColor.LIME,
+                C.cGreen + C.fBold + "3 Days Mute",
+                "Severity 1",
+                "",
+                "Light chat offense");
+        ItemStack mute5d = UtilItem.createWool(DyeColor.YELLOW,
+                C.cYellow + C.fBold + "5 Days Mute",
+                "Severity 2",
                 "",
                 "Moderate chat offense");
-        ItemStack chat3 = UtilItem.createItemWool(DyeColor.ORANGE,
-                C.cGold + C.fBold + "Chat Severity 3",
-                "5 Days Mute",
+        ItemStack mute7d = UtilItem.createWool(DyeColor.YELLOW,
+                C.cYellow + C.fBold + "7 Days Mute",
+                "Severity 2",
+                "",
+                "Moderate chat offense");
+        ItemStack mute14d = UtilItem.createWool(DyeColor.ORANGE,
+                C.cGold + C.fBold + "14 Days Mute",
+                "Severity 3",
                 "",
                 "Heavy chat offense");
-
-        ItemStack gameplayHeader = UtilItem.createItem(Material.IRON_BLOCK, C.cBlue + C.fBold + "Gameplay Offenses");
-        ItemStack gameplay1 = UtilItem.createItemWool(DyeColor.LIME,
-                C.cGreen + C.fBold + "Gameplay Severity 1",
-                "1 Day Ban",
+        ItemStack mute28d = UtilItem.createWool(DyeColor.ORANGE,
+                C.cGold + C.fBold + "28 Days Mute",
+                "Severity 3",
                 "",
-                "Light gameplay offense");
-        ItemStack gameplay2 = UtilItem.createItemWool(DyeColor.YELLOW,
-                C.cYellow + C.fBold + "Gameplay Severity 2",
-                "3 Days Ban",
-                "",
-                "Moderate gameplay offense");
-        ItemStack gameplay3 = UtilItem.createItemWool(DyeColor.ORANGE,
-                C.cGold + C.fBold + "Gameplay Severity 3",
-                "5 Days Ban",
-                "",
-                "Heavy gameplay offense");
-
-        ItemStack clientHeader = UtilItem.createItem(Material.IRON_SWORD, C.cBlue + C.fBold + "Client Offenses");
-        ItemStack client1 = UtilItem.createItemWool(DyeColor.LIME,
-                C.cGreen + C.fBold + "Client Severity 1",
-                "7 Days Ban",
-                "",
-                "Light client offense");
-        ItemStack client2 = UtilItem.createItemWool(DyeColor.YELLOW,
-                C.cYellow + C.fBold + "Client Severity 2",
-                "14 Days Ban",
-                "",
-                "Moderate client offense");
-        ItemStack client3 = UtilItem.createItemWool(DyeColor.ORANGE,
-                C.cGold + C.fBold + "Client Severity 3",
-                "28 Days Ban",
-                "",
-                "Heavy client offense");
-
-        ItemStack miscHeader = UtilItem.createItem(Material.LEVER, C.cBlue + C.fBold + "Miscellaneous");
-        ItemStack miscWarn = UtilItem.createItem(Material.PAPER,
-                C.cGreen + C.fBold + "Friendly Warning",
-                "Inform someone that they are breaking the rules");
-        ItemStack miscMute = UtilItem.createItem(Material.BOOK,
+                "Heavy chat offense");
+        ItemStack mutePerm = UtilItem.create(Material.BOOK_AND_QUILL,
                 C.cRed + C.fBold + "Permanent Mute",
                 "Severity 4",
                 "",
                 "Severe chat offense");
-        ItemStack miscBan = UtilItem.createItem(Material.REDSTONE_BLOCK,
+
+        ItemStack ban1d = UtilItem.createWithData(Material.HARD_CLAY,
+                DyeColor.LIME.getData(),
+                C.cGreen + C.fBold + "1 Day Ban",
+                "Severity 1",
+                "",
+                "Light gameplay offense");
+        ItemStack ban3d = UtilItem.createWithData(Material.HARD_CLAY,
+                DyeColor.LIME.getData(),
+                C.cGreen + C.fBold + "3 Days Ban",
+                "Severity 1",
+                "",
+                "Light gameplay offense");
+        ItemStack ban5d = UtilItem.createWithData(Material.HARD_CLAY,
+                DyeColor.YELLOW.getData(),
+                C.cYellow + C.fBold + "5 Days Ban",
+                "Severity 2",
+                "",
+                "Moderate gameplay offense");
+        ItemStack ban7d = UtilItem.createWithData(Material.HARD_CLAY,
+                DyeColor.YELLOW.getData(),
+                C.cYellow + C.fBold + "7 Days Ban",
+                "Severity 2",
+                "",
+                "Moderate gameplay offense");
+        ItemStack ban14d = UtilItem.createWithData(Material.HARD_CLAY,
+                DyeColor.ORANGE.getData(),
+                C.cGold + C.fBold + "14 Days Ban",
+                "Severity 3",
+                "",
+                "Heavy gameplay offense");
+        ItemStack ban28d = UtilItem.createWithData(Material.HARD_CLAY,
+                DyeColor.ORANGE.getData(),
+                C.cGold + C.fBold + "28 Days Ban",
+                "Severity 3",
+                "",
+                "Heavy gameplay offense");
+        ItemStack banPerm = UtilItem.create(Material.REDSTONE_BLOCK,
                 C.cRed + C.fBold + "Permanent Ban",
                 "Severity 4",
                 "",
-                "Severe gameplay/client offense");
+                "Severe gameplay offense");
 
-        inventory.setItem(4, targetSkull);
-        inventory.setItem(10, chatHeader);
-        inventory.setItem(12, gameplayHeader);
-        inventory.setItem(14, clientHeader);
-        inventory.setItem(16, miscHeader);
-        inventory.setItem(25, miscWarn);
+        ItemStack warning = UtilItem.create(Material.PAPER,
+                C.cGreen + C.fBold + "Friendly Warning",
+                "Inform someone that they are breaking the rules");
+
+        inventory.setItem(4, skull);
 
         if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
         {
-            inventory.setItem(19, chat1);
-            inventory.setItem(21, gameplay1);
-            inventory.setItem(23, client1);
+            inventory.setItem(19, mute1d);
+            inventory.setItem(20, mute3d);
+            inventory.setItem(22, ban1d);
+            inventory.setItem(23, ban3d);
+            inventory.setItem(25, warning);
         }
 
         if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
         {
-            inventory.setItem(28, chat2);
-            inventory.setItem(30, gameplay2);
-            inventory.setItem(32, client2);
+            inventory.setItem(28, mute5d);
+            inventory.setItem(29, mute7d);
+            inventory.setItem(31, ban5d);
+            inventory.setItem(32, ban7d);
         }
 
         if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
         {
-            inventory.setItem(37, chat3);
-            inventory.setItem(39, gameplay3);
-            inventory.setItem(41, client3);
+            inventory.setItem(37, mute14d);
+            inventory.setItem(38, mute28d);
+            inventory.setItem(40, ban14d);
+            inventory.setItem(41, ban28d);
         }
 
         if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
         {
-            inventory.setItem(34, miscMute);
-            inventory.setItem(43, miscBan);
-        }
-
-        if (staff.hasPermission(PERM.COMMAND_PUNISH_HISTORY.name()))
-        {
-            inventory.setItem(53, viewHistory);
+            inventory.setItem(34, mutePerm);
+            inventory.setItem(43, banPerm);
         }
 
         _punishGuis.put(staff,
                 new PunishGui(inventory,
                         target,
                         reason,
-                        chat1,
-                        chat2,
-                        chat3,
-                        gameplay1,
-                        gameplay2,
-                        gameplay3,
-                        client1,
-                        client2,
-                        client3,
-                        miscWarn,
-                        miscMute,
-                        miscBan,
-                        viewHistory));
+                        skull,
+                        warning,
+                        mute1d,
+                        mute3d,
+                        mute5d,
+                        mute7d,
+                        mute14d,
+                        mute28d,
+                        mutePerm,
+                        ban1d,
+                        ban3d,
+                        ban5d,
+                        ban7d,
+                        ban14d,
+                        ban28d,
+                        banPerm));
         staff.openInventory(inventory);
     }
 
@@ -491,7 +503,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
 
         Inventory gui = _hexusPlugin.getServer().createInventory(viewer, 6 * 9, "Punish History - " + target.getName());
 
-        ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
+        ItemStack targetSkull = UtilItem.createPlayerSkull(target.getName(),
                 C.cGreen + C.fBold + target.getName(),
                 target.getUniqueId().toString(),
                 "",
@@ -510,13 +522,13 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event)
+    void onInventoryClose(InventoryCloseEvent event)
     {
         _punishGuis.remove(event.getPlayer());
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event)
+    void onInventoryClick(InventoryClickEvent event)
     {
         if (!(event.getWhoClicked() instanceof Player staff))
         {
@@ -531,7 +543,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             AtomicReference<PunishType> type = new AtomicReference<>();
             AtomicLong lengthMillis = new AtomicLong(-1);
 
-            if (event.getCurrentItem().equals(punishGui._viewHistory()))
+            if (event.getCurrentItem().equals(punishGui._skull()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_HISTORY.name()))
                 {
@@ -549,7 +561,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                 }
                 type.set(PunishType.WARNING);
             }
-            else if (event.getCurrentItem().equals(punishGui._chatSev1()))
+            else if (event.getCurrentItem().equals(punishGui._mute1d()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
                 {
@@ -559,7 +571,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                 type.set(PunishType.MUTE);
                 lengthMillis.set(ONE_DAY_MILLIS);
             }
-            else if (event.getCurrentItem().equals(punishGui._gameplaySev1()))
+            else if (event.getCurrentItem().equals(punishGui._ban1d()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
                 {
@@ -569,9 +581,59 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                 type.set(PunishType.BAN);
                 lengthMillis.set(ONE_DAY_MILLIS);
             }
-            else if (event.getCurrentItem().equals(punishGui._clientSev1()))
+            else if (event.getCurrentItem().equals(punishGui._mute3d()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
+                {
+                    staff.sendMessage(F.fInsufficientPermissions());
+                    return;
+                }
+                type.set(PunishType.MUTE);
+                lengthMillis.set(ONE_DAY_MILLIS * 3);
+            }
+            else if (event.getCurrentItem().equals(punishGui._ban3d()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
+                {
+                    staff.sendMessage(F.fInsufficientPermissions());
+                    return;
+                }
+                type.set(PunishType.BAN);
+                lengthMillis.set(ONE_DAY_MILLIS * 3);
+            }
+            else if (event.getCurrentItem().equals(punishGui._mute5d()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
+                {
+                    staff.sendMessage(F.fInsufficientPermissions());
+                    return;
+                }
+                type.set(PunishType.MUTE);
+                lengthMillis.set(ONE_DAY_MILLIS * 5);
+            }
+            else if (event.getCurrentItem().equals(punishGui._ban5d()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
+                {
+                    staff.sendMessage(F.fInsufficientPermissions());
+                    return;
+                }
+                type.set(PunishType.BAN);
+                lengthMillis.set(ONE_DAY_MILLIS * 5);
+            }
+            else if (event.getCurrentItem().equals(punishGui._mute7d()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
+                {
+                    staff.sendMessage(F.fInsufficientPermissions());
+                    return;
+                }
+                type.set(PunishType.MUTE);
+                lengthMillis.set(ONE_DAY_MILLIS * 7);
+            }
+            else if (event.getCurrentItem().equals(punishGui._ban7d()))
+            {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
                 {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
@@ -579,29 +641,19 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                 type.set(PunishType.BAN);
                 lengthMillis.set(ONE_DAY_MILLIS * 7);
             }
-            else if (event.getCurrentItem().equals(punishGui._chatSev2()))
+            else if (event.getCurrentItem().equals(punishGui._mute14d()))
             {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
                 {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.MUTE);
-                lengthMillis.set(ONE_DAY_MILLIS * 3);
+                lengthMillis.set(ONE_DAY_MILLIS * 14);
             }
-            else if (event.getCurrentItem().equals(punishGui._gameplaySev2()))
+            else if (event.getCurrentItem().equals(punishGui._ban14d()))
             {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
-                {
-                    staff.sendMessage(F.fInsufficientPermissions());
-                    return;
-                }
-                type.set(PunishType.BAN);
-                lengthMillis.set(ONE_DAY_MILLIS * 3);
-            }
-            else if (event.getCurrentItem().equals(punishGui._clientSev2()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
                 {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
@@ -609,7 +661,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                 type.set(PunishType.BAN);
                 lengthMillis.set(ONE_DAY_MILLIS * 14);
             }
-            else if (event.getCurrentItem().equals(punishGui._chatSev3()))
+            else if (event.getCurrentItem().equals(punishGui._mute28d()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
                 {
@@ -617,9 +669,9 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                     return;
                 }
                 type.set(PunishType.MUTE);
-                lengthMillis.set(ONE_DAY_MILLIS * 5);
+                lengthMillis.set(ONE_DAY_MILLIS * 28);
             }
-            else if (event.getCurrentItem().equals(punishGui._gameplaySev3()))
+            else if (event.getCurrentItem().equals(punishGui._ban28d()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
                 {
@@ -627,19 +679,9 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                     return;
                 }
                 type.set(PunishType.BAN);
-                lengthMillis.set(ONE_DAY_MILLIS * 5);
+                lengthMillis.set(ONE_DAY_MILLIS * 28);
             }
-            else if (event.getCurrentItem().equals(punishGui._clientSev3()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
-                {
-                    staff.sendMessage(F.fInsufficientPermissions());
-                    return;
-                }
-                type.set(PunishType.BAN);
-                lengthMillis.set(ONE_DAY_MILLIS * 25);
-            }
-            else if (event.getCurrentItem().equals(punishGui._permanentMute()))
+            else if (event.getCurrentItem().equals(punishGui._mutePerm()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
                 {
@@ -648,7 +690,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                 }
                 type.set(PunishType.MUTE);
             }
-            else if (event.getCurrentItem().equals(punishGui._permanentBan()))
+            else if (event.getCurrentItem().equals(punishGui._banPerm()))
             {
                 if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
                 {
@@ -663,9 +705,10 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                 return;
             }
 
-            ActionBar actionBar = _coreActionBar.registerActionBar(new ActionBar(staff,
+            ActionBar actionBar = _coreActionBar.registerActionBar(new ActionBar(_coreActionBar,
+                    staff,
                     1,
-                    F.fMain(this,
+                    F.fActionBar(this,
                             "Processing your punishment against ",
                             F.fItem(punishGui._target().getName()),
                             "...")));
@@ -678,6 +721,10 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                     punishGui._reason(),
                     (punishData ->
                     {
+                        actionBar.setMessage(F.fActionBar(this,
+                                F.fSuccess("Punishment successfully applied against ",
+                                        F.fItem(punishGui._target().getName()),
+                                        ".")));
                         _coreActionBar.unregisterActionBar(actionBar);
                         if (punishData != null)
                         {
