@@ -20,13 +20,13 @@ public class HubDoubleJump extends MiniPlugin<Hub>
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         event.getPlayer().setAllowFlight(true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onGameModeChanged(PlayerGameModeChangeEvent event)
+    void onGameModeChanged(PlayerGameModeChangeEvent event)
     {
         // For some reason we need to delay this by a tick even though EventPriority.MONITOR should be the last to fire.
         // Probably some quirky nms logic when changing game mode.
@@ -34,7 +34,7 @@ public class HubDoubleJump extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    public void onFlight(PlayerToggleFlightEvent event)
+    void onPlayerToggleFlight(PlayerToggleFlightEvent event)
     {
         Player player = event.getPlayer();
 

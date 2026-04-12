@@ -32,13 +32,13 @@ public class Build extends HexusPlugin
     }
 
     @EventHandler
-    public void onWorldLoad(WorldLoadEvent event)
+    void onWorldLoad(WorldLoadEvent event)
     {
         event.getWorld().setSpawnLocation(0, 100, 0);
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         event.getPlayer().teleport(getSpawn());
         event.getPlayer().setGameMode(GameMode.CREATIVE);

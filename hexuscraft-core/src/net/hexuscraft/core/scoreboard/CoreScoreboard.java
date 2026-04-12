@@ -46,7 +46,7 @@ public class CoreScoreboard extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
         Scoreboard scoreboard = _hexusPlugin.getServer().getScoreboardManager().getNewScoreboard();
@@ -55,7 +55,7 @@ public class CoreScoreboard extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event)
+    void onPlayerQuit(PlayerQuitEvent event)
     {
         Player player = event.getPlayer();
         player.setScoreboard(_hexusPlugin.getServer().getScoreboardManager().getMainScoreboard());

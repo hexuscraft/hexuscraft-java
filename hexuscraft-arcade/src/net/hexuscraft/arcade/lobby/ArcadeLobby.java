@@ -35,7 +35,7 @@ public class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         if (_arcadeManager.getGameState() == GameState.IN_PROGRESS)
         {
@@ -69,7 +69,7 @@ public class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event)
+    void onEntityDamageByEntity(EntityDamageByEntityEvent event)
     {
         if (!(event.getEntity() instanceof Player player))
         {
@@ -89,7 +89,7 @@ public class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onEntityDamage(EntityDamageEvent event)
+    void onEntityDamage(EntityDamageEvent event)
     {
         if (!(event.getEntity() instanceof Player player))
         {
@@ -116,7 +116,7 @@ public class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onWeatherChange(WeatherChangeEvent event)
+    void onWeatherChange(WeatherChangeEvent event)
     {
         if (!event.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst()))
         {
@@ -126,7 +126,7 @@ public class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onFoodLevelChange(FoodLevelChangeEvent event)
+    void onFoodLevelChange(FoodLevelChangeEvent event)
     {
         if (!event.getEntity().getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst()))
         {

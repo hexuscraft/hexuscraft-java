@@ -160,7 +160,7 @@ public class ArcadeHost extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event)
+    void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
         if (!_host.get().equals(player))
@@ -176,7 +176,7 @@ public class ArcadeHost extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event)
+    void onPlayerQuit(PlayerQuitEvent event)
     {
         if (!event.getPlayer().equals(_host.get()))
         {
@@ -193,7 +193,7 @@ public class ArcadeHost extends MiniPlugin<Arcade>
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onAsyncPlayerChat(AsyncPlayerChatEvent event)
+    void onAsyncPlayerChat(AsyncPlayerChatEvent event)
     {
         if (!event.getPlayer().equals(_host.get()))
         {
