@@ -25,7 +25,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -72,9 +75,23 @@ public class HubPlayer extends MiniPlugin<Hub>
     @EventHandler
     void onPlayerJoin(PlayerJoinEvent event)
     {
-        event.setJoinMessage(F.fSub("Join", event.getPlayer().getDisplayName()));
-
         Player player = event.getPlayer();
+
+        if (_hexusPlugin._spawn != null)
+        {
+            player.teleport(_hexusPlugin._spawn);
+        }
+
+        resetAttributes(player);
+        refreshInventory(player);
+
+        UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), F.fTabFooter());
+
+        player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
+    }
+
+    void resetAttributes(Player player)
+    {
         player.setFallDistance(0);
         player.setFlying(false);
         player.setSneaking(false);
@@ -89,26 +106,8 @@ public class HubPlayer extends MiniPlugin<Hub>
         player.setExhaustion(0);
         player.setExp(0);
         player.setFallDistance(0);
-
         player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
         player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
-
-        if (_hexusPlugin._spawn != null)
-        {
-            player.teleport(_hexusPlugin._spawn);
-        }
-
-        refreshInventory(player);
-
-        UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), " ");
-
-        player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
-    }
-
-    @EventHandler
-    void onPlayerQuit(PlayerQuitEvent event)
-    {
-        event.setQuitMessage(F.fSub("Quit", event.getPlayer().getDisplayName()));
     }
 
     void refreshInventory(Player player)
@@ -116,17 +115,16 @@ public class HubPlayer extends MiniPlugin<Hub>
         PlayerInventory inventory = player.getInventory();
 
         ItemStack gameCompass =
-                UtilItem.createItem(Material.COMPASS, C.cGreen + C.fBold + "Games", "Click to open the Games Menu");
-        ItemStack profileSkull = UtilItem.createItemSkull(player.getName(),
+                UtilItem.create(Material.COMPASS, C.cGreen + C.fBold + "Games", "Click to open the Games Menu");
+        ItemStack profileSkull = UtilItem.createPlayerSkull(player.getName(),
                 C.cGreen + C.fBold + player.getName(),
                 "Click to open the Profile Menu");
-        ItemStack cosmeticsChest = UtilItem.createItem(Material.CHEST,
-                C.cGreen + C.fBold + "Cosmetics",
-                "Click to open the Cosmetics Menu");
+        ItemStack cosmeticsChest =
+                UtilItem.create(Material.CHEST, C.cGreen + C.fBold + "Cosmetics", "Click to open the Cosmetics Menu");
         ItemStack storeEmerald =
-                UtilItem.createItem(Material.EMERALD, C.cGreen + C.fBold + "Store", "Click to open the Store Menu");
+                UtilItem.create(Material.EMERALD, C.cGreen + C.fBold + "Store", "Click to open the Store Menu");
         ItemStack lobbyClock =
-                UtilItem.createItem(Material.WATCH, C.cGreen + C.fBold + "Lobbies", "Click to open the Lobbies Menu");
+                UtilItem.create(Material.WATCH, C.cGreen + C.fBold + "Lobbies", "Click to open the Lobbies Menu");
 
         inventory.clear();
         inventory.setItem(0, gameCompass);
@@ -249,7 +247,7 @@ public class HubPlayer extends MiniPlugin<Hub>
 
     void openStoreMenu(Player player)
     {
-        player.sendMessage(F.fMain("Shop", "This feature is currently work in progress. Please try again later!"));
+        player.sendMessage(F.fMain("Store", "You can visit our store page at: ", F.fItem("store.hexuscraft.net")));
         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
@@ -306,7 +304,7 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    public void onFoodLevelChange(FoodLevelChangeEvent event)
+    void onFoodLevelChange(FoodLevelChangeEvent event)
     {
         Entity entity = event.getEntity();
         if (!(entity instanceof Player player))
@@ -319,7 +317,7 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    public void onPlayerDropItem(PlayerDropItemEvent event)
+    void onPlayerDropItem(PlayerDropItemEvent event)
     {
         Player player = event.getPlayer();
 
@@ -345,7 +343,7 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    public void onPlayerPickupItem(PlayerPickupItemEvent event)
+    void onPlayerPickupItem(PlayerPickupItemEvent event)
     {
         if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE))
         {
@@ -355,7 +353,7 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event)
+    void onPlayerInteract(PlayerInteractEvent event)
     {
         Player player = event.getPlayer();
 
@@ -375,7 +373,7 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    public void onEntityTargetLivingEntity(EntityTargetLivingEntityEvent event)
+    void onEntityTargetLivingEntity(EntityTargetLivingEntityEvent event)
     {
         if (!(event.getTarget() instanceof Player))
         {
