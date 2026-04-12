@@ -1,7 +1,8 @@
-package net.hexuscraft.webtranslator;
+package net.hexuscraft.web;
 
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
+import net.hexuscraft.web.sales.WebSales;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -11,12 +12,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class WebTranslator extends HexusPlugin
+public class Web extends HexusPlugin
 {
 
-    public WebTranslator()
+    public Web()
     {
         super();
+
+        require(new WebSales(this));
     }
 
     @EventHandler

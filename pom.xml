@@ -29,7 +29,7 @@
         <module>hexuscraft-hub</module>
         <module>hexuscraft-proxy</module>
         <module>hexuscraft-server-monitor</module>
-        <module>hexuscraft-web-translator</module>
+        <module>hexuscraft-web</module>
     </modules>
 
     <repositories>
@@ -95,21 +95,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            <addClasspath>false</addClasspath>
-                            <addDefaultEntries>false</addDefaultEntries>
-                        </manifest>
-                    </archive>
-                    <finalName>${project.name}-unshaded</finalName>
-                    <outputDirectory>${project.basedir}/../out/unshaded</outputDirectory>
-                </configuration>
             </plugin>
         </plugins>
 

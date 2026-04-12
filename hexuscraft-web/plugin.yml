@@ -1,5 +1,5 @@
 #file: noinspection YAMLSchemaValidation
 name: ${project.name}
-main: ${project.groupId}.webtranslator.WebTranslator
+main: ${project.groupId}.web.Web
 version: ${project.version}
 load: STARTUP

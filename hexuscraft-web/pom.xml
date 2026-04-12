@@ -12,8 +12,8 @@
         <relativePath>../plugin-server.xml</relativePath>
     </parent>
 
-    <name>WebTranslator</name>
-    <artifactId>hexuscraft-web-translator</artifactId>
+    <name>Web</name>
+    <artifactId>hexuscraft-web</artifactId>
     <description>Handles Tebex and Votifier web requests</description>
 
     <build>
