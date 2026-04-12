@@ -12,12 +12,15 @@ import net.hexuscraft.common.database.messages.PortalTeleportMessage;
 import net.hexuscraft.common.database.messages.PortalTeleportStaffMessage;
 import net.hexuscraft.common.database.queries.ServerQueries;
 import net.hexuscraft.common.enums.PermissionGroup;
+import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilUniqueId;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
+import net.hexuscraft.core.chat.CoreChat;
 import net.hexuscraft.core.command.CoreCommand;
 import net.hexuscraft.core.database.CoreDatabase;
+import net.hexuscraft.core.permission.CorePermission;
 import net.hexuscraft.core.player.PlayerSearch;
 import net.hexuscraft.core.portal.command.*;
 import org.bukkit.Server;
@@ -26,6 +29,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerListPingEvent;
@@ -79,9 +83,9 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     }
 
     public static String PROXY_CHANNEL = "BungeeCord";
-    public static int MIN_PORT_PRIVATE_SERVERS = 39900;
-    public static int MAX_PORT_PRIVATE_SERVERS = 39999;
-    public static int EVENT_SERVER_PORT = 30003;
+    public static int MIN_PORT_PRIVATE_SERVERS = 59900;
+    public static int MAX_PORT_PRIVATE_SERVERS = 59999;
+    public static int EVENT_SERVER_PORT = 50003;
     final Messenger _messenger;
     final Map<String, Map<UUID, ByteArrayDataInputRunnable>> _callbacks;
     final Set<ServerGroupData> _serverGroupCache;
@@ -90,6 +94,7 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     public long _createdMillis;
     public String _serverName;
     public String _serverGroupName;
+    CorePermission _corePermission;
     CoreCommand _coreCommand;
     CoreDatabase _coreDatabase;
     BukkitTask _updateServerDataTask;
@@ -146,6 +151,7 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
+        _corePermission = (CorePermission) dependencies.get(CorePermission.class);
 
         // Run this sync so we at least have an initial copy of server & group data
         updateServerData();
@@ -548,9 +554,28 @@ public class CorePortal extends MiniPlugin<HexusPlugin> implements PluginMessage
     }
 
     @EventHandler
+    void onPlayerJoin(PlayerJoinEvent event)
+    {
+        Player player = event.getPlayer();
+        event.setJoinMessage(F.fSub("Join",
+                (player.hasPermission(CoreChat.PERM.CHAT_PREFIX.name()) ?
+                        F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(
+                                player)._groups()), true, true) + C.fReset + " " :
+                        ""),
+                event.getPlayer().getName()));
+    }
+
+    @EventHandler
     void onPlayerQuit(PlayerQuitEvent event)
     {
+        Player player = event.getPlayer();
         _networkChannelSpies.remove(event.getPlayer());
+        event.setQuitMessage(F.fSub("Join",
+                (player.hasPermission(CoreChat.PERM.CHAT_PREFIX.name()) ?
+                        F.fPermissionGroup(PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(
+                                player)._groups()), true, true) + C.fReset + " " :
+                        ""),
+                event.getPlayer().getName()));
     }
 
 }
