@@ -1,5 +1,6 @@
 package net.hexuscraft.core.portal.command;
 
+import net.hexuscraft.common.database.data.ServerData;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.player.PlayerSearch;
@@ -37,13 +38,14 @@ public class CommandSend extends BaseCommand<CorePortal>
         String targetName = args[0];
         String serverName = args[1];
 
-        OfflinePlayer targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(targetName, sender);
-        if (targetOfflinePlayer == null)
+        OfflinePlayer target = PlayerSearch.offlinePlayerSearch(targetName, sender);
+        if (target == null)
         {
             return;
         }
 
-        if (_miniPlugin.getServer(serverName) == null)
+        ServerData server = _miniPlugin.getServer(serverName);
+        if (server == null)
         {
             sender.sendMessage(F.fMain(this, F.fError("Could not locate server with name ", F.fItem(serverName), ".")));
             return;
@@ -51,14 +53,13 @@ public class CommandSend extends BaseCommand<CorePortal>
 
         if (sender instanceof Player player)
         {
-            _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(),
-                    serverName,
+            _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(target.getUniqueId(),
+                    server._name,
                     player.getUniqueId()));
             return;
         }
 
-        _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(targetOfflinePlayer.getUniqueId(),
-                serverName));
+        _miniPlugin._hexusPlugin.runAsync(() -> _miniPlugin.teleportAsync(target.getUniqueId(), server._name));
     }
 
     @Override
