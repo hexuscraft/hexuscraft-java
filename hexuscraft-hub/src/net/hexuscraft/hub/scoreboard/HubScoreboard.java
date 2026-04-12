@@ -18,11 +18,13 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HubScoreboard extends MiniPlugin<Hub>
 {
 
-    final Map<Player, BukkitTask> _sidebarUpdateTasks;
+    final Map<Player, List<BukkitTask>> _sidebarUpdateTasks;
+    private final String SIDEBAR_TITLE = "          Welcome %s, to the Hexuscraft Network!";
     CorePortal _corePortal;
     CorePermission _corePermission;
 
@@ -53,7 +55,7 @@ public class HubScoreboard extends MiniPlugin<Hub>
     @Override
     public void onDisable()
     {
-        _sidebarUpdateTasks.values().forEach(BukkitTask::cancel);
+        _sidebarUpdateTasks.values().stream().flatMap(Collection::stream).forEach(BukkitTask::cancel);
         _sidebarUpdateTasks.clear();
     }
 
@@ -63,11 +65,20 @@ public class HubScoreboard extends MiniPlugin<Hub>
         Player player = event.getPlayer();
         Scoreboard scoreboard = player.getScoreboard(); // Player's scoreboard is set by CoreScoreboard
 
-        Objective sidebarObjective = scoreboard.registerNewObjective("§6§lHEXUSCRAFT", "dummy");
+        String sidebarTitle = SIDEBAR_TITLE.formatted(player.getName());
+        AtomicInteger sidebarTitleIndex = new AtomicInteger();
+
+        Objective sidebarObjective =
+                scoreboard.registerNewObjective(sidebarTitle.substring(0, Math.min(16, sidebarTitle.length())),
+                        "dummy");
         sidebarObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         List<Score> sidebarScores = new ArrayList<>();
-        _sidebarUpdateTasks.put(player, _hexusPlugin.runSyncTimer(() ->
+
+        List<BukkitTask> sidebarTasks = new ArrayList<>();
+        _sidebarUpdateTasks.put(player, sidebarTasks);
+
+        sidebarTasks.add(_hexusPlugin.runSyncTimer(() ->
         {
             sidebarScores.stream().map(Score::getEntry).forEach(scoreboard::resetScores);
             sidebarScores.clear();
@@ -81,6 +92,21 @@ public class HubScoreboard extends MiniPlugin<Hub>
                 sidebarScores.add(score);
             }
         }, 0, 20));
+
+        if (sidebarTitle.length() > 16)
+        {
+            sidebarTasks.add(_hexusPlugin.runSyncTimer(() ->
+            {
+                int index = sidebarTitleIndex.getAndUpdate(operand -> (operand + 1) % sidebarTitle.length());
+
+                sidebarObjective.setDisplayName(C.cWhite +
+                        C.fBold +
+                        (index + 16 > sidebarTitle.length() ?
+                                sidebarTitle.substring(index) +
+                                        sidebarTitle.substring(0, 16 - (sidebarTitle.length() - index)) :
+                                sidebarTitle.substring(index, index + 16)));
+            }, 0, 4));
+        }
     }
 
     @EventHandler
@@ -92,7 +118,7 @@ public class HubScoreboard extends MiniPlugin<Hub>
             return;
         }
 
-        _sidebarUpdateTasks.get(player).cancel();
+        _sidebarUpdateTasks.get(player).forEach(BukkitTask::cancel);
         _sidebarUpdateTasks.remove(player);
     }
 
