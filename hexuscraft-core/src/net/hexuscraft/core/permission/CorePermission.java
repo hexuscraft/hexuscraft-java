@@ -76,7 +76,7 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerLogin(PlayerLoginEvent event)
+    void onPlayerLogin(PlayerLoginEvent event)
     {
         Player player = event.getPlayer();
 
@@ -107,7 +107,8 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         refreshPermissions(player);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
+        // We want to remove the permission profiles after other MiniPlugins have finished their things
     void onPlayerQuit(PlayerQuitEvent event)
     {
         Player player = event.getPlayer();
