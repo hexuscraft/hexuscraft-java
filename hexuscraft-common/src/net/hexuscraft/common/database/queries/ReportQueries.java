@@ -14,12 +14,12 @@ public class ReportQueries
 
     public static String LIST_SUBMITTED(UUID playerUUID)
     {
-        return Database.buildQuery("reports", playerUUID.toString(), "submitted");
+        return Database.buildQuery("user", playerUUID.toString(), "reports", "submitted");
     }
 
     public static String LIST_RECEIVED(UUID playerUUID)
     {
-        return Database.buildQuery("reports", playerUUID.toString(), "received");
+        return Database.buildQuery("user", playerUUID.toString(), "reports", "received");
     }
 
 }
