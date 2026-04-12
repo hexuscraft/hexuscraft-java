@@ -39,7 +39,7 @@ public class Hub extends HexusPlugin
     }
 
     @EventHandler
-    public void onWorldLoad(WorldLoadEvent event)
+    void onWorldLoad(WorldLoadEvent event)
     {
         World world = event.getWorld();
         logInfo("WORLD NAME: '" + world.getName() + "'");
