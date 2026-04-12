@@ -10,6 +10,8 @@ import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
+import net.hexuscraft.core.actionbar.ActionBar;
+import net.hexuscraft.core.actionbar.CoreActionBar;
 import net.hexuscraft.core.command.CoreCommand;
 import net.hexuscraft.core.database.CoreDatabase;
 import net.hexuscraft.core.item.UtilItem;
@@ -44,6 +46,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
     }
 
     Map<HumanEntity, ReportGui> _reportGuis;
+    CoreActionBar _coreActionBar;
     CoreCommand _coreCommand;
     CoreDatabase _coreDatabase;
     CorePortal _corePortal;
@@ -62,6 +65,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
     @Override
     public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
     {
+        _coreActionBar = (CoreActionBar) dependencies.get(CoreActionBar.class);
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
@@ -154,30 +158,30 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
     {
         Inventory inventory = _hexusPlugin.getServer().createInventory(reporter, 3 * 9, "Report - " + target.getName());
 
-        ItemStack targetSkull = UtilItem.createItemSkull(target.getName(),
+        ItemStack targetSkull = UtilItem.createPlayerSkull(target.getName(),
                 C.cGreen + C.fBold + target.getName(),
                 target.getUniqueId().toString() + "\n\n" + C.cWhite + message);
 
-        ItemStack history = UtilItem.createItem(Material.NAME_TAG,
+        ItemStack history = UtilItem.create(Material.NAME_TAG,
                 C.cBlue + C.fBold + "Report History",
                 "View the report history of " + F.fItem(target.getName()));
 
-        ItemStack chat = UtilItem.createItem(Material.BOOK_AND_QUILL,
+        ItemStack chat = UtilItem.create(Material.BOOK_AND_QUILL,
                 C.cGreen + C.fBold + "Breaking Chat Rules",
                 "Spamming",
                 "Bigotry",
                 "etc.");
-        ItemStack gameplay = UtilItem.createItem(Material.IRON_BLOCK,
+        ItemStack gameplay = UtilItem.create(Material.IRON_BLOCK,
                 C.cGreen + C.fBold + "Breaking Gameplay Rules",
                 "Map Exploits",
                 "Abusing Bugs",
                 "etc.");
-        ItemStack client = UtilItem.createItem(Material.IRON_SWORD,
+        ItemStack client = UtilItem.create(Material.IRON_SWORD,
                 C.cGreen + C.fBold + "Unapproved Client Modifications",
                 "Flying",
                 "Xray",
                 "etc.");
-        ItemStack misc = UtilItem.createItem(Material.PAPER,
+        ItemStack misc = UtilItem.create(Material.PAPER,
                 C.cGreen + C.fBold + "Other Rule Violation",
                 "",
                 "Alt Account",
@@ -197,6 +201,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
 
         _reportGuis.put(reporter, new ReportGui(inventory, target, message, chat, gameplay, client, misc, history));
         reporter.openInventory(inventory);
+        reporter.playSound(reporter.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
     public void openHistoryGui(Player reporter, OfflinePlayer target)
@@ -206,13 +211,13 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event)
+    void onInventoryClose(InventoryCloseEvent event)
     {
         _reportGuis.remove(event.getPlayer());
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event)
+    void onInventoryClick(InventoryClickEvent event)
     {
         if (!(event.getWhoClicked() instanceof Player reporter))
         {
@@ -259,6 +264,14 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
             return;
         }
 
+        ActionBar actionBar = _coreActionBar.registerActionBar(new ActionBar(_coreActionBar,
+                reporter,
+                1,
+                F.fActionBar(this, "Submitting report against ", F.fItem(reportGui._target().getName()), "...")));
+        reporter.playSound(reporter.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+
+        reporter.closeInventory();
+
         _hexusPlugin.runAsync(() ->
         {
             try
@@ -267,13 +280,24 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
             }
             catch (JedisException ex)
             {
+                actionBar.setMessage(F.fActionBar(this,
+                        F.fError("Error while submitting report against ",
+                                F.fItem(reportGui._target().getName()),
+                                ".")));
+                _coreActionBar.unregisterActionBar(actionBar);
                 reporter.sendMessage(F.fMain(this,
                         F.fError("There was an error while submitting your report. Please try again later or contact " +
                                 "an administrator if this issue persists.")));
+                reporter.playSound(reporter.getLocation(), Sound.CAT_MEOW, Float.MAX_VALUE, 0.5f);
                 logSevere(ex);
                 return;
             }
 
+            reporter.playSound(reporter.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
+
+            actionBar.setMessage(F.fActionBar(this,
+                    F.fSuccess("Report successfully submitted against ", F.fItem(reportGui._target().getName()), ".")));
+            _coreActionBar.unregisterActionBar(actionBar);
             reporter.sendMessage(F.fMain(this,
                     F.fSuccess("Your report has been successfully submitted and will be reviewed shortly.")));
         });
