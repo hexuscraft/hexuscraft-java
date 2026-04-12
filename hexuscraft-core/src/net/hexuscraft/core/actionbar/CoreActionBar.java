@@ -23,30 +23,33 @@ public class CoreActionBar extends MiniPlugin<HexusPlugin>
     @Override
     public void onEnable()
     {
-        _hexusPlugin.runAsyncTimer(() -> _actionBarMap.forEach((player, actionBars) ->
+        _hexusPlugin.runAsyncTimer(this::updateActionBars, 0, 20);
+    }
+
+    public void updateActionBars()
+    {
+        _actionBarMap.forEach((player, actionBars) ->
         {
             if (actionBars.isEmpty())
             {
                 return;
             }
-            ActionBar activeActionBar =
-                    actionBars.stream().max(Comparator.comparing(actionBar -> actionBar.weight().get())).orElse(null);
-
-            UtilTitleTab.sendActionText(player, activeActionBar.message().get());
-        }), 0, 1);
+            UtilTitleTab.sendActionText(player,
+                    actionBars.stream().max(Comparator.comparing(ActionBar::getWeight)).get().getMessage());
+        });
     }
 
     public ActionBar registerActionBar(ActionBar actionBar)
     {
         Set<ActionBar> actionBars;
-        if (_actionBarMap.containsKey(actionBar.player()))
+        if (_actionBarMap.containsKey(actionBar._player))
         {
-            actionBars = _actionBarMap.get(actionBar.player());
+            actionBars = _actionBarMap.get(actionBar._player);
         }
         else
         {
             actionBars = new HashSet<>();
-            _actionBarMap.put(actionBar.player(), actionBars);
+            _actionBarMap.put(actionBar._player, actionBars);
         }
         actionBars.add(actionBar);
 
@@ -55,7 +58,7 @@ public class CoreActionBar extends MiniPlugin<HexusPlugin>
 
     public void unregisterActionBar(ActionBar actionBar)
     {
-        Player player = actionBar.player();
+        Player player = actionBar._player;
 
         if (_actionBarMap.containsKey(player))
         {
