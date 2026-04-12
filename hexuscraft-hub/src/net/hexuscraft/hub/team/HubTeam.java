@@ -5,6 +5,7 @@ import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
+import net.hexuscraft.core.chat.CoreChat;
 import net.hexuscraft.core.permission.CorePermission;
 import net.hexuscraft.core.permission.PermissionProfile;
 import net.hexuscraft.hub.Hub;
@@ -44,7 +45,9 @@ public class HubTeam extends MiniPlugin<Hub>
                 .forEach((PermissionGroup group) ->
                 {
                     Team team = eventPlayerScoreboard.registerNewTeam(group._prefix);
-                    team.setPrefix(F.fPermissionGroup(group, true, true) + C.fReset + " ");
+                    team.setPrefix(group.hasPermission(CoreChat.PERM.CHAT_PREFIX) ?
+                            F.fPermissionGroup(group, true, true) + C.fReset + " " :
+                            C.fReset);
                 });
 
         _corePermission._permissionProfiles.forEach((Player target, PermissionProfile permissionProfile) ->
