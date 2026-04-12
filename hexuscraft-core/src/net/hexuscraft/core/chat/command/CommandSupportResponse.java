@@ -64,9 +64,10 @@ public class CommandSupportResponse extends BaseCommand<CoreChat>
         AtomicReference<ActionBar> atomicActionBar = new AtomicReference<>();
         if (sender instanceof Player player)
         {
-            atomicActionBar.set(_coreActionBar.registerActionBar(new ActionBar(player,
+            atomicActionBar.set(_coreActionBar.registerActionBar(new ActionBar(_coreActionBar,
+                    player,
                     0,
-                    F.fMain(this, "Fetching offline player for ", F.fItem(args[0]), "..."))));
+                    F.fActionBar(this, "Fetching offline player for ", F.fItem(args[0]), "..."))));
         }
 
         OfflinePlayer target = PlayerSearch.offlinePlayerSearch(args[0], sender);
@@ -74,6 +75,7 @@ public class CommandSupportResponse extends BaseCommand<CoreChat>
         {
             if (atomicActionBar.get() != null)
             {
+                atomicActionBar.get().setMessage(F.fActionBar(this, F.fError("Failed to fetch offline player")));
                 _coreActionBar.unregisterActionBar(atomicActionBar.get());
             }
             return;
@@ -81,7 +83,7 @@ public class CommandSupportResponse extends BaseCommand<CoreChat>
 
         if (atomicActionBar.get() instanceof ActionBar actionBar)
         {
-            actionBar.message().set(F.fMain(this, "Sending support response to ", F.fItem(target.getName()), "..."));
+            actionBar.setMessage(F.fActionBar(this, "Sending support response to ", F.fItem(target.getName()), "..."));
         }
 
         UUID uuid = UUID.randomUUID();
@@ -96,6 +98,8 @@ public class CommandSupportResponse extends BaseCommand<CoreChat>
             }
             if (atomicActionBar.get() instanceof ActionBar actionBar)
             {
+                actionBar.setMessage(F.fActionBar(this,
+                        F.fError("Timed out while sending support message to ", F.fItem(target.getName()), ".")));
                 _coreActionBar.unregisterActionBar(actionBar);
             }
             sender.sendMessage(F.fMain(this,
@@ -119,6 +123,8 @@ public class CommandSupportResponse extends BaseCommand<CoreChat>
             }
             if (atomicActionBar.get() instanceof ActionBar actionBar)
             {
+                actionBar.setMessage(F.fActionBar(this,
+                        F.fSuccess("Successfully sent support message to ", F.fItem(target.getName()), ".")));
                 _coreActionBar.unregisterActionBar(actionBar);
             }
             task.cancel();
