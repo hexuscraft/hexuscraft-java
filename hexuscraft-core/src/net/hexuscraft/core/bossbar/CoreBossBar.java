@@ -19,26 +19,22 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
-public class CoreBossBar extends MiniPlugin<HexusPlugin>
-{
+public class CoreBossBar extends MiniPlugin<HexusPlugin> {
 
     Map<Player, Set<BossBar>> _bossBarMap;
     Map<Player, Wither> _witherMap;
 
-    public CoreBossBar(HexusPlugin plugin)
-    {
+    public CoreBossBar(HexusPlugin plugin) {
         super(plugin, "Boss Bar");
         _bossBarMap = new HashMap<>();
         _witherMap = new HashMap<>();
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _hexusPlugin.runAsyncTimer(() -> _bossBarMap.forEach((player, bossBars) ->
         {
-            if (bossBars.isEmpty())
-            {
+            if (bossBars.isEmpty()) {
                 return;
             }
             BossBar activeBossBar =
@@ -55,10 +51,8 @@ public class CoreBossBar extends MiniPlugin<HexusPlugin>
         }), 0, 1);
     }
 
-    public BossBar registerBossBar(BossBar bossBar)
-    {
-        if (!_witherMap.containsKey(bossBar.player()))
-        {
+    public BossBar registerBossBar(BossBar bossBar) {
+        if (!_witherMap.containsKey(bossBar.player())) {
             Wither wither = bossBar.player().getWorld().spawn(bossBar.player().getLocation(), Wither.class);
             wither.setCanPickupItems(false);
             wither.setFallDistance(0f);
@@ -95,12 +89,9 @@ public class CoreBossBar extends MiniPlugin<HexusPlugin>
         }
 
         Set<BossBar> bossBars;
-        if (_bossBarMap.containsKey(bossBar.player()))
-        {
+        if (_bossBarMap.containsKey(bossBar.player())) {
             bossBars = _bossBarMap.get(bossBar.player());
-        }
-        else
-        {
+        } else {
             bossBars = new HashSet<>();
             _bossBarMap.put(bossBar.player(), bossBars);
         }
@@ -109,45 +100,37 @@ public class CoreBossBar extends MiniPlugin<HexusPlugin>
         return bossBar;
     }
 
-    public void unregisterBossBar(BossBar bossBar)
-    {
+    public void unregisterBossBar(BossBar bossBar) {
         Player player = bossBar.player();
 
-        if (_bossBarMap.containsKey(player))
-        {
+        if (_bossBarMap.containsKey(player)) {
             Set<BossBar> bossBars = _bossBarMap.get(player);
             bossBars.remove(bossBar);
 
-            if (!bossBars.isEmpty())
-            {
+            if (!bossBars.isEmpty()) {
                 return;
             }
             _bossBarMap.remove(player);
         }
 
-        if (_witherMap.containsKey(player))
-        {
+        if (_witherMap.containsKey(player)) {
             _witherMap.get(player).remove();
             _witherMap.remove(player);
         }
     }
 
     @EventHandler
-    void onEntityTarget(EntityTargetEvent event)
-    {
-        if (!event.getEntity().hasMetadata("BossBarNPC"))
-        {
+    void onEntityTarget(EntityTargetEvent event) {
+        if (!event.getEntity().hasMetadata("BossBarNPC")) {
             return;
         }
         event.setCancelled(true);
     }
 
     @EventHandler
-    void onPlayerMove(PlayerMoveEvent event)
-    {
+    void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (!_witherMap.containsKey(player))
-        {
+        if (!_witherMap.containsKey(player)) {
             return;
         }
 
@@ -162,11 +145,9 @@ public class CoreBossBar extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    void onPlayerQuit(PlayerQuitEvent event)
-    {
+    void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        if (!_bossBarMap.containsKey(player))
-        {
+        if (!_bossBarMap.containsKey(player)) {
             return;
         }
         _bossBarMap.get(player).forEach(this::unregisterBossBar);

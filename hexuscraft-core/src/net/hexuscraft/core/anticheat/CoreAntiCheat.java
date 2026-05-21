@@ -20,20 +20,13 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CoreAntiCheat extends MiniPlugin<HexusPlugin>
-{
-
-    public enum PERM implements IPermission
-    {
-        CHEAT_ALERTS
-    }
+public class CoreAntiCheat extends MiniPlugin<HexusPlugin> {
 
     final Map<Player, Map<String, Integer>> _violations;
     CorePortal _corePortal;
     CorePunish _corePunish;
 
-    public CoreAntiCheat(HexusPlugin plugin)
-    {
+    public CoreAntiCheat(HexusPlugin plugin) {
         super(plugin, "Anti Cheat");
 
         _violations = new HashMap<>();
@@ -42,102 +35,78 @@ public class CoreAntiCheat extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
         _corePunish = (CorePunish) dependencies.get(CorePunish.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> onPlayerJoin(new PlayerJoinEvent(player, null)));
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         _violations.clear();
     }
 
     @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event)
-    {
+    void onPlayerJoin(PlayerJoinEvent event) {
         _violations.put(event.getPlayer(), new HashMap<>());
     }
 
     @EventHandler
-    void onPlayerQuit(PlayerQuitEvent event)
-    {
+    void onPlayerQuit(PlayerQuitEvent event) {
         _violations.remove(event.getPlayer());
     }
 
     @EventHandler
-    void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event)
-    {
+    void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
         Player player = event.getPlayer();
-        if (player.getGameMode() == GameMode.CREATIVE)
-        {
+        if (player.getGameMode() == GameMode.CREATIVE) {
             return;
         }
 
         double distance = player.getLocation().distance(event.getRightClicked().getLocation());
-        if (distance > 4)
-        {
+        if (distance > 4) {
             event.setCancelled(true);
         }
-        if (distance > 5.5)
-        {
+        if (distance > 5.5) {
             flag(player, "Reach", CheatSeverity.HIGH);
-        }
-        else if (distance > 5)
-        {
+        } else if (distance > 5) {
             flag(player, "Reach", CheatSeverity.MEDIUM);
-        }
-        else if (distance > 4.5)
-        {
+        } else if (distance > 4.5) {
             flag(player, "Reach", CheatSeverity.LOW);
         }
     }
 
     @EventHandler
-    void onEntityDamageByEntity(EntityDamageByEntityEvent event)
-    {
-        if (!(event.getDamager() instanceof Player))
-        {
+    void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player)) {
             return;
         }
         Player player = ((Player) event.getDamager()).getPlayer();
         double distance = event.getDamager().getLocation().distance(event.getEntity().getLocation());
 
-        if (distance > 4)
-        {
+        if (distance > 4) {
             event.setCancelled(true);
         }
 
-        if (player.getGameMode() == GameMode.CREATIVE)
-        {
+        if (player.getGameMode() == GameMode.CREATIVE) {
             return;
         }
 
-        if (distance > 5.5)
-        {
+        if (distance > 5.5) {
             flag(player, "Reach", CheatSeverity.HIGH);
-        }
-        else if (distance > 5)
-        {
+        } else if (distance > 5) {
             flag(player, "Reach", CheatSeverity.MEDIUM);
-        }
-        else if (distance > 4.5)
-        {
+        } else if (distance > 4.5) {
             flag(player, "Reach", CheatSeverity.LOW);
         }
     }
 
-    public void alert(Player player, String reason, CheatSeverity severity)
-    {
-        _hexusPlugin.getServer()
-                .getOnlinePlayers()
+    public void alert(Player player, String reason, CheatSeverity severity) {
+        _hexusPlugin.getServer().getOnlinePlayers()
                 .stream()
                 .filter(staff -> staff.hasPermission(PERM.CHEAT_ALERTS.name()))
                 .forEach(staff -> staff.sendMessage(F.fCheat(player.getDisplayName(),
@@ -146,29 +115,29 @@ public class CoreAntiCheat extends MiniPlugin<HexusPlugin>
                         _corePortal._serverName)));
     }
 
-    public void kick(Player player, String reason)
-    {
+    public void kick(Player player, String reason) {
         _corePunish.punishAsync(player.getUniqueId(), null, PunishType.KICK, 0, reason);
     }
 
-    public void flag(Player player, String reason, CheatSeverity severity)
-    {
+    public void flag(Player player, String reason, CheatSeverity severity) {
         String keyName = reason + ":" + severity.name();
 
         Map<String, Integer> playerViolations = _violations.get(player);
 
-        if (!playerViolations.containsKey(keyName))
-        {
+        if (!playerViolations.containsKey(keyName)) {
             playerViolations.put(keyName, 0);
         }
         int newCount = playerViolations.get(keyName) + 1;
         playerViolations.put(keyName, newCount);
 
         alert(player, newCount + " " + reason, severity);
-        if (newCount == 10)
-        {
+        if (newCount == 10) {
             kick(player, reason);
         }
+    }
+
+    public enum PERM implements IPermission {
+        CHEAT_ALERTS
     }
 
 }

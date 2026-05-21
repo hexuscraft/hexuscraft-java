@@ -2,8 +2,7 @@ package net.hexuscraft.common.utils;
 
 import java.util.Map;
 
-public class C
-{
+public class C {
 
     public static String fBold = "§l";
     public static String fItalic = "§o";

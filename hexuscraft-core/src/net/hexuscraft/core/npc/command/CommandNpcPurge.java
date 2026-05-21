@@ -8,11 +8,9 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public class CommandNpcPurge extends BaseCommand<CoreNpc>
-{
+public class CommandNpcPurge extends BaseCommand<CoreNpc> {
 
-    CommandNpcPurge(CoreNpc coreNpc)
-    {
+    CommandNpcPurge(CoreNpc coreNpc) {
         super(coreNpc,
                 "purge",
                 "",
@@ -22,16 +20,13 @@ public class CommandNpcPurge extends BaseCommand<CoreNpc>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length > 0)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length > 0) {
             sender.sendMessage(help(alias));
             return;
         }
 
-        if (!(sender instanceof Player player))
-        {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(F.fMain(this, F.fError("Only players can purge NPCs in their current world.")));
             return;
         }

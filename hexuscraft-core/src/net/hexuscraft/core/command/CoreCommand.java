@@ -12,14 +12,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class CoreCommand extends MiniPlugin<HexusPlugin>
-{
+public class CoreCommand extends MiniPlugin<HexusPlugin> {
 
     final AtomicReference<SimpleCommandMap> _commandMap;
     public Set<Command> _commands;
 
-    public CoreCommand(HexusPlugin plugin)
-    {
+    public CoreCommand(HexusPlugin plugin) {
         super(plugin, "Command");
 
         _commands = new HashSet<>();
@@ -27,32 +25,27 @@ public class CoreCommand extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _commandMap.set(((CraftServer) _hexusPlugin.getServer()).getCommandMap());
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _commandMap.get().getCommands().forEach(command -> command.setPermissionMessage(F.fInsufficientPermissions()));
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         _commands.forEach(this::unregister);
         _commands.clear();
     }
 
-    public void register(Command command)
-    {
+    public void register(Command command) {
         _commands.add(command);
         _commandMap.get().register("", command);
     }
 
-    public void unregister(Command command)
-    {
+    public void unregister(Command command) {
         command.unregister(_commandMap.get());
     }
 

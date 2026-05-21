@@ -5,11 +5,9 @@ import net.hexuscraft.core.featureflags.CoreFeatureFlags;
 
 import java.util.Set;
 
-public class CommandFeatureFlags extends BaseMultiCommand<CoreFeatureFlags>
-{
+public class CommandFeatureFlags extends BaseMultiCommand<CoreFeatureFlags> {
 
-    public CommandFeatureFlags(CoreFeatureFlags miniPlugin)
-    {
+    public CommandFeatureFlags(CoreFeatureFlags miniPlugin) {
         super(miniPlugin,
                 "featureflags",
                 "View and change flags to modify server or network behaviour.",

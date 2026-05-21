@@ -9,35 +9,28 @@ import org.bukkit.command.CommandSender;
 
 import java.util.*;
 
-public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugin>> extends BaseCommand<T>
-{
+public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugin>> extends BaseCommand<T> {
 
     final Set<BaseCommand<T>> _commands;
 
     public BaseMultiCommand(T miniPlugin,
-            String name,
-            String description,
-            Set<String> aliases,
-            IPermission permission,
-            Set<BaseCommand<T>> commands)
-    {
+                            String name,
+                            String description,
+                            Set<String> aliases,
+                            IPermission permission,
+                            Set<BaseCommand<T>> commands) {
         super(miniPlugin, name, "", description, aliases, permission);
         _commands = commands;
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length > 0)
-        {
-            for (BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands)
-            {
-                if (!command.isAlias(args[0]))
-                {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length > 0) {
+            for (BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands) {
+                if (!command.isAlias(args[0])) {
                     continue;
                 }
-                if (!command.testPermission(sender))
-                {
+                if (!command.testPermission(sender)) {
                     return;
                 }
                 command.run(sender, alias + " " + args[0], Arrays.copyOfRange(args, 1, args.length));
@@ -50,8 +43,7 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
 
         _commands.stream().sorted(Comparator.comparing(Command::getName)).forEach(command ->
         {
-            if (!command.testPermissionSilent(sender))
-            {
+            if (!command.testPermissionSilent(sender)) {
                 return;
             }
             builder.append("\n")
@@ -62,18 +54,13 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length > 1)
-        {
-            for (BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands)
-            {
-                if (!command.getName().equals(args[0]) && !command.getAliases().contains(args[0]))
-                {
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        if (args.length > 1) {
+            for (BaseCommand<? extends MiniPlugin<? extends HexusPlugin>> command : _commands) {
+                if (!command.getName().equals(args[0]) && !command.getAliases().contains(args[0])) {
                     continue;
                 }
-                if (!command.testPermissionSilent(sender))
-                {
+                if (!command.testPermissionSilent(sender)) {
                     break;
                 }
 
@@ -85,8 +72,7 @@ public abstract class BaseMultiCommand<T extends MiniPlugin<? extends HexusPlugi
         List<String> completions = new ArrayList<>();
         _commands.forEach(commandBase ->
         {
-            if (!commandBase.testPermissionSilent(sender))
-            {
+            if (!commandBase.testPermissionSilent(sender)) {
                 return;
             }
             completions.add(commandBase.getName());

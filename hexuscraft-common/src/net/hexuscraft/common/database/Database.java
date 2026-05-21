@@ -14,8 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class Database
-{
+public class Database {
 
     public static String KEY_DELIMITER = ":";
     final Map<String, Map<PubSubConsumer, JedisPubSub>> _consumers;
@@ -23,51 +22,42 @@ public class Database
 
     // TODO::::::::: https://redis.io/docs/latest/develop/clients/jedis/produsage/
 
-    public Database(String host, int port, String username, String password, String clientName) throws JedisException
-    {
+    public Database(String host, int port, String username, String password, String clientName) throws JedisException {
         _consumers = new HashMap<>();
         _jedis = buildUnifiedJedis(host, port, username, password, clientName);
     }
 
-    public Database()
-    {
+    public Database() {
         AtomicReference<String> atomicHost = new AtomicReference<>("127.0.0.1");
         AtomicInteger atomicPort = new AtomicInteger(6379);
         AtomicReference<String> atomicUsername = new AtomicReference<>("default");
         AtomicReference<String> atomicPassword = new AtomicReference<>("");
 
         File redisFile = new File("_redis.dat");
-        try (Scanner scanner = new Scanner(redisFile))
-        {
+        try (Scanner scanner = new Scanner(redisFile)) {
             ((Runnable) () ->
             {
-                if (!scanner.hasNextLine())
-                {
+                if (!scanner.hasNextLine()) {
                     return;
                 }
                 atomicHost.set(scanner.nextLine());
 
-                if (!scanner.hasNextLine())
-                {
+                if (!scanner.hasNextLine()) {
                     return;
                 }
                 atomicPort.set(Integer.parseInt(scanner.nextLine()));
 
-                if (!scanner.hasNextLine())
-                {
+                if (!scanner.hasNextLine()) {
                     return;
                 }
                 atomicUsername.set(scanner.nextLine());
 
-                if (!scanner.hasNextLine())
-                {
+                if (!scanner.hasNextLine()) {
                     return;
                 }
                 atomicPassword.set(scanner.nextLine());
             }).run();
-        }
-        catch (FileNotFoundException ex)
-        {
+        } catch (FileNotFoundException ex) {
             System.out.println("WARNING: Could not locate '" +
                     redisFile.getName() +
                     "'. Using default credentials '" +
@@ -83,12 +73,9 @@ public class Database
 
         AtomicReference<String> clientName = new AtomicReference<>();
         File nameFile = new File("_name.dat");
-        try (Scanner scanner = new Scanner(nameFile))
-        {
+        try (Scanner scanner = new Scanner(nameFile)) {
             clientName.set(scanner.nextLine());
-        }
-        catch (FileNotFoundException ex)
-        {
+        } catch (FileNotFoundException ex) {
             clientName.set(new Random().ints(16, 0, 36)
                     .mapToObj("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"::charAt)
                     .map(String::valueOf)
@@ -110,13 +97,11 @@ public class Database
         java.security.Security.setProperty("networkaddress.cache.negative.ttl", "0");
     }
 
-    public static String buildQuery(String... args)
-    {
+    public static String buildQuery(String... args) {
         return String.join(KEY_DELIMITER, args);
     }
 
-    UnifiedJedis buildUnifiedJedis(String host, int port, String username, String password, String clientName)
-    {
+    UnifiedJedis buildUnifiedJedis(String host, int port, String username, String password, String clientName) {
         HostAndPort hostAndPort = new HostAndPort(host, port);
 
         ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
@@ -142,24 +127,18 @@ public class Database
                 .build();
     }
 
-    public void registerConsumer(String pattern, PubSubConsumer consumer)
-    {
+    public void registerConsumer(String pattern, PubSubConsumer consumer) {
         Map<PubSubConsumer, JedisPubSub> consumerMap;
-        if (_consumers.containsKey(pattern))
-        {
+        if (_consumers.containsKey(pattern)) {
             consumerMap = _consumers.get(pattern);
-        }
-        else
-        {
+        } else {
             consumerMap = new HashMap<>();
             _consumers.put(pattern, consumerMap);
         }
 
-        JedisPubSub jedisPubSub = new JedisPubSub()
-        {
+        JedisPubSub jedisPubSub = new JedisPubSub() {
             @Override
-            public void onPMessage(String pattern, String channelName, String rawMessage)
-            {
+            public void onPMessage(String pattern, String channelName, String rawMessage) {
                 consumer.accept(pattern, channelName, rawMessage);
             }
         };
@@ -168,26 +147,22 @@ public class Database
         new Thread(() -> _jedis.psubscribe(jedisPubSub, pattern)).start();
     }
 
-    public void unregisterConsumer(PubSubConsumer consumer)
-    {
+    public void unregisterConsumer(PubSubConsumer consumer) {
         _consumers.forEach((pattern, consumerMap) ->
         {
             consumerMap.remove(consumer);
-            if (!consumerMap.isEmpty())
-            {
+            if (!consumerMap.isEmpty()) {
                 return;
             }
             _consumers.remove(pattern);
         });
     }
 
-    public boolean isConsumerRegistered(PubSubConsumer consumer)
-    {
+    public boolean isConsumerRegistered(PubSubConsumer consumer) {
         return _consumers.values().stream().anyMatch(map -> map.containsKey(consumer));
     }
 
-    public void unregisterConsumers()
-    {
+    public void unregisterConsumers() {
         _consumers.clear();
     }
 

@@ -6,10 +6,8 @@ import net.hexuscraft.web.sales.WebSales;
 
 import java.util.Set;
 
-public class CommandSales extends BaseMultiCommand<WebSales>
-{
-    public CommandSales(WebSales miniPlugin, CoreDatabase coreDatabase)
-    {
+public class CommandSales extends BaseMultiCommand<WebSales> {
+    public CommandSales(WebSales miniPlugin, CoreDatabase coreDatabase) {
         super(miniPlugin,
                 "sales",
                 "Store management",

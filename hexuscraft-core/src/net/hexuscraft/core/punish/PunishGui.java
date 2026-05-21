@@ -22,6 +22,5 @@ public record PunishGui(Inventory _inventory,
                         ItemStack _ban7d,
                         ItemStack _ban14d,
                         ItemStack _ban28d,
-                        ItemStack _banPerm)
-{
+                        ItemStack _banPerm) {
 }

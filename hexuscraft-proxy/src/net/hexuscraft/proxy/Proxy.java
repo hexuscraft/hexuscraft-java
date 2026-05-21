@@ -42,13 +42,9 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Plugin(id = "hexuscraft-proxy", name = "Proxy", version = "1.0.0")
-public class Proxy
-{
+public class Proxy {
 
-    final String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8]§r", " §f§l▶§r ");
-
-    //    String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8 & 26.1]§r",
-    //            " §f§l▶§r ");
+    final String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8+]§r", " §f§l▶§r ");
 
     final Database _database;
     final ProxyServer _server;
@@ -58,8 +54,7 @@ public class Proxy
     final AtomicInteger _capacityCount;
 
     @Inject
-    public Proxy(ProxyServer server, Logger logger)
-    {
+    public Proxy(ProxyServer server, Logger logger) {
         _database = new Database();
         _server = server;
         _logger = logger;
@@ -69,8 +64,7 @@ public class Proxy
     }
 
     @Subscribe
-    void onProxyInitialize(ProxyInitializeEvent event)
-    {
+    void onProxyInitialize(ProxyInitializeEvent event) {
         CommandManager commandManager = _server.getCommandManager();
         commandManager.getAliases().forEach(commandManager::unregister);
 
@@ -95,8 +89,7 @@ public class Proxy
                         new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(punishAppliedMessage._punishData._uuid)));
                 rawData.put("uuid", punishAppliedMessage._punishData._uuid.toString());
                 PunishData punishData = new PunishData(rawData);
-                if (punishData._type != PunishType.BAN)
-                {
+                if (punishData._type != PunishType.BAN) {
                     return;
                 }
                 player.disconnect(Component.text(F.fPunish(punishData)));
@@ -104,15 +97,13 @@ public class Proxy
         });
     }
 
-    void updateMOTD()
-    {
+    void updateMOTD() {
         UnifiedJedis jedis = _database._jedis;
         _motd.set(MOTD_PREFIX + ServerQueries.getMotd(jedis));
 
     }
 
-    void updateServers()
-    {
+    void updateServers() {
         List<ServerInfo> allServers = new ArrayList<>();
         List<String> fallbackServers = new ArrayList<>();
         AtomicInteger playerCount = new AtomicInteger();
@@ -120,8 +111,7 @@ public class Proxy
 
         Arrays.stream(ServerQueries.getServers(_database._jedis)).forEach(serverData ->
         {
-            if (serverData._updatedByMonitor)
-            {
+            if (serverData._updatedByMonitor) {
                 return;
             }
 
@@ -129,8 +119,7 @@ public class Proxy
                     new ServerInfo(serverData._name, new InetSocketAddress(serverData._address, serverData._port));
             allServers.add(serverInfo);
 
-            if (serverData._group.equals("Lobby"))
-            {
+            if (serverData._group.equals("Lobby")) {
                 fallbackServers.add(serverData._name);
             }
 
@@ -152,8 +141,7 @@ public class Proxy
     }
 
     @Subscribe
-    void onProxyQuery(ProxyQueryEvent event)
-    {
+    void onProxyQuery(ProxyQueryEvent event) {
         QueryResponse.Builder builder = QueryResponse.builder();
         builder.players("§r",
                 "    §6§lHexuscraft§r §f§lNetwork§r    ",
@@ -171,8 +159,7 @@ public class Proxy
     }
 
     @Subscribe
-    void onProxyPing(ProxyPingEvent event)
-    {
+    void onProxyPing(ProxyPingEvent event) {
         ServerPing.Builder builder = ServerPing.builder();
 
         builder.onlinePlayers(_playerCount.get());
@@ -188,22 +175,17 @@ public class Proxy
                 new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)));
         builder.version(new ServerPing.Version(Math.max(ProtocolVersion.MINECRAFT_1_8.getProtocol(),
                 event.getConnection().getProtocolVersion().getProtocol()), "Minecraft 1.8"));
-        try
-        {
+        try {
             builder.favicon(Favicon.create(Path.of("server-icon.png")));
-        }
-        catch (IOException ex)
-        {
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
         event.setPing(builder.build());
     }
 
     @Subscribe
-    void onLogin(LoginEvent event)
-    {
-        try
-        {
+    void onLogin(LoginEvent event) {
+        try {
             UnifiedJedis jedis = _database._jedis;
             Set<UUID> punishmentIds = jedis.smembers(PunishQueries.RECEIVED(event.getPlayer().getUniqueId()))
                     .stream()
@@ -218,53 +200,44 @@ public class Proxy
 
             Set<PunishData> activePunishments = new HashSet<>();
 
-            for (UUID punishmentUniqueId : punishmentIds)
-            {
-                try
-                {
+            for (UUID punishmentUniqueId : punishmentIds) {
+                try {
                     Map<String, String> rawData =
                             new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
                     rawData.put("uuid", punishmentUniqueId.toString());
 
                     PunishData punishData = new PunishData(rawData);
-                    if (!punishData._active)
-                    {
-                        continue;
-                    }
-                    if (!punishData._type.equals(PunishType.BAN))
-                    {
+
+                    if (!punishData._active) {
                         continue;
                     }
 
-                    if (punishData._length == -1)
-                    { // permanent ban
-                        activePunishments.add(punishData);
-                        continue;
+                    if (punishData._length != -1) {
+                        long remaining = punishData.getRemaining();
+                        if (remaining <= 0) {
+                            _database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
+                                    Map.of("active",
+                                            "false",
+                                            "removeOrigin",
+                                            Long.toString(System.currentTimeMillis()),
+                                            "removeReason",
+                                            "EXPIRED",
+                                            "removeTargetServer",
+                                            "Proxy-" + _server.getBoundAddress().toString(),
+                                            "removeStaffUUID",
+                                            UtilUniqueId.EMPTY_UUID.toString(),
+                                            "removeStaffServer",
+                                            "Proxy-" + _server.getBoundAddress().toString()));
+                            continue;
+                        }
                     }
 
-                    long remaining = punishData.getRemaining();
-                    if (remaining <= 0)
-                    {
-                        _database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
-                                Map.of("active",
-                                        "false",
-                                        "removeOrigin",
-                                        Long.toString(System.currentTimeMillis()),
-                                        "removeReason",
-                                        "EXPIRED",
-                                        "removeServer",
-                                        "Proxy-" + _server.getBoundAddress().toString(),
-                                        "removeStaffId",
-                                        UtilUniqueId.EMPTY_UUID.toString(),
-                                        "removeStaffServer",
-                                        "Proxy-" + _server.getBoundAddress().toString()));
+                    if (!punishData._type.equals(PunishType.BAN)) {
                         continue;
                     }
 
                     activePunishments.add(punishData);
-                }
-                catch (JedisException ex)
-                {
+                } catch (JedisException ex) {
                     _logger.warning("Error while checking punish punish for '" +
                             event.getPlayer().getUsername() +
                             "': " +
@@ -272,33 +245,25 @@ public class Proxy
                 }
             }
 
-            if (activePunishments.isEmpty())
-            {
+            if (activePunishments.isEmpty()) {
                 return;
             }
 
             AtomicReference<PunishData> punishData = new AtomicReference<>();
-            if (activePunishments.size() > 1)
-            {
-                for (PunishData data : activePunishments)
-                {
-                    if (punishData.get() == null)
-                    {
+            if (activePunishments.size() > 1) {
+                for (PunishData data : activePunishments) {
+                    if (punishData.get() == null) {
                         punishData.set(data);
                         continue;
                     }
                     punishData.set(punishData.get().compare(data));
                 }
-            }
-            else
-            {
+            } else {
                 punishData.set(activePunishments.iterator().next());
             }
 
             event.setResult(ResultedEvent.ComponentResult.denied(Component.text(F.fPunish(punishData.get()))));
-        }
-        catch (JedisException ex)
-        {
+        } catch (JedisException ex) {
             _logger.warning("Error while fetching punishment punish for '" +
                     event.getPlayer().getUsername() +
                     "': " +
@@ -308,12 +273,10 @@ public class Proxy
     }
 
     @Subscribe
-    void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event)
-    {
+    void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
         Player player = event.getPlayer();
 
-        if (player.getProtocolVersion().getProtocol() < ProtocolVersion.MINECRAFT_1_8.getProtocol())
-        {
+        if (player.getProtocolVersion().getProtocol() < ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
             event.setInitialServer(null);
             player.disconnect(Component.text()
                     .color(NamedTextColor.RED)
@@ -330,8 +293,7 @@ public class Proxy
                 .filter(registeredServer -> registeredServer.getServerInfo().getName().split("-(?=[^-]*$)")[0].equals(
                         "Lobby"))
                 .toArray(RegisteredServer[]::new);
-        if (lobbyServers.length == 0)
-        {
+        if (lobbyServers.length == 0) {
             player.disconnect(Component.text()
                     .color(NamedTextColor.RED)
                     .append(Component.text("There are currently no lobby servers available."))

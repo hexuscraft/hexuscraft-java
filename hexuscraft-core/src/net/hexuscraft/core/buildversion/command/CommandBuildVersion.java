@@ -9,11 +9,9 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import java.util.Map;
 import java.util.Set;
 
-public class CommandBuildVersion extends BaseCommand<CoreBuildVersion>
-{
+public class CommandBuildVersion extends BaseCommand<CoreBuildVersion> {
 
-    public CommandBuildVersion(CoreBuildVersion plugin)
-    {
+    public CommandBuildVersion(CoreBuildVersion plugin) {
         super(plugin,
                 "buildversion",
                 "",
@@ -23,10 +21,8 @@ public class CommandBuildVersion extends BaseCommand<CoreBuildVersion>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length > 0)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length > 0) {
             sender.sendMessage(help(alias));
             return;
         }

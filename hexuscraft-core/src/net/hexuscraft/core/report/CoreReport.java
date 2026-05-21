@@ -35,15 +35,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class CoreReport extends MiniPlugin<HexusPlugin>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_REPORT,
-        COMMAND_REPORT_HISTORY,
-        REPORT_ALERTS
-    }
+public class CoreReport extends MiniPlugin<HexusPlugin> {
 
     Map<HumanEntity, ReportGui> _reportGuis;
     CoreActionBar _coreActionBar;
@@ -51,8 +43,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
     CoreDatabase _coreDatabase;
     CorePortal _corePortal;
 
-    public CoreReport(HexusPlugin plugin)
-    {
+    public CoreReport(HexusPlugin plugin) {
         super(plugin, "Reports");
         _reportGuis = new HashMap<>();
 
@@ -63,8 +54,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _coreActionBar = (CoreActionBar) dependencies.get(CoreActionBar.class);
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
@@ -72,8 +62,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _coreCommand.register(new CommandReport(this));
 
         _coreDatabase._database.registerConsumer(ReportSubmittedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
@@ -89,30 +78,23 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
 
                 OfflinePlayer sender, target;
 
-                try
-                {
+                try {
                     sender = PlayerSearch.offlinePlayerSearch(reportData.senderUUID);
                     assert (sender != null);
-                }
-                catch (AssertionError ex)
-                {
+                } catch (AssertionError ex) {
                     logSevere(ex);
                     return;
                 }
 
-                try
-                {
+                try {
                     target = PlayerSearch.offlinePlayerSearch(reportData.targetUUID);
                     assert (target != null);
-                }
-                catch (AssertionError ex)
-                {
+                } catch (AssertionError ex) {
                     logSevere(ex);
                     return;
                 }
 
-                _hexusPlugin.getServer()
-                        .getOnlinePlayers()
+                _hexusPlugin.getServer().getOnlinePlayers()
                         .stream()
                         .filter(player -> player.hasPermission(PERM.REPORT_ALERTS.name()))
                         .forEach(player ->
@@ -136,14 +118,12 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         _reportGuis.keySet().forEach(HumanEntity::closeInventory);
         _reportGuis.clear();
     }
 
-    public void submitReport(Player reporter, OfflinePlayer target, String message, ReportSubmitReason reason)
-    {
+    public void submitReport(Player reporter, OfflinePlayer target, String message, ReportSubmitReason reason) {
         new ReportData(Map.ofEntries(Map.entry("uuid", UUID.randomUUID().toString()),
                 Map.entry("senderUUID", reporter.getUniqueId().toString()),
                 Map.entry("targetUUID", target.getUniqueId().toString()),
@@ -154,8 +134,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
                 Map.entry("server", _corePortal._serverName))).submit(_coreDatabase._database._jedis);
     }
 
-    public void openReportGui(Player reporter, OfflinePlayer target, String message)
-    {
+    public void openReportGui(Player reporter, OfflinePlayer target, String message) {
         Inventory inventory = _hexusPlugin.getServer().createInventory(reporter, 3 * 9, "Report - " + target.getName());
 
         ItemStack targetSkull = UtilItem.createPlayerSkull(target.getName(),
@@ -194,8 +173,7 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
         inventory.setItem(14, client);
         inventory.setItem(16, misc);
 
-        if (reporter.hasPermission(PERM.COMMAND_REPORT_HISTORY.name()))
-        {
+        if (reporter.hasPermission(PERM.COMMAND_REPORT_HISTORY.name())) {
             inventory.setItem(26, history);
         }
 
@@ -204,63 +182,47 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
         reporter.playSound(reporter.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
-    public void openHistoryGui(Player reporter, OfflinePlayer target)
-    {
+    public void openHistoryGui(Player reporter, OfflinePlayer target) {
         // TODO: Paginated report history
         reporter.sendMessage(F.fMain(this, "The report history GUI is still work in progress."));
     }
 
     @EventHandler
-    void onInventoryClose(InventoryCloseEvent event)
-    {
+    void onInventoryClose(InventoryCloseEvent event) {
         _reportGuis.remove(event.getPlayer());
     }
 
     @EventHandler
-    void onInventoryClick(InventoryClickEvent event)
-    {
-        if (!(event.getWhoClicked() instanceof Player reporter))
-        {
+    void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player reporter)) {
             return;
         }
 
         ReportGui reportGui = _reportGuis.get(reporter);
-        if (reportGui == null)
-        {
+        if (reportGui == null) {
             return;
         }
-        if (!reportGui._inventory().equals(event.getInventory()))
-        {
+        if (!reportGui._inventory().equals(event.getInventory())) {
             return;
         }
 
         event.setCancelled(true);
 
-        if (event.getCurrentItem().equals(reportGui._history()))
-        {
+        if (event.getCurrentItem().equals(reportGui._history())) {
             openHistoryGui(reporter, reportGui._target());
             return;
         }
 
         AtomicReference<ReportSubmitReason> reportReason = new AtomicReference<>();
-        if (event.getCurrentItem().equals(reportGui._chat()))
-        {
+        if (event.getCurrentItem().equals(reportGui._chat())) {
             reportReason.set(ReportSubmitReason.CHAT);
-        }
-        else if (event.getCurrentItem().equals(reportGui._gameplay()))
-        {
+        } else if (event.getCurrentItem().equals(reportGui._gameplay())) {
             reportReason.set(ReportSubmitReason.GAMEPLAY);
-        }
-        else if (event.getCurrentItem().equals(reportGui._client()))
-        {
+        } else if (event.getCurrentItem().equals(reportGui._client())) {
             reportReason.set(ReportSubmitReason.CLIENT);
-        }
-        else if (event.getCurrentItem().equals(reportGui._misc()))
-        {
+        } else if (event.getCurrentItem().equals(reportGui._misc())) {
             reportReason.set(ReportSubmitReason.MISC);
-        }
-        else
-        {
+        } else {
             return;
         }
 
@@ -274,12 +236,9 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
 
         _hexusPlugin.runAsync(() ->
         {
-            try
-            {
+            try {
                 submitReport(reporter, reportGui._target(), reportGui._message(), reportReason.get());
-            }
-            catch (JedisException ex)
-            {
+            } catch (JedisException ex) {
                 actionBar.setMessage(F.fActionBar(this,
                         F.fError("Error while submitting report against ",
                                 F.fItem(reportGui._target().getName()),
@@ -301,6 +260,12 @@ public class CoreReport extends MiniPlugin<HexusPlugin>
             reporter.sendMessage(F.fMain(this,
                     F.fSuccess("Your report has been successfully submitted and will be reviewed shortly.")));
         });
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_REPORT,
+        COMMAND_REPORT_HISTORY,
+        REPORT_ALERTS
     }
 
 }

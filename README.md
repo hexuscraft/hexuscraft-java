@@ -105,7 +105,7 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 > |-------------------:|:----------------------------------------|
 > |           capacity | **Integer**                             |
 > |              games | **String** (Game Enums split by commas) |
-> |       hostUniqueId | **String** (Player UUID)                |
+> |           hostUUID | **String** (Player UUID)                |
 > |    joinableServers | **Integer**                             |
 > |            maxPort | **Integer**                             |
 > |            minPort | **Integer**                             |

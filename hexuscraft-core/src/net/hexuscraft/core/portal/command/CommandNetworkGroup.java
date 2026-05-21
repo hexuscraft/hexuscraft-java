@@ -6,11 +6,9 @@ import net.hexuscraft.core.portal.CorePortal;
 
 import java.util.Set;
 
-public class CommandNetworkGroup extends BaseMultiCommand<CorePortal>
-{
+public class CommandNetworkGroup extends BaseMultiCommand<CorePortal> {
 
-    public CommandNetworkGroup(CorePortal corePortal, CoreDatabase coreDatabase)
-    {
+    public CommandNetworkGroup(CorePortal corePortal, CoreDatabase coreDatabase) {
         super(corePortal,
                 "group",
                 "Manage server groups.",

@@ -10,48 +10,38 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
-public class CoreBuildVersion extends MiniPlugin<HexusPlugin>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_BUILDVERSION
-    }
+public class CoreBuildVersion extends MiniPlugin<HexusPlugin> {
 
     CoreCommand _pluginCommand;
 
-    public CoreBuildVersion(HexusPlugin plugin)
-    {
+    public CoreBuildVersion(HexusPlugin plugin) {
         super(plugin, "Build Version");
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _pluginCommand.register(new CommandBuildVersion(this));
     }
 
-    public long getLastModifiedMillis()
-    {
+    public long getLastModifiedMillis() {
         return _hexusPlugin.getFile().lastModified();
     }
 
-    public long getSizeBytes()
-    {
-        try
-        {
+    public long getSizeBytes() {
+        try {
             return Files.size(_hexusPlugin.getFile().toPath());
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_BUILDVERSION
     }
 
 }

@@ -11,39 +11,32 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 
-public class HubDoubleJump extends MiniPlugin<Hub>
-{
+public class HubDoubleJump extends MiniPlugin<Hub> {
 
-    public HubDoubleJump(Hub hub)
-    {
+    public HubDoubleJump(Hub hub) {
         super(hub, "Double Jump");
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    void onPlayerJoin(PlayerJoinEvent event)
-    {
+    void onPlayerJoin(PlayerJoinEvent event) {
         event.getPlayer().setAllowFlight(true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    void onGameModeChanged(PlayerGameModeChangeEvent event)
-    {
+    void onGameModeChanged(PlayerGameModeChangeEvent event) {
         // For some reason we need to delay this by a tick even though EventPriority.MONITOR should be the last to fire.
         // Probably some quirky nms logic when changing game mode.
         _hexusPlugin.runSyncLater(() -> event.getPlayer().setAllowFlight(true), 1);
     }
 
     @EventHandler
-    void onPlayerToggleFlight(PlayerToggleFlightEvent event)
-    {
+    void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
 
-        if (player.getGameMode().equals(GameMode.CREATIVE))
-        {
+        if (player.getGameMode().equals(GameMode.CREATIVE)) {
             return;
         }
-        if (!event.isFlying())
-        {
+        if (!event.isFlying()) {
             return;
         }
 

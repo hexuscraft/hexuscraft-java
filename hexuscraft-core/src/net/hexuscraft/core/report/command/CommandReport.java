@@ -14,11 +14,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandReport extends BaseCommand<CoreReport>
-{
+public class CommandReport extends BaseCommand<CoreReport> {
 
-    public CommandReport(CoreReport coreReport)
-    {
+    public CommandReport(CoreReport coreReport) {
         super(coreReport,
                 "report",
                 "<Player> [Message]",
@@ -28,23 +26,19 @@ public class CommandReport extends BaseCommand<CoreReport>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length < 1)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length < 1) {
             sender.sendMessage(help(alias));
             return;
         }
 
-        if (!(sender instanceof Player player))
-        {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(F.fMain(this) + "Only players can use this command.");
             return;
         }
 
         OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], player);
-        if (offlinePlayer == null)
-        {
+        if (offlinePlayer == null) {
             sender.sendMessage(F.fMatches(new String[]{}, args[0]));
             return;
         }
@@ -55,17 +49,14 @@ public class CommandReport extends BaseCommand<CoreReport>
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args)
-    {
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
         List<String> names = new ArrayList<>();
-        if (args.length == 1)
-        {
+        if (args.length == 1) {
 
             //noinspection ReassignedVariable
             Stream<? extends Player> streamedOnlinePlayers =
                     _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
-            if (sender instanceof Player player)
-            {
+            if (sender instanceof Player player) {
                 streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
             }
 

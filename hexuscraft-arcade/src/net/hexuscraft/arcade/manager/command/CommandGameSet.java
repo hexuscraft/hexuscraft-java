@@ -5,11 +5,9 @@ import net.hexuscraft.core.command.BaseCommand;
 
 import java.util.Set;
 
-public class CommandGameSet extends BaseCommand<ArcadeManager>
-{
+public class CommandGameSet extends BaseCommand<ArcadeManager> {
 
-    CommandGameSet(ArcadeManager arcadeManager)
-    {
+    CommandGameSet(ArcadeManager arcadeManager) {
         super(arcadeManager,
                 "set",
                 "<Name> [Map]",

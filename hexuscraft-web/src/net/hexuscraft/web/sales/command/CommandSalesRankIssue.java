@@ -16,13 +16,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandSalesRankIssue extends BaseCommand<WebSales>
-{
+public class CommandSalesRankIssue extends BaseCommand<WebSales> {
 
     CoreDatabase _coreDatabase;
 
-    public CommandSalesRankIssue(WebSales miniPlugin, CoreDatabase coreDatabase)
-    {
+    public CommandSalesRankIssue(WebSales miniPlugin, CoreDatabase coreDatabase) {
         super(miniPlugin,
                 "issue",
                 "<Username> <Rank>",
@@ -34,38 +32,29 @@ public class CommandSalesRankIssue extends BaseCommand<WebSales>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
+    public void run(CommandSender sender, String alias, String[] args) {
         OfflinePlayer target = PlayerSearch.offlinePlayerSearch(args[0], sender);
-        if (target == null)
-        {
+        if (target == null) {
             return;
         }
 
         PermissionGroup permissionGroup;
-        try
-        {
+        try {
             permissionGroup = PermissionGroup.valueOf(args[1]);
-        }
-        catch (IllegalArgumentException ex)
-        {
+        } catch (IllegalArgumentException ex) {
             sender.sendMessage(F.fMain(this, F.fMatches(new String[0], args[1])));
             return;
         }
 
-        if (!Arrays.asList(WebSales.STORE_RANKS).contains(permissionGroup))
-        {
+        if (!Arrays.asList(WebSales.STORE_RANKS).contains(permissionGroup)) {
             sender.sendMessage(F.fMain(this,
                     F.fError("Permission group ", F.fItem(permissionGroup.name()), " is not a purchasable rank.")));
             return;
         }
 
-        try
-        {
+        try {
             _coreDatabase._database._jedis.sadd(PermissionQueries.GROUPS(target.getUniqueId()), permissionGroup.name());
-        }
-        catch (JedisException ex)
-        {
+        } catch (JedisException ex) {
             sender.sendMessage(F.fMain(this,
                     F.fError("An error occurred while adding permission group. Please try again later or contact an " +
                             "administrator if this issue persists.")));
@@ -80,13 +69,10 @@ public class CommandSalesRankIssue extends BaseCommand<WebSales>
                         F.fItem(target.getName()),
                         ".")));
 
-        try
-        {
+        try {
             _coreDatabase._database._jedis.publish(SalesProcessedMessage.CHANNEL_NAME,
                     new SalesProcessedMessage(target.getUniqueId(), permissionGroup.name()).toString());
-        }
-        catch (JedisException ex)
-        {
+        } catch (JedisException ex) {
             sender.sendMessage(F.fMain(this,
                     F.fError("An error occurred while sending sales processed message."),
                     " The user has still received their package but they were not informed about it in-game."));
@@ -95,22 +81,17 @@ public class CommandSalesRankIssue extends BaseCommand<WebSales>
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args)
-    {
-        switch (args.length)
-        {
-            case 1 ->
-            {
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        switch (args.length) {
+            case 1 -> {
                 return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
                         sender,
                         false);
             }
-            case 2 ->
-            {
+            case 2 -> {
                 return List.of(Arrays.stream(WebSales.STORE_RANKS).map(PermissionGroup::name).toArray(String[]::new));
             }
-            default ->
-            {
+            default -> {
                 return List.of();
             }
         }

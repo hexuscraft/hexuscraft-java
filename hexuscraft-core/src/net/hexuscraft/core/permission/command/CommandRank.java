@@ -6,11 +6,9 @@ import net.hexuscraft.core.permission.CorePermission;
 
 import java.util.Set;
 
-public class CommandRank extends BaseMultiCommand<CorePermission>
-{
+public class CommandRank extends BaseMultiCommand<CorePermission> {
 
-    public CommandRank(CorePermission corePermission, CoreDatabase coreDatabase)
-    {
+    public CommandRank(CorePermission corePermission, CoreDatabase coreDatabase) {
         super(corePermission,
                 "rank",
                 "Manage permission groups of players.",

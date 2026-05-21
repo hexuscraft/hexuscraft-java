@@ -20,57 +20,50 @@ import org.bukkit.scoreboard.Scoreboard;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HubScoreboard extends MiniPlugin<Hub>
-{
+public class HubScoreboard extends MiniPlugin<Hub> {
 
     final Map<Player, List<BukkitTask>> _sidebarUpdateTasks;
     private final String SIDEBAR_TITLE = "          Welcome %s, to the Hexuscraft Network!";
+    private final int SIDEBAR_TITLE_MAX_CHARS = 16;
     CorePortal _corePortal;
     CorePermission _corePermission;
 
-    public HubScoreboard(Hub hub)
-    {
+    public HubScoreboard(Hub hub) {
         super(hub, "Scoreboard");
 
         _sidebarUpdateTasks = new HashMap<>();
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
         _corePermission = (CorePermission) dependencies.get(CorePermission.class);
     }
 
     @Override
-    public void onEnable()
-    {
-        _hexusPlugin.getServer()
-                .getOnlinePlayers()
+    public void onEnable() {
+        _hexusPlugin.getServer().getOnlinePlayers()
                 .stream()
                 .map(player -> new PlayerJoinEvent(player, null))
                 .forEach(this::onPlayerJoin);
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         _sidebarUpdateTasks.values().stream().flatMap(Collection::stream).forEach(BukkitTask::cancel);
         _sidebarUpdateTasks.clear();
     }
 
     @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event)
-    {
+    void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Scoreboard scoreboard = player.getScoreboard(); // Player's scoreboard is set by CoreScoreboard
 
         String sidebarTitle = SIDEBAR_TITLE.formatted(player.getName());
         AtomicInteger sidebarTitleIndex = new AtomicInteger();
 
-        Objective sidebarObjective =
-                scoreboard.registerNewObjective(sidebarTitle.substring(0, Math.min(16, sidebarTitle.length())),
-                        "dummy");
+        Objective sidebarObjective = scoreboard.registerNewObjective(sidebarTitle.substring(0,
+                Math.min(SIDEBAR_TITLE_MAX_CHARS, sidebarTitle.length())), "dummy");
         sidebarObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         List<Score> sidebarScores = new ArrayList<>();
@@ -84,8 +77,7 @@ public class HubScoreboard extends MiniPlugin<Hub>
             sidebarScores.clear();
 
             String[] lines = generateSidebarLines(player);
-            for (int i = 0; i < lines.length; i++)
-            {
+            for (int i = 0; i < lines.length; i++) {
                 String line = lines[lines.length - i - 1];
                 Score score = sidebarObjective.getScore(C.hexMap.get(i) + C.fReset + line);
                 score.setScore(i);
@@ -93,28 +85,26 @@ public class HubScoreboard extends MiniPlugin<Hub>
             }
         }, 0, 20));
 
-        if (sidebarTitle.length() > 16)
-        {
+        if (sidebarTitle.length() > SIDEBAR_TITLE_MAX_CHARS) {
             sidebarTasks.add(_hexusPlugin.runSyncTimer(() ->
             {
                 int index = sidebarTitleIndex.getAndUpdate(operand -> (operand + 1) % sidebarTitle.length());
 
                 sidebarObjective.setDisplayName(C.cWhite +
                         C.fBold +
-                        (index + 16 > sidebarTitle.length() ?
+                        (index + SIDEBAR_TITLE_MAX_CHARS > sidebarTitle.length() ?
                                 sidebarTitle.substring(index) +
-                                        sidebarTitle.substring(0, 16 - (sidebarTitle.length() - index)) :
-                                sidebarTitle.substring(index, index + 16)));
+                                        sidebarTitle.substring(0,
+                                                SIDEBAR_TITLE_MAX_CHARS - (sidebarTitle.length() - index)) :
+                                sidebarTitle.substring(index, index + SIDEBAR_TITLE_MAX_CHARS)));
             }, 0, 4));
         }
     }
 
     @EventHandler
-    void onPlayerQuit(PlayerQuitEvent event)
-    {
+    void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        if (!_sidebarUpdateTasks.containsKey(player))
-        {
+        if (!_sidebarUpdateTasks.containsKey(player)) {
             return;
         }
 
@@ -122,8 +112,7 @@ public class HubScoreboard extends MiniPlugin<Hub>
         _sidebarUpdateTasks.remove(player);
     }
 
-    String[] generateSidebarLines(Player player)
-    {
+    String[] generateSidebarLines(Player player) {
         return new String[]{C.cAqua + C.fBold + "Server",
                 _corePortal._serverName,
                 "",

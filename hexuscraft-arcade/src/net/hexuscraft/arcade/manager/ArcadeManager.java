@@ -24,22 +24,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ArcadeManager extends MiniPlugin<Arcade>
-{
+public class ArcadeManager extends MiniPlugin<Arcade> {
 
-    public enum PERM implements IPermission
-    {
-        COMMAND_GAME,
-        COMMAND_GAME_SET,
-        COMMAND_GAME_START,
-        COMMAND_GAME_STOP,
-        COMMAND_HUB
-    }
-
-    final Map<GameType, Class<? extends Game>> GAME_CLASS_MAP =
-            Map.ofEntries(Map.entry(GameType.SURVIVAL_GAMES, GameSurvivalGames.class),
-                    Map.entry(GameType.SURVIVAL_GAMES_2, GameSurvivalGamesDuo.class),
-                    Map.entry(GameType.THE_BRIDGES, GameTheBridges.class));
+    final Map<GameType, Class<? extends Game>> GAME_CLASS_MAP = Map.ofEntries(Map.entry(GameType.SURVIVAL_GAMES, GameSurvivalGames.class), Map.entry(GameType.SURVIVAL_GAMES_2, GameSurvivalGamesDuo.class), Map.entry(GameType.THE_BRIDGES, GameTheBridges.class));
     final Random _nextBestGameRandom = new Random();
     final AtomicReference<BukkitTask> _gameTickTask = new AtomicReference<>();
     public AtomicReference<Game> _game = new AtomicReference<>();
@@ -48,8 +35,7 @@ public class ArcadeManager extends MiniPlugin<Arcade>
     CoreDatabase _coreDatabase;
     CorePortal _corePortal;
 
-    public ArcadeManager(Arcade arcade)
-    {
+    public ArcadeManager(Arcade arcade) {
         super(arcade, "Game");
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME);
@@ -58,16 +44,14 @@ public class ArcadeManager extends MiniPlugin<Arcade>
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _coreCommand.register(new CommandGame(this));
         _coreCommand.register(new CommandHub(this, _corePortal));
 
@@ -75,59 +59,42 @@ public class ArcadeManager extends MiniPlugin<Arcade>
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         BukkitTask oldTask = _gameTickTask.getAndSet(null);
-        if (oldTask == null)
-        {
+        if (oldTask == null) {
             return;
         }
         oldTask.cancel();
     }
 
-    void tick()
-    {
-        if (_game.get() == null)
-        {
+    void tick() {
+        if (_game.get() == null) {
             GameType nextBestGametype = selectNextBestGame();
-            if (nextBestGametype == null)
-            {
+            if (nextBestGametype == null) {
                 logWarning("Could not select next best game!");
                 return;
             }
 
-            if (!GAME_CLASS_MAP.containsKey(nextBestGametype))
-            {
+            if (!GAME_CLASS_MAP.containsKey(nextBestGametype)) {
                 logWarning("Could not find class for game type '" + nextBestGametype.name() + "'!");
                 return;
             }
 
-            try
-            {
-                Constructor<? extends Game> constructor =
-                        GAME_CLASS_MAP.get(nextBestGametype).getDeclaredConstructor(ArcadeManager.class);
+            try {
+                Constructor<? extends Game> constructor = GAME_CLASS_MAP.get(nextBestGametype).getDeclaredConstructor(ArcadeManager.class);
                 constructor.setAccessible(true);
                 _game.set(constructor.newInstance(this));
-            }
-            catch (InstantiationException |
-                   IllegalAccessException |
-                   InvocationTargetException |
-                   NoSuchMethodException ex)
-            {
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException ex) {
                 logSevere(ex);
                 return;
             }
         }
 
-        switch (getGameState())
-        {
+        switch (getGameState()) {
             case null -> setGameState(GameState.LOADING_MAP);
-            case LOADING_MAP ->
-            {
-                if (_gameMap.get() != null)
-                {
-                    return;
-                }
+            case LOADING_MAP -> {
+                if (_gameMap.get() != null) return;
                 _gameMap.set(new GameMap());
 
                 setGameState(GameState.WAITING_FOR_PLAYERS);
@@ -140,36 +107,34 @@ public class ArcadeManager extends MiniPlugin<Arcade>
         }
     }
 
-    public GameState getGameState()
-    {
+    public GameState getGameState() {
         Game game = _game.get();
         return game == null ? null : game._state.get();
     }
 
-    boolean setGameState(GameState newState)
-    {
+    boolean setGameState(GameState newState) {
         GameStateChangedEvent event = new GameStateChangedEvent(_game.get()._state.get(), newState);
         _hexusPlugin.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled())
-        {
+        if (event.isCancelled()) {
             return false;
         }
         _game.get()._state.set(newState);
         return true;
     }
 
-    GameType selectNextBestGame()
-    {
+    GameType selectNextBestGame() {
         GameType[] games = _corePortal.getServerGroup(_corePortal._serverGroupName)._games;
-        if (games.length == 0)
-        {
+        if (games.length == 0) {
             return Arrays.stream(GameType.values()).findAny().orElse(null);
         }
-        if (games.length == 1)
-        {
+        if (games.length == 1) {
             return games[0];
         }
         return games[_nextBestGameRandom.nextInt(0, games.length - 1)];
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_GAME, COMMAND_GAME_SET, COMMAND_GAME_START, COMMAND_GAME_STOP, COMMAND_HUB
     }
 
 }

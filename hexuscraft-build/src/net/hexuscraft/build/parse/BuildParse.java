@@ -11,37 +11,31 @@ import org.bukkit.World;
 
 import java.util.Map;
 
-public class BuildParse extends MiniPlugin<Build>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_PARSE
-    }
+public class BuildParse extends MiniPlugin<Build> {
 
     CoreCommand _command;
 
-    public BuildParse(Build build)
-    {
+    public BuildParse(Build build) {
         super(build, "Parse");
 
         PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_PARSE);
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _command = (CoreCommand) dependencies.get(CoreCommand.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _command.register(new CommandParse(this));
     }
 
-    public void parse(World world, int radius)
-    {
+    public void parse(World world, int radius) {
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_PARSE
     }
 
 }

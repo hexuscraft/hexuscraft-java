@@ -13,11 +13,9 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.Set;
 
-public class CommandWorldCreate extends BaseCommand<BuildWorld>
-{
+public class CommandWorldCreate extends BaseCommand<BuildWorld> {
 
-    public CommandWorldCreate(BuildWorld buildWorld)
-    {
+    public CommandWorldCreate(BuildWorld buildWorld) {
         super(buildWorld,
                 "create",
                 "<Name>",
@@ -27,10 +25,8 @@ public class CommandWorldCreate extends BaseCommand<BuildWorld>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length != 1)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length != 1) {
             sender.sendMessage(help(alias));
             return;
         }
@@ -57,8 +53,7 @@ public class CommandWorldCreate extends BaseCommand<BuildWorld>
 
         sender.sendMessage(F.fMain(this, "Created world ", F.fItem(world.getName()), "."));
 
-        if (!(sender instanceof Player player))
-        {
+        if (!(sender instanceof Player player)) {
             return;
         }
         player.teleport(world.getSpawnLocation());

@@ -28,38 +28,23 @@ import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.exceptions.JedisException;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-public class CorePunish extends MiniPlugin<HexusPlugin>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_PUNISH,
-        COMMAND_PUNISH_SEVERITY_1,
-        COMMAND_PUNISH_SEVERITY_2,
-        COMMAND_PUNISH_SEVERITY_3,
-        COMMAND_PUNISH_SEVERITY_4,
-        COMMAND_PUNISH_HISTORY,
-        COMMAND_RULES,
-        PUNISH_ALERTS,
-    }
+public class CorePunish extends MiniPlugin<HexusPlugin> {
 
     static final Logger log = LoggerFactory.getLogger(CorePunish.class);
     final long ONE_DAY_MILLIS = 86400000;
@@ -68,15 +53,14 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
     CorePortal _corePortal;
     CoreActionBar _coreActionBar;
     Map<HumanEntity, PunishGui> _punishGuis;
+    Map<HumanEntity, PunishHistoryGui> _punishHistoryGuis;
 
-    public CorePunish(HexusPlugin plugin)
-    {
+    public CorePunish(HexusPlugin plugin) {
         super(plugin, "Punish");
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
@@ -95,11 +79,11 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_PUNISH_SEVERITY_4);
 
         _punishGuis = new HashMap<>();
+        _punishHistoryGuis = new HashMap<>();
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _pluginCommand.register(new CommandRules(this));
         _pluginCommand.register(new CommandPunish(this));
         _pluginCommand.register(new CommandPunishHistory(this));
@@ -111,13 +95,10 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             _hexusPlugin.runAsync(() ->
             {
                 OfflinePlayer target;
-                try
-                {
+                try {
                     target = PlayerSearch.offlinePlayerSearch(punishData._targetUUID);
                     assert (target != null);
-                }
-                catch (AssertionError ex)
-                {
+                } catch (AssertionError ex) {
                     logWarning("Could not fetch offline player for punish _target '" +
                             punishData._targetUUID +
                             "': " +
@@ -126,19 +107,13 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                 }
 
                 AtomicReference<String> staffName = new AtomicReference<>();
-                if (punishData._staffUUID.equals(UtilUniqueId.EMPTY_UUID))
-                {
+                if (punishData._staffUUID.equals(UtilUniqueId.EMPTY_UUID)) {
                     staffName.set(_hexusPlugin.getServer().getConsoleSender().getName());
-                }
-                else
-                {
-                    try
-                    {
+                } else {
+                    try {
                         staffName.set(Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(punishData._staffUUID))
                                 .getName());
-                    }
-                    catch (NullPointerException ex)
-                    {
+                    } catch (NullPointerException ex) {
                         logSevere(ex);
                         return;
                     }
@@ -151,14 +126,12 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                     targetPlayer.playSound(targetPlayer.getLocation(), Sound.CAT_MEOW, Float.MAX_VALUE, 0.6F);
                 });
 
-                _hexusPlugin.getServer()
-                        .getOnlinePlayers()
+                _hexusPlugin.getServer().getOnlinePlayers()
                         .stream()
                         .filter((Player staff) -> staff.hasPermission(PERM.PUNISH_ALERTS.name()))
                         .forEach((Player staff) ->
                         {
-                            switch (punishData._type)
-                            {
+                            switch (punishData._type) {
                                 case PunishType.WARNING -> staff.sendMessage(F.fStaff(this,
                                         F.fItem(staffName.get()),
                                         " warned ",
@@ -194,128 +167,20 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         });
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    void onConnect(AsyncPlayerPreLoginEvent event)
-    {
-        if (!event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.ALLOWED))
-        {
-            return;
-        }
-
-        try
-        {
-            UnifiedJedis jedis = _coreDatabase._database._jedis;
-            Set<UUID> punishmentIds = jedis.smembers(PunishQueries.RECEIVED(event.getUniqueId()))
-                    .stream()
-                    .map(UUID::fromString)
-                    .collect(Collectors.toSet());
-
-            // We want to display the longest ban remaining.
-            // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most
-            // recent ban.
-            // If there are multiple bans matching this and were also applied at the EXACT same time (??), fate
-            // decides the displayed _message.
-
-            Set<PunishData> activePunishments = new HashSet<>();
-
-            for (UUID punishmentUniqueId : punishmentIds)
-            {
-                try
-                {
-                    Map<String, String> rawData =
-                            new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
-                    rawData.put("uuid", punishmentUniqueId.toString());
-
-                    PunishData punishData = new PunishData(rawData);
-                    if (!punishData._active)
-                    {
-                        continue;
-                    }
-                    if (!punishData._type.equals(PunishType.BAN))
-                    {
-                        continue;
-                    }
-
-                    if (punishData._length == -1)
-                    { // permanent ban
-                        activePunishments.add(punishData);
-                        continue;
-                    }
-
-                    long remaining = punishData.getRemaining();
-                    if (remaining <= 0)
-                    {
-                        _coreDatabase._database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
-                                Map.of("active",
-                                        "false",
-                                        "removeOrigin",
-                                        Long.toString(System.currentTimeMillis()),
-                                        "removeReason",
-                                        "EXPIRED",
-                                        "removeServer",
-                                        _corePortal._serverName,
-                                        "removeStaffId",
-                                        UtilUniqueId.EMPTY_UUID.toString(),
-                                        "removeStaffServer",
-                                        _corePortal._serverName));
-                        continue;
-                    }
-
-                    activePunishments.add(punishData);
-                }
-                catch (JedisException ex)
-                {
-                    logWarning("Error while checking punish punish player");
-                }
-            }
-
-            if (activePunishments.isEmpty())
-            {
-                return;
-            }
-
-            AtomicReference<PunishData> punishData = new AtomicReference<>();
-            if (activePunishments.size() > 1)
-            {
-                for (PunishData data : activePunishments)
-                {
-                    if (punishData.get() == null)
-                    {
-                        punishData.set(data);
-                        continue;
-                    }
-                    punishData.set(punishData.get().compare(data));
-                }
-            }
-            else
-            {
-                punishData.set(activePunishments.iterator().next());
-            }
-
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, F.fPunish(punishData.get()));
-        }
-        catch (JedisException ex)
-        {
-            logWarning("Error while fetching punishment punish for '" + event.getName() + "': " + ex.getMessage());
-        }
-    }
-
     public BukkitTask punishAsync(UUID targetUUID,
-            UUID staffUUID,
-            PunishType punishType,
-            long lengthMillis,
-            String reason)
-    {
+                                  UUID staffUUID,
+                                  PunishType punishType,
+                                  long lengthMillis,
+                                  String reason) {
         return punishAsync(targetUUID, staffUUID, punishType, lengthMillis, reason, null);
     }
 
     public BukkitTask punishAsync(UUID targetUUID,
-            UUID staffUUID,
-            PunishType punishType,
-            long lengthMillis,
-            String reason,
-            Consumer<PunishData> callback)
-    {
+                                  UUID staffUUID,
+                                  PunishType punishType,
+                                  long lengthMillis,
+                                  String reason,
+                                  Consumer<PunishData> callback) {
         PunishData punishData = new PunishData(UUID.randomUUID(),
                 punishType,
                 true,
@@ -329,26 +194,21 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
 
         return _hexusPlugin.runAsync(() ->
         {
-            try
-            {
+            try {
                 punishData.publish(_coreDatabase._database._jedis);
-            }
-            catch (JedisException ex)
-            {
+            } catch (JedisException ex) {
                 logSevere(ex);
                 callback.accept(null);
                 return;
             }
-            if (callback != null)
-            {
+            if (callback != null) {
                 callback.accept(punishData);
             }
         });
     }
 
     @SuppressWarnings("deprecation")
-    public void openPunishGui(Player staff, OfflinePlayer target, String reason)
-    {
+    public void openPunishGui(Player staff, OfflinePlayer target, String reason) {
         Inventory inventory = _hexusPlugin.getServer().createInventory(staff, 6 * 9, "Punish - " + target.getName());
 
         ItemStack skull = UtilItem.createPlayerSkull(target.getName(),
@@ -443,8 +303,7 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
 
         inventory.setItem(4, skull);
 
-        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
-        {
+        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) {
             inventory.setItem(19, mute1d);
             inventory.setItem(20, mute3d);
             inventory.setItem(22, ban1d);
@@ -452,24 +311,21 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
             inventory.setItem(25, warning);
         }
 
-        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
-        {
+        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name())) {
             inventory.setItem(28, mute5d);
             inventory.setItem(29, mute7d);
             inventory.setItem(31, ban5d);
             inventory.setItem(32, ban7d);
         }
 
-        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
-        {
+        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name())) {
             inventory.setItem(37, mute14d);
             inventory.setItem(38, mute28d);
             inventory.setItem(40, ban14d);
             inventory.setItem(41, ban28d);
         }
 
-        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
-        {
+        if (staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name())) {
             inventory.setItem(34, mutePerm);
             inventory.setItem(43, banPerm);
         }
@@ -497,211 +353,235 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
         staff.openInventory(inventory);
     }
 
-    public void openHistoryGui(Player viewer, OfflinePlayer target)
-    {
+    public void openHistoryGui(Player viewer, OfflinePlayer target) {
         boolean viewerCanPunish = viewer.hasPermission(PERM.COMMAND_PUNISH.name());
 
-        Inventory gui = _hexusPlugin.getServer().createInventory(viewer, 6 * 9, "Punish History - " + target.getName());
+        Inventory inventory =
+                _hexusPlugin.getServer().createInventory(viewer, 6 * 9, "Punish History - " + target.getName());
 
-        ItemStack targetSkull = UtilItem.createPlayerSkull(target.getName(),
-                C.cGreen + C.fBold + target.getName(),
-                target.getUniqueId().toString(),
-                "",
-                C.cWhite + "Viewing punishment history");
+        inventory.setItem(4,
+                UtilItem.createPlayerSkull(target.getName(),
+                        C.cGreen + C.fBold + target.getName(),
+                        target.getUniqueId().toString(),
+                        "",
+                        C.cWhite + "Viewing punishment history"));
 
-        //        ItemStack openPunishGui = UtilItem.createItem(Material.NAME_TAG, C.cBlue + C.fBold + "Apply
-        //        Punishment",
-        //                "Open the punishment menu for " + F.fItem(_target.getName()));
-        //
-        //        if (viewerCanPunish) gui.setItem(53, openPunishGui);
-
-        gui.setItem(4, targetSkull);
-
-
-        viewer.openInventory(gui);
-    }
-
-    @EventHandler
-    void onInventoryClose(InventoryCloseEvent event)
-    {
-        _punishGuis.remove(event.getPlayer());
-    }
-
-    @EventHandler
-    void onInventoryClick(InventoryClickEvent event)
-    {
-        if (!(event.getWhoClicked() instanceof Player staff))
+        AtomicInteger loadingIndex = new AtomicInteger();
+        String loadingDisplayName = C.cGold + C.fBold + "Loading Punishments";
+        ItemStack loadingActiveIndex = UtilItem.create(Material.EMERALD_BLOCK, loadingDisplayName);
+        ItemStack loadingInactiveIndex = UtilItem.create(Material.IRON_BLOCK, loadingDisplayName);
+        BukkitTask loadingTask = _hexusPlugin.runAsyncTimer(() ->
         {
+            int index = loadingIndex.getAndUpdate(operand ->
+            {
+                if (operand >= 2) {
+                    return 0;
+                }
+                return operand + 1;
+            });
+
+            inventory.setItem(30, index == 0 ? loadingActiveIndex : loadingInactiveIndex);
+            inventory.setItem(31, index == 1 ? loadingActiveIndex : loadingInactiveIndex);
+            inventory.setItem(32, index == 2 ? loadingActiveIndex : loadingInactiveIndex);
+        }, 0, 5);
+
+        Map<ItemStack, PunishData> punishments = new HashMap<>();
+        BukkitTask fetchTask = _hexusPlugin.runAsyncLater(() ->
+        {
+            PunishData[] punishDatas =
+                    _coreDatabase._database._jedis.smembers(PunishQueries.RECEIVED(target.getUniqueId()))
+                            .stream()
+                            .map(UUID::fromString)
+                            .map(punishmentUUID -> new PunishData(_coreDatabase._database._jedis.hgetAll(PunishQueries.PUNISHMENT(
+                                    punishmentUUID))))
+                            .sorted(Comparator.comparingLong(punishData -> -punishData._origin))
+                            // Sorting by negative origin makes the newest punishments appear first
+                            .toArray(PunishData[]::new);
+
+            loadingTask.cancel();
+            for (int i = 9; i < 54; i++)
+                inventory.setItem(i, null);
+
+            for (int i = 0; i < punishDatas.length; i++) {
+                if (i >= 9 * 6 - 1) {
+                    break;
+                }
+                PunishData punishData = punishDatas[i];
+                Material punishmentItemMaterial;
+                switch (punishData._type) {
+                    case BAN -> punishmentItemMaterial = Material.IRON_BLOCK;
+                    case KICK -> punishmentItemMaterial = Material.STICK;
+                    case WARNING -> punishmentItemMaterial = Material.PAPER;
+                    case MUTE -> punishmentItemMaterial = Material.BOOK_AND_QUILL;
+                    default -> punishmentItemMaterial = Material.GRASS;
+                }
+
+                SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                ItemStack punishmentItem = UtilItem.create(punishmentItemMaterial,
+                        C.cAqua + C.fBold + F.fTime(punishData._length) + " " + punishData._type._friendlyName,
+                        punishData._active ?
+                                F.fSuccess("This punishment is currently active") :
+                                F.fError("This punishment has been revoked"),
+                        "",
+                        "Reason: " + F.fItem(punishData._reason),
+                        "Issued at: " + F.fItem(dateFormatter.format(new Date(punishData._origin))),
+                        "Issued in: " + F.fItem(punishData._targetServer),
+                        "Expires at: " +
+                                F.fItem(dateFormatter.format(new Date(punishData._origin + punishData._length))),
+                        "Expires in: " + F.fItem(F.fTime(punishData.getRemaining())),
+                        "",
+                        "Remove reason: " +
+                                F.fItem(punishData._removeReason == null ? "N/A" : punishData._removeReason),
+                        "Removed at: " +
+                                F.fItem(punishData._removeOrigin == null ?
+                                        "N/A" :
+                                        dateFormatter.format(new Date(punishData._removeOrigin))));
+
+                inventory.setItem(i + 9, punishmentItem);
+            }
+        }, 1);
+
+        _punishHistoryGuis.put(viewer, new PunishHistoryGui(inventory, target, loadingTask, fetchTask, punishments));
+        viewer.openInventory(inventory);
+    }
+
+    @EventHandler
+    void onInventoryClose(InventoryCloseEvent event) {
+        HumanEntity player = event.getPlayer();
+
+        if (_punishHistoryGuis.containsKey(player)) {
+            _punishHistoryGuis.get(player)._loadingTask().cancel();
+        }
+
+        _punishGuis.remove(player);
+        _punishHistoryGuis.remove(player);
+    }
+
+    @EventHandler
+    void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player staff)) {
             return;
         }
 
         PunishGui punishGui = _punishGuis.get(staff);
-        if (punishGui != null && punishGui._inventory().equals(event.getInventory()))
-        {
+        if (punishGui != null && punishGui._inventory().equals(event.getInventory())) {
             event.setCancelled(true);
 
             AtomicReference<PunishType> type = new AtomicReference<>();
             AtomicLong lengthMillis = new AtomicLong(-1);
 
-            if (event.getCurrentItem().equals(punishGui._skull()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_HISTORY.name()))
-                {
+            if (event.getCurrentItem().equals(punishGui._skull())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_HISTORY.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 openHistoryGui(staff, punishGui._target());
-            }
-            else if (event.getCurrentItem().equals(punishGui._warning()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._warning())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.WARNING);
-            }
-            else if (event.getCurrentItem().equals(punishGui._mute1d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._mute1d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.MUTE);
                 lengthMillis.set(ONE_DAY_MILLIS);
-            }
-            else if (event.getCurrentItem().equals(punishGui._ban1d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._ban1d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.BAN);
                 lengthMillis.set(ONE_DAY_MILLIS);
-            }
-            else if (event.getCurrentItem().equals(punishGui._mute3d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._mute3d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.MUTE);
                 lengthMillis.set(ONE_DAY_MILLIS * 3);
-            }
-            else if (event.getCurrentItem().equals(punishGui._ban3d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._ban3d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_1.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.BAN);
                 lengthMillis.set(ONE_DAY_MILLIS * 3);
-            }
-            else if (event.getCurrentItem().equals(punishGui._mute5d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._mute5d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.MUTE);
                 lengthMillis.set(ONE_DAY_MILLIS * 5);
-            }
-            else if (event.getCurrentItem().equals(punishGui._ban5d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._ban5d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.BAN);
                 lengthMillis.set(ONE_DAY_MILLIS * 5);
-            }
-            else if (event.getCurrentItem().equals(punishGui._mute7d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._mute7d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.MUTE);
                 lengthMillis.set(ONE_DAY_MILLIS * 7);
-            }
-            else if (event.getCurrentItem().equals(punishGui._ban7d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._ban7d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_2.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.BAN);
                 lengthMillis.set(ONE_DAY_MILLIS * 7);
-            }
-            else if (event.getCurrentItem().equals(punishGui._mute14d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._mute14d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.MUTE);
                 lengthMillis.set(ONE_DAY_MILLIS * 14);
-            }
-            else if (event.getCurrentItem().equals(punishGui._ban14d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._ban14d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.BAN);
                 lengthMillis.set(ONE_DAY_MILLIS * 14);
-            }
-            else if (event.getCurrentItem().equals(punishGui._mute28d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._mute28d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.MUTE);
                 lengthMillis.set(ONE_DAY_MILLIS * 28);
-            }
-            else if (event.getCurrentItem().equals(punishGui._ban28d()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._ban28d())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_3.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.BAN);
                 lengthMillis.set(ONE_DAY_MILLIS * 28);
-            }
-            else if (event.getCurrentItem().equals(punishGui._mutePerm()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._mutePerm())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.MUTE);
-            }
-            else if (event.getCurrentItem().equals(punishGui._banPerm()))
-            {
-                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name()))
-                {
+            } else if (event.getCurrentItem().equals(punishGui._banPerm())) {
+                if (!staff.hasPermission(PERM.COMMAND_PUNISH_SEVERITY_4.name())) {
                     staff.sendMessage(F.fInsufficientPermissions());
                     return;
                 }
                 type.set(PunishType.BAN);
             }
 
-            if (type.get() == null)
-            {
+            if (type.get() == null) {
                 return;
             }
 
@@ -726,15 +606,33 @@ public class CorePunish extends MiniPlugin<HexusPlugin>
                                         F.fItem(punishGui._target().getName()),
                                         ".")));
                         _coreActionBar.unregisterActionBar(actionBar);
-                        if (punishData != null)
-                        {
+                        if (punishData != null) {
                             return;
                         }
                         staff.sendMessage(F.fMain(this,
                                 F.fError("There was an error while processing the punishment. Please try again " +
                                         "later or contact an administrator if this issue persists.")));
                     }));
+            return;
         }
+
+
+        PunishHistoryGui punishHistoryGui = _punishHistoryGuis.get(staff);
+        if (punishHistoryGui != null && punishHistoryGui._inventory().equals(event.getInventory())) {
+            event.setCancelled(true);
+            // TODO: Punish history GUI. Click to remove punishment.
+        }
+
     }
 
+    public enum PERM implements IPermission {
+        COMMAND_PUNISH,
+        COMMAND_PUNISH_SEVERITY_1,
+        COMMAND_PUNISH_SEVERITY_2,
+        COMMAND_PUNISH_SEVERITY_3,
+        COMMAND_PUNISH_SEVERITY_4,
+        COMMAND_PUNISH_HISTORY,
+        COMMAND_RULES,
+        PUNISH_ALERTS,
+    }
 }

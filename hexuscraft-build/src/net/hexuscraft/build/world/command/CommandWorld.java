@@ -5,11 +5,9 @@ import net.hexuscraft.core.command.BaseMultiCommand;
 
 import java.util.Set;
 
-public class CommandWorld extends BaseMultiCommand<BuildWorld>
-{
+public class CommandWorld extends BaseMultiCommand<BuildWorld> {
 
-    public CommandWorld(BuildWorld buildWorld)
-    {
+    public CommandWorld(BuildWorld buildWorld) {
         super(buildWorld,
                 "world",
                 "Create, edit and remove worlds.",

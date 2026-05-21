@@ -15,16 +15,14 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CommandNewsAdd extends BaseCommand<HubNews>
-{
+public class CommandNewsAdd extends BaseCommand<HubNews> {
 
     final Set<String> POSITIVES = Set.of("true", "yes", "1");
     final Set<String> NEGATIVES = Set.of("false", "no", "0");
 
     final CoreDatabase _coreDatabase;
 
-    public CommandNewsAdd(HubNews hubNews, CoreDatabase coreDatabase)
-    {
+    public CommandNewsAdd(HubNews hubNews, CoreDatabase coreDatabase) {
         super(hubNews,
                 "add",
                 "<Active TRUE/FALSE> <Weight #> <Message>",
@@ -35,32 +33,24 @@ public class CommandNewsAdd extends BaseCommand<HubNews>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length < 3)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length < 3) {
             sender.sendMessage(help(alias));
             return;
         }
 
         AtomicBoolean active = new AtomicBoolean(false);
-        if (POSITIVES.contains(args[0].toLowerCase()))
-        {
+        if (POSITIVES.contains(args[0].toLowerCase())) {
             active.set(true);
-        }
-        else if (!NEGATIVES.contains(args[0].toLowerCase()))
-        {
+        } else if (!NEGATIVES.contains(args[0].toLowerCase())) {
             sender.sendMessage(help(alias));
             return;
         }
 
         AtomicInteger weight = new AtomicInteger(0);
-        try
-        {
+        try {
             weight.set(Integer.parseInt(args[1]));
-        }
-        catch (NumberFormatException ex)
-        {
+        } catch (NumberFormatException ex) {
             sender.sendMessage(F.fMain(this,
                     F.fError("There was an error while parsing weight ",
                             F.fItem(args[1]),
@@ -76,13 +66,10 @@ public class CommandNewsAdd extends BaseCommand<HubNews>
                         Map.entry("weight", Integer.toString(weight.get())),
                         Map.entry("_message", message)));
 
-        try
-        {
+        try {
             newsData.publish(_coreDatabase._database._jedis);
             sender.sendMessage(F.fMain(this, F.fSuccess("Successfully added news line.")));
-        }
-        catch (JedisException ex)
-        {
+        } catch (JedisException ex) {
             sender.sendMessage(F.fMain(this,
                     F.fError("There was an error while publishing news. Please try again later or contact an " +
                             "administrator if this issue persists.")));

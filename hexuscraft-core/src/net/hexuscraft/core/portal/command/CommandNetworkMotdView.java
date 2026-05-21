@@ -11,21 +11,18 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandNetworkMotdView extends BaseCommand<CorePortal>
-{
+public class CommandNetworkMotdView extends BaseCommand<CorePortal> {
 
     final CoreDatabase _coreDatabase;
 
-    CommandNetworkMotdView(CorePortal corePortal, CoreDatabase coreDatabase)
-    {
+    CommandNetworkMotdView(CorePortal corePortal, CoreDatabase coreDatabase) {
         super(corePortal, "view", "", "View the current MOTD.", Set.of("v"), CorePortal.PERM.COMMAND_MOTD_VIEW);
 
         _coreDatabase = coreDatabase;
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
+    public void run(CommandSender sender, String alias, String[] args) {
         sender.sendMessage(F.fMain(this,
                 "Viewing the current MOTD:\n",
                 F.fMain("",

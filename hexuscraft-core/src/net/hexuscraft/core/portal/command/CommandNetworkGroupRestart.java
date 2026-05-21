@@ -11,11 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
-{
+public class CommandNetworkGroupRestart extends BaseCommand<CorePortal> {
 
-    public CommandNetworkGroupRestart(CorePortal corePortal)
-    {
+    public CommandNetworkGroupRestart(CorePortal corePortal) {
         super(corePortal,
                 "restart",
                 "<Server Group>",
@@ -25,16 +23,13 @@ public class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length != 1)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length != 1) {
             sender.sendMessage(help(alias));
             return;
         }
 
-        if (args[0].equals("*"))
-        {
+        if (args[0].equals("*")) {
             sender.sendMessage(F.fMain(this, "Sending restart command to all server groups..."));
             _miniPlugin.restartServerGroupAsync("*");
             sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to all server groups.")));
@@ -44,12 +39,9 @@ public class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
         _miniPlugin._hexusPlugin.runAsync(() ->
         {
             ServerGroupData serverGroupData;
-            try
-            {
+            try {
                 serverGroupData = _miniPlugin.getServerGroup(args[0]);
-            }
-            catch (JedisException ex)
-            {
+            } catch (JedisException ex) {
                 sender.sendMessage(F.fMain(this,
                         F.fError("JedisException while fetching server group data. Please try again later or " +
                                 "contact" +
@@ -57,8 +49,7 @@ public class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
                 return;
             }
 
-            if (serverGroupData == null)
-            {
+            if (serverGroupData == null) {
                 sender.sendMessage(F.fMain(this,
                         F.fError("Could not locate server group with name ", F.fItem(args[0]), ".")));
                 return;
@@ -66,12 +57,9 @@ public class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
 
             _miniPlugin._hexusPlugin.runAsync(() ->
             {
-                try
-                {
+                try {
                     _miniPlugin.restartServerGroupAsync(serverGroupData._name);
-                }
-                catch (JedisException ex)
-                {
+                } catch (JedisException ex) {
                     sender.sendMessage(F.fMain(this,
                             F.fError("JedisException while restarting server group. Please try again later or contact" +
                                     " " +
@@ -84,10 +72,8 @@ public class CommandNetworkGroupRestart extends BaseCommand<CorePortal>
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length == 1)
-        {
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        if (args.length == 1) {
             return Arrays.asList(_miniPlugin.getServerGroupNames());
         }
         return List.of();

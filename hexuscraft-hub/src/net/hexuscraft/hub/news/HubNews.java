@@ -22,21 +22,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HubNews extends MiniPlugin<Hub>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_NEWS,
-        COMMAND_NEWS_ADD,
-        COMMAND_NEWS_REMOVE,
-        COMMAND_NEWS_LIST,
-        COMMAND_NEWS_MODIFY,
-        COMMAND_NEWS_SET,
-        COMMAND_NEWS_SET_ACTIVE,
-        COMMAND_NEWS_SET_WEIGHT,
-        COMMAND_NEWS_SET_MESSAGE,
-    }
+public class HubNews extends MiniPlugin<Hub> {
 
     CoreBossBar _coreBossBar;
     CoreCommand _coreCommand;
@@ -46,14 +32,12 @@ public class HubNews extends MiniPlugin<Hub>
     List<NewsData> _activeNews;
     AtomicInteger _activeNewsIndex;
 
-    public HubNews(Hub hub)
-    {
+    public HubNews(Hub hub) {
         super(hub, "News");
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _coreBossBar = (CoreBossBar) dependencies.get(CoreBossBar.class);
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
@@ -64,8 +48,7 @@ public class HubNews extends MiniPlugin<Hub>
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _coreDatabase._database.registerConsumer(NewsUpdatedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
         {
             NewsUpdatedMessage parsedMessage = NewsUpdatedMessage.parse(rawMessage);
@@ -73,8 +56,7 @@ public class HubNews extends MiniPlugin<Hub>
             _hexusPlugin.runAsync(() ->
             {
                 NewsData newNewsData = NewsQueries.getNews(_coreDatabase._database._jedis, parsedMessage._id);
-                if (newNewsData == null)
-                {
+                if (newNewsData == null) {
                     return; // silences the linter
                 }
 
@@ -103,14 +85,12 @@ public class HubNews extends MiniPlugin<Hub>
             _activeNews.clear();
             _activeNews.addAll(_newsDatas.stream().filter(newsData -> newsData._active).toList());
 
-            if (_activeNews.isEmpty())
-            {
+            if (_activeNews.isEmpty()) {
                 _bossBars.values().forEach(bossBar -> bossBar.message().set(C.cGold + C.fBold + "HEXUSCRAFT"));
                 return;
             }
 
-            if (_activeNewsIndex.incrementAndGet() >= _activeNews.size())
-            {
+            if (_activeNewsIndex.incrementAndGet() >= _activeNews.size()) {
                 _activeNewsIndex.set(0);
             }
 
@@ -122,22 +102,31 @@ public class HubNews extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event)
-    {
+    void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         _bossBars.put(player, _coreBossBar.registerBossBar(new BossBar(player, 0, "<news loading>")));
     }
 
     @EventHandler
-    void onPlayerQuit(PlayerQuitEvent event)
-    {
+    void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        if (!_bossBars.containsKey(player))
-        {
+        if (!_bossBars.containsKey(player)) {
             return;
         }
         _coreBossBar.unregisterBossBar(_bossBars.get(player));
         _bossBars.remove(player);
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_NEWS,
+        COMMAND_NEWS_ADD,
+        COMMAND_NEWS_REMOVE,
+        COMMAND_NEWS_LIST,
+        COMMAND_NEWS_MODIFY,
+        COMMAND_NEWS_SET,
+        COMMAND_NEWS_SET_ACTIVE,
+        COMMAND_NEWS_SET_WEIGHT,
+        COMMAND_NEWS_SET_MESSAGE,
     }
 
 }

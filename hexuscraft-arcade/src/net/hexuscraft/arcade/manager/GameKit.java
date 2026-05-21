@@ -1,5 +1,4 @@
 package net.hexuscraft.arcade.manager;
 
-public class GameKit
-{
+public class GameKit {
 }

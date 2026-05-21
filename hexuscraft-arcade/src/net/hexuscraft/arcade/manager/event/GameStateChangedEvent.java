@@ -5,35 +5,30 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class GameStateChangedEvent extends Event implements Cancellable
-{
+public class GameStateChangedEvent extends Event implements Cancellable {
 
     static final HandlerList _handlers = new HandlerList();
     public GameState _oldState;
     public GameState _newState;
     boolean _isCancelled;
 
-    public GameStateChangedEvent(GameState oldState, GameState newState)
-    {
+    public GameStateChangedEvent(GameState oldState, GameState newState) {
         _oldState = oldState;
         _newState = newState;
     }
 
     @Override
-    public HandlerList getHandlers()
-    {
+    public HandlerList getHandlers() {
         return _handlers;
     }
 
     @Override
-    public boolean isCancelled()
-    {
+    public boolean isCancelled() {
         return _isCancelled;
     }
 
     @Override
-    public void setCancelled(boolean isCancelled)
-    {
+    public void setCancelled(boolean isCancelled) {
         _isCancelled = isCancelled;
     }
 

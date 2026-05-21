@@ -41,44 +41,33 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class HubPlayer extends MiniPlugin<Hub>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_SPAWN
-    }
+public class HubPlayer extends MiniPlugin<Hub> {
 
     CoreCommand _pluginCommand;
     CorePortal _corePortal;
 
-    public HubPlayer(Hub hub)
-    {
+    public HubPlayer(Hub hub) {
         super(hub, "Player");
 
         PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_SPAWN);
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _corePortal = (CorePortal) dependencies.get(CorePortal.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _pluginCommand.register(new CommandSpawn(this));
     }
 
     @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event)
-    {
+    void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        if (_hexusPlugin._spawn != null)
-        {
+        if (_hexusPlugin._spawn != null) {
             player.teleport(_hexusPlugin._spawn);
         }
 
@@ -90,8 +79,7 @@ public class HubPlayer extends MiniPlugin<Hub>
         player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
     }
 
-    void resetAttributes(Player player)
-    {
+    void resetAttributes(Player player) {
         player.setFallDistance(0);
         player.setFlying(false);
         player.setSneaking(false);
@@ -110,8 +98,7 @@ public class HubPlayer extends MiniPlugin<Hub>
         player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
     }
 
-    void refreshInventory(Player player)
-    {
+    void refreshInventory(Player player) {
         PlayerInventory inventory = player.getInventory();
 
         ItemStack gameCompass =
@@ -135,44 +122,36 @@ public class HubPlayer extends MiniPlugin<Hub>
         inventory.setHeldItemSlot(0);
     }
 
-    boolean onItemInteract(Player player, ItemStack itemStack)
-    {
-        if (!itemStack.hasItemMeta())
-        {
+    boolean onItemInteract(Player player, ItemStack itemStack) {
+        if (!itemStack.hasItemMeta()) {
             return false;
         }
 
         ItemMeta itemMeta = itemStack.getItemMeta();
-        if (!itemMeta.hasDisplayName())
-        {
+        if (!itemMeta.hasDisplayName()) {
             return false;
         }
 
         Material itemType = itemStack.getType();
         String displayName = ChatColor.stripColor(itemMeta.getDisplayName());
 
-        if (itemType.equals(Material.COMPASS) && displayName.equals("Games"))
-        {
+        if (itemType.equals(Material.COMPASS) && displayName.equals("Games")) {
             openGameMenu(player);
             return true;
         }
-        if (itemType.equals(Material.SKULL_ITEM) && displayName.equals(player.getName()))
-        {
+        if (itemType.equals(Material.SKULL_ITEM) && displayName.equals(player.getName())) {
             openProfileMenu(player);
             return true;
         }
-        if (itemType.equals(Material.CHEST) && displayName.equals("Cosmetics"))
-        {
+        if (itemType.equals(Material.CHEST) && displayName.equals("Cosmetics")) {
             openCosmeticsMenu(player);
             return true;
         }
-        if (itemType.equals(Material.EMERALD) && displayName.equals("Store"))
-        {
+        if (itemType.equals(Material.EMERALD) && displayName.equals("Store")) {
             openStoreMenu(player);
             return true;
         }
-        if (itemType.equals(Material.WATCH) && displayName.equals("Lobbies"))
-        {
+        if (itemType.equals(Material.WATCH) && displayName.equals("Lobbies")) {
             openLobbyMenu(player);
             return true;
         }
@@ -180,14 +159,11 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    void onInventoryClick(InventoryClickEvent event)
-    {
-        if (!(event.getWhoClicked() instanceof Player player))
-        {
+    void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) {
             return;
         }
-        if (player.getGameMode().equals(GameMode.CREATIVE))
-        {
+        if (player.getGameMode().equals(GameMode.CREATIVE)) {
             return;
         }
 
@@ -195,30 +171,25 @@ public class HubPlayer extends MiniPlugin<Hub>
 
         Inventory clickedInventory = event.getInventory();
 
-        if (clickedInventory.equals(player.getInventory()))
-        {
+        if (clickedInventory.equals(player.getInventory())) {
             ItemStack currentItem = event.getCurrentItem();
-            if (currentItem == null)
-            {
+            if (currentItem == null) {
                 return;
             }
 
             onItemInteract(player, currentItem);
             return;
         }
-        if (ChatColor.stripColor(clickedInventory.getName()).equals("Lobby Menu"))
-        {
+        if (ChatColor.stripColor(clickedInventory.getName()).equals("Lobby Menu")) {
             ItemStack currentItem = event.getCurrentItem();
-            if (currentItem.hasItemMeta())
-            {
+            if (currentItem.hasItemMeta()) {
                 ItemMeta currentItemMeta = currentItem.getItemMeta();
-                if (currentItemMeta.hasDisplayName())
-                {
-                    if (!UtilCooldown.use(player, "Lobby Server Teleport", 1000L))
-                    {
+                if (currentItemMeta.hasDisplayName()) {
+                    if (!UtilCooldown.use(player, "Lobby Server Teleport", 1000L)) {
                         return;
                     }
 
+                    player.closeInventory();
                     String targetServerName = ChatColor.stripColor(currentItemMeta.getDisplayName());
                     _corePortal.teleport(player, targetServerName);
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
@@ -227,39 +198,33 @@ public class HubPlayer extends MiniPlugin<Hub>
         }
     }
 
-    void openGameMenu(Player player)
-    {
+    void openGameMenu(Player player) {
         player.sendMessage(F.fMain("Games", "This feature is currently work in progress. Please try again later!"));
         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
-    void openProfileMenu(Player player)
-    {
+    void openProfileMenu(Player player) {
         player.sendMessage(F.fMain("Profile", "This feature is currently work in progress. Please try again later!"));
         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
-    void openCosmeticsMenu(Player player)
-    {
+    void openCosmeticsMenu(Player player) {
         player.sendMessage(F.fMain("Cosmetics", "This feature is currently work in progress. Please try again later!"));
         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
-    void openStoreMenu(Player player)
-    {
+    void openStoreMenu(Player player) {
         player.sendMessage(F.fMain("Store", "You can visit our store page at: ", F.fItem("store.hexuscraft.net")));
         player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
     }
 
-    void openLobbyMenu(Player player)
-    {
+    void openLobbyMenu(Player player) {
         Inventory lobbyMenu = _hexusPlugin.getServer().createInventory(player, 54, "Lobby Menu");
 
         Arrays.stream(_corePortal.getServers("Lobby")).limit(54).forEach(serverData ->
         {
             int lobbyId = Integer.parseInt(serverData._name.split(serverData._group + "-")[1]);
-            if (lobbyId > 54)
-            {
+            if (lobbyId > 54) {
                 return;
             }
 
@@ -282,20 +247,16 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    void onEntityDamage(EntityDamageEvent event)
-    {
+    void onEntityDamage(EntityDamageEvent event) {
         Entity entity = event.getEntity();
-        if (!(entity instanceof Player player))
-        {
+        if (!(entity instanceof Player player)) {
             return;
         }
 
-        if (event.getCause() == EntityDamageEvent.DamageCause.CUSTOM)
-        {
+        if (event.getCause() == EntityDamageEvent.DamageCause.CUSTOM) {
             return;
         }
-        if (event.getCause() == EntityDamageEvent.DamageCause.VOID)
-        {
+        if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
             player.setVelocity(new Vector());
             player.teleport(_hexusPlugin._spawn);
         }
@@ -304,11 +265,9 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    void onFoodLevelChange(FoodLevelChangeEvent event)
-    {
+    void onFoodLevelChange(FoodLevelChangeEvent event) {
         Entity entity = event.getEntity();
-        if (!(entity instanceof Player player))
-        {
+        if (!(entity instanceof Player player)) {
             return;
         }
 
@@ -317,25 +276,21 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    void onPlayerDropItem(PlayerDropItemEvent event)
-    {
+    void onPlayerDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
 
-        if (player.getGameMode().equals(GameMode.CREATIVE))
-        {
+        if (player.getGameMode().equals(GameMode.CREATIVE)) {
             return;
         }
         event.setCancelled(true);
 
         Item droppedItem = event.getItemDrop();
-        if (droppedItem == null)
-        {
+        if (droppedItem == null) {
             return;
         }
 
         ItemStack itemStack = droppedItem.getItemStack();
-        if (itemStack == null)
-        {
+        if (itemStack == null) {
             return;
         }
 
@@ -343,29 +298,24 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    void onPlayerPickupItem(PlayerPickupItemEvent event)
-    {
-        if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE))
-        {
+    void onPlayerPickupItem(PlayerPickupItemEvent event) {
+        if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             return;
         }
         event.setCancelled(true);
     }
 
     @EventHandler
-    void onPlayerInteract(PlayerInteractEvent event)
-    {
+    void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if (player.getGameMode().equals(GameMode.CREATIVE))
-        {
+        if (player.getGameMode().equals(GameMode.CREATIVE)) {
             return;
         }
         event.setCancelled(true);
 
         ItemStack currentItem = player.getItemInHand();
-        if (currentItem == null)
-        {
+        if (currentItem == null) {
             return;
         }
 
@@ -373,13 +323,15 @@ public class HubPlayer extends MiniPlugin<Hub>
     }
 
     @EventHandler
-    void onEntityTargetLivingEntity(EntityTargetLivingEntityEvent event)
-    {
-        if (!(event.getTarget() instanceof Player))
-        {
+    void onEntityTargetLivingEntity(EntityTargetLivingEntityEvent event) {
+        if (!(event.getTarget() instanceof Player)) {
             return;
         }
         event.setCancelled(true);
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_SPAWN
     }
 
 }

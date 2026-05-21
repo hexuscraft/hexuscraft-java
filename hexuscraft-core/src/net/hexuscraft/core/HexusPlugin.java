@@ -22,10 +22,8 @@ import net.hexuscraft.core.punish.CorePunish;
 import net.hexuscraft.core.report.CoreReport;
 import net.hexuscraft.core.scoreboard.CoreScoreboard;
 import net.hexuscraft.core.teleport.CoreTeleport;
-import org.bukkit.Server;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
@@ -33,33 +31,22 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Listener
-{
+public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Listener {
 
     final Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> _miniPlugins;
     final boolean _isDebug;
-    public Server _server;
-    public BukkitScheduler _scheduler;
-    public Logger _logger;
 
-    public HexusPlugin()
-    {
+    public HexusPlugin() {
         this(true);
     }
 
-    public HexusPlugin(boolean shouldRequireCorePlugins)
-    {
+    public HexusPlugin(boolean shouldRequireCorePlugins) {
         long start = System.currentTimeMillis();
-        _server = getServer();
-        _scheduler = _server.getScheduler();
-        _logger = getLogger();
 
         _miniPlugins = new HashMap<>();
-        if (shouldRequireCorePlugins)
-        {
+        if (shouldRequireCorePlugins) {
             requireCorePlugins();
         }
 
@@ -68,25 +55,15 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    boolean getIsDebug()
-    {
-        File debugFile = new File("_debug.dat");
-        if (debugFile.exists())
-        {
-            try
-            {
-                return Boolean.parseBoolean(readFile(debugFile)[0]);
-            }
-            catch (FileNotFoundException ex)
-            {
-                throw new RuntimeException(ex);
-            }
+    boolean getIsDebug() {
+        try {
+            return Boolean.parseBoolean(readFile(new File("_debug.dat"))[0]);
+        } catch (FileNotFoundException ex) {
+            return false;
         }
-        return false;
     }
 
-    public void requireCorePlugins()
-    {
+    public void requireCorePlugins() {
         require(new CoreActionBar(this));
         require(new CoreAntiCheat(this));
         require(new CoreTwoFactorAuthentication(this));
@@ -112,8 +89,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     @Override
-    public void onLoad()
-    {
+    public void onLoad() {
         AtomicLong start = new AtomicLong(System.currentTimeMillis());
         logInfo("Loading...");
 
@@ -124,12 +100,11 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         long start = System.currentTimeMillis();
         logInfo("Enabling...");
 
-        _server.getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(this, this);
         enable();
         _miniPlugins.values().forEach(MiniPlugin::enable);
 
@@ -137,8 +112,7 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         long start = System.currentTimeMillis();
         logInfo("Disabling...");
 
@@ -149,110 +123,74 @@ public abstract class HexusPlugin extends JavaPlugin implements IHexusPlugin, Li
         logInfo("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public String[] readFile(File file) throws FileNotFoundException
-    {
+    public String[] readFile(File file) throws FileNotFoundException {
         List<String> lines = new ArrayList<>();
-        try (Scanner scanner = new Scanner(file))
-        {
-            while (scanner.hasNextLine())
-                lines.add(scanner.nextLine());
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) lines.add(scanner.nextLine());
         }
         return lines.toArray(String[]::new);
     }
 
-    public void require(MiniPlugin<? extends HexusPlugin> miniPlugin)
-    {
+    public void require(MiniPlugin<? extends HexusPlugin> miniPlugin) {
         //noinspection unchecked
         _miniPlugins.put((Class<? extends MiniPlugin<? extends HexusPlugin>>) miniPlugin.getClass(), miniPlugin);
     }
 
-    public void logInfo(String message)
-    {
-        _logger.log(Level.INFO, message);
+    public void logInfo(String message) {
+        getLogger().log(Level.INFO, message);
     }
 
-    public void logInfo(Throwable ex)
-    {
-        logInfo("[" +
-                ex.getClass().getName() +
-                "] " +
-                String.join("\n",
-                        Stream.concat(Stream.of(ex.getMessage()),
-                                        Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
-                                .toArray(String[]::new)));
+    public void logInfo(Throwable ex) {
+        logInfo("[" + ex.getClass().getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()), Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString)).toArray(String[]::new)));
     }
 
-    public void logWarning(String message)
-    {
-        _logger.log(Level.WARNING, "[WARNING] " + message);
+    public void logWarning(String message) {
+        getLogger().log(Level.WARNING, "[WARNING] " + message);
     }
 
-    public void logWarning(Throwable ex)
-    {
-        logWarning("[" +
-                ex.getClass().getName() +
-                "] " +
-                String.join("\n",
-                        Stream.concat(Stream.of(ex.getMessage()),
-                                        Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
-                                .toArray(String[]::new)));
+    public void logWarning(Throwable ex) {
+        logWarning("[" + ex.getClass().getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()), Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString)).toArray(String[]::new)));
     }
 
-    public void logSevere(String message)
-    {
-        _logger.log(Level.SEVERE, "[SEVERE] " + message);
+    public void logSevere(String message) {
+        getLogger().log(Level.SEVERE, "[SEVERE] " + message);
     }
 
-    public void logSevere(Throwable ex)
-    {
-        logSevere("[" +
-                ex.getClass().getName() +
-                "] " +
-                String.join("\n",
-                        Stream.concat(Stream.of(ex.getMessage()),
-                                        Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString))
-                                .toArray(String[]::new)));
+    public void logSevere(Throwable ex) {
+        logSevere("[" + ex.getClass().getName() + "] " + String.join("\n", Stream.concat(Stream.of(ex.getMessage()), Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString)).toArray(String[]::new)));
     }
 
-    public File getFile()
-    {
+    public File getFile() {
         return super.getFile();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getName();
     }
 
-    public BukkitTask runSync(Runnable runnable)
-    {
-        return _scheduler.runTask(this, runnable);
+    public BukkitTask runSync(Runnable runnable) {
+        return getServer().getScheduler().runTask(this, runnable);
     }
 
-    public BukkitTask runSyncLater(Runnable runnable, long delayTicks)
-    {
-        return _scheduler.runTaskLater(this, runnable, delayTicks);
+    public BukkitTask runSyncLater(Runnable runnable, long delayTicks) {
+        return getServer().getScheduler().runTaskLater(this, runnable, delayTicks);
     }
 
-    public BukkitTask runSyncTimer(Runnable runnable, long initialDelayTicks, long repeatEveryTicks)
-    {
-        return _scheduler.runTaskTimer(this, runnable, initialDelayTicks, repeatEveryTicks);
+    public BukkitTask runSyncTimer(Runnable runnable, long initialDelayTicks, long repeatEveryTicks) {
+        return getServer().getScheduler().runTaskTimer(this, runnable, initialDelayTicks, repeatEveryTicks);
     }
 
-    public BukkitTask runAsync(Runnable runnable)
-    {
-        return _scheduler.runTaskAsynchronously(this, runnable);
+    public BukkitTask runAsync(Runnable runnable) {
+        return getServer().getScheduler().runTaskAsynchronously(this, runnable);
     }
 
-    public BukkitTask runAsyncLater(Runnable runnable, long delayTicks)
-    {
-        return _scheduler.runTaskLaterAsynchronously(this, runnable, delayTicks);
+    public BukkitTask runAsyncLater(Runnable runnable, long delayTicks) {
+        return getServer().getScheduler().runTaskLaterAsynchronously(this, runnable, delayTicks);
     }
 
-    public BukkitTask runAsyncTimer(Runnable runnable, long initialDelayTicks, long repeatEveryTicks)
-    {
-        return _scheduler.runTaskTimerAsynchronously(this, runnable, initialDelayTicks, repeatEveryTicks);
+    public BukkitTask runAsyncTimer(Runnable runnable, long initialDelayTicks, long repeatEveryTicks) {
+        return getServer().getScheduler().runTaskTimerAsynchronously(this, runnable, initialDelayTicks, repeatEveryTicks);
     }
 
 }

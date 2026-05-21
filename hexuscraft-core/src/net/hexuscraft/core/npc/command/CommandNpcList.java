@@ -12,19 +12,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandNpcList extends BaseCommand<CoreNpc>
-{
+public class CommandNpcList extends BaseCommand<CoreNpc> {
 
-    CommandNpcList(CoreNpc coreNpc)
-    {
+    CommandNpcList(CoreNpc coreNpc) {
         super(coreNpc, "list", "", "List all NPCs.", Set.of("ls", "l"), CoreNpc.PERM.COMMAND_ENTITY_LIST);
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length > 0)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length > 0) {
             sender.sendMessage(help(alias));
             return;
         }

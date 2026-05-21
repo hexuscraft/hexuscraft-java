@@ -7,26 +7,20 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandSilence extends BaseCommand<CoreChat>
-{
+public class CommandSilence extends BaseCommand<CoreChat> {
 
-    public CommandSilence(CoreChat coreChat)
-    {
+    public CommandSilence(CoreChat coreChat) {
         super(coreChat, "silence", "", "Mute the global chat.", Set.of("mutechat"), CoreChat.PERM.COMMAND_SILENCE);
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length == 0)
-        {
-            if (_miniPlugin.getMuted())
-            {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length == 0) {
+            if (_miniPlugin.getMuted()) {
                 _miniPlugin.setMuted(false);
                 _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player ->
                 {
-                    if (!player.hasPermission(CoreChat.PERM.COMMAND_SILENCE_SEE.name()))
-                    {
+                    if (!player.hasPermission(CoreChat.PERM.COMMAND_SILENCE_SEE.name())) {
                         return;
                     }
 
@@ -38,8 +32,7 @@ public class CommandSilence extends BaseCommand<CoreChat>
             _miniPlugin.setMuted(true);
             _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(player ->
             {
-                if (!player.hasPermission(CoreChat.PERM.COMMAND_SILENCE_SEE.name()))
-                {
+                if (!player.hasPermission(CoreChat.PERM.COMMAND_SILENCE_SEE.name())) {
                     return;
                 }
                 player.sendMessage(F.fStaff(this, F.fError(F.fItem(sender.getName()), " muted the global chat")));

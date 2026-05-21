@@ -13,8 +13,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
-public class ServerMonitor implements Runnable
-{
+public class ServerMonitor implements Runnable {
 
     final String NETWORK_SPY_CHANNEL = "NetworkSpy";
 
@@ -26,8 +25,7 @@ public class ServerMonitor implements Runnable
     final Map<String, ServerData> _serverDataMap;
     final Map<String, ServerGroupData> _serverGroupDataMap;
 
-    ServerMonitor(String[] args) throws UnknownHostException, FileNotFoundException
-    {
+    ServerMonitor(String[] args) throws UnknownHostException, FileNotFoundException {
         _console = System.console();
         _database = new Database();
         _manager = new ServerManager(this, new Scanner(new File("_path.dat")).nextLine());
@@ -38,28 +36,22 @@ public class ServerMonitor implements Runnable
         new Thread(this).start();
     }
 
-    static void main(String[] args)
-    {
-        try
-        {
+    static void main(String[] args) {
+        try {
             new ServerMonitor(args);
-        }
-        catch (UnknownHostException | FileNotFoundException ex)
-        {
+        } catch (UnknownHostException | FileNotFoundException ex) {
             System.out.println("Exception while instantiating: " +
                     String.join("\n",
                             Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)));
         }
     }
 
-    public void log(String message)
-    {
+    public void log(String message) {
         _console.printf("\n[" + System.currentTimeMillis() + "] " + message);
         new Thread(() -> _database._jedis.publish(NETWORK_SPY_CHANNEL, message)).start();
     }
 
-    void tick()
-    {
+    void tick() {
         _serverDataMap.clear();
         _serverDataMap.putAll(ServerQueries.getServersAsMap(_database._jedis));
 
@@ -75,44 +67,37 @@ public class ServerMonitor implements Runnable
             joinableServersMap.put(serverGroupData, new HashSet<>());
         });
 
-        for (ServerData serverData : _serverDataMap.values())
-        {
+        for (ServerData serverData : _serverDataMap.values()) {
             ServerGroupData serverGroupData = _serverGroupDataMap.get(serverData._group);
-            if (serverGroupData == null)
-            {
+            if (serverGroupData == null) {
                 _manager.killServer(_database._jedis, serverData._name, serverData._group, "Invalid Server Group");
                 return;
             }
 
-            if (serverData._port < serverGroupData._minPort || serverData._port > serverGroupData._maxPort)
-            {
+            if (serverData._port < serverGroupData._minPort || serverData._port > serverGroupData._maxPort) {
                 _manager.killServer(_database._jedis, serverData._name, serverData._group, "Port Outside Range");
                 return;
             }
 
             List<String> motdStrings = Arrays.stream(serverData._motd.split(",")).toList();
-            if (motdStrings.contains("DEAD"))
-            {
+            if (motdStrings.contains("DEAD")) {
                 _manager.killServer(_database._jedis, serverData._name, serverData._group, "Dead");
                 return;
             }
 
-            if ((System.currentTimeMillis() - serverData._updated) >
+            if ((System.currentTimeMillis() - serverData._updatedMillis) >
                     (serverData._updatedByMonitor ?
                             Math.max(30000L, serverGroupData._timeoutMillis) :
-                            serverGroupData._timeoutMillis))
-            {
+                            serverGroupData._timeoutMillis)) {
                 _manager.killServer(_database._jedis, serverData._name, serverData._group, "Unresponsive");
                 return;
             }
 
             totalServersMap.get(serverGroupData).add(serverData);
-            if (motdStrings.contains("LIVE_GAME"))
-            {
+            if (motdStrings.contains("LIVE_GAME")) {
                 continue;
             }
-            if (serverData._players >= serverData._capacity)
-            {
+            if (serverData._players >= serverData._capacity) {
                 continue;
             }
             joinableServersMap.get(serverGroupData).add(serverData);
@@ -121,8 +106,7 @@ public class ServerMonitor implements Runnable
         for (ServerGroupData serverGroupData : _serverGroupDataMap.values()
                 .stream()
                 .sorted(Comparator.comparingInt(value -> value._minPort))
-                .toArray(ServerGroupData[]::new))
-        {
+                .toArray(ServerGroupData[]::new)) {
             Set<ServerData> totalServers = totalServersMap.get(serverGroupData);
             int totalServersAmount = totalServers.size();
 
@@ -136,11 +120,9 @@ public class ServerMonitor implements Runnable
             boolean isOverflowJoinableServers = joinableServersAmount > serverGroupData._joinableServers;
 
             // Kill excess servers
-            if (isOverflowTotalServers && isOverflowJoinableServers)
-            {
+            if (isOverflowTotalServers && isOverflowJoinableServers) {
                 ServerData bestServerToKill = getBestServerToKill(_database._jedis, serverGroupData);
-                if (bestServerToKill != null)
-                {
+                if (bestServerToKill != null) {
                     _manager.killServer(_database._jedis,
                             bestServerToKill._name,
                             bestServerToKill._group,
@@ -150,24 +132,19 @@ public class ServerMonitor implements Runnable
             }
 
             // Start minimum servers
-            if (!isEnoughTotalServers || !isEnoughJoinableServers)
-            {
+            if (!isEnoughTotalServers || !isEnoughJoinableServers) {
                 _manager.startServer(_database._jedis, serverGroupData, "Insufficient Servers");
             }
         }
 
     }
 
-    ServerData getBestServerToKill(UnifiedJedis jedis, ServerGroupData serverGroupData)
-    {
-        for (ServerData serverData : ServerQueries.getServers(jedis, serverGroupData))
-        {
-            if (serverData._motd.startsWith("LIVE"))
-            {
+    ServerData getBestServerToKill(UnifiedJedis jedis, ServerGroupData serverGroupData) {
+        for (ServerData serverData : ServerQueries.getServers(jedis, serverGroupData)) {
+            if (serverData._motd.startsWith("LIVE")) {
                 continue;
             }
-            if (serverData._players > (serverData._capacity / 3))
-            {
+            if (serverData._players > (serverData._capacity / 3)) {
                 continue;
             }
             return serverData;
@@ -176,28 +153,20 @@ public class ServerMonitor implements Runnable
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         //noinspection InfiniteLoopStatement
-        while (true)
-        {
-            try
-            {
+        while (true) {
+            try {
                 tick();
-            }
-            catch (Throwable ex)
-            {
+            } catch (Throwable ex) {
                 //noinspection CallToPrintStackTrace
                 ex.printStackTrace();
             }
 
-            try
-            {
+            try {
                 //noinspection BusyWait
                 Thread.sleep(500L);
-            }
-            catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }

@@ -11,20 +11,11 @@ import net.hexuscraft.core.command.CoreCommand;
 
 import java.util.Map;
 
-public class BuildWorld extends MiniPlugin<Build>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_SPAWN,
-        COMMAND_WORLD,
-        COMMAND_WORLD_CREATE
-    }
+public class BuildWorld extends MiniPlugin<Build> {
 
     CoreCommand _coreCommand = null;
 
-    public BuildWorld(Build plugin)
-    {
+    public BuildWorld(Build plugin) {
         super(plugin, "World");
 
         PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_SPAWN);
@@ -33,16 +24,20 @@ public class BuildWorld extends MiniPlugin<Build>
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _coreCommand.register(new CommandSpawn(this));
         _coreCommand.register(new CommandWorld(this));
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_SPAWN,
+        COMMAND_WORLD,
+        COMMAND_WORLD_CREATE
     }
 
 }

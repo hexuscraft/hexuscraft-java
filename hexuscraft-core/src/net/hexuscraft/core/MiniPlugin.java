@@ -7,22 +7,19 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMiniPlugin
-{
+public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMiniPlugin {
 
     public T _hexusPlugin;
     public String _prefix;
 
-    public MiniPlugin(T plugin, String prefix)
-    {
+    public MiniPlugin(T plugin, String prefix) {
         long start = System.currentTimeMillis();
         _hexusPlugin = plugin;
         _prefix = prefix;
         logInfo("Instantiated in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void load(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap)
-    {
+    public final void load(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> miniPluginClassMap) {
         long start = System.currentTimeMillis();
         logInfo("Loading...");
 
@@ -31,8 +28,7 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         logInfo("Loaded in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void enable()
-    {
+    public final void enable() {
         long start = System.currentTimeMillis();
         logInfo("Enabling...");
 
@@ -40,15 +36,13 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         onEnable();
 
         long finish = System.currentTimeMillis();
-        if (finish - start > 2000L)
-        {
+        if (finish - start > 2000L) {
             logWarning("Took " + (System.currentTimeMillis() - start) + "ms to enable. (>2s)");
         }
         logInfo("Enabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public final void disable()
-    {
+    public final void disable() {
         long start = System.currentTimeMillis();
         logInfo("Disabling...");
 
@@ -56,26 +50,22 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
         onDisable();
 
         long finish = System.currentTimeMillis();
-        if (finish - start > 2000L)
-        {
+        if (finish - start > 2000L) {
             logWarning("Took " + (System.currentTimeMillis() - start) + "ms to disable. (>2s)");
         }
         logInfo("Disabled in " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return _prefix;
     }
 
-    public void logInfo(String message)
-    {
+    public void logInfo(String message) {
         _hexusPlugin.logInfo("[" + _prefix + "] " + message);
     }
 
-    public void logInfo(Throwable ex)
-    {
+    public void logInfo(Throwable ex) {
         logInfo("[" +
                 ex.getClass().getName() +
                 "] " +
@@ -85,13 +75,11 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
                                 .toArray(String[]::new)));
     }
 
-    public void logWarning(String message)
-    {
+    public void logWarning(String message) {
         _hexusPlugin.logWarning("[" + _prefix + "] " + message);
     }
 
-    public void logWarning(Throwable ex)
-    {
+    public void logWarning(Throwable ex) {
         logWarning("[" +
                 ex.getClass().getName() +
                 "] " +
@@ -101,13 +89,11 @@ public abstract class MiniPlugin<T extends HexusPlugin> implements Listener, IMi
                                 .toArray(String[]::new)));
     }
 
-    public void logSevere(String message)
-    {
+    public void logSevere(String message) {
         _hexusPlugin.logSevere("[" + _prefix + "] " + message);
     }
 
-    public void logSevere(Throwable ex)
-    {
+    public void logSevere(Throwable ex) {
         logSevere("[" +
                 ex.getClass().getName() +
                 "] " +

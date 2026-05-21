@@ -11,6 +11,5 @@ public record ReportGui(Inventory _inventory,
                         ItemStack _gameplay,
                         ItemStack _client,
                         ItemStack _misc,
-                        ItemStack _history)
-{
+                        ItemStack _history) {
 }

@@ -6,16 +6,13 @@ import redis.clients.jedis.UnifiedJedis;
 import java.util.Set;
 import java.util.UUID;
 
-public class PermissionQueries
-{
+public class PermissionQueries {
 
-    public static String GROUPS(UUID uuid)
-    {
+    public static String GROUPS(UUID uuid) {
         return Database.buildQuery("user", uuid.toString(), "permission", "groups");
     }
 
-    public static Set<String> getGroupNames(UnifiedJedis jedis, UUID uuid)
-    {
+    public static Set<String> getGroupNames(UnifiedJedis jedis, UUID uuid) {
         return jedis.smembers(GROUPS(uuid));
     }
 

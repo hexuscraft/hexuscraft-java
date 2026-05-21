@@ -10,8 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class ReportData
-{
+public class ReportData {
 
     public UUID uuid;
     public UUID senderUUID;
@@ -28,8 +27,7 @@ public class ReportData
     public String removeServer;
     public UUID removeStaffUUID;
 
-    public ReportData(Map<String, String> rawData)
-    {
+    public ReportData(Map<String, String> rawData) {
         uuid = UUID.fromString(rawData.get("uuid"));
         senderUUID = UUID.fromString(rawData.get("senderUUID"));
         targetUUID = UUID.fromString(rawData.get("targetUUID"));
@@ -39,8 +37,7 @@ public class ReportData
         origin = Long.parseLong(rawData.get("origin"));
         server = rawData.get("server");
 
-        if (!active)
-        { // we cannot guarantee these should exist unless 'active' is false
+        if (!active) { // we cannot guarantee these should exist unless 'active' is false
             removeOrigin = Long.parseLong(rawData.get("removeOrigin"));
             removeReason = ReportCloseReason.valueOf(rawData.get("removeReason"));
             removeServer = rawData.get("removeServer");
@@ -54,8 +51,7 @@ public class ReportData
         removeStaffUUID = null;
     }
 
-    public Map<String, String> toMap()
-    {
+    public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<>();
         map.put("uuid", uuid.toString());
         map.put("senderUUID", senderUUID.toString());
@@ -66,8 +62,7 @@ public class ReportData
         map.put("origin", origin.toString());
         map.put("server", server);
 
-        if (!active)
-        {
+        if (!active) {
             map.put("removeOrigin", removeOrigin.toString());
             map.put("removeReason", removeReason.name());
             map.put("removeServer", removeServer);
@@ -77,8 +72,7 @@ public class ReportData
         return map;
     }
 
-    public void submit(UnifiedJedis jedis)
-    {
+    public void submit(UnifiedJedis jedis) {
         jedis.hset(ReportQueries.REPORT(uuid), toMap());
         jedis.sadd(ReportQueries.LIST_SUBMITTED(senderUUID), uuid.toString());
         jedis.sadd(ReportQueries.LIST_RECEIVED(targetUUID), uuid.toString());

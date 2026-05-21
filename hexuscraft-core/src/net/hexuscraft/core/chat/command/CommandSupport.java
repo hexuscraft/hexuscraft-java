@@ -15,18 +15,16 @@ import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.Set;
 
-public class CommandSupport extends BaseCommand<CoreChat>
-{
+public class CommandSupport extends BaseCommand<CoreChat> {
 
     final CorePortal _corePortal;
     final CorePermission _corePermission;
     final CoreDatabase _coreDatabase;
 
     public CommandSupport(CoreChat coreChat,
-            CorePermission corePermission,
-            CoreDatabase coreDatabase,
-            CorePortal corePortal)
-    {
+                          CorePermission corePermission,
+                          CoreDatabase coreDatabase,
+                          CorePortal corePortal) {
         super(coreChat,
                 "support",
                 "<Message>",
@@ -39,16 +37,13 @@ public class CommandSupport extends BaseCommand<CoreChat>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length == 0)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length == 0) {
             sender.sendMessage(help(alias));
             return;
         }
 
-        if (!_miniPlugin._receivedTipSet.contains(sender))
-        {
+        if (!_miniPlugin._receivedTipSet.contains(sender)) {
             _miniPlugin._receivedTipSet.add(sender);
             sender.sendMessage(F.fMain(this,
                     "You should receive a reply shortly if a staff member is available. You can also report " +
@@ -59,8 +54,7 @@ public class CommandSupport extends BaseCommand<CoreChat>
 
         _miniPlugin._hexusPlugin.runAsync(() ->
         {
-            try
-            {
+            try {
                 _coreDatabase._database._jedis.publish(ChatSupportMessage.CHANNEL_NAME,
                         new ChatSupportMessage(sender instanceof Player player ?
                                 player.getUniqueId() :
@@ -71,9 +65,7 @@ public class CommandSupport extends BaseCommand<CoreChat>
                                         _corePermission._permissionProfiles.get(player)._groups() :
                                         new PermissionGroup[]{PermissionGroup._CONSOLE},
                                 String.join(" ", args)).toString());
-            }
-            catch (JedisException ex)
-            {
+            } catch (JedisException ex) {
                 sender.sendMessage(F.fMain(this,
                         F.fError("An error occurred while sending your support message. Maybe try again later?")));
                 _miniPlugin.logSevere(ex);

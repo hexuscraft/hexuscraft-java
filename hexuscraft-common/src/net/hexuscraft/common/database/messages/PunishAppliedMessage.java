@@ -8,20 +8,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class PunishAppliedMessage
-{
+public class PunishAppliedMessage {
 
     public static String CHANNEL_NAME = "punish.applied";
 
     public PunishData _punishData;
 
-    public PunishAppliedMessage(PunishData punishData)
-    {
+    public PunishAppliedMessage(PunishData punishData) {
         _punishData = punishData;
     }
 
-    public static PunishAppliedMessage fromString(String jsonString)
-    {
+    public static PunishAppliedMessage fromString(String jsonString) {
         JSONObject jsonObject = new JSONObject(jsonString);
         return new PunishAppliedMessage(new PunishData(UUID.fromString(jsonObject.getString("uuid")),
                 jsonObject.getEnum(PunishType.class, "type"),
@@ -41,8 +38,7 @@ public class PunishAppliedMessage
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         Map<Object, Object> data = new HashMap<>(Map.ofEntries(Map.entry("uuid", _punishData._uuid),
                 Map.entry("type", _punishData._type),
                 Map.entry("active", _punishData._active),
@@ -54,8 +50,7 @@ public class PunishAppliedMessage
                 Map.entry("staffUUID", _punishData._staffUUID),
                 Map.entry("staffServer", _punishData._staffServer)));
 
-        if (!_punishData._active)
-        {
+        if (!_punishData._active) {
             data.putAll(Map.ofEntries(Map.entry("removeOrigin", _punishData._removeOrigin),
                     Map.entry("removeReason", _punishData._removeReason),
                     Map.entry("removeTargetServer", _punishData._removeTargetServer),

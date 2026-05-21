@@ -6,13 +6,11 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.UUID;
 
-public record ChatAnnouncementMessage(UUID _senderUniqueId, String _message, PermissionGroup _permissionGroup)
-{
+public record ChatAnnouncementMessage(UUID _senderUniqueId, String _message, PermissionGroup _permissionGroup) {
 
     public static String CHANNEL_NAME = "chat.announcement";
 
-    public static ChatAnnouncementMessage fromString(String jsonString)
-    {
+    public static ChatAnnouncementMessage fromString(String jsonString) {
         JSONObject jsonObject = new JSONObject(jsonString);
 
         return new ChatAnnouncementMessage(UUID.fromString(jsonObject.getString("senderUniqueId")),
@@ -22,8 +20,7 @@ public record ChatAnnouncementMessage(UUID _senderUniqueId, String _message, Per
 
     @Override
     @SuppressWarnings("NullableProblems")
-    public String toString()
-    {
+    public String toString() {
         return new JSONObject(Map.of("senderUniqueId",
                 _senderUniqueId.toString(),
                 "message",

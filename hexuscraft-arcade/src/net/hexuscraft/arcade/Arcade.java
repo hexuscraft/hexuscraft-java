@@ -6,11 +6,9 @@ import net.hexuscraft.arcade.manager.ArcadeManager;
 import net.hexuscraft.arcade.tab.ArcadeTab;
 import net.hexuscraft.core.HexusPlugin;
 
-public class Arcade extends HexusPlugin
-{
+public class Arcade extends HexusPlugin {
 
-    public Arcade()
-    {
+    public Arcade() {
         super();
 
         require(new ArcadeHost(this));

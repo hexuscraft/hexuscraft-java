@@ -2,8 +2,7 @@ package net.hexuscraft.core.blockbuilder;
 
 import java.util.List;
 
-public enum CharacterBlock
-{
+public enum CharacterBlock {
 
     A(List.of(new Vector2(0, 0), new Vector2(1, 0), new Vector2(2, 0), new Vector2(3, 0),
 
@@ -77,8 +76,7 @@ public enum CharacterBlock
 
     public List<Vector2> _blocks;
 
-    CharacterBlock(List<Vector2> blocks)
-    {
+    CharacterBlock(List<Vector2> blocks) {
         _blocks = blocks;
     }
 

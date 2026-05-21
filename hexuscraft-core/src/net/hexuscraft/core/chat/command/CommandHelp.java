@@ -10,28 +10,23 @@ import org.bukkit.command.CommandSender;
 
 import java.util.*;
 
-public class CommandHelp extends BaseCommand<CoreChat>
-{
+public class CommandHelp extends BaseCommand<CoreChat> {
 
     final CoreCommand _coreCommand;
 
-    public CommandHelp(CoreChat coreChat, CoreCommand coreCommand)
-    {
+    public CommandHelp(CoreChat coreChat, CoreCommand coreCommand) {
         super(coreChat, "help", "", "Need some help? We got you covered.", Set.of("?"), CoreChat.PERM.COMMAND_HELP);
         _coreCommand = coreCommand;
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length > 1)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length > 1) {
             sender.sendMessage(help(alias));
             return;
         }
 
-        if (args.length == 1)
-        {
+        if (args.length == 1) {
             Command[] availableCommands = _coreCommand._commands.stream()
                     .filter(command -> command.testPermissionSilent(sender))
                     .sorted(Comparator.comparing(command -> command.getName().toLowerCase()))
@@ -40,20 +35,15 @@ public class CommandHelp extends BaseCommand<CoreChat>
             int pageAmount = (int) Math.ceil((double) availableCommands.length / 8);
 
             int pageNumber;
-            try
-            {
+            try {
                 pageNumber = Integer.parseInt(args[0]);
-                if (pageNumber < 1)
-                {
+                if (pageNumber < 1) {
                     throw new NumberFormatException();
                 }
-                if (pageNumber > pageAmount)
-                {
+                if (pageNumber > pageAmount) {
                     throw new NumberFormatException();
                 }
-            }
-            catch (NumberFormatException ex)
-            {
+            } catch (NumberFormatException ex) {
                 sender.sendMessage(F.fMain(this, F.fError("Invalid page number ", F.fItem(args[0]), ".")));
                 return;
             }
@@ -78,8 +68,7 @@ public class CommandHelp extends BaseCommand<CoreChat>
                 String.join("\n", constructHelpStrings(alias)));
     }
 
-    String[] constructHelpStrings(String alias)
-    {
+    String[] constructHelpStrings(String alias) {
         return new String[]{F.fMain("", "Visit our website: " + C.cGreen + "https://hexuscraft.net"),
                 F.fMain("", "Join our Discord: " + C.cPurple + "https://discord.gg/yusJMxrg3e"),
                 F.fMain("", "Request help from staff with ", F.fItem("/support"), "."),

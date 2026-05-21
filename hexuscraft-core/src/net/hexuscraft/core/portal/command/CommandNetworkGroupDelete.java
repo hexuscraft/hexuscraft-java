@@ -11,13 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandNetworkGroupDelete extends BaseCommand<CorePortal>
-{
+public class CommandNetworkGroupDelete extends BaseCommand<CorePortal> {
 
     final CoreDatabase _coreDatabase;
 
-    CommandNetworkGroupDelete(CorePortal corePortal, CoreDatabase coreDatabase)
-    {
+    CommandNetworkGroupDelete(CorePortal corePortal, CoreDatabase coreDatabase) {
         super(corePortal,
                 "delete",
                 "<Name>",
@@ -28,10 +26,8 @@ public class CommandNetworkGroupDelete extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length != 1)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length != 1) {
             sender.sendMessage(help(alias));
             return;
         }
@@ -42,10 +38,8 @@ public class CommandNetworkGroupDelete extends BaseCommand<CorePortal>
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length == 1)
-        {
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        if (args.length == 1) {
             return Arrays.asList(_miniPlugin.getServerGroupNames());
         }
         return List.of();

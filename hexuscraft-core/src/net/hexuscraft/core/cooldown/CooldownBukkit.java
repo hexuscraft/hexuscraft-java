@@ -4,24 +4,19 @@ import net.hexuscraft.common.utils.F;
 import net.hexuscraft.common.utils.UtilCooldown;
 import org.bukkit.command.CommandSender;
 
-public class CooldownBukkit
-{
+public class CooldownBukkit {
 
-    Long calculateRemaining(Long now, Long start, Long delay)
-    {
+    Long calculateRemaining(Long now, Long start, Long delay) {
         return delay - (now - start);
     }
 
-    public boolean use(Object parent, String name, Long delayMs, CommandSender sender)
-    {
-        if (UtilCooldown.use(parent, name, delayMs))
-        {
+    public boolean use(Object parent, String name, Long delayMs, CommandSender sender) {
+        if (UtilCooldown.use(parent, name, delayMs)) {
             return true;
         }
 
         UtilCooldown.Cooldown cooldown = UtilCooldown.getCooldown(parent, name);
-        if (cooldown == null)
-        {
+        if (cooldown == null) {
             sender.sendMessage(F.fMain(this, "Please wait before trying to use ", F.fItem(name), " again."));
             return false;
         }

@@ -10,19 +10,11 @@ import net.hexuscraft.core.item.command.CommandGive;
 
 import java.util.Map;
 
-public class CoreItem extends MiniPlugin<HexusPlugin>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_GIVE,
-        COMMAND_CLEAR
-    }
+public class CoreItem extends MiniPlugin<HexusPlugin> {
 
     CoreCommand _pluginCommand;
 
-    public CoreItem(HexusPlugin plugin)
-    {
+    public CoreItem(HexusPlugin plugin) {
         super(plugin, "Item");
 
         PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GIVE);
@@ -30,16 +22,19 @@ public class CoreItem extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _pluginCommand.register(new CommandClear(this));
         _pluginCommand.register(new CommandGive(this));
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_GIVE,
+        COMMAND_CLEAR
     }
 
 }

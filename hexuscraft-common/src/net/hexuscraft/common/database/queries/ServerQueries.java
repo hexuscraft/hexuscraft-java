@@ -7,99 +7,81 @@ import redis.clients.jedis.UnifiedJedis;
 
 import java.util.*;
 
-public class ServerQueries
-{
+public class ServerQueries {
 
-    public static String SERVER(String name)
-    {
+    public static String SERVER(String name) {
         return Database.buildQuery("server", name);
     }
 
-    public static String SERVERGROUP(String name)
-    {
+    public static String SERVERGROUP(String name) {
         return Database.buildQuery("servergroup", name);
     }
 
-    public static String MOTD()
-    {
+    public static String MOTD() {
         return Database.buildQuery("motd");
     }
 
-    public static ServerData getServer(UnifiedJedis jedis, String serverName)
-    {
+    public static ServerData getServer(UnifiedJedis jedis, String serverName) {
         Map<String, String> dataMap = jedis.hgetAll(SERVER(serverName));
-        if (dataMap.isEmpty())
-        {
+        if (dataMap.isEmpty()) {
             return null;
         }
-        return new ServerData(serverName, dataMap);
+        return new ServerData(dataMap);
     }
 
-    public static ServerData[] getServers(UnifiedJedis jedis)
-    {
+    public static ServerData[] getServers(UnifiedJedis jedis) {
         Set<ServerData> serverDataSet = new HashSet<>();
         jedis.keys(Database.buildQuery("server", "*"))
                 .forEach(key -> serverDataSet.add(getServer(jedis, key.split(Database.KEY_DELIMITER, 2)[1])));
         return serverDataSet.toArray(ServerData[]::new);
     }
 
-    public static ServerData[] getServers(UnifiedJedis jedis, String serverGroupName)
-    {
+    public static ServerData[] getServers(UnifiedJedis jedis, String serverGroupName) {
         return Arrays.stream(getServers(jedis))
                 .filter(serverData -> serverData._group.equals(serverGroupName))
                 .toArray(ServerData[]::new);
     }
 
-    public static ServerData[] getServers(UnifiedJedis jedis, ServerGroupData serverGroupData)
-    {
+    public static ServerData[] getServers(UnifiedJedis jedis, ServerGroupData serverGroupData) {
         return getServers(jedis, serverGroupData._name);
     }
 
-    public static Map<String, ServerData> getServersAsMap(UnifiedJedis jedis)
-    {
+    public static Map<String, ServerData> getServersAsMap(UnifiedJedis jedis) {
         Map<String, ServerData> serverDataMap = new HashMap<>();
-        for (ServerData serverData : getServers(jedis))
-        {
+        for (ServerData serverData : getServers(jedis)) {
             serverDataMap.put(serverData._name, serverData);
         }
         return serverDataMap;
     }
 
-    public static ServerGroupData getServerGroup(UnifiedJedis jedis, String name)
-    {
+    public static ServerGroupData getServerGroup(UnifiedJedis jedis, String name) {
         Map<String, String> dataMap = jedis.hgetAll(SERVERGROUP(name));
-        if (dataMap.isEmpty())
-        {
+        if (dataMap.isEmpty()) {
             return null;
         }
-        return new ServerGroupData(name, dataMap);
+        return new ServerGroupData(dataMap);
     }
 
-    public static ServerGroupData[] getServerGroups(UnifiedJedis jedis)
-    {
+    public static ServerGroupData[] getServerGroups(UnifiedJedis jedis) {
         Set<ServerGroupData> serverGroupDataSet = new HashSet<>();
-        jedis.keys(Database.buildQuery("servergroup", "*"))
+        jedis.keys(ServerQueries.SERVERGROUP("*"))
                 .forEach(key -> serverGroupDataSet.add(getServerGroup(jedis, key.split(Database.KEY_DELIMITER, 2)[1])));
         return serverGroupDataSet.toArray(ServerGroupData[]::new);
     }
 
-    public static Map<String, ServerGroupData> getServerGroupsAsMap(UnifiedJedis jedis)
-    {
+    public static Map<String, ServerGroupData> getServerGroupsAsMap(UnifiedJedis jedis) {
         Map<String, ServerGroupData> serverGroupDataMap = new HashMap<>();
-        for (ServerGroupData serverGroupData : getServerGroups(jedis))
-        {
+        for (ServerGroupData serverGroupData : getServerGroups(jedis)) {
             serverGroupDataMap.put(serverGroupData._name, serverGroupData);
         }
         return serverGroupDataMap;
     }
 
-    public static String getMotd(UnifiedJedis jedis)
-    {
+    public static String getMotd(UnifiedJedis jedis) {
         return jedis.get(MOTD());
     }
 
-    public static void setMotd(UnifiedJedis jedis, String value)
-    {
+    public static void setMotd(UnifiedJedis jedis, String value) {
         jedis.set(MOTD(), value);
     }
 

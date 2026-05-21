@@ -7,19 +7,15 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandNpcRefresh extends BaseCommand<CoreNpc>
-{
+public class CommandNpcRefresh extends BaseCommand<CoreNpc> {
 
-    CommandNpcRefresh(CoreNpc coreNpc)
-    {
+    CommandNpcRefresh(CoreNpc coreNpc) {
         super(coreNpc, "refresh", "", "Refresh all NPCs.", Set.of("ref", "r"), CoreNpc.PERM.COMMAND_ENTITY_REFRESH);
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length > 0)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length > 0) {
             sender.sendMessage(help(alias));
             return;
         }

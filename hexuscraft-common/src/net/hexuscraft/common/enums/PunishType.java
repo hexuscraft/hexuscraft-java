@@ -1,11 +1,16 @@
 package net.hexuscraft.common.enums;
 
-public enum PunishType
-{
+public enum PunishType {
 
-    WARNING,
-    KICK,
-    MUTE,
-    BAN,
+    WARNING("Warning"),
+    KICK("Kick"),
+    MUTE("Mute"),
+    BAN("Ban");
+
+    public final String _friendlyName;
+
+    PunishType(String friendlyName) {
+        _friendlyName = friendlyName;
+    }
 
 }

@@ -16,13 +16,11 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.Scanner;
 
-public class Hub extends HexusPlugin
-{
+public class Hub extends HexusPlugin {
 
     public Location _spawn = null;
 
-    public Hub()
-    {
+    public Hub() {
         super();
 
         require(new HubDoubleJump(this));
@@ -33,25 +31,21 @@ public class Hub extends HexusPlugin
     }
 
     @Override
-    public void enable()
-    {
+    public void enable() {
         getServer().setDefaultGameMode(GameMode.ADVENTURE);
     }
 
     @EventHandler
-    void onWorldLoad(WorldLoadEvent event)
-    {
+    void onWorldLoad(WorldLoadEvent event) {
         World world = event.getWorld();
         logInfo("WORLD NAME: '" + world.getName() + "'");
-        if (!world.getName().equals("world"))
-        {
+        if (!world.getName().equals("world")) {
             return;
         }
 
         _spawn = new Location(world, 0, 100, 0, 0, 0);
 
-        try
-        {
+        try {
             Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_spawn.dat").toFile());
             _spawn = new Location(event.getWorld(),
                     scanner.nextDouble(),
@@ -59,9 +53,7 @@ public class Hub extends HexusPlugin
                     scanner.nextDouble(),
                     scanner.nextFloat(),
                     scanner.nextFloat());
-        }
-        catch (FileNotFoundException ex)
-        {
+        } catch (FileNotFoundException ex) {
             logInfo("Could not locate _spawn.dat in world '" + world.getName() + "'");
         }
     }

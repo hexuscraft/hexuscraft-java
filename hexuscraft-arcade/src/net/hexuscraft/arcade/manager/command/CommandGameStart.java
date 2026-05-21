@@ -5,11 +5,9 @@ import net.hexuscraft.core.command.BaseCommand;
 
 import java.util.Set;
 
-public class CommandGameStart extends BaseCommand<ArcadeManager>
-{
+public class CommandGameStart extends BaseCommand<ArcadeManager> {
 
-    CommandGameStart(ArcadeManager arcadeManager)
-    {
+    CommandGameStart(ArcadeManager arcadeManager) {
         super(arcadeManager,
                 "start",
                 "[Seconds]",

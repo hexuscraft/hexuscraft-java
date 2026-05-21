@@ -6,11 +6,9 @@ import net.hexuscraft.core.portal.CorePortal;
 
 import java.util.Set;
 
-public class CommandNetworkMotd extends BaseMultiCommand<CorePortal>
-{
+public class CommandNetworkMotd extends BaseMultiCommand<CorePortal> {
 
-    public CommandNetworkMotd(CorePortal corePortal, CoreDatabase coreDatabase)
-    {
+    public CommandNetworkMotd(CorePortal corePortal, CoreDatabase coreDatabase) {
         super(corePortal,
                 "messageoftheday",
                 "Manage the network MOTD.",

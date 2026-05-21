@@ -8,11 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandLocateServer extends BaseCommand<CorePortal>
-{
+public class CommandLocateServer extends BaseCommand<CorePortal> {
 
-    public CommandLocateServer(CorePortal corePortal)
-    {
+    public CommandLocateServer(CorePortal corePortal) {
         super(corePortal,
                 "server",
                 "<Name>",
@@ -22,16 +20,13 @@ public class CommandLocateServer extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
+    public void run(CommandSender sender, String alias, String[] args) {
         super.run(sender, alias, args);
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length == 1)
-        {
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        if (args.length == 1) {
             return Arrays.asList(_miniPlugin.getServerNames());
         }
         return List.of();

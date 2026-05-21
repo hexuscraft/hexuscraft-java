@@ -1,7 +1,6 @@
 package net.hexuscraft.common.enums;
 
-public enum ReportSubmitReason
-{
+public enum ReportSubmitReason {
 
     CHAT("Chat Offense"),
     GAMEPLAY("Gameplay Offense"),
@@ -10,8 +9,7 @@ public enum ReportSubmitReason
 
     public String _friendlyName;
 
-    ReportSubmitReason(String friendlyName)
-    {
+    ReportSubmitReason(String friendlyName) {
         _friendlyName = friendlyName;
     }
 

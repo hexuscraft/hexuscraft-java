@@ -5,11 +5,9 @@ import net.hexuscraft.core.portal.CorePortal;
 
 import java.util.Set;
 
-public class CommandLocate extends BaseMultiCommand<CorePortal>
-{
+public class CommandLocate extends BaseMultiCommand<CorePortal> {
 
-    public CommandLocate(CorePortal corePortal)
-    {
+    public CommandLocate(CorePortal corePortal) {
         super(corePortal,
                 "list",
                 "Find players across the network.",

@@ -9,29 +9,24 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
 
-public class CoreActionBar extends MiniPlugin<HexusPlugin>
-{
+public class CoreActionBar extends MiniPlugin<HexusPlugin> {
 
     Map<Player, Set<ActionBar>> _actionBarMap;
 
-    public CoreActionBar(HexusPlugin plugin)
-    {
+    public CoreActionBar(HexusPlugin plugin) {
         super(plugin, "Action Bar");
         _actionBarMap = new HashMap<>();
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _hexusPlugin.runAsyncTimer(this::updateActionBars, 0, 20);
     }
 
-    public void updateActionBars()
-    {
+    public void updateActionBars() {
         _actionBarMap.forEach((player, actionBars) ->
         {
-            if (actionBars.isEmpty())
-            {
+            if (actionBars.isEmpty()) {
                 return;
             }
             UtilTitleTab.sendActionText(player,
@@ -39,15 +34,11 @@ public class CoreActionBar extends MiniPlugin<HexusPlugin>
         });
     }
 
-    public ActionBar registerActionBar(ActionBar actionBar)
-    {
+    public ActionBar registerActionBar(ActionBar actionBar) {
         Set<ActionBar> actionBars;
-        if (_actionBarMap.containsKey(actionBar._player))
-        {
+        if (_actionBarMap.containsKey(actionBar._player)) {
             actionBars = _actionBarMap.get(actionBar._player);
-        }
-        else
-        {
+        } else {
             actionBars = new HashSet<>();
             _actionBarMap.put(actionBar._player, actionBars);
         }
@@ -56,17 +47,14 @@ public class CoreActionBar extends MiniPlugin<HexusPlugin>
         return actionBar;
     }
 
-    public void unregisterActionBar(ActionBar actionBar)
-    {
+    public void unregisterActionBar(ActionBar actionBar) {
         Player player = actionBar._player;
 
-        if (_actionBarMap.containsKey(player))
-        {
+        if (_actionBarMap.containsKey(player)) {
             Set<ActionBar> actionBars = _actionBarMap.get(player);
             actionBars.remove(actionBar);
 
-            if (!actionBars.isEmpty())
-            {
+            if (!actionBars.isEmpty()) {
                 return;
             }
             _actionBarMap.remove(player);
@@ -74,11 +62,9 @@ public class CoreActionBar extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    void onPlayerQuit(PlayerQuitEvent event)
-    {
+    void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        if (!_actionBarMap.containsKey(player))
-        {
+        if (!_actionBarMap.containsKey(player)) {
             return;
         }
         _actionBarMap.get(player).forEach(this::unregisterActionBar);

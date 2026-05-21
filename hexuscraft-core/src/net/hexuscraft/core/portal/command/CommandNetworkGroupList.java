@@ -7,11 +7,9 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandNetworkGroupList extends BaseCommand<CorePortal>
-{
+public class CommandNetworkGroupList extends BaseCommand<CorePortal> {
 
-    CommandNetworkGroupList(CorePortal corePortal)
-    {
+    CommandNetworkGroupList(CorePortal corePortal) {
         super(corePortal,
                 "list",
                 "",
@@ -21,10 +19,8 @@ public class CommandNetworkGroupList extends BaseCommand<CorePortal>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length > 0)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length > 0) {
             sender.sendMessage(help(alias));
             return;
         }

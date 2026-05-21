@@ -14,40 +14,33 @@ import org.bukkit.scoreboard.Team;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CoreScoreboard extends MiniPlugin<HexusPlugin>
-{
+public class CoreScoreboard extends MiniPlugin<HexusPlugin> {
 
     final Map<Player, Scoreboard> _scoreboardMap;
 
-    public CoreScoreboard(HexusPlugin plugin)
-    {
+    public CoreScoreboard(HexusPlugin plugin) {
         super(plugin, "Scoreboard");
 
         _scoreboardMap = new HashMap<>();
     }
 
     @Override
-    public void onEnable()
-    {
-        for (Player player : _hexusPlugin.getServer().getOnlinePlayers())
-        {
+    public void onEnable() {
+        for (Player player : _hexusPlugin.getServer().getOnlinePlayers()) {
             onPlayerJoin(new PlayerJoinEvent(player, null));
         }
     }
 
     @Override
-    public void onDisable()
-    {
-        for (Player player : _hexusPlugin.getServer().getOnlinePlayers())
-        {
+    public void onDisable() {
+        for (Player player : _hexusPlugin.getServer().getOnlinePlayers()) {
             onPlayerQuit(new PlayerQuitEvent(player, null));
         }
         _scoreboardMap.clear();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    void onPlayerJoin(PlayerJoinEvent event)
-    {
+    void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Scoreboard scoreboard = _hexusPlugin.getServer().getScoreboardManager().getNewScoreboard();
         player.setScoreboard(scoreboard);
@@ -55,13 +48,11 @@ public class CoreScoreboard extends MiniPlugin<HexusPlugin>
     }
 
     @EventHandler
-    void onPlayerQuit(PlayerQuitEvent event)
-    {
+    void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         player.setScoreboard(_hexusPlugin.getServer().getScoreboardManager().getMainScoreboard());
 
-        if (!_scoreboardMap.containsKey(player))
-        {
+        if (!_scoreboardMap.containsKey(player)) {
             return;
         }
         Scoreboard scoreboard = _scoreboardMap.get(player);

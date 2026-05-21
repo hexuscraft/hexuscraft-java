@@ -9,20 +9,11 @@ import net.hexuscraft.core.teleport.command.CommandTeleport;
 
 import java.util.Map;
 
-public class CoreTeleport extends MiniPlugin<HexusPlugin>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_TELEPORT,
-        COMMAND_TELEPORT_COORDINATES,
-        COMMAND_TELEPORT_OTHERS
-    }
+public class CoreTeleport extends MiniPlugin<HexusPlugin> {
 
     CoreCommand _pluginCommand;
 
-    public CoreTeleport(HexusPlugin plugin)
-    {
+    public CoreTeleport(HexusPlugin plugin) {
         super(plugin, "Teleport");
 
         PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_TELEPORT);
@@ -31,15 +22,19 @@ public class CoreTeleport extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _pluginCommand.register(new CommandTeleport(this));
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_TELEPORT,
+        COMMAND_TELEPORT_COORDINATES,
+        COMMAND_TELEPORT_OTHERS
     }
 
 }

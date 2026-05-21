@@ -16,13 +16,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandRankInfo extends BaseCommand<CorePermission>
-{
+public class CommandRankInfo extends BaseCommand<CorePermission> {
 
     CoreDatabase _coreDatabase;
 
-    CommandRankInfo(CorePermission corePermission, CoreDatabase coreDatabase)
-    {
+    CommandRankInfo(CorePermission corePermission, CoreDatabase coreDatabase) {
         super(corePermission,
                 "info",
                 "<Player>",
@@ -33,10 +31,8 @@ public class CommandRankInfo extends BaseCommand<CorePermission>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length != 1)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length != 1) {
             sender.sendMessage(help(alias));
             return;
         }
@@ -44,17 +40,14 @@ public class CommandRankInfo extends BaseCommand<CorePermission>
         _miniPlugin._hexusPlugin.runAsync(() ->
         {
             OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
-            if (offlinePlayer == null)
-            {
+            if (offlinePlayer == null) {
                 sender.sendMessage(F.fMatches(new String[]{}, args[0]));
                 return;
             }
 
-            if (offlinePlayer.isOnline())
-            {
+            if (offlinePlayer.isOnline()) {
                 Player player = offlinePlayer.getPlayer();
-                if (_miniPlugin._permissionProfiles.containsKey(player))
-                {
+                if (_miniPlugin._permissionProfiles.containsKey(player)) {
                     sender.sendMessage(F.fMain(this,
                             F.fItem(offlinePlayer.getName()),
                             " Permission Groups: ",
@@ -66,14 +59,10 @@ public class CommandRankInfo extends BaseCommand<CorePermission>
             }
 
             Set<String> groupNames;
-            try
-            {
-                groupNames
-                        =
+            try {
+                groupNames =
                         _coreDatabase._database._jedis.smembers(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
-            }
-            catch (JedisException ex)
-            {
+            } catch (JedisException ex) {
                 sender.sendMessage(F.fMain(this,
                         F.fError("An exception occurred while fetching the permission groups of ",
                                 F.fItem(offlinePlayer.getName()),
@@ -91,10 +80,8 @@ public class CommandRankInfo extends BaseCommand<CorePermission>
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length == 1)
-        {
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
+        if (args.length == 1) {
             return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(),
                     sender,
                     false);

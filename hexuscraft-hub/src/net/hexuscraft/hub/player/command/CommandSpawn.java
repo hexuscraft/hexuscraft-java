@@ -11,11 +11,9 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public class CommandSpawn extends BaseCommand<HubPlayer>
-{
+public class CommandSpawn extends BaseCommand<HubPlayer> {
 
-    public CommandSpawn(HubPlayer hubPlayer)
-    {
+    public CommandSpawn(HubPlayer hubPlayer) {
         super(hubPlayer,
                 "spawn",
                 "[Player]",
@@ -25,20 +23,16 @@ public class CommandSpawn extends BaseCommand<HubPlayer>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length > 1)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length > 1) {
             sender.sendMessage(help(alias));
             return;
         }
 
         Player target;
 
-        if (args.length == 1)
-        {
-            if (!sender.hasPermission(PermissionGroup.TRAINEE.name()))
-            {
+        if (args.length == 1) {
+            if (!sender.hasPermission(PermissionGroup.TRAINEE.name())) {
                 sender.sendMessage(F.fInsufficientPermissions());
                 return;
             }
@@ -47,26 +41,20 @@ public class CommandSpawn extends BaseCommand<HubPlayer>
                     args[0],
                     sender,
                     matches -> matches.length != 1);
-            if (players.length != 1)
-            {
+            if (players.length != 1) {
                 return;
             }
 
             target = players[0];
-        }
-        else if (!(sender instanceof Player))
-        {
+        } else if (!(sender instanceof Player)) {
             sender.sendMessage(F.fMain(this) + "Only players can teleport themselves.");
             return;
-        }
-        else
-        {
+        } else {
             target = (Player) sender;
         }
 
         target.teleport(_miniPlugin._hexusPlugin._spawn);
-        if (target.getName().equals(sender.getName()))
-        {
+        if (target.getName().equals(sender.getName())) {
             target.sendMessage(F.fMain(this) + "You teleported to spawn.");
             return;
         }
@@ -78,8 +66,7 @@ public class CommandSpawn extends BaseCommand<HubPlayer>
         sender.sendMessage(F.fMain(this) + "Teleported " + F.fItem(target.getDisplayName()) + " to spawn.");
         _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().forEach(staff ->
         {
-            if (!staff.hasPermission(PermissionGroup.TRAINEE.name()))
-            {
+            if (!staff.hasPermission(PermissionGroup.TRAINEE.name())) {
                 return;
             }
             staff.sendMessage(F.fStaff(this,

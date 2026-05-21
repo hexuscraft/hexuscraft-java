@@ -12,11 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandClear extends BaseCommand<CoreItem>
-{
+public class CommandClear extends BaseCommand<CoreItem> {
 
-    public CommandClear(CoreItem coreItem)
-    {
+    public CommandClear(CoreItem coreItem) {
         super(coreItem,
                 "clear",
                 "[Players]",
@@ -26,10 +24,8 @@ public class CommandClear extends BaseCommand<CoreItem>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length != 1)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length != 1) {
             sender.sendMessage(help(alias));
             return;
         }
@@ -38,8 +34,7 @@ public class CommandClear extends BaseCommand<CoreItem>
                 args[0],
                 sender,
                 matches -> matches.length == 0);
-        if (targets.length == 0)
-        {
+        if (targets.length == 0) {
             return;
         }
 
@@ -51,14 +46,9 @@ public class CommandClear extends BaseCommand<CoreItem>
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args)
-    {
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
         List<String> completions = new ArrayList<>(List.of("*", "**", "."));
-        completions.addAll(_miniPlugin._hexusPlugin.getServer()
-                .getOnlinePlayers()
-                .stream()
-                .map(Player::getName)
-                .toList());
+        completions.addAll(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
         return completions;
     }
 }

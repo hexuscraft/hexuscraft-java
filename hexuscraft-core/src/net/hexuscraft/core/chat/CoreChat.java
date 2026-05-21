@@ -29,23 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class CoreChat extends MiniPlugin<HexusPlugin>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_ANNOUNCEMENT,
-        COMMAND_BROADCAST,
-        COMMAND_HELP,
-        COMMAND_SILENCE,
-        COMMAND_SILENCE_SEE,
-        COMMAND_SUPPORT,
-        COMMAND_SUPPORT_STAFF,
-
-        CHAT_PREFIX,
-
-        BYPASS_SILENCE
-    }
+public class CoreChat extends MiniPlugin<HexusPlugin> {
 
     public String CHANNEL_ANNOUNCEMENT = "ChatAnnouncement";
     public Set<CommandSender> _receivedTipSet;
@@ -56,8 +40,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
     CorePortal _corePortal;
     CoreActionBar _coreActionBar;
 
-    public CoreChat(HexusPlugin plugin)
-    {
+    public CoreChat(HexusPlugin plugin) {
         super(plugin, "Chat");
 
         PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_HELP);
@@ -78,8 +61,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _corePermission = (CorePermission) dependencies.get(CorePermission.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
@@ -88,8 +70,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _coreCommand.register(new CommandAnnouncement(this, _coreDatabase));
         _coreCommand.register(new CommandBroadcast(this));
         _coreCommand.register(new CommandSilence(this));
@@ -108,20 +89,16 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
             _hexusPlugin.runAsync(() ->
             {
                 String senderName;
-                try
-                {
+                try {
                     senderName =
                             Objects.requireNonNull(PlayerSearch.offlinePlayerSearch(parsedMessage._senderUniqueId()))
                                     .getName();
-                }
-                catch (NullPointerException ex)
-                {
+                } catch (NullPointerException ex) {
                     logSevere(ex);
                     return;
                 }
 
-                _hexusPlugin.getServer()
-                        .getOnlinePlayers()
+                _hexusPlugin.getServer().getOnlinePlayers()
                         .stream()
                         .filter(player -> player.hasPermission(PermissionGroup.ADMINISTRATOR.name()))
                         .forEach(player -> player.sendMessage(F.fStaff(this,
@@ -131,8 +108,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
                                 ".")));
             });
 
-            _hexusPlugin.getServer()
-                    .getOnlinePlayers()
+            _hexusPlugin.getServer().getOnlinePlayers()
                     .stream()
                     .filter(player -> player.hasPermission(parsedMessage._permissionGroup().name()))
                     .forEach(player ->
@@ -148,8 +124,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
         {
             ChatSupportMessage messageData = ChatSupportMessage.fromString(rawMessage);
 
-            _hexusPlugin.getServer()
-                    .getOnlinePlayers()
+            _hexusPlugin.getServer().getOnlinePlayers()
                     .stream()
                     .filter(player -> player.getUniqueId().equals(messageData._senderUniqueId()) ||
                             player.hasPermission(PERM.COMMAND_SUPPORT_STAFF.name()))
@@ -173,8 +148,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
             ChatSupportResponseSentMessage parsedMessage = ChatSupportResponseSentMessage.fromString(rawMessage);
 
             Player target = _hexusPlugin.getServer().getPlayer(parsedMessage._targetUniqueId());
-            if (target == null)
-            {
+            if (target == null) {
                 return;
             }
 
@@ -199,16 +173,14 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
         {
             ChatSupportResponseReceivedMessage parsedMessage =
                     ChatSupportResponseReceivedMessage.fromString(rawMessage);
-            _hexusPlugin.getServer()
-                    .getOnlinePlayers()
+            _hexusPlugin.getServer().getOnlinePlayers()
                     .stream()
                     .filter(player -> player.getUniqueId().equals(parsedMessage._senderUniqueId()) ||
                             player.getUniqueId().equals(parsedMessage._targetUniqueId()) ||
                             player.hasPermission(PERM.COMMAND_SUPPORT_STAFF.name()))
                     .forEach(player ->
                     {
-                        if (player.getUniqueId().equals(parsedMessage._senderUniqueId()))
-                        {
+                        if (player.getUniqueId().equals(parsedMessage._senderUniqueId())) {
                             player.sendMessage(C.cDPurple +
                                     "-> " +
                                     C.cPurple +
@@ -220,9 +192,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
                                     " " +
                                     C.cPurple +
                                     parsedMessage._message());
-                        }
-                        else if (player.getUniqueId().equals(parsedMessage._targetUniqueId()))
-                        {
+                        } else if (player.getUniqueId().equals(parsedMessage._targetUniqueId())) {
                             player.sendMessage(C.cDPurple +
                                     "<- " +
                                     C.cPurple +
@@ -234,9 +204,7 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
                                     " " +
                                     C.cPurple +
                                     parsedMessage._message());
-                        }
-                        else
-                        {
+                        } else {
                             player.sendMessage(C.cPurple +
                                     parsedMessage._senderServerName() +
                                     " " +
@@ -261,55 +229,56 @@ public class CoreChat extends MiniPlugin<HexusPlugin>
         });
     }
 
-
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         _receivedTipSet.clear();
     }
 
-    public boolean getMuted()
-    {
+    public boolean getMuted() {
         return _chatMuted;
     }
 
-    public void setMuted(boolean toggle)
-    {
+    public void setMuted(boolean toggle) {
         _chatMuted = toggle;
-        _hexusPlugin.getServer()
-                .broadcastMessage(F.fMain(this,
-                        toggle ?
-                                F.fError("The chat is now silenced.") :
-                                F.fSuccess("The chat is no longer silenced.")));
+        _hexusPlugin.getServer().broadcastMessage(F.fMain(this,
+                toggle ? F.fError("The chat is now silenced.") : F.fSuccess("The chat is no longer silenced.")));
     }
 
     @EventHandler
-    void onAsyncPlayerChat(AsyncPlayerChatEvent event)
-    {
+    void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
 
-        if (player.hasPermission(PERM.CHAT_PREFIX.name()))
-        {
+        if (player.hasPermission(PERM.CHAT_PREFIX.name())) {
             event.setFormat(F.fChat(0,
                     PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(player)
                             ._groups())));
-        }
-        else
-        {
+        } else {
             event.setFormat(F.fChat(0));
         }
 
-        if (_chatMuted && !player.hasPermission(PERM.BYPASS_SILENCE.name()))
-        {
+        if (_chatMuted && !player.hasPermission(PERM.BYPASS_SILENCE.name())) {
             event.setCancelled(true);
             player.sendMessage(F.fMain(this, F.fError("The chat is currently silenced.")));
         }
     }
 
     @EventHandler
-    void onPlayerQuit(PlayerQuitEvent event)
-    {
+    void onPlayerQuit(PlayerQuitEvent event) {
         _receivedTipSet.remove(event.getPlayer());
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_ANNOUNCEMENT,
+        COMMAND_BROADCAST,
+        COMMAND_HELP,
+        COMMAND_SILENCE,
+        COMMAND_SILENCE_SEE,
+        COMMAND_SUPPORT,
+        COMMAND_SUPPORT_STAFF,
+
+        CHAT_PREFIX,
+
+        BYPASS_SILENCE
     }
 
 }

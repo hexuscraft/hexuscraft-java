@@ -6,11 +6,9 @@ import net.hexuscraft.hub.news.HubNews;
 
 import java.util.Set;
 
-public class CommandNews extends BaseMultiCommand<HubNews>
-{
+public class CommandNews extends BaseMultiCommand<HubNews> {
 
-    public CommandNews(HubNews hubNews, CoreDatabase coreDatabase)
-    {
+    public CommandNews(HubNews hubNews, CoreDatabase coreDatabase) {
         super(hubNews,
                 "news",
                 "Manage the hub news.",

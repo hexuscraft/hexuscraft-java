@@ -10,11 +10,9 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandBroadcast extends BaseCommand<CoreChat>
-{
+public class CommandBroadcast extends BaseCommand<CoreChat> {
 
-    public CommandBroadcast(CoreChat coreChat)
-    {
+    public CommandBroadcast(CoreChat coreChat) {
         super(coreChat,
                 "s",
                 "<Message>",
@@ -24,10 +22,8 @@ public class CommandBroadcast extends BaseCommand<CoreChat>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length == 0)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length == 0) {
             sender.sendMessage(help(alias));
             return;
         }

@@ -9,32 +9,27 @@ import net.hexuscraft.core.party.command.CommandParty;
 
 import java.util.Map;
 
-public class CoreParty extends MiniPlugin<HexusPlugin>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_PARTY
-    }
+public class CoreParty extends MiniPlugin<HexusPlugin> {
 
     CoreCommand _pluginCommand;
 
-    public CoreParty(HexusPlugin plugin)
-    {
+    public CoreParty(HexusPlugin plugin) {
         super(plugin, "Party");
 
         PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_PARTY);
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _pluginCommand.register(new CommandParty(this));
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_PARTY
     }
 }

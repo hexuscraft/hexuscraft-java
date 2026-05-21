@@ -12,11 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class CommandDisguise extends BaseCommand<CoreDisguise>
-{
+public class CommandDisguise extends BaseCommand<CoreDisguise> {
 
-    public CommandDisguise(CoreDisguise coreDisguise)
-    {
+    public CommandDisguise(CoreDisguise coreDisguise) {
         super(coreDisguise,
                 "disguise",
                 "[Target] [Username]",
@@ -26,10 +24,8 @@ public class CommandDisguise extends BaseCommand<CoreDisguise>
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
-        if (args.length == 0 || args.length > 2)
-        {
+    public void run(CommandSender sender, String alias, String[] args) {
+        if (args.length == 0 || args.length > 2) {
             sender.sendMessage(help(alias));
             return;
         }
@@ -37,23 +33,18 @@ public class CommandDisguise extends BaseCommand<CoreDisguise>
         Player targetPlayer;
         String disguiseUsername;
 
-        if (args.length == 1)
-        {
-            if (!(sender instanceof Player player))
-            {
+        if (args.length == 1) {
+            if (!(sender instanceof Player player)) {
                 sender.sendMessage(F.fMain(this, F.fError("Only players can disguise themself.")));
                 return;
             }
 
             targetPlayer = player;
             disguiseUsername = args[0];
-        }
-        else
-        {
-            Player[] potentialMatches = PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer()
-                    .getOnlinePlayers(), args[0]);
-            if (potentialMatches.length != 1)
-            {
+        } else {
+            Player[] potentialMatches =
+                    PlayerSearch.onlinePlayerSearch(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), args[0]);
+            if (potentialMatches.length != 1) {
                 sender.sendMessage(F.fMain(this,
                         F.fMatches(Arrays.stream(potentialMatches).map(Player::getName).toArray(String[]::new),
                                 args[0])));
@@ -65,8 +56,7 @@ public class CommandDisguise extends BaseCommand<CoreDisguise>
         }
 
         OfflinePlayer potentialDisguise = PlayerSearch.offlinePlayerSearch(disguiseUsername, sender);
-        if (potentialDisguise == null)
-        {
+        if (potentialDisguise == null) {
             sender.sendMessage(F.fMain(this, F.fError("The specified disguise username does not exist.")));
             return;
         }
@@ -74,8 +64,7 @@ public class CommandDisguise extends BaseCommand<CoreDisguise>
         super._miniPlugin.disguise(targetPlayer, potentialDisguise);
 
         targetPlayer.sendMessage(F.fMain(this, "You are now disguised as ", F.fItem(potentialDisguise.getName()), "."));
-        if (targetPlayer.equals(sender))
-        {
+        if (targetPlayer.equals(sender)) {
             return;
         }
         sender.sendMessage(F.fMain(this,
@@ -87,8 +76,7 @@ public class CommandDisguise extends BaseCommand<CoreDisguise>
     }
 
     @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args)
-    {
+    public List<String> tab(CommandSender sender, String alias, String[] args) {
         return List.of(sender.getName());
     }
 

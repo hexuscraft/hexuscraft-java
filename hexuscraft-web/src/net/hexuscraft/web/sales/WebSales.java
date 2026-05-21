@@ -11,37 +11,31 @@ import net.hexuscraft.web.sales.command.CommandSales;
 
 import java.util.Map;
 
-public class WebSales extends MiniPlugin<Web>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_SALES,
-        COMMAND_SALES_RANK,
-        COMMAND_SALES_RANK_ISSUE,
-        COMMAND_SALES_RANK_REVOKE
-    }
+public class WebSales extends MiniPlugin<Web> {
 
     public static final PermissionGroup[] STORE_RANKS = new PermissionGroup[]{PermissionGroup.VIP, PermissionGroup.MVP};
-
     CoreCommand _coreCommand;
     CoreDatabase _coreDatabase;
 
-    public WebSales(Web webTranslator)
-    {
+    public WebSales(Web webTranslator) {
         super(webTranslator, "Sales");
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _coreCommand.register(new CommandSales(this, _coreDatabase));
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_SALES,
+        COMMAND_SALES_RANK,
+        COMMAND_SALES_RANK_ISSUE,
+        COMMAND_SALES_RANK_REVOKE
     }
 }

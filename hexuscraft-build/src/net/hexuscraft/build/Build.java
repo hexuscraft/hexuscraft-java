@@ -11,11 +11,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
-public class Build extends HexusPlugin
-{
+public class Build extends HexusPlugin {
 
-    public Build()
-    {
+    public Build() {
         super();
 
         PermissionGroup.BUILD_TEAM._permissions.add(CoreTeleport.PERM.COMMAND_TELEPORT);
@@ -26,20 +24,17 @@ public class Build extends HexusPlugin
         require(new BuildWorld(this));
     }
 
-    public Location getSpawn()
-    {
+    public Location getSpawn() {
         return getServer().getWorlds().getFirst().getSpawnLocation();
     }
 
     @EventHandler
-    void onWorldLoad(WorldLoadEvent event)
-    {
+    void onWorldLoad(WorldLoadEvent event) {
         event.getWorld().setSpawnLocation(0, 100, 0);
     }
 
     @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event)
-    {
+    void onPlayerJoin(PlayerJoinEvent event) {
         event.getPlayer().teleport(getSpawn());
         event.getPlayer().setGameMode(GameMode.CREATIVE);
     }

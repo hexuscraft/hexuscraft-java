@@ -18,25 +18,21 @@ import org.bukkit.scoreboard.Team;
 import java.util.Arrays;
 import java.util.Map;
 
-public class HubTeam extends MiniPlugin<Hub>
-{
+public class HubTeam extends MiniPlugin<Hub> {
 
     CorePermission _corePermission;
 
-    public HubTeam(Hub hub)
-    {
+    public HubTeam(Hub hub) {
         super(hub, "Team");
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _corePermission = (CorePermission) dependencies.get(CorePermission.class);
     }
 
     @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event)
-    {
+    void onPlayerJoin(PlayerJoinEvent event) {
         Player eventPlayer = event.getPlayer();
         Scoreboard eventPlayerScoreboard = eventPlayer.getScoreboard();
 
@@ -53,13 +49,11 @@ public class HubTeam extends MiniPlugin<Hub>
         _corePermission._permissionProfiles.forEach((Player target, PermissionProfile permissionProfile) ->
         {
             PermissionGroup highestGroup = PermissionGroup.getGroupWithHighestWeight(permissionProfile._groups());
-            if (highestGroup == null)
-            {
+            if (highestGroup == null) {
                 return;
             }
 
-            _hexusPlugin.getServer()
-                    .getOnlinePlayers()
+            _hexusPlugin.getServer().getOnlinePlayers()
                     .stream()
                     .map(Player::getScoreboard)
                     .map(scoreboard -> scoreboard.getTeam(highestGroup._prefix))

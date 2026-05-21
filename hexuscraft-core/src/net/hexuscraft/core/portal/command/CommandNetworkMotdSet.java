@@ -11,21 +11,18 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Set;
 
-public class CommandNetworkMotdSet extends BaseCommand<CorePortal>
-{
+public class CommandNetworkMotdSet extends BaseCommand<CorePortal> {
 
     final CoreDatabase _coreDatabase;
 
-    CommandNetworkMotdSet(CorePortal corePortal, CoreDatabase coreDatabase)
-    {
+    CommandNetworkMotdSet(CorePortal corePortal, CoreDatabase coreDatabase) {
         super(corePortal, "set", "<Message>", "Set the current MOTD.", Set.of("s"), CorePortal.PERM.COMMAND_MOTD_SET);
 
         _coreDatabase = coreDatabase;
     }
 
     @Override
-    public void run(CommandSender sender, String alias, String[] args)
-    {
+    public void run(CommandSender sender, String alias, String[] args) {
         String message = ChatColor.translateAlternateColorCodes('&', String.join(" ", args));
         sender.sendMessage(F.fMain(this, "Please wait... Updating the MOTD to:\n", C.fReset + message));
 

@@ -18,36 +18,27 @@ import org.bukkit.util.Vector;
 
 import java.util.Map;
 
-public class ArcadeLobby extends MiniPlugin<Arcade>
-{
+public class ArcadeLobby extends MiniPlugin<Arcade> {
 
     ArcadeManager _arcadeManager;
 
-    public ArcadeLobby(Arcade arcade)
-    {
+    public ArcadeLobby(Arcade arcade) {
         super(arcade, "Game Lobby");
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _arcadeManager = (ArcadeManager) dependencies.get(ArcadeManager.class);
     }
 
     @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event)
-    {
-        if (_arcadeManager.getGameState() == GameState.IN_PROGRESS)
-        {
+    void onPlayerJoin(PlayerJoinEvent event) {
+        if (_arcadeManager.getGameState() == GameState.IN_PROGRESS) {
             return;
         }
 
         Player player = event.getPlayer();
-        player.teleport(_hexusPlugin.getServer()
-                .getWorlds()
-                .getFirst()
-                .getSpawnLocation()
-                .add(new Vector(0.5, 0, 0.5)));
+        player.teleport(_hexusPlugin.getServer().getWorlds().getFirst().getSpawnLocation().add(new Vector(0.5, 0, 0.5)));
         player.resetPlayerTime();
         player.resetPlayerWeather();
         player.resetMaxHealth();
@@ -69,19 +60,15 @@ public class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    void onEntityDamageByEntity(EntityDamageByEntityEvent event)
-    {
-        if (!(event.getEntity() instanceof Player player))
-        {
+    void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player player)) {
             return;
         }
-        if (!player.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst()))
-        {
+        if (!player.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
             return;
         }
 
-        if (event.getDamager() instanceof Player damager && damager.getGameMode().equals(GameMode.CREATIVE))
-        {
+        if (event.getDamager() instanceof Player damager && damager.getGameMode().equals(GameMode.CREATIVE)) {
             return;
         }
 
@@ -89,26 +76,21 @@ public class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    void onEntityDamage(EntityDamageEvent event)
-    {
-        if (!(event.getEntity() instanceof Player player))
-        {
+    void onEntityDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player player)) {
             return;
         }
-        if (!player.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst()))
-        {
+        if (!player.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
             return;
         }
 
-        if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK))
-        {
+        if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
             return;
         }
 
         event.setCancelled(true);
 
-        if (!event.getCause().equals(EntityDamageEvent.DamageCause.VOID))
-        {
+        if (!event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
             return;
         }
 
@@ -116,20 +98,16 @@ public class ArcadeLobby extends MiniPlugin<Arcade>
     }
 
     @EventHandler
-    void onWeatherChange(WeatherChangeEvent event)
-    {
-        if (!event.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst()))
-        {
+    void onWeatherChange(WeatherChangeEvent event) {
+        if (!event.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
             return;
         }
         event.setCancelled(true);
     }
 
     @EventHandler
-    void onFoodLevelChange(FoodLevelChangeEvent event)
-    {
-        if (!event.getEntity().getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst()))
-        {
+    void onFoodLevelChange(FoodLevelChangeEvent event) {
+        if (!event.getEntity().getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
             return;
         }
         event.setCancelled(true);

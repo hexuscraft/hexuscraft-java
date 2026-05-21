@@ -18,27 +18,13 @@ import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.*;
 
-public class CorePermission extends MiniPlugin<HexusPlugin>
-{
-
-    public enum PERM implements IPermission
-    {
-        COMMAND_RANK,
-        COMMAND_RANK_ADD,
-        COMMAND_RANK_INFO,
-        COMMAND_RANK_LIST,
-        COMMAND_RANK_REMOVE,
-        COMMAND_RANK_CLEAR,
-
-        OPERATOR
-    }
+public class CorePermission extends MiniPlugin<HexusPlugin> {
 
     public HashMap<Player, PermissionProfile> _permissionProfiles;
     CoreCommand _coreCommand;
     CoreDatabase _coreDatabase;
 
-    public CorePermission(HexusPlugin plugin)
-    {
+    public CorePermission(HexusPlugin plugin) {
         super(plugin, "Permissions");
 
         _permissionProfiles = new HashMap<>();
@@ -55,39 +41,32 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
     }
 
     @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies)
-    {
+    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
         _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
         _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         _coreCommand.register(new CommandRank(this, _coreDatabase));
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         _hexusPlugin.getServer().getOnlinePlayers().forEach(this::clearPermissions);
         _permissionProfiles.forEach((_, permissionProfile) -> permissionProfile._attachment().remove());
         _permissionProfiles.clear();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    void onPlayerLogin(PlayerLoginEvent event)
-    {
+    void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
         Set<String> permissionGroupNames;
-        try
-        {
+        try {
             permissionGroupNames =
                     _coreDatabase._database._jedis.smembers(PermissionQueries.GROUPS(player.getUniqueId()));
-        }
-        catch (JedisException ex)
-        {
+        } catch (JedisException ex) {
             logSevere(ex);
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
             event.setKickMessage(
@@ -109,20 +88,17 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
 
     @EventHandler(priority = EventPriority.MONITOR)
         // We want to remove the permission profiles after other MiniPlugins have finished their things
-    void onPlayerQuit(PlayerQuitEvent event)
-    {
+    void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         clearPermissions(player);
         _permissionProfiles.remove(player);
     }
 
-    public void refreshPermissions(Player player)
-    {
+    public void refreshPermissions(Player player) {
         clearPermissions(player);
 
         PermissionProfile profile = _permissionProfiles.get(player);
-        if (profile == null)
-        {
+        if (profile == null) {
             logWarning("Unable to grant permissions for player '" +
                     player.getName() +
                     "' as they have no permission profile.");
@@ -132,23 +108,18 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         PermissionAttachment attachment = profile._attachment();
         Arrays.stream(profile._groups()).forEach(group -> grantPermissions(attachment, group));
 
-        if (player.hasPermission(PERM.OPERATOR.name()))
-        {
+        if (player.hasPermission(PERM.OPERATOR.name())) {
             player.setOp(true);
-        }
-        else
-        {
+        } else {
             denyBukkitPermissions(attachment);
         }
     }
 
-    void clearPermissions(Player player)
-    {
+    void clearPermissions(Player player) {
         player.setOp(false);
 
         PermissionProfile profile = _permissionProfiles.get(player);
-        if (profile == null)
-        {
+        if (profile == null) {
             logWarning("Unable to clear permissions for player '" +
                     player.getName() +
                     "' as they have no permission profile.");
@@ -159,8 +130,7 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         attachment.getPermissions().forEach((s, _) -> attachment.unsetPermission(s));
     }
 
-    void denyBukkitPermissions(PermissionAttachment attachment)
-    {
+    void denyBukkitPermissions(PermissionAttachment attachment) {
         attachment.setPermission("minecraft.command.me", false);
         attachment.setPermission("minecraft.command.tell", false);
         attachment.setPermission("bukkit.command.help", false);
@@ -168,8 +138,7 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
         attachment.setPermission("bukkit.command.version", false);
     }
 
-    void grantPermissions(PermissionAttachment attachment, PermissionGroup group)
-    {
+    void grantPermissions(PermissionAttachment attachment, PermissionGroup group) {
         attachment.setPermission(group.name(), true);
         group._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(), true));
 
@@ -179,6 +148,17 @@ public class CorePermission extends MiniPlugin<HexusPlugin>
             parentGroup._permissions.forEach(basePermission -> attachment.setPermission(basePermission.toString(),
                     true));
         });
+    }
+
+    public enum PERM implements IPermission {
+        COMMAND_RANK,
+        COMMAND_RANK_ADD,
+        COMMAND_RANK_INFO,
+        COMMAND_RANK_LIST,
+        COMMAND_RANK_REMOVE,
+        COMMAND_RANK_CLEAR,
+
+        OPERATOR
     }
 
 }

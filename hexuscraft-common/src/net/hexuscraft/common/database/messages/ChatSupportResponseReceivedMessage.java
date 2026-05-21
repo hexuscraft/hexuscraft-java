@@ -17,13 +17,11 @@ public record ChatSupportResponseReceivedMessage(UUID _uuid,
                                                  String _targetName,
                                                  String _targetServerName,
                                                  PermissionGroup[] _targetPermissionGroups,
-                                                 String _message)
-{
+                                                 String _message) {
 
     public static String CHANNEL_NAME = "chat.support.response.received";
 
-    public static ChatSupportResponseReceivedMessage fromString(String jsonString)
-    {
+    public static ChatSupportResponseReceivedMessage fromString(String jsonString) {
         JSONObject jsonObject = new JSONObject(jsonString);
         JSONArray senderPermissionGroups = jsonObject.getJSONArray("senderPermissionGroups");
         JSONArray targetPermissionGroups = jsonObject.getJSONArray("targetPermissionGroups");
@@ -47,8 +45,7 @@ public record ChatSupportResponseReceivedMessage(UUID _uuid,
 
     @Override
     @SuppressWarnings("NullableProblems")
-    public String toString()
-    {
+    public String toString() {
         return new JSONObject(Map.ofEntries(Map.entry("uuid", _uuid.toString()),
                 Map.entry("senderUniqueId", _senderUniqueId.toString()),
                 Map.entry("senderName", _senderName),

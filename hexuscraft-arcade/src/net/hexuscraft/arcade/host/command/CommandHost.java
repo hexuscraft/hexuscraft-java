@@ -5,10 +5,8 @@ import net.hexuscraft.core.command.BaseMultiCommand;
 
 import java.util.Set;
 
-public class CommandHost extends BaseMultiCommand<ArcadeHost>
-{
-    public CommandHost(ArcadeHost arcadeHost)
-    {
+public class CommandHost extends BaseMultiCommand<ArcadeHost> {
+    public CommandHost(ArcadeHost arcadeHost) {
         super(arcadeHost,
                 "host",
                 "View or modify the server host.",
