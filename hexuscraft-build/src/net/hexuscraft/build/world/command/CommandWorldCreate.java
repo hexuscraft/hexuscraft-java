@@ -15,48 +15,48 @@ import java.util.Set;
 
 public class CommandWorldCreate extends BaseCommand<BuildWorld> {
 
-    public CommandWorldCreate(BuildWorld buildWorld) {
-        super(buildWorld,
-                "create",
-                "<Name>",
-                "Create a new void world.",
-                Set.of("c"),
-                BuildWorld.PERM.COMMAND_WORLD_CREATE);
-    }
+	public CommandWorldCreate(BuildWorld buildWorld) {
+		super(buildWorld,
+			"create",
+			"<Name>",
+			"Create a new void world.",
+			Set.of("c"),
+			BuildWorld.PERM.COMMAND_WORLD_CREATE);
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (args.length != 1) {
-            sender.sendMessage(help(alias));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (args.length != 1) {
+			sender.sendMessage(help(alias));
+			return;
+		}
 
-        WorldCreator worldCreator = new WorldCreator(args[0]);
-        worldCreator.type(WorldType.FLAT);
-        worldCreator.environment(World.Environment.NORMAL);
-        worldCreator.generateStructures(false);
-        worldCreator.generatorSettings("3;0");
-        worldCreator.generator("3;0");
+		WorldCreator worldCreator = new WorldCreator(args[0]);
+		worldCreator.type(WorldType.FLAT);
+		worldCreator.environment(World.Environment.NORMAL);
+		worldCreator.generateStructures(false);
+		worldCreator.generatorSettings("3;0");
+		worldCreator.generator("3;0");
 
-        World world = _miniPlugin._hexusPlugin.getServer().createWorld(worldCreator);
-        world.setSpawnLocation(0, 100, 0);
-        world.setDifficulty(Difficulty.NORMAL);
-        world.setAutoSave(false);
-        world.setAmbientSpawnLimit(0);
-        world.setAnimalSpawnLimit(0);
-        world.setMonsterSpawnLimit(0);
-        world.setPVP(false);
-        world.setWaterAnimalSpawnLimit(0);
-        Map.of("doDaylightCycle", "false", "doEntityDrops", "false", "doFireTick", "false", "mobGriefing", "false")
-                .forEach(world::setGameRuleValue);
-        world.save();
+		World world = _miniPlugin._hexusPlugin.getServer().createWorld(worldCreator);
+		world.setSpawnLocation(0, 100, 0);
+		world.setDifficulty(Difficulty.NORMAL);
+		world.setAutoSave(false);
+		world.setAmbientSpawnLimit(0);
+		world.setAnimalSpawnLimit(0);
+		world.setMonsterSpawnLimit(0);
+		world.setPVP(false);
+		world.setWaterAnimalSpawnLimit(0);
+		Map.of("doDaylightCycle", "false", "doEntityDrops", "false", "doFireTick", "false", "mobGriefing", "false")
+			.forEach(world::setGameRuleValue);
+		world.save();
 
-        sender.sendMessage(F.fMain(this, "Created world ", F.fItem(world.getName()), "."));
+		sender.sendMessage(F.fMain(this, "Created world ", F.fItem(world.getName()), "."));
 
-        if (!(sender instanceof Player player)) {
-            return;
-        }
-        player.teleport(world.getSpawnLocation());
-    }
+		if (!(sender instanceof Player player)) {
+			return;
+		}
+		player.teleport(world.getSpawnLocation());
+	}
 
 }

@@ -10,26 +10,26 @@ import java.util.Set;
 
 public class CommandLocateServer extends BaseCommand<CorePortal> {
 
-    public CommandLocateServer(CorePortal corePortal) {
-        super(corePortal,
-                "server",
-                "<Name>",
-                "List all players in a specific server.",
-                Set.of("srv", "s"),
-                CorePortal.PERM.COMMAND_LOCATE_SERVER);
-    }
+	public CommandLocateServer(CorePortal corePortal) {
+		super(corePortal,
+			"server",
+			"<Name>",
+			"List all players in a specific server.",
+			Set.of("srv", "s"),
+			CorePortal.PERM.COMMAND_LOCATE_SERVER);
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        super.run(sender, alias, args);
-    }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		super.run(sender, alias, args);
+	}
 
-    @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
-        if (args.length == 1) {
-            return Arrays.asList(_miniPlugin.getServerNames());
-        }
-        return List.of();
-    }
+	@Override
+	public List<String> tab(CommandSender sender, String alias, String[] args) {
+		if (args.length == 1) {
+			return Arrays.asList(_miniPlugin.getServerNames());
+		}
+		return List.of();
+	}
 
 }

@@ -13,31 +13,37 @@ import java.util.Map;
 
 public class BuildWorld extends MiniPlugin<Build> {
 
-    CoreCommand _coreCommand = null;
+	CoreCommand _coreCommand = null;
 
-    public BuildWorld(Build plugin) {
-        super(plugin, "World");
+	public BuildWorld(Build plugin) {
+		super(plugin, "World");
 
-        PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_SPAWN);
-        PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_WORLD);
-        PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_WORLD_CREATE);
-    }
+		PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_SPAWN);
+		PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_WORLD);
+		PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_WORLD_CREATE);
+		PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_WORLD_LIST);
+		PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_WORLD_LOCATE);
+		PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_WORLD_TELEPORT);
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
+	}
 
-    @Override
-    public void onEnable() {
-        _coreCommand.register(new CommandSpawn(this));
-        _coreCommand.register(new CommandWorld(this));
-    }
+	@Override
+	public void onEnable() {
+		_coreCommand.register(new CommandSpawn(this));
+		_coreCommand.register(new CommandWorld(this));
+	}
 
-    public enum PERM implements IPermission {
-        COMMAND_SPAWN,
-        COMMAND_WORLD,
-        COMMAND_WORLD_CREATE
-    }
+	public enum PERM implements IPermission {
+		COMMAND_SPAWN,
+		COMMAND_WORLD,
+		COMMAND_WORLD_CREATE,
+		COMMAND_WORLD_LIST,
+		COMMAND_WORLD_LOCATE,
+		COMMAND_WORLD_TELEPORT
+	}
 
 }

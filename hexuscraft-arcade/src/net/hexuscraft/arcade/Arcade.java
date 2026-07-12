@@ -8,13 +8,13 @@ import net.hexuscraft.core.HexusPlugin;
 
 public class Arcade extends HexusPlugin {
 
-    public Arcade() {
-        super();
+	public Arcade() {
+		super();
 
-        require(new ArcadeHost(this));
-        require(new ArcadeLobby(this));
-        require(new ArcadeManager(this));
-        require(new ArcadeTab(this));
-    }
+		require(new ArcadeHost(this));
+		require(new ArcadeLobby(this));
+		require(new ArcadeManager(this));
+		require(new ArcadeTab(this));
+	}
 
 }

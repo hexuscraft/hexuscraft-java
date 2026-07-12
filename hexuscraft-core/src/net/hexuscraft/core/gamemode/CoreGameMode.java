@@ -11,29 +11,29 @@ import java.util.Map;
 
 public class CoreGameMode extends MiniPlugin<HexusPlugin> {
 
-    CoreCommand _coreCommand;
+	CoreCommand _coreCommand;
 
-    public CoreGameMode(HexusPlugin plugin) {
-        super(plugin, "Game Mode");
+	public CoreGameMode(HexusPlugin plugin) {
+		super(plugin, "Game Mode");
 
-        PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_GAMEMODE);
+		PermissionGroup.BUILD_TEAM._permissions.add(PERM.COMMAND_GAMEMODE);
 
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAMEMODE_OTHERS);
-    }
+		PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAMEMODE_OTHERS);
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
+	}
 
-    @Override
-    public void onEnable() {
-        _coreCommand.register(new CommandGameMode(this));
-    }
+	@Override
+	public void onEnable() {
+		_coreCommand.register(new CommandGameMode(this));
+	}
 
-    public enum PERM implements IPermission {
-        COMMAND_GAMEMODE,
-        COMMAND_GAMEMODE_OTHERS
-    }
+	public enum PERM implements IPermission {
+		COMMAND_GAMEMODE,
+		COMMAND_GAMEMODE_OTHERS
+	}
 
 }

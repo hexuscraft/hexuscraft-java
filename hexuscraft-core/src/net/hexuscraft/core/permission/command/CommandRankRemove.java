@@ -19,82 +19,82 @@ import java.util.stream.Stream;
 
 public class CommandRankRemove extends BaseCommand<CorePermission> {
 
-    final CoreDatabase _coreDatabase;
+	final CoreDatabase _coreDatabase;
 
-    CommandRankRemove(CorePermission corePermission, CoreDatabase coreDatabase) {
-        super(corePermission,
-                "remove",
-                "<Player> <Permission Group>",
-                "Take a group from a player.",
-                Set.of("r"),
-                CorePermission.PERM.COMMAND_RANK_REMOVE);
-        _coreDatabase = coreDatabase;
-    }
+	CommandRankRemove(CorePermission corePermission, CoreDatabase coreDatabase) {
+		super(corePermission,
+			"remove",
+			"<Player> <Permission Group>",
+			"Take a group from a player.",
+			Set.of("r"),
+			CorePermission.PERM.COMMAND_RANK_REMOVE);
+		_coreDatabase = coreDatabase;
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (args.length != 2) {
-            sender.sendMessage(help(alias));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (args.length != 2) {
+			sender.sendMessage(help(alias));
+			return;
+		}
 
-        PermissionGroup targetGroup;
-        try {
-            targetGroup = PermissionGroup.valueOf(args[1]);
-        } catch (IllegalArgumentException ex) {
-            sender.sendMessage(F.fMain(this,
-                    F.fError("Invalid group. Groups: ", F.fItem(PermissionGroup.getColoredNames()), ".")));
-            return;
-        }
+		PermissionGroup targetGroup;
+		try {
+			targetGroup = PermissionGroup.valueOf(args[1]);
+		} catch (IllegalArgumentException ex) {
+			sender.sendMessage(F.fMain(this,
+				F.fError("Invalid group. Groups: ", F.fItem(PermissionGroup.getColoredNames()), ".")));
+			return;
+		}
 
-        if (targetGroup.toString().startsWith("_")) {
-            sender.sendMessage(F.fMain(this, F.fError("This group cannot be manually granted to players.")));
-            return;
-        }
+		if (targetGroup.toString().startsWith("_")) {
+			sender.sendMessage(F.fMain(this, F.fError("This group cannot be manually granted to players.")));
+			return;
+		}
 
-        if (!sender.hasPermission(targetGroup.name())) {
-            sender.sendMessage(F.fInsufficientPermissions());
-            return;
-        }
+		if (!sender.hasPermission(targetGroup.name())) {
+			sender.sendMessage(F.fInsufficientPermissions());
+			return;
+		}
 
-        _miniPlugin._hexusPlugin.runAsync(() ->
-        {
-            OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
-            if (offlinePlayer == null) {
-                sender.sendMessage(F.fMatches(new String[]{}, args[0]));
-                return;
-            }
+		_miniPlugin._hexusPlugin.runAsync(() ->
+		{
+			OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
+			if (offlinePlayer == null) {
+				sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+				return;
+			}
 
-            _coreDatabase._database._jedis.srem(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()),
-                    targetGroup.name());
-            sender.sendMessage(F.fMain(this,
-                    "Removed sub-group ",
-                    F.fPermissionGroup(targetGroup),
-                    " from ",
-                    F.fItem(offlinePlayer.getName()),
-                    "."));
-        });
-    }
+			_coreDatabase._database._jedis.srem(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()),
+				targetGroup.name());
+			sender.sendMessage(F.fMain(this,
+				"Removed sub-group ",
+				F.fPermissionGroup(targetGroup),
+				" from ",
+				F.fItem(offlinePlayer.getName()),
+				"."));
+		});
+	}
 
-    @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
-        List<String> names = new ArrayList<>();
-        switch (args.length) {
-            case 1 -> {
-                //noinspection ReassignedVariable
-                Stream<? extends Player> streamedOnlinePlayers =
-                        _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
-                if (sender instanceof Player player) {
-                    streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
-                }
-                names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
-            }
-            case 2 -> names.addAll(Arrays.stream(PermissionGroup.values())
-                    .map(PermissionGroup::name)
-                    .filter(s -> !s.startsWith("_"))
-                    .toList());
-        }
-        return names;
-    }
+	@Override
+	public List<String> tab(CommandSender sender, String alias, String[] args) {
+		List<String> names = new ArrayList<>();
+		switch (args.length) {
+			case 1 -> {
+				//noinspection ReassignedVariable
+				Stream<? extends Player> streamedOnlinePlayers =
+					_miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
+				if (sender instanceof Player player) {
+					streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+				}
+				names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
+			}
+			case 2 -> names.addAll(Arrays.stream(PermissionGroup.values())
+				.map(PermissionGroup::name)
+				.filter(s -> !s.startsWith("_"))
+				.toList());
+		}
+		return names;
+	}
 
 }

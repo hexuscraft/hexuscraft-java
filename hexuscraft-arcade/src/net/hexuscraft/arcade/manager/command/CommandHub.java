@@ -11,26 +11,26 @@ import java.util.Set;
 
 public class CommandHub extends BaseCommand<ArcadeManager> {
 
-    final CorePortal _corePortal;
+	final CorePortal _corePortal;
 
-    public CommandHub(ArcadeManager arcadeManager, CorePortal corePortal) {
-        super(arcadeManager,
-                "hub",
-                "",
-                "Teleport back to a lobby server.",
-                Set.of("lobby"),
-                ArcadeManager.PERM.COMMAND_HUB);
-        _corePortal = corePortal;
-    }
+	public CommandHub(ArcadeManager arcadeManager, CorePortal corePortal) {
+		super(arcadeManager,
+			"hub",
+			"",
+			"Teleport back to a lobby server.",
+			Set.of("lobby"),
+			ArcadeManager.PERM.COMMAND_HUB);
+		_corePortal = corePortal;
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(F.fMain(this, "Only players can execute this command."));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (!(sender instanceof Player player)) {
+			sender.sendMessage(F.fMain(this, "Only players can execute this command."));
+			return;
+		}
 
-        _miniPlugin._hexusPlugin.runAsync(() -> _corePortal.teleportPlayerToRandomServer(player, "Lobby"));
-    }
+		_miniPlugin._hexusPlugin.runAsync(() -> _corePortal.teleportPlayerToRandomServer(player, "Lobby"));
+	}
 
 }

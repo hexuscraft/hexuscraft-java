@@ -26,115 +26,121 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ArcadeManager extends MiniPlugin<Arcade> {
 
-    final Map<GameType, Class<? extends Game>> GAME_CLASS_MAP = Map.ofEntries(Map.entry(GameType.SURVIVAL_GAMES, GameSurvivalGames.class), Map.entry(GameType.SURVIVAL_GAMES_2, GameSurvivalGamesDuo.class), Map.entry(GameType.THE_BRIDGES, GameTheBridges.class));
-    final Random _nextBestGameRandom = new Random();
-    final AtomicReference<BukkitTask> _gameTickTask = new AtomicReference<>();
-    public AtomicReference<Game> _game = new AtomicReference<>();
-    public AtomicReference<GameMap> _gameMap = new AtomicReference<>();
-    CoreCommand _coreCommand;
-    CoreDatabase _coreDatabase;
-    CorePortal _corePortal;
+	final Map<GameType, Class<? extends Game>> GAME_CLASS_MAP = Map.ofEntries(Map.entry(GameType.SURVIVAL_GAMES, GameSurvivalGames.class), Map.entry(GameType.SURVIVAL_GAMES_2, GameSurvivalGamesDuo.class), Map.entry(GameType.THE_BRIDGES, GameTheBridges.class));
+	final Random _nextBestGameRandom = new Random();
+	final AtomicReference<BukkitTask> _gameTickTask = new AtomicReference<>();
+	public AtomicReference<Game> _game = new AtomicReference<>();
+	public AtomicReference<GameMap> _gameMap = new AtomicReference<>();
+	CoreCommand _coreCommand;
+	CoreDatabase _coreDatabase;
+	CorePortal _corePortal;
 
-    public ArcadeManager(Arcade arcade) {
-        super(arcade, "Game");
+	public ArcadeManager(Arcade arcade) {
+		super(arcade, "Game");
 
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME_SET);
-        PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_HUB);
-    }
+		PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME);
+		PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GAME_SET);
+		PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_HUB);
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
-        _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
-        _corePortal = (CorePortal) dependencies.get(CorePortal.class);
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
+		_coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
+		_corePortal = (CorePortal) dependencies.get(CorePortal.class);
+	}
 
-    @Override
-    public void onEnable() {
-        _coreCommand.register(new CommandGame(this));
-        _coreCommand.register(new CommandHub(this, _corePortal));
+	@Override
+	public void onEnable() {
+		_coreCommand.register(new CommandGame(this));
+		_coreCommand.register(new CommandHub(this, _corePortal));
 
-        _gameTickTask.set(_hexusPlugin.runSyncTimer(this::tick, 0, 1));
-    }
+		_gameTickTask.set(_hexusPlugin.runSyncTimer(this::tick, 0, 1));
+	}
 
-    @Override
-    public void onDisable() {
-        BukkitTask oldTask = _gameTickTask.getAndSet(null);
-        if (oldTask == null) {
-            return;
-        }
-        oldTask.cancel();
-    }
+	@Override
+	public void onDisable() {
+		BukkitTask oldTask = _gameTickTask.getAndSet(null);
+		if (oldTask == null) {
+			return;
+		}
+		oldTask.cancel();
+	}
 
-    void tick() {
-        if (_game.get() == null) {
-            GameType nextBestGametype = selectNextBestGame();
-            if (nextBestGametype == null) {
-                logWarning("Could not select next best game!");
-                return;
-            }
+	void tick() {
+		if (_game.get() == null) {
+			GameType nextBestGametype = selectNextBestGame();
+			if (nextBestGametype == null) {
+				logWarning("Could not select next best game!");
+				return;
+			}
 
-            if (!GAME_CLASS_MAP.containsKey(nextBestGametype)) {
-                logWarning("Could not find class for game type '" + nextBestGametype.name() + "'!");
-                return;
-            }
+			if (!GAME_CLASS_MAP.containsKey(nextBestGametype)) {
+				logWarning("Could not find class for game type '" + nextBestGametype.name() + "'!");
+				return;
+			}
 
-            try {
-                Constructor<? extends Game> constructor = GAME_CLASS_MAP.get(nextBestGametype).getDeclaredConstructor(ArcadeManager.class);
-                constructor.setAccessible(true);
-                _game.set(constructor.newInstance(this));
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                     NoSuchMethodException ex) {
-                logSevere(ex);
-                return;
-            }
-        }
+			try {
+				Constructor<? extends Game> constructor = GAME_CLASS_MAP.get(nextBestGametype).getDeclaredConstructor(ArcadeManager.class);
+				constructor.setAccessible(true);
+				_game.set(constructor.newInstance(this));
+			} catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+			         NoSuchMethodException ex) {
+				logSevere(ex);
+				return;
+			}
+		}
 
-        switch (getGameState()) {
-            case null -> setGameState(GameState.LOADING_MAP);
-            case LOADING_MAP -> {
-                if (_gameMap.get() != null) return;
-                _gameMap.set(new GameMap());
+		switch (getGameState()) {
+			case null -> setGameState(GameState.LOADING_MAP);
+			case LOADING_MAP -> {
+				if (_gameMap.get() != null) return;
+				_gameMap.set(new GameMap());
 
-                setGameState(GameState.WAITING_FOR_PLAYERS);
-            }
-            case WAITING_FOR_PLAYERS -> setGameState(GameState.START_COUNTDOWN);
-            case START_COUNTDOWN -> setGameState(GameState.STARTING);
-            case STARTING -> setGameState(GameState.IN_PROGRESS);
-            case IN_PROGRESS -> setGameState(GameState.ENDING);
-            case ENDING -> setGameState(GameState.LOADING_MAP);
-        }
-    }
+				setGameState(GameState.WAITING_FOR_PLAYERS);
+			}
+			case WAITING_FOR_PLAYERS -> {
+				if (_hexusPlugin.getServer().getOnlinePlayers().isEmpty()) return;
+				setGameState(GameState.START_COUNTDOWN);
+			}
+			case START_COUNTDOWN -> {
 
-    public GameState getGameState() {
-        Game game = _game.get();
-        return game == null ? null : game._state.get();
-    }
+				setGameState(GameState.STARTING);
+			}
+			case STARTING -> setGameState(GameState.IN_PROGRESS);
+			case IN_PROGRESS -> setGameState(GameState.ENDING);
+			case ENDING -> setGameState(GameState.LOADING_MAP);
+		}
+	}
 
-    boolean setGameState(GameState newState) {
-        GameStateChangedEvent event = new GameStateChangedEvent(_game.get()._state.get(), newState);
-        _hexusPlugin.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return false;
-        }
-        _game.get()._state.set(newState);
-        return true;
-    }
+	public GameState getGameState() {
+		Game game = _game.get();
+		return game == null ? null : game._state.get();
+	}
 
-    GameType selectNextBestGame() {
-        GameType[] games = _corePortal.getServerGroup(_corePortal._serverGroupName)._games;
-        if (games.length == 0) {
-            return Arrays.stream(GameType.values()).findAny().orElse(null);
-        }
-        if (games.length == 1) {
-            return games[0];
-        }
-        return games[_nextBestGameRandom.nextInt(0, games.length - 1)];
-    }
+	boolean setGameState(GameState newState) {
+		GameStateChangedEvent event = new GameStateChangedEvent(_game.get()._state.get(), newState);
+		_hexusPlugin.getServer().getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			return false;
+		}
+		_game.get()._state.set(newState);
+		return true;
+	}
 
-    public enum PERM implements IPermission {
-        COMMAND_GAME, COMMAND_GAME_SET, COMMAND_GAME_START, COMMAND_GAME_STOP, COMMAND_HUB
-    }
+	GameType selectNextBestGame() {
+		GameType[] games = _corePortal.getServerGroup(_corePortal._serverGroupName)._games;
+		if (games.length == 0) {
+			return Arrays.stream(GameType.values()).findAny().orElse(null);
+		}
+		if (games.length == 1) {
+			return games[0];
+		}
+		return games[_nextBestGameRandom.nextInt(0, games.length - 1)];
+	}
+
+	public enum PERM implements IPermission {
+		COMMAND_GAME, COMMAND_GAME_SET, COMMAND_GAME_START, COMMAND_GAME_STOP, COMMAND_HUB
+	}
 
 }

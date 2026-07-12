@@ -15,62 +15,62 @@ import java.util.Set;
 
 public class CommandServer extends BaseCommand<CorePortal> {
 
-    final CoreDatabase _coreDatabase;
+	final CoreDatabase _coreDatabase;
 
-    public CommandServer(CorePortal corePortal, CoreDatabase coreDatabase) {
-        super(corePortal,
-                "server",
-                "[Name]",
-                "View your current server or teleport to a server.",
-                Set.of("sv", "portal"),
-                CorePortal.PERM.COMMAND_SERVER);
-        _coreDatabase = coreDatabase;
-    }
+	public CommandServer(CorePortal corePortal, CoreDatabase coreDatabase) {
+		super(corePortal,
+			"server",
+			"[Name]",
+			"View your current server or teleport to a server.",
+			Set.of("sv", "portal"),
+			CorePortal.PERM.COMMAND_SERVER);
+		_coreDatabase = coreDatabase;
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (args.length == 1) {
-            if (!(sender instanceof Player player)) {
-                sender.sendMessage(F.fMain(this, "Only players can teleport to a server."));
-                return;
-            }
-            String serverName = args[0];
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (args.length == 1) {
+			if (!(sender instanceof Player player)) {
+				sender.sendMessage(F.fMain(this, "Only players can teleport to a server."));
+				return;
+			}
+			String serverName = args[0];
 
-            ServerData serverData = _miniPlugin.getServer(serverName);
-            if (serverData == null) {
-                sender.sendMessage(F.fMain(this,
-                        F.fError("Could not locate server with name ", F.fItem(serverName), ".")));
-                return;
-            }
+			ServerData serverData = _miniPlugin.getServer(serverName);
+			if (serverData == null) {
+				sender.sendMessage(F.fMain(this,
+					F.fError("Could not locate server with name ", F.fItem(serverName), ".")));
+				return;
+			}
 
-            ServerGroupData serverGroupData = _miniPlugin.getServerGroup(serverData._group);
-            if (serverGroupData == null) {
-                sender.sendMessage(F.fMain(this,
-                        F.fError("Could not locate server group with name ", F.fItem(serverData._group), ".")));
-                return;
-            }
-            if (!sender.hasPermission(serverGroupData._requiredPermission.name())) {
-                sender.sendMessage(F.fInsufficientPermissions());
-                return;
-            }
+			ServerGroupData serverGroupData = _miniPlugin.getServerGroup(serverData._group);
+			if (serverGroupData == null) {
+				sender.sendMessage(F.fMain(this,
+					F.fError("Could not locate server group with name ", F.fItem(serverData._group), ".")));
+				return;
+			}
+			if (!sender.hasPermission(serverGroupData._requiredPermission.name())) {
+				sender.sendMessage(F.fInsufficientPermissions());
+				return;
+			}
 
-            _miniPlugin.teleport(player, serverData._name);
-            return;
-        }
+			_miniPlugin.teleport(player, serverData._name);
+			return;
+		}
 
-        if (args.length == 0) {
-            sender.sendMessage(F.fMain(this, "You are connected to ", F.fItem(_miniPlugin._serverName), "."));
-            return;
-        }
+		if (args.length == 0) {
+			sender.sendMessage(F.fMain(this, "You are connected to ", F.fItem(_miniPlugin._serverName), "."));
+			return;
+		}
 
-        sender.sendMessage(help(alias));
-    }
+		sender.sendMessage(help(alias));
+	}
 
-    @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
-        if (args.length == 1) {
-            return Arrays.stream(_miniPlugin.getServers()).map(serverData -> serverData._name).toList();
-        }
-        return List.of();
-    }
+	@Override
+	public List<String> tab(CommandSender sender, String alias, String[] args) {
+		if (args.length == 1) {
+			return Arrays.stream(_miniPlugin.getServers()).map(serverData -> serverData._name).toList();
+		}
+		return List.of();
+	}
 }

@@ -14,22 +14,22 @@ import java.util.Map;
 
 public class ArcadeTab extends MiniPlugin<Arcade> {
 
-    CorePortal _corePortal;
+	CorePortal _corePortal;
 
-    public ArcadeTab(Arcade arcade) {
-        super(arcade, "Tab");
-    }
+	public ArcadeTab(Arcade arcade) {
+		super(arcade, "Tab");
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _corePortal = (CorePortal) dependencies.get(CorePortal.class);
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_corePortal = (CorePortal) dependencies.get(CorePortal.class);
+	}
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), " ");
-    }
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+		UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), " ");
+	}
 
 
 }

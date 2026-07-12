@@ -7,13 +7,13 @@ import java.util.Set;
 
 public class CommandPerformance extends BaseCommand<CorePortal> {
 
-    public CommandPerformance(CorePortal corePortal) {
-        super(corePortal,
-                "performance",
-                "",
-                "View the server and your player performance stats.",
-                Set.of("perf", "lag", "tps"),
-                CorePortal.PERM.COMMAND_PERFORMANCE);
-    }
+	public CommandPerformance(CorePortal corePortal) {
+		super(corePortal,
+			"performance",
+			"",
+			"View the server and your player performance stats.",
+			Set.of("perf", "lag", "tps"),
+			CorePortal.PERM.COMMAND_PERFORMANCE);
+	}
 
 }

@@ -17,41 +17,41 @@ import java.util.Set;
 
 public class CommandNetworkGroupCreate extends BaseCommand<CorePortal> {
 
-    final String[] DISALLOWED_CHARACTERS = new String[]{":", "//", "\\\\", ".."};
+	final String[] DISALLOWED_CHARACTERS = new String[]{":", "//", "\\\\", ".."};
 
-    final CoreDatabase _coreDatabase;
+	final CoreDatabase _coreDatabase;
 
-    CommandNetworkGroupCreate(CorePortal corePortal, CoreDatabase coreDatabase) {
-        super(corePortal,
-                "create",
-                "",
-                "Create a server group.",
-                Set.of("c", "add", "a"),
-                CorePortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
-        _coreDatabase = coreDatabase;
-    }
+	CommandNetworkGroupCreate(CorePortal corePortal, CoreDatabase coreDatabase) {
+		super(corePortal,
+			"create",
+			"",
+			"Create a server group.",
+			Set.of("c", "add", "a"),
+			CorePortal.PERM.COMMAND_NETWORK_GROUP_CREATE);
+		_coreDatabase = coreDatabase;
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (args.length > 0) {
-            sender.sendMessage(help(alias));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (args.length > 0) {
+			sender.sendMessage(help(alias));
+			return;
+		}
 
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(F.fMain(this, F.fError("Only players can open the server group creation menu.")));
-            return;
-        }
+		if (!(sender instanceof Player player)) {
+			sender.sendMessage(F.fMain(this, F.fError("Only players can open the server group creation menu.")));
+			return;
+		}
 
-        _miniPlugin.openServerGroupCreateGui(player);
-    }
+		_miniPlugin.openServerGroupCreateGui(player);
+	}
 
-    @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
-        if (args.length == 2) {
-            return Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).toList();
-        }
-        return List.of();
-    }
+	@Override
+	public List<String> tab(CommandSender sender, String alias, String[] args) {
+		if (args.length == 2) {
+			return Arrays.stream(PermissionGroup.values()).map(PermissionGroup::name).toList();
+		}
+		return List.of();
+	}
 
 }

@@ -30,6 +30,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.exceptions.JedisException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -37,235 +39,173 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class CoreReport extends MiniPlugin<HexusPlugin> {
 
-    Map<HumanEntity, ReportGui> _reportGuis;
-    CoreActionBar _coreActionBar;
-    CoreCommand _coreCommand;
-    CoreDatabase _coreDatabase;
-    CorePortal _corePortal;
+	Map<HumanEntity, ReportGui> _reportGuis;
+	CoreActionBar _coreActionBar;
+	CoreCommand _coreCommand;
+	CoreDatabase _coreDatabase;
+	CorePortal _corePortal;
 
-    public CoreReport(HexusPlugin plugin) {
-        super(plugin, "Reports");
-        _reportGuis = new HashMap<>();
+	public CoreReport(HexusPlugin plugin) {
+		super(plugin, "Reports");
+		_reportGuis = new HashMap<>();
 
-        PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_REPORT);
+		PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_REPORT);
 
-        PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_REPORT_HISTORY);
-        PermissionGroup.TRAINEE._permissions.add(PERM.REPORT_ALERTS);
-    }
+		PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_REPORT_HISTORY);
+		PermissionGroup.TRAINEE._permissions.add(PERM.REPORT_ALERTS);
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _coreActionBar = (CoreActionBar) dependencies.get(CoreActionBar.class);
-        _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
-        _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
-        _corePortal = (CorePortal) dependencies.get(CorePortal.class);
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_coreActionBar = (CoreActionBar) dependencies.get(CoreActionBar.class);
+		_coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
+		_coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
+		_corePortal = (CorePortal) dependencies.get(CorePortal.class);
+	}
 
-    @Override
-    public void onEnable() {
-        _coreCommand.register(new CommandReport(this));
+	@Override
+	public void onEnable() {
+		_coreCommand.register(new CommandReport(this));
 
-        _coreDatabase._database.registerConsumer(ReportSubmittedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
-        {
-            ReportSubmittedMessage parsedMessage = ReportSubmittedMessage.fromString(rawMessage);
+		_coreDatabase._database.registerConsumer(ReportSubmittedMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+			ReportSubmittedMessage parsedMessage = ReportSubmittedMessage.fromString(rawMessage);
 
-            _hexusPlugin.runAsync(() ->
-            {
-                Map<String, String> rawData =
-                        new HashMap<>(_coreDatabase._database._jedis.hgetAll(ReportQueries.REPORT(parsedMessage.reportUUID())));
+			_hexusPlugin.runAsync(() -> {
+				Map<String, String> rawData = new HashMap<>(_coreDatabase._database._jedis.hgetAll(ReportQueries.REPORT(parsedMessage.reportUUID())));
 
-                ReportData reportData = new ReportData(rawData);
+				ReportData reportData = new ReportData(rawData);
 
-                OfflinePlayer sender, target;
+				AtomicReference<String> senderName = new AtomicReference<>("<UNKNOWN>");
+				AtomicReference<String> targetName = new AtomicReference<>("<UNKNOWN>");
 
-                try {
-                    sender = PlayerSearch.offlinePlayerSearch(reportData.senderUUID);
-                    assert (sender != null);
-                } catch (AssertionError ex) {
-                    logSevere(ex);
-                    return;
-                }
+				try {
+					senderName.set(PlayerSearch.offlinePlayerSearch(reportData.senderUUID).getName());
+				} catch (URISyntaxException | IOException ex) {
+					logWarning(ex);
+				}
 
-                try {
-                    target = PlayerSearch.offlinePlayerSearch(reportData.targetUUID);
-                    assert (target != null);
-                } catch (AssertionError ex) {
-                    logSevere(ex);
-                    return;
-                }
+				try {
+					targetName.set(PlayerSearch.offlinePlayerSearch(reportData.targetUUID).getName());
+				} catch (URISyntaxException | IOException ex) {
+					logWarning(ex);
+				}
 
-                _hexusPlugin.getServer().getOnlinePlayers()
-                        .stream()
-                        .filter(player -> player.hasPermission(PERM.REPORT_ALERTS.name()))
-                        .forEach(player ->
-                        {
-                            player.sendMessage(F.fStaff(this,
-                                    F.fItem(sender.getName()),
-                                    " reported ",
-                                    F.fItem(target.getName()),
-                                    ":\n",
-                                    F.fStaff("", "Reason: ", F.fItem(reportData.reason._friendlyName)),
-                                    "\n",
-                                    F.fStaff("", "Server: ", F.fItem(reportData.server)),
-                                    "\n",
-                                    F.fStaff("",
-                                            "Message: ",
-                                            F.fItem(!reportData.message.isEmpty() ? reportData.message : "<empty>"))));
-                            player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-                        });
-            });
-        });
-    }
+				_hexusPlugin.getServer().getOnlinePlayers().stream().filter(player -> player.hasPermission(PERM.REPORT_ALERTS.name())).forEach(player -> {
+					player.sendMessage(F.fStaff(this, F.fItem(senderName.get()), " reported ", F.fItem(targetName.get()), ":\n", F.fStaff("", "Reason: ", F.fItem(reportData.reason._friendlyName)), "\n", F.fStaff("", "Server: ", F.fItem(reportData.server)), "\n", F.fStaff("", "Message: ", F.fItem(!reportData.message.isEmpty() ? reportData.message : "<empty>"))));
+					player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+				});
+			});
+		});
+	}
 
-    @Override
-    public void onDisable() {
-        _reportGuis.keySet().forEach(HumanEntity::closeInventory);
-        _reportGuis.clear();
-    }
+	@Override
+	public void onDisable() {
+		_reportGuis.keySet().forEach(HumanEntity::closeInventory);
+		_reportGuis.clear();
+	}
 
-    public void submitReport(Player reporter, OfflinePlayer target, String message, ReportSubmitReason reason) {
-        new ReportData(Map.ofEntries(Map.entry("uuid", UUID.randomUUID().toString()),
-                Map.entry("senderUUID", reporter.getUniqueId().toString()),
-                Map.entry("targetUUID", target.getUniqueId().toString()),
-                Map.entry("message", message),
-                Map.entry("reason", reason.name()),
-                Map.entry("active", Boolean.toString(true)),
-                Map.entry("origin", Long.toString(System.currentTimeMillis())),
-                Map.entry("server", _corePortal._serverName))).submit(_coreDatabase._database._jedis);
-    }
+	public void submitReport(Player reporter, OfflinePlayer target, String message, ReportSubmitReason reason) {
+		new ReportData(Map.ofEntries(Map.entry("uuid", UUID.randomUUID().toString()), Map.entry("senderUUID", reporter.getUniqueId().toString()), Map.entry("targetUUID", target.getUniqueId().toString()), Map.entry("message", message), Map.entry("reason", reason.name()), Map.entry("active", Boolean.toString(true)), Map.entry("origin", Long.toString(System.currentTimeMillis())), Map.entry("server", _corePortal._serverName))).submit(_coreDatabase._database._jedis);
+	}
 
-    public void openReportGui(Player reporter, OfflinePlayer target, String message) {
-        Inventory inventory = _hexusPlugin.getServer().createInventory(reporter, 3 * 9, "Report - " + target.getName());
+	public void openReportGui(Player reporter, OfflinePlayer target, String message) {
+		Inventory inventory = _hexusPlugin.getServer().createInventory(reporter, 3 * 9, "Report - " + target.getName());
 
-        ItemStack targetSkull = UtilItem.createPlayerSkull(target.getName(),
-                C.cGreen + C.fBold + target.getName(),
-                target.getUniqueId().toString() + "\n\n" + C.cWhite + message);
+		ItemStack targetSkull = UtilItem.createPlayerSkull(target.getName(), C.cGreen + C.fBold + target.getName(), target.getUniqueId().toString() + "\n\n" + C.cWhite + message);
 
-        ItemStack history = UtilItem.create(Material.NAME_TAG,
-                C.cBlue + C.fBold + "Report History",
-                "View the report history of " + F.fItem(target.getName()));
+		ItemStack history = UtilItem.create(Material.NAME_TAG, C.cBlue + C.fBold + "Report History", "View the report history of " + F.fItem(target.getName()));
 
-        ItemStack chat = UtilItem.create(Material.BOOK_AND_QUILL,
-                C.cGreen + C.fBold + "Breaking Chat Rules",
-                "Spamming",
-                "Bigotry",
-                "etc.");
-        ItemStack gameplay = UtilItem.create(Material.IRON_BLOCK,
-                C.cGreen + C.fBold + "Breaking Gameplay Rules",
-                "Map Exploits",
-                "Abusing Bugs",
-                "etc.");
-        ItemStack client = UtilItem.create(Material.IRON_SWORD,
-                C.cGreen + C.fBold + "Unapproved Client Modifications",
-                "Flying",
-                "Xray",
-                "etc.");
-        ItemStack misc = UtilItem.create(Material.PAPER,
-                C.cGreen + C.fBold + "Other Rule Violation",
-                "",
-                "Alt Account",
-                "Inappropriate Username/Skin",
-                "etc.");
+		ItemStack chat = UtilItem.create(Material.BOOK_AND_QUILL, C.cGreen + C.fBold + "Breaking Chat Rules", "Spamming", "Bigotry", "etc.");
+		ItemStack gameplay = UtilItem.create(Material.IRON_BLOCK, C.cGreen + C.fBold + "Breaking Gameplay Rules", "Map Exploits", "Abusing Bugs", "etc.");
+		ItemStack client = UtilItem.create(Material.IRON_SWORD, C.cGreen + C.fBold + "Unapproved Client Modifications", "Flying", "Xray", "etc.");
+		ItemStack misc = UtilItem.create(Material.PAPER, C.cGreen + C.fBold + "Other Rule Violation", "", "Alt Account", "Inappropriate Username/Skin", "etc.");
 
-        inventory.setItem(4, targetSkull);
-        inventory.setItem(10, chat);
-        inventory.setItem(12, gameplay);
-        inventory.setItem(14, client);
-        inventory.setItem(16, misc);
+		inventory.setItem(4, targetSkull);
+		inventory.setItem(10, chat);
+		inventory.setItem(12, gameplay);
+		inventory.setItem(14, client);
+		inventory.setItem(16, misc);
 
-        if (reporter.hasPermission(PERM.COMMAND_REPORT_HISTORY.name())) {
-            inventory.setItem(26, history);
-        }
+		if (reporter.hasPermission(PERM.COMMAND_REPORT_HISTORY.name())) {
+			inventory.setItem(26, history);
+		}
 
-        _reportGuis.put(reporter, new ReportGui(inventory, target, message, chat, gameplay, client, misc, history));
-        reporter.openInventory(inventory);
-        reporter.playSound(reporter.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-    }
+		_reportGuis.put(reporter, new ReportGui(inventory, target, message, chat, gameplay, client, misc, history));
+		reporter.openInventory(inventory);
+		reporter.playSound(reporter.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+	}
 
-    public void openHistoryGui(Player reporter, OfflinePlayer target) {
-        // TODO: Paginated report history
-        reporter.sendMessage(F.fMain(this, "The report history GUI is still work in progress."));
-    }
+	public void openHistoryGui(Player reporter, OfflinePlayer target) {
+		// TODO: Paginated report history
+		reporter.sendMessage(F.fMain(this, "The report history GUI is still work in progress."));
+	}
 
-    @EventHandler
-    void onInventoryClose(InventoryCloseEvent event) {
-        _reportGuis.remove(event.getPlayer());
-    }
+	@EventHandler
+	void onInventoryClose(InventoryCloseEvent event) {
+		_reportGuis.remove(event.getPlayer());
+	}
 
-    @EventHandler
-    void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player reporter)) {
-            return;
-        }
+	@EventHandler
+	void onInventoryClick(InventoryClickEvent event) {
+		if (!(event.getWhoClicked() instanceof Player reporter)) {
+			return;
+		}
 
-        ReportGui reportGui = _reportGuis.get(reporter);
-        if (reportGui == null) {
-            return;
-        }
-        if (!reportGui._inventory().equals(event.getInventory())) {
-            return;
-        }
+		ReportGui reportGui = _reportGuis.get(reporter);
+		if (reportGui == null) {
+			return;
+		}
+		if (!reportGui._inventory().equals(event.getInventory())) {
+			return;
+		}
 
-        event.setCancelled(true);
+		event.setCancelled(true);
 
-        if (event.getCurrentItem().equals(reportGui._history())) {
-            openHistoryGui(reporter, reportGui._target());
-            return;
-        }
+		if (event.getCurrentItem().equals(reportGui._history())) {
+			openHistoryGui(reporter, reportGui._target());
+			return;
+		}
 
-        AtomicReference<ReportSubmitReason> reportReason = new AtomicReference<>();
-        if (event.getCurrentItem().equals(reportGui._chat())) {
-            reportReason.set(ReportSubmitReason.CHAT);
-        } else if (event.getCurrentItem().equals(reportGui._gameplay())) {
-            reportReason.set(ReportSubmitReason.GAMEPLAY);
-        } else if (event.getCurrentItem().equals(reportGui._client())) {
-            reportReason.set(ReportSubmitReason.CLIENT);
-        } else if (event.getCurrentItem().equals(reportGui._misc())) {
-            reportReason.set(ReportSubmitReason.MISC);
-        } else {
-            return;
-        }
+		AtomicReference<ReportSubmitReason> reportReason = new AtomicReference<>();
+		if (event.getCurrentItem().equals(reportGui._chat())) {
+			reportReason.set(ReportSubmitReason.CHAT);
+		} else if (event.getCurrentItem().equals(reportGui._gameplay())) {
+			reportReason.set(ReportSubmitReason.GAMEPLAY);
+		} else if (event.getCurrentItem().equals(reportGui._client())) {
+			reportReason.set(ReportSubmitReason.CLIENT);
+		} else if (event.getCurrentItem().equals(reportGui._misc())) {
+			reportReason.set(ReportSubmitReason.MISC);
+		} else {
+			return;
+		}
 
-        ActionBar actionBar = _coreActionBar.registerActionBar(new ActionBar(_coreActionBar,
-                reporter,
-                1,
-                F.fActionBar(this, "Submitting report against ", F.fItem(reportGui._target().getName()), "...")));
-        reporter.playSound(reporter.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+		ActionBar actionBar = _coreActionBar.registerActionBar(new ActionBar(_coreActionBar, reporter, 1, F.fActionBar(this, "Submitting report against ", F.fItem(reportGui._target().getName()), "...")));
+		reporter.playSound(reporter.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
 
-        reporter.closeInventory();
+		reporter.closeInventory();
 
-        _hexusPlugin.runAsync(() ->
-        {
-            try {
-                submitReport(reporter, reportGui._target(), reportGui._message(), reportReason.get());
-            } catch (JedisException ex) {
-                actionBar.setMessage(F.fActionBar(this,
-                        F.fError("Error while submitting report against ",
-                                F.fItem(reportGui._target().getName()),
-                                ".")));
-                _coreActionBar.unregisterActionBar(actionBar);
-                reporter.sendMessage(F.fMain(this,
-                        F.fError("There was an error while submitting your report. Please try again later or contact " +
-                                "an administrator if this issue persists.")));
-                reporter.playSound(reporter.getLocation(), Sound.CAT_MEOW, Float.MAX_VALUE, 0.5f);
-                logSevere(ex);
-                return;
-            }
+		_hexusPlugin.runAsync(() -> {
+			try {
+				submitReport(reporter, reportGui._target(), reportGui._message(), reportReason.get());
+			} catch (JedisException ex) {
+				actionBar.setMessage(F.fActionBar(this, F.fError("Error while submitting report against ", F.fItem(reportGui._target().getName()), ".")));
+				_coreActionBar.unregisterActionBar(actionBar);
+				reporter.sendMessage(F.fMain(this, F.fError("There was an error while submitting your report. Please try again later or contact " + "an administrator if this issue persists.")));
+				reporter.playSound(reporter.getLocation(), Sound.CAT_MEOW, Float.MAX_VALUE, 0.5f);
+				logSevere(ex);
+				return;
+			}
 
-            reporter.playSound(reporter.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
+			reporter.playSound(reporter.getLocation(), Sound.LEVEL_UP, Float.MAX_VALUE, 1);
 
-            actionBar.setMessage(F.fActionBar(this,
-                    F.fSuccess("Report successfully submitted against ", F.fItem(reportGui._target().getName()), ".")));
-            _coreActionBar.unregisterActionBar(actionBar);
-            reporter.sendMessage(F.fMain(this,
-                    F.fSuccess("Your report has been successfully submitted and will be reviewed shortly.")));
-        });
-    }
+			actionBar.setMessage(F.fActionBar(this, F.fSuccess("Report successfully submitted against ", F.fItem(reportGui._target().getName()), ".")));
+			_coreActionBar.unregisterActionBar(actionBar);
+			reporter.sendMessage(F.fMain(this, F.fSuccess("Your report has been successfully submitted and will be reviewed shortly.")));
+		});
+	}
 
-    public enum PERM implements IPermission {
-        COMMAND_REPORT,
-        COMMAND_REPORT_HISTORY,
-        REPORT_ALERTS
-    }
+	public enum PERM implements IPermission {
+		COMMAND_REPORT, COMMAND_REPORT_HISTORY, REPORT_ALERTS
+	}
 
 }

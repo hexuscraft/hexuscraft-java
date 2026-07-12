@@ -5,8 +5,8 @@ import net.hexuscraft.core.MiniPlugin;
 
 public class CoreCombat extends MiniPlugin<HexusPlugin> {
 
-    public CoreCombat(HexusPlugin plugin) {
-        super(plugin, "Combat");
-    }
+	public CoreCombat(HexusPlugin plugin) {
+		super(plugin, "Combat");
+	}
 
 }

@@ -5,6 +5,8 @@ import net.hexuscraft.arcade.manager.ArcadeManager;
 import net.hexuscraft.arcade.manager.GameState;
 import net.hexuscraft.core.HexusPlugin;
 import net.hexuscraft.core.MiniPlugin;
+import net.hexuscraft.core.scoreboard.CoreScoreboard;
+import net.hexuscraft.core.scoreboard.CustomScoreboard;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -17,100 +19,108 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class ArcadeLobby extends MiniPlugin<Arcade> {
 
-    ArcadeManager _arcadeManager;
+	ArcadeManager _arcadeManager;
+	CoreScoreboard _coreScoreboard;
 
-    public ArcadeLobby(Arcade arcade) {
-        super(arcade, "Game Lobby");
-    }
+	public ArcadeLobby(Arcade arcade) {
+		super(arcade, "Game Lobby");
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _arcadeManager = (ArcadeManager) dependencies.get(ArcadeManager.class);
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_arcadeManager = (ArcadeManager) dependencies.get(ArcadeManager.class);
+		_coreScoreboard = (CoreScoreboard) dependencies.get(CoreScoreboard.class);
+	}
 
-    @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event) {
-        if (_arcadeManager.getGameState() == GameState.IN_PROGRESS) {
-            return;
-        }
+	@EventHandler
+	void onPlayerJoin(PlayerJoinEvent event) {
+		if (_arcadeManager.getGameState() == GameState.IN_PROGRESS) {
+			return;
+		}
 
-        Player player = event.getPlayer();
-        player.teleport(_hexusPlugin.getServer().getWorlds().getFirst().getSpawnLocation().add(new Vector(0.5, 0, 0.5)));
-        player.resetPlayerTime();
-        player.resetPlayerWeather();
-        player.resetMaxHealth();
-        //noinspection deprecation
-        player.resetTitle();
-        player.setSprinting(false);
-        player.leaveVehicle();
-        player.setHealth(player.getMaxHealth());
-        player.setSaturation(0);
-        player.setFoodLevel(20);
-        player.setFireTicks(0);
-        player.setAllowFlight(true);
-        player.setFlying(false);
-        player.setExp(0);
-        player.setCanPickupItems(false);
-        player.setGameMode(GameMode.ADVENTURE);
-        player.getInventory().clear();
-        player.getInventory().setHeldItemSlot(0);
-    }
+		Player player = event.getPlayer();
+		player.teleport(_hexusPlugin.getServer().getWorlds().getFirst().getSpawnLocation().add(new Vector(0.5, 0, 0.5)));
+		player.resetPlayerTime();
+		player.resetPlayerWeather();
+		player.resetMaxHealth();
+		//noinspection deprecation
+		player.resetTitle();
+		player.setSprinting(false);
+		player.leaveVehicle();
+		player.setHealth(player.getMaxHealth());
+		player.setSaturation(0);
+		player.setFoodLevel(20);
+		player.setFireTicks(0);
+		player.setAllowFlight(true);
+		player.setFlying(false);
+		player.setExp(0);
+		player.setCanPickupItems(false);
+		player.setGameMode(GameMode.ADVENTURE);
+		player.getInventory().clear();
+		player.getInventory().setHeldItemSlot(0);
 
-    @EventHandler
-    void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player player)) {
-            return;
-        }
-        if (!player.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
-            return;
-        }
+		CustomScoreboard customScoreboard = _coreScoreboard._customScoreboards.get(player);
+		Optional.ofNullable(_arcadeManager._game.get()).ifPresent(game ->
+			customScoreboard._sidebar.setTitle("§f§l" + game._type._name));
+		customScoreboard._sidebar.setLines("Waiting for players");
+	}
 
-        if (event.getDamager() instanceof Player damager && damager.getGameMode().equals(GameMode.CREATIVE)) {
-            return;
-        }
+	@EventHandler
+	void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+		if (!(event.getEntity() instanceof Player player)) {
+			return;
+		}
+		if (!player.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
+			return;
+		}
 
-        event.setCancelled(true);
-    }
+		if (event.getDamager() instanceof Player damager && damager.getGameMode().equals(GameMode.CREATIVE)) {
+			return;
+		}
 
-    @EventHandler
-    void onEntityDamage(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player player)) {
-            return;
-        }
-        if (!player.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
-            return;
-        }
+		event.setCancelled(true);
+	}
 
-        if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
-            return;
-        }
+	@EventHandler
+	void onEntityDamage(EntityDamageEvent event) {
+		if (!(event.getEntity() instanceof Player player)) {
+			return;
+		}
+		if (!player.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
+			return;
+		}
 
-        event.setCancelled(true);
+		if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+			return;
+		}
 
-        if (!event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
-            return;
-        }
+		event.setCancelled(true);
 
-        player.teleport(new Location(player.getWorld(), 0, 100, 0, 0, 0));
-    }
+		if (!event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
+			return;
+		}
 
-    @EventHandler
-    void onWeatherChange(WeatherChangeEvent event) {
-        if (!event.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
-            return;
-        }
-        event.setCancelled(true);
-    }
+		player.teleport(new Location(player.getWorld(), 0, 100, 0, 0, 0));
+	}
 
-    @EventHandler
-    void onFoodLevelChange(FoodLevelChangeEvent event) {
-        if (!event.getEntity().getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
-            return;
-        }
-        event.setCancelled(true);
-    }
+	@EventHandler
+	void onWeatherChange(WeatherChangeEvent event) {
+		if (!event.getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
+			return;
+		}
+		event.setCancelled(true);
+	}
+
+	@EventHandler
+	void onFoodLevelChange(FoodLevelChangeEvent event) {
+		if (!event.getEntity().getWorld().equals(_hexusPlugin.getServer().getWorlds().getFirst())) {
+			return;
+		}
+		event.setCancelled(true);
+	}
 
 }

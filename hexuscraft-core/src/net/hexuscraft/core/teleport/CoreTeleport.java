@@ -11,30 +11,30 @@ import java.util.Map;
 
 public class CoreTeleport extends MiniPlugin<HexusPlugin> {
 
-    CoreCommand _pluginCommand;
+	CoreCommand _pluginCommand;
 
-    public CoreTeleport(HexusPlugin plugin) {
-        super(plugin, "Teleport");
+	public CoreTeleport(HexusPlugin plugin) {
+		super(plugin, "Teleport");
 
-        PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_TELEPORT);
-        PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_TELEPORT_COORDINATES);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_TELEPORT_OTHERS);
-    }
+		PermissionGroup.TRAINEE._permissions.add(PERM.COMMAND_TELEPORT);
+		PermissionGroup.MODERATOR._permissions.add(PERM.COMMAND_TELEPORT_COORDINATES);
+		PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_TELEPORT_OTHERS);
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
+	}
 
-    @Override
-    public void onEnable() {
-        _pluginCommand.register(new CommandTeleport(this));
-    }
+	@Override
+	public void onEnable() {
+		_pluginCommand.register(new CommandTeleport(this));
+	}
 
-    public enum PERM implements IPermission {
-        COMMAND_TELEPORT,
-        COMMAND_TELEPORT_COORDINATES,
-        COMMAND_TELEPORT_OTHERS
-    }
+	public enum PERM implements IPermission {
+		COMMAND_TELEPORT,
+		COMMAND_TELEPORT_COORDINATES,
+		COMMAND_TELEPORT_OTHERS
+	}
 
 }

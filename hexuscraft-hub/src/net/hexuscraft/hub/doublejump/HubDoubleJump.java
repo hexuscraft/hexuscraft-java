@@ -13,36 +13,36 @@ import org.bukkit.event.player.PlayerToggleFlightEvent;
 
 public class HubDoubleJump extends MiniPlugin<Hub> {
 
-    public HubDoubleJump(Hub hub) {
-        super(hub, "Double Jump");
-    }
+	public HubDoubleJump(Hub hub) {
+		super(hub, "Double Jump");
+	}
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    void onPlayerJoin(PlayerJoinEvent event) {
-        event.getPlayer().setAllowFlight(true);
-    }
+	@EventHandler(priority = EventPriority.MONITOR)
+	void onPlayerJoin(PlayerJoinEvent event) {
+		event.getPlayer().setAllowFlight(true);
+	}
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    void onGameModeChanged(PlayerGameModeChangeEvent event) {
-        // For some reason we need to delay this by a tick even though EventPriority.MONITOR should be the last to fire.
-        // Probably some quirky nms logic when changing game mode.
-        _hexusPlugin.runSyncLater(() -> event.getPlayer().setAllowFlight(true), 1);
-    }
+	@EventHandler(priority = EventPriority.MONITOR)
+	void onGameModeChanged(PlayerGameModeChangeEvent event) {
+		// For some reason we need to delay this by a tick even though EventPriority.MONITOR should be the last to fire.
+		// Probably some quirky nms logic when changing game mode.
+		_hexusPlugin.runSyncLater(() -> event.getPlayer().setAllowFlight(true), 1);
+	}
 
-    @EventHandler
-    void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
-        Player player = event.getPlayer();
+	@EventHandler
+	void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
+		Player player = event.getPlayer();
 
-        if (player.getGameMode().equals(GameMode.CREATIVE)) {
-            return;
-        }
-        if (!event.isFlying()) {
-            return;
-        }
+		if (player.getGameMode().equals(GameMode.CREATIVE)) {
+			return;
+		}
+		if (!event.isFlying()) {
+			return;
+		}
 
-        event.setCancelled(true);
-        player.setVelocity(player.getLocation().getDirection().setY(1));
-        player.playSound(player.getLocation(), Sound.GHAST_FIREBALL, Float.MAX_VALUE, 1);
-    }
+		event.setCancelled(true);
+		player.setVelocity(player.getLocation().getDirection().setY(1));
+		player.playSound(player.getLocation(), Sound.GHAST_FIREBALL, Float.MAX_VALUE, 1);
+	}
 
 }

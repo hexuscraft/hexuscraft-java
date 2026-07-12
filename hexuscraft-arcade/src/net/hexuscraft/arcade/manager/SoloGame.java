@@ -6,10 +6,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class SoloGame extends Game {
 
-    public AtomicReference<GameState> _state = new AtomicReference<>();
+	public AtomicReference<GameState> _state = new AtomicReference<>();
 
-    protected SoloGame(GameType type, GameKit[] kits) {
-        super(type, kits);
-    }
+	protected SoloGame(GameType type, GameKit[] kits) {
+		super(type, kits);
+	}
 
 }

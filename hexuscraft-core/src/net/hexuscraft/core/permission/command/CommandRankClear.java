@@ -17,54 +17,54 @@ import java.util.stream.Stream;
 
 public class CommandRankClear extends BaseCommand<CorePermission> {
 
-    final CoreDatabase _coreDatabase;
+	final CoreDatabase _coreDatabase;
 
-    public CommandRankClear(CorePermission permission, CoreDatabase database) {
-        super(permission,
-                "clear",
-                "<Player>",
-                "Clears a player's additional groups.",
-                Set.of(),
-                CorePermission.PERM.COMMAND_RANK_CLEAR);
-        _coreDatabase = database;
-    }
+	public CommandRankClear(CorePermission permission, CoreDatabase database) {
+		super(permission,
+			"clear",
+			"<Player>",
+			"Clears a player's additional groups.",
+			Set.of(),
+			CorePermission.PERM.COMMAND_RANK_CLEAR);
+		_coreDatabase = database;
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (args.length != 1) {
-            sender.sendMessage(help(alias));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (args.length != 1) {
+			sender.sendMessage(help(alias));
+			return;
+		}
 
-        _miniPlugin._hexusPlugin.runAsync(() ->
-        {
-            OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0]);
-            if (offlinePlayer == null) {
-                sender.sendMessage(F.fMatches(new String[]{}, args[0]));
-                return;
-            }
+		_miniPlugin._hexusPlugin.runAsync(() ->
+		{
+			OfflinePlayer offlinePlayer = PlayerSearch.offlinePlayerSearch(args[0]);
+			if (offlinePlayer == null) {
+				sender.sendMessage(F.fMatches(new String[]{}, args[0]));
+				return;
+			}
 
-            sender.sendMessage(F.fMain(this, "Clearing sub-groups of ", F.fItem(offlinePlayer.getName()), "..."));
+			sender.sendMessage(F.fMain(this, "Clearing sub-groups of ", F.fItem(offlinePlayer.getName()), "..."));
 
-            _coreDatabase._database._jedis.del(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
-            sender.sendMessage(F.fMain(this,
-                    F.fSuccess("Cleared sub-groups of ", F.fItem(offlinePlayer.getName()), ".")));
-        });
-    }
+			_coreDatabase._database._jedis.del(PermissionQueries.GROUPS(offlinePlayer.getUniqueId()));
+			sender.sendMessage(F.fMain(this,
+				F.fSuccess("Cleared sub-groups of ", F.fItem(offlinePlayer.getName()), ".")));
+		});
+	}
 
-    @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
-        List<String> names = new ArrayList<>();
-        if (args.length == 1) {
-            //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers =
-                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
-            if (sender instanceof Player player) {
-                streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
-            }
-            names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
-        }
-        return names;
-    }
+	@Override
+	public List<String> tab(CommandSender sender, String alias, String[] args) {
+		List<String> names = new ArrayList<>();
+		if (args.length == 1) {
+			//noinspection ReassignedVariable
+			Stream<? extends Player> streamedOnlinePlayers =
+				_miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
+			if (sender instanceof Player player) {
+				streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+			}
+			names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
+		}
+		return names;
+	}
 
 }

@@ -18,44 +18,44 @@ import java.util.Scanner;
 
 public class Hub extends HexusPlugin {
 
-    public Location _spawn = null;
+	public Location _spawn = null;
 
-    public Hub() {
-        super();
+	public Hub() {
+		super();
 
-        require(new HubDoubleJump(this));
-        require(new HubScoreboard(this));
-        require(new HubNews(this));
-        require(new HubPlayer(this));
-        require(new HubTeam(this));
-    }
+		require(new HubDoubleJump(this));
+		require(new HubScoreboard(this));
+		require(new HubNews(this));
+		require(new HubPlayer(this));
+		require(new HubTeam(this));
+	}
 
-    @Override
-    public void enable() {
-        getServer().setDefaultGameMode(GameMode.ADVENTURE);
-    }
+	@Override
+	public void enable() {
+		getServer().setDefaultGameMode(GameMode.ADVENTURE);
+	}
 
-    @EventHandler
-    void onWorldLoad(WorldLoadEvent event) {
-        World world = event.getWorld();
-        logInfo("WORLD NAME: '" + world.getName() + "'");
-        if (!world.getName().equals("world")) {
-            return;
-        }
+	@EventHandler
+	void onWorldLoad(WorldLoadEvent event) {
+		World world = event.getWorld();
+		logInfo("WORLD NAME: '" + world.getName() + "'");
+		if (!world.getName().equals("world")) {
+			return;
+		}
 
-        _spawn = new Location(world, 0, 100, 0, 0, 0);
+		_spawn = new Location(world, 0, 100, 0, 0, 0);
 
-        try {
-            Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_spawn.dat").toFile());
-            _spawn = new Location(event.getWorld(),
-                    scanner.nextDouble(),
-                    scanner.nextDouble(),
-                    scanner.nextDouble(),
-                    scanner.nextFloat(),
-                    scanner.nextFloat());
-        } catch (FileNotFoundException ex) {
-            logInfo("Could not locate _spawn.dat in world '" + world.getName() + "'");
-        }
-    }
+		try {
+			Scanner scanner = new Scanner(Path.of(world.getWorldFolder().getPath(), "_spawn.dat").toFile());
+			_spawn = new Location(event.getWorld(),
+				scanner.nextDouble(),
+				scanner.nextDouble(),
+				scanner.nextDouble(),
+				scanner.nextFloat(),
+				scanner.nextFloat());
+		} catch (FileNotFoundException ex) {
+			logInfo("Could not locate _spawn.dat in world '" + world.getName() + "'");
+		}
+	}
 
 }

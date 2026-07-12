@@ -9,18 +9,18 @@ import java.util.Set;
 
 public class CommandNetworkServerList extends BaseCommand<CorePortal> {
 
-    CommandNetworkServerList(CorePortal corePortal) {
-        super(corePortal, "list", "", "List all servers.", Set.of("l"), CorePortal.PERM.COMMAND_NETWORK_SERVER_LIST);
-    }
+	CommandNetworkServerList(CorePortal corePortal) {
+		super(corePortal, "list", "", "List all servers.", Set.of("l"), CorePortal.PERM.COMMAND_NETWORK_SERVER_LIST);
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (args.length > 0) {
-            sender.sendMessage(help(alias));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (args.length > 0) {
+			sender.sendMessage(help(alias));
+			return;
+		}
 
-        sender.sendMessage(F.fMain(this, "Servers: ", F.fItem(_miniPlugin.getServerNames())));
-    }
+		sender.sendMessage(F.fMain(this, "Servers: ", F.fItem(_miniPlugin.getServerNames())));
+	}
 
 }

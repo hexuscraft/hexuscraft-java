@@ -20,45 +20,45 @@ import java.util.Map;
 
 public class HubTeam extends MiniPlugin<Hub> {
 
-    CorePermission _corePermission;
+	CorePermission _corePermission;
 
-    public HubTeam(Hub hub) {
-        super(hub, "Team");
-    }
+	public HubTeam(Hub hub) {
+		super(hub, "Team");
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _corePermission = (CorePermission) dependencies.get(CorePermission.class);
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_corePermission = (CorePermission) dependencies.get(CorePermission.class);
+	}
 
-    @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event) {
-        Player eventPlayer = event.getPlayer();
-        Scoreboard eventPlayerScoreboard = eventPlayer.getScoreboard();
+	@EventHandler
+	void onPlayerJoin(PlayerJoinEvent event) {
+		Player eventPlayer = event.getPlayer();
+		Scoreboard eventPlayerScoreboard = eventPlayer.getScoreboard();
 
-        Arrays.stream(PermissionGroup.values())
-                .filter(permissionGroup -> eventPlayerScoreboard.getTeam(permissionGroup._prefix) == null)
-                .forEach((PermissionGroup group) ->
-                {
-                    Team team = eventPlayerScoreboard.registerNewTeam(group._prefix);
-                    team.setPrefix(group.hasPermission(CoreChat.PERM.CHAT_PREFIX) ?
-                            F.fPermissionGroup(group, true, true) + C.fReset + " " :
-                            C.fReset);
-                });
+		Arrays.stream(PermissionGroup.values())
+			.filter(permissionGroup -> eventPlayerScoreboard.getTeam(permissionGroup._prefix) == null)
+			.forEach((PermissionGroup group) ->
+			{
+				Team team = eventPlayerScoreboard.registerNewTeam(group._prefix);
+				team.setPrefix(group.hasPermission(CoreChat.PERM.CHAT_PREFIX) ?
+					F.fPermissionGroup(group, true, true) + C.fReset + " " :
+					C.fReset);
+			});
 
-        _corePermission._permissionProfiles.forEach((Player target, PermissionProfile permissionProfile) ->
-        {
-            PermissionGroup highestGroup = PermissionGroup.getGroupWithHighestWeight(permissionProfile._groups());
-            if (highestGroup == null) {
-                return;
-            }
+		_corePermission._permissionProfiles.forEach((Player target, PermissionProfile permissionProfile) ->
+		{
+			PermissionGroup highestGroup = PermissionGroup.getGroupWithHighestWeight(permissionProfile._groups());
+			if (highestGroup == null) {
+				return;
+			}
 
-            _hexusPlugin.getServer().getOnlinePlayers()
-                    .stream()
-                    .map(Player::getScoreboard)
-                    .map(scoreboard -> scoreboard.getTeam(highestGroup._prefix))
-                    .forEach(team -> team.addEntry(target.getName()));
-        });
-    }
+			_hexusPlugin.getServer().getOnlinePlayers()
+				.stream()
+				.map(Player::getScoreboard)
+				.map(scoreboard -> scoreboard.getTeam(highestGroup._prefix))
+				.forEach(team -> team.addEntry(target.getName()));
+		});
+	}
 
 }

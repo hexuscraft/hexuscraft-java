@@ -44,266 +44,205 @@ import java.util.stream.Collectors;
 @Plugin(id = "hexuscraft-proxy", name = "Proxy", version = "1.0.0")
 public class Proxy {
 
-    final String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8+]§r", " §f§l▶§r ");
+	final String MOTD_PREFIX = String.join("\n", "        §6§lHexuscraft§r §f§lNetwork§r  §3[1.8+]§r", " §f§l▶§r ");
 
-    final Database _database;
-    final ProxyServer _server;
-    final Logger _logger;
-    final AtomicReference<String> _motd;
-    final AtomicInteger _playerCount;
-    final AtomicInteger _capacityCount;
+	final Database _database;
+	final ProxyServer _server;
+	final Logger _logger;
+	final AtomicReference<String> _motd;
+	final AtomicInteger _playerCount;
+	final AtomicInteger _capacityCount;
 
-    @Inject
-    public Proxy(ProxyServer server, Logger logger) {
-        _database = new Database();
-        _server = server;
-        _logger = logger;
-        _motd = new AtomicReference<>(MOTD_PREFIX + "<insert funny message here>");
-        _playerCount = new AtomicInteger();
-        _capacityCount = new AtomicInteger();
-    }
+	@Inject
+	public Proxy(ProxyServer server, Logger logger) {
+		_database = new Database();
+		_server = server;
+		_logger = logger;
+		_motd = new AtomicReference<>(MOTD_PREFIX + "<insert funny message here>");
+		_playerCount = new AtomicInteger();
+		_capacityCount = new AtomicInteger();
+	}
 
-    @Subscribe
-    void onProxyInitialize(ProxyInitializeEvent event) {
-        CommandManager commandManager = _server.getCommandManager();
-        commandManager.getAliases().forEach(commandManager::unregister);
+	@Subscribe
+	void onProxyInitialize(ProxyInitializeEvent event) {
+		CommandManager commandManager = _server.getCommandManager();
+		commandManager.getAliases().forEach(commandManager::unregister);
 
-        _server.getScheduler()
-                .buildTask(this, this::updateMOTD)
-                .repeat(Duration.ofSeconds(5))
-                .delay(Duration.ofSeconds(0))
-                .schedule();
-        _server.getScheduler()
-                .buildTask(this, this::updateServers)
-                .repeat(Duration.ofSeconds(1))
-                .delay(Duration.ofSeconds(0))
-                .schedule();
+		_server.getScheduler().buildTask(this, this::updateMOTD).repeat(Duration.ofSeconds(5)).delay(Duration.ofSeconds(0)).schedule();
+		_server.getScheduler().buildTask(this, this::updateServers).repeat(Duration.ofSeconds(1)).delay(Duration.ofSeconds(0)).schedule();
 
-        _database.registerConsumer(PunishAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
-        {
-            PunishAppliedMessage punishAppliedMessage = PunishAppliedMessage.fromString(rawMessage);
-            Optional<Player> optionalPlayer = _server.getPlayer(punishAppliedMessage._punishData._targetUUID);
-            optionalPlayer.ifPresent(player -> _server.getScheduler().buildTask(this, () ->
-            {
-                Map<String, String> rawData =
-                        new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(punishAppliedMessage._punishData._uuid)));
-                rawData.put("uuid", punishAppliedMessage._punishData._uuid.toString());
-                PunishData punishData = new PunishData(rawData);
-                if (punishData._type != PunishType.BAN) {
-                    return;
-                }
-                player.disconnect(Component.text(F.fPunish(punishData)));
-            }).schedule());
-        });
-    }
+		_database.registerConsumer(PunishAppliedMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+			_server.getScheduler().buildTask(this, () -> {
+				PunishData punishData;
+				try {
+					punishData = new PunishData(new HashMap<>(_database._jedis.hgetAll(PunishQueries.PUNISHMENT(PunishAppliedMessage.fromString(rawMessage)._uuid))));
+				} catch (JedisException ex) {
+					_logger.severe(ex.getMessage());
+					return;
+				}
 
-    void updateMOTD() {
-        UnifiedJedis jedis = _database._jedis;
-        _motd.set(MOTD_PREFIX + ServerQueries.getMotd(jedis));
+				if (punishData._type != PunishType.BAN) return;
+				Player target = _server.getPlayer(punishData._targetUUID).orElse(null);
+				if (target == null) return;
+				target.disconnect(Component.text(F.fPunish(punishData)));
+			});
+		});
+	}
 
-    }
+	void updateMOTD() {
+		_motd.set(MOTD_PREFIX + ServerQueries.getMotd(_database._jedis));
+	}
 
-    void updateServers() {
-        List<ServerInfo> allServers = new ArrayList<>();
-        List<String> fallbackServers = new ArrayList<>();
-        AtomicInteger playerCount = new AtomicInteger();
-        AtomicInteger capacityCount = new AtomicInteger();
+	void updateServers() {
+		List<ServerInfo> allServers = new ArrayList<>();
+		List<String> fallbackServers = new ArrayList<>();
+		AtomicInteger playerCount = new AtomicInteger();
+		AtomicInteger capacityCount = new AtomicInteger();
 
-        Arrays.stream(ServerQueries.getServers(_database._jedis)).forEach(serverData ->
-        {
-            if (serverData._updatedByMonitor) {
-                return;
-            }
+		Arrays.stream(ServerQueries.getServers(_database._jedis)).forEach(serverData -> {
+			if (serverData._updatedByMonitor) {
+				return;
+			}
 
-            ServerInfo serverInfo =
-                    new ServerInfo(serverData._name, new InetSocketAddress(serverData._address, serverData._port));
-            allServers.add(serverInfo);
+			ServerInfo serverInfo = new ServerInfo(serverData._name, new InetSocketAddress(serverData._address, serverData._port));
+			allServers.add(serverInfo);
 
-            if (serverData._group.equals("Lobby")) {
-                fallbackServers.add(serverData._name);
-            }
+			if (serverData._group.equals("Lobby")) {
+				fallbackServers.add(serverData._name);
+			}
 
-            playerCount.addAndGet(serverData._players);
-            capacityCount.addAndGet(serverData._capacity);
-        });
+			playerCount.addAndGet(serverData._players);
+			capacityCount.addAndGet(serverData._capacity);
+		});
 
-        _server.getAllServers().stream().map(RegisteredServer::getServerInfo).forEach(_server::unregisterServer);
+		_server.getAllServers().stream().map(RegisteredServer::getServerInfo).forEach(_server::unregisterServer);
 
-        allServers.forEach(_server::registerServer);
+		allServers.forEach(_server::registerServer);
 
-        List<String> fallbackServerConfig = _server.getConfiguration().getAttemptConnectionOrder();
-        fallbackServerConfig.clear();
-        fallbackServerConfig.addAll(fallbackServers);
-        fallbackServerConfig.sort(String::compareTo);
+		List<String> fallbackServerConfig = _server.getConfiguration().getAttemptConnectionOrder();
+		fallbackServerConfig.clear();
+		fallbackServerConfig.addAll(fallbackServers);
+		fallbackServerConfig.sort(String::compareTo);
 
-        _playerCount.set(playerCount.get());
-        _capacityCount.set(capacityCount.get());
-    }
+		_playerCount.set(playerCount.get());
+		_capacityCount.set(capacityCount.get());
+	}
 
-    @Subscribe
-    void onProxyQuery(ProxyQueryEvent event) {
-        QueryResponse.Builder builder = QueryResponse.builder();
-        builder.players("§r",
-                "    §6§lHexuscraft§r §f§lNetwork§r    ",
-                "§r",
-                "  §f§l▶§r  Mini Games",
-                "  §f§l▶§r  Private Servers",
-                "  §f§l▶§r  Tournaments",
-                "§r");
-        builder.clearPlugins();
-        builder.proxyVersion("Minecraft 1.8");
-        builder.gameVersion("Minecraft 1.8");
-        builder.currentPlayers(_playerCount.get());
-        builder.maxPlayers(_capacityCount.get());
-        event.setResponse(builder.build());
-    }
+	@Subscribe
+	void onProxyQuery(ProxyQueryEvent event) {
+		QueryResponse.Builder builder = QueryResponse.builder();
+		builder.players("§r", "    §6§lHexuscraft§r §f§lNetwork§r    ", "§r", "  §f§l▶§r  Mini Games", "  §f§l▶§r  Private Servers", "  §f§l▶§r  Tournaments", "§r");
+		builder.clearPlugins();
+		builder.proxyVersion("Minecraft 1.8+");
+		builder.gameVersion("Minecraft 1.8+");
+		builder.currentPlayers(_playerCount.get());
+		builder.maxPlayers(_capacityCount.get());
+		event.setResponse(builder.build());
+	}
 
-    @Subscribe
-    void onProxyPing(ProxyPingEvent event) {
-        ServerPing.Builder builder = ServerPing.builder();
+	@Subscribe
+	void onProxyPing(ProxyPingEvent event) {
+		ServerPing.Builder builder = ServerPing.builder();
 
-        builder.onlinePlayers(_playerCount.get());
-        builder.maximumPlayers(_capacityCount.get());
+		builder.onlinePlayers(_playerCount.get());
+		builder.maximumPlayers(_capacityCount.get());
 
-        builder.description(Component.text(_motd.get()));
-        builder.samplePlayers(new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)),
-                new ServerPing.SamplePlayer("    §6§lHexuscraft§r §f§lNetwork§r    ", new UUID(0L, 0L)),
-                new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)),
-                new ServerPing.SamplePlayer("  §f§l▶§r  Mini Games", new UUID(0L, 0L)),
-                new ServerPing.SamplePlayer("  §f§l▶§r  Private Servers", new UUID(0L, 0L)),
-                new ServerPing.SamplePlayer("  §f§l▶§r  Tournaments", new UUID(0L, 0L)),
-                new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)));
-        builder.version(new ServerPing.Version(Math.max(ProtocolVersion.MINECRAFT_1_8.getProtocol(),
-                event.getConnection().getProtocolVersion().getProtocol()), "Minecraft 1.8"));
-        try {
-            builder.favicon(Favicon.create(Path.of("server-icon.png")));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        event.setPing(builder.build());
-    }
+		builder.description(Component.text(_motd.get()));
+		builder.samplePlayers(new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)), new ServerPing.SamplePlayer("    §6§lHexuscraft§r §f§lNetwork§r    ", new UUID(0L, 0L)), new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)), new ServerPing.SamplePlayer("  §f§l▶§r  Mini Games", new UUID(0L, 0L)), new ServerPing.SamplePlayer("  §f§l▶§r  Private Servers", new UUID(0L, 0L)), new ServerPing.SamplePlayer("  §f§l▶§r  Tournaments", new UUID(0L, 0L)), new ServerPing.SamplePlayer("§r", new UUID(0L, 0L)));
+		builder.version(new ServerPing.Version(Math.max(ProtocolVersion.MINECRAFT_1_8.getProtocol(), event.getConnection().getProtocolVersion().getProtocol()), "Minecraft 1.8"));
+		try {
+			builder.favicon(Favicon.create(Path.of("server-icon.png")));
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+		event.setPing(builder.build());
+	}
 
-    @Subscribe
-    void onLogin(LoginEvent event) {
-        try {
-            UnifiedJedis jedis = _database._jedis;
-            Set<UUID> punishmentIds = jedis.smembers(PunishQueries.RECEIVED(event.getPlayer().getUniqueId()))
-                    .stream()
-                    .map(UUID::fromString)
-                    .collect(Collectors.toSet());
+	@Subscribe
+	void onLogin(LoginEvent event) {
+		try {
+			UnifiedJedis jedis = _database._jedis;
+			Set<UUID> punishmentIds = jedis.smembers(PunishQueries.RECEIVED(event.getPlayer().getUniqueId())).stream().map(UUID::fromString).collect(Collectors.toSet());
 
-            // We want to display the longest ban remaining.
-            // If there are multiple bans with the same remaining time (usually multiple perm bans), display the most
-            // recent ban.
-            // If there are multiple bans matching this and were also applied at the EXACT same time (??), fate
-            // decides the displayed message.
+			// We want to display the longest ban remaining.
+			// If there are multiple bans with the same remaining time (usually multiple perm bans), display the most
+			// recent ban.
+			// If there are multiple bans matching this and were also applied at the EXACT same time (??), fate
+			// decides the displayed message.
 
-            Set<PunishData> activePunishments = new HashSet<>();
+			Set<PunishData> activePunishments = new HashSet<>();
 
-            for (UUID punishmentUniqueId : punishmentIds) {
-                try {
-                    Map<String, String> rawData =
-                            new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
-                    rawData.put("uuid", punishmentUniqueId.toString());
+			for (UUID punishmentUniqueId : punishmentIds) {
+				try {
+					Map<String, String> rawData = new HashMap<>(jedis.hgetAll(PunishQueries.PUNISHMENT(punishmentUniqueId)));
+					rawData.put("uuid", punishmentUniqueId.toString());
 
-                    PunishData punishData = new PunishData(rawData);
+					PunishData punishData = new PunishData(rawData);
 
-                    if (!punishData._active) {
-                        continue;
-                    }
+					if (!punishData._active) {
+						continue;
+					}
 
-                    if (punishData._length != -1) {
-                        long remaining = punishData.getRemaining();
-                        if (remaining <= 0) {
-                            _database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId),
-                                    Map.of("active",
-                                            "false",
-                                            "removeOrigin",
-                                            Long.toString(System.currentTimeMillis()),
-                                            "removeReason",
-                                            "EXPIRED",
-                                            "removeTargetServer",
-                                            "Proxy-" + _server.getBoundAddress().toString(),
-                                            "removeStaffUUID",
-                                            UtilUniqueId.EMPTY_UUID.toString(),
-                                            "removeStaffServer",
-                                            "Proxy-" + _server.getBoundAddress().toString()));
-                            continue;
-                        }
-                    }
+					if (punishData._length != -1) {
+						long remaining = punishData.getRemaining();
+						if (remaining <= 0) {
+							_database._jedis.hset(PunishQueries.PUNISHMENT(punishmentUniqueId), Map.of("active", "false", "removeOrigin", Long.toString(System.currentTimeMillis()), "removeReason", "EXPIRED", "removeTargetServer", "Proxy-" + _server.getBoundAddress().toString(), "removeStaffUUID", UtilUniqueId.EMPTY_UUID.toString(), "removeStaffServer", "Proxy-" + _server.getBoundAddress().toString()));
+							continue;
+						}
+					}
 
-                    if (!punishData._type.equals(PunishType.BAN)) {
-                        continue;
-                    }
+					if (!punishData._type.equals(PunishType.BAN)) {
+						continue;
+					}
 
-                    activePunishments.add(punishData);
-                } catch (JedisException ex) {
-                    _logger.warning("Error while checking punish punish for '" +
-                            event.getPlayer().getUsername() +
-                            "': " +
-                            ex.getMessage());
-                }
-            }
+					activePunishments.add(punishData);
+				} catch (JedisException ex) {
+					_logger.warning("Error while checking punish punish for '" + event.getPlayer().getUsername() + "': " + ex.getMessage());
+				}
+			}
 
-            if (activePunishments.isEmpty()) {
-                return;
-            }
+			if (activePunishments.isEmpty()) {
+				return;
+			}
 
-            AtomicReference<PunishData> punishData = new AtomicReference<>();
-            if (activePunishments.size() > 1) {
-                for (PunishData data : activePunishments) {
-                    if (punishData.get() == null) {
-                        punishData.set(data);
-                        continue;
-                    }
-                    punishData.set(punishData.get().compare(data));
-                }
-            } else {
-                punishData.set(activePunishments.iterator().next());
-            }
+			AtomicReference<PunishData> punishData = new AtomicReference<>();
+			if (activePunishments.size() > 1) {
+				for (PunishData data : activePunishments) {
+					if (punishData.get() == null) {
+						punishData.set(data);
+						continue;
+					}
+					punishData.set(punishData.get().compare(data));
+				}
+			} else {
+				punishData.set(activePunishments.iterator().next());
+			}
 
-            event.setResult(ResultedEvent.ComponentResult.denied(Component.text(F.fPunish(punishData.get()))));
-        } catch (JedisException ex) {
-            _logger.warning("Error while fetching punishment punish for '" +
-                    event.getPlayer().getUsername() +
-                    "': " +
-                    ex.getMessage());
-        }
+			event.setResult(ResultedEvent.ComponentResult.denied(Component.text(F.fPunish(punishData.get()))));
+		} catch (JedisException ex) {
+			_logger.warning("Error while fetching punishment punish for '" + event.getPlayer().getUsername() + "': " + ex.getMessage());
+		}
 
-    }
+	}
 
-    @Subscribe
-    void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
-        Player player = event.getPlayer();
+	@Subscribe
+	void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
+		Player player = event.getPlayer();
 
-        if (player.getProtocolVersion().getProtocol() < ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
-            event.setInitialServer(null);
-            player.disconnect(Component.text()
-                    .color(NamedTextColor.RED)
-                    .append(Component.text("Your game client is too outdated."))
-                    .append(Component.text("\nPlease use Minecraft 1.8 or newer to join Hexuscraft.",
-                            NamedTextColor.GRAY))
-                    .append(Component.text("\n\nwww.hexuscraft.net", NamedTextColor.YELLOW))
-                    .build());
-            return;
-        }
+//        if (player.getProtocolVersion().getProtocol() < ProtocolVersion.MINECRAFT_1_8.getProtocol()) {
+		if (player.getProtocolVersion().getProtocol() < ProtocolVersion.MINECRAFT_1_7_6.getProtocol()) {
+			event.setInitialServer(null);
+			player.disconnect(Component.text().color(NamedTextColor.RED).append(Component.text("Your game client is too outdated.")).append(Component.text("\nPlease use Minecraft 1.8 or newer to join Hexuscraft.", NamedTextColor.GRAY)).append(Component.text("\n\nwww.hexuscraft.net", NamedTextColor.YELLOW)).build());
+			return;
+		}
 
-        RegisteredServer[] lobbyServers = _server.getAllServers()
-                .stream()
-                .filter(registeredServer -> registeredServer.getServerInfo().getName().split("-(?=[^-]*$)")[0].equals(
-                        "Lobby"))
-                .toArray(RegisteredServer[]::new);
-        if (lobbyServers.length == 0) {
-            player.disconnect(Component.text()
-                    .color(NamedTextColor.RED)
-                    .append(Component.text("There are currently no lobby servers available."))
-                    .append(Component.text("\nPlease try again later.", NamedTextColor.GRAY))
-                    .append(Component.text("\n\nwww.hexuscraft.net", NamedTextColor.YELLOW))
-                    .build());
-            return;
-        }
+		RegisteredServer[] lobbyServers = _server.getAllServers().stream().filter(registeredServer -> registeredServer.getServerInfo().getName().split("-(?=[^-]*$)")[0].equals("Lobby")).toArray(RegisteredServer[]::new);
+		if (lobbyServers.length == 0) {
+			player.disconnect(Component.text().color(NamedTextColor.RED).append(Component.text("There are currently no lobby servers available.")).append(Component.text("\nPlease try again later.", NamedTextColor.GRAY)).append(Component.text("\n\nwww.hexuscraft.net", NamedTextColor.YELLOW)).build());
+			return;
+		}
 
-        event.setInitialServer(lobbyServers[new Random().nextInt(lobbyServers.length)]);
-    }
+		event.setInitialServer(lobbyServers[new Random().nextInt(lobbyServers.length)]);
+	}
 
 }

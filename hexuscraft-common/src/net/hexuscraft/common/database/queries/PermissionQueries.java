@@ -8,12 +8,12 @@ import java.util.UUID;
 
 public class PermissionQueries {
 
-    public static String GROUPS(UUID uuid) {
-        return Database.buildQuery("user", uuid.toString(), "permission", "groups");
-    }
+	public static String GROUPS(UUID uuid) {
+		return Database.buildQuery("user", uuid.toString(), "permission", "groups");
+	}
 
-    public static Set<String> getGroupNames(UnifiedJedis jedis, UUID uuid) {
-        return jedis.smembers(GROUPS(uuid));
-    }
+	public static Set<String> getGroupNames(UnifiedJedis jedis, UUID uuid) {
+		return jedis.smembers(GROUPS(uuid));
+	}
 
 }

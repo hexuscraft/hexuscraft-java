@@ -24,109 +24,98 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class HubNews extends MiniPlugin<Hub> {
 
-    CoreBossBar _coreBossBar;
-    CoreCommand _coreCommand;
-    CoreDatabase _coreDatabase;
-    Map<Player, BossBar> _bossBars;
-    List<NewsData> _newsDatas;
-    List<NewsData> _activeNews;
-    AtomicInteger _activeNewsIndex;
+	CoreBossBar _coreBossBar;
+	CoreCommand _coreCommand;
+	CoreDatabase _coreDatabase;
+	Map<Player, BossBar> _bossBars;
+	List<NewsData> _newsDatas;
+	List<NewsData> _activeNews;
+	AtomicInteger _activeNewsIndex;
 
-    public HubNews(Hub hub) {
-        super(hub, "News");
-    }
+	public HubNews(Hub hub) {
+		super(hub, "News");
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _coreBossBar = (CoreBossBar) dependencies.get(CoreBossBar.class);
-        _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
-        _coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
-        _bossBars = new HashMap<>();
-        _newsDatas = new ArrayList<>();
-        _activeNews = new ArrayList<>();
-        _activeNewsIndex = new AtomicInteger();
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_coreBossBar = (CoreBossBar) dependencies.get(CoreBossBar.class);
+		_coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
+		_coreDatabase = (CoreDatabase) dependencies.get(CoreDatabase.class);
+		_bossBars = new HashMap<>();
+		_newsDatas = new ArrayList<>();
+		_activeNews = new ArrayList<>();
+		_activeNewsIndex = new AtomicInteger();
+	}
 
-    @Override
-    public void onEnable() {
-        _coreDatabase._database.registerConsumer(NewsUpdatedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
-        {
-            NewsUpdatedMessage parsedMessage = NewsUpdatedMessage.parse(rawMessage);
+	@Override
+	public void onEnable() {
+		_coreDatabase._database.registerConsumer(NewsUpdatedMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+			NewsUpdatedMessage parsedMessage = NewsUpdatedMessage.parse(rawMessage);
 
-            _hexusPlugin.runAsync(() ->
-            {
-                NewsData newNewsData = NewsQueries.getNews(_coreDatabase._database._jedis, parsedMessage._id);
-                if (newNewsData == null) {
-                    return; // silences the linter
-                }
+			_hexusPlugin.runAsync(() -> {
+				NewsData newNewsData = NewsQueries.getNews(_coreDatabase._database._jedis, parsedMessage._id);
+				if (newNewsData == null) {
+					return; // silences the linter
+				}
 
-                _newsDatas.removeIf(newsData -> newsData._id.equals(newNewsData._id));
-                _newsDatas.add(newNewsData);
-                _newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
-            });
-        });
+				_newsDatas.removeIf(newsData -> newsData._id.equals(newNewsData._id));
+				_newsDatas.add(newNewsData);
+				_newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
+			});
+		});
 
-        _coreDatabase._database.registerConsumer(NewsDeletedMessage.CHANNEL_NAME, (_, _, rawMessage) ->
-        {
-            NewsDeletedMessage parsedMessage = NewsDeletedMessage.parse(rawMessage);
-            _newsDatas.removeIf(newsData -> newsData._id.equals(parsedMessage._id));
-        });
+		_coreDatabase._database.registerConsumer(NewsDeletedMessage.CHANNEL_NAME, (_, _, rawMessage) -> {
+			NewsDeletedMessage parsedMessage = NewsDeletedMessage.parse(rawMessage);
+			_newsDatas.removeIf(newsData -> newsData._id.equals(parsedMessage._id));
+		});
 
-        _hexusPlugin.runAsync(() ->
-        {
-            NewsData[] news = NewsQueries.getNews(_coreDatabase._database._jedis);
-            _newsDatas.clear();
-            _newsDatas.addAll(Arrays.asList(news));
-            _newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
-        });
+		_hexusPlugin.runAsync(() -> {
+			NewsData[] news = NewsQueries.getNews(_coreDatabase._database._jedis);
+			_newsDatas.clear();
+			_newsDatas.addAll(Arrays.asList(news));
+			_newsDatas.sort(Comparator.comparing(newsData -> newsData._weight));
+		});
 
-        _hexusPlugin.runAsyncTimer(() ->
-        {
-            _activeNews.clear();
-            _activeNews.addAll(_newsDatas.stream().filter(newsData -> newsData._active).toList());
+		_hexusPlugin.runAsyncTimer(() -> {
+			_activeNews.clear();
+			_activeNews.addAll(_newsDatas.stream().filter(newsData -> newsData._active).toList());
 
-            if (_activeNews.isEmpty()) {
-                _bossBars.values().forEach(bossBar -> bossBar.message().set(C.cGold + C.fBold + "HEXUSCRAFT"));
-                return;
-            }
+			if (_activeNews.isEmpty()) {
+				_bossBars.values().forEach(bossBar -> bossBar.message().set(C.cGold + C.fBold + "HEXUSCRAFT"));
+				return;
+			}
 
-            if (_activeNewsIndex.incrementAndGet() >= _activeNews.size()) {
-                _activeNewsIndex.set(0);
-            }
+			if (_activeNewsIndex.incrementAndGet() >= _activeNews.size()) {
+				_activeNewsIndex.set(0);
+			}
 
-            _bossBars.values()
-                    .forEach(bossBar -> bossBar.message().set(_activeNews.get(_activeNewsIndex.get())._message));
-        }, 0, 100); // 5 seconds
+			_bossBars.values().forEach(bossBar -> bossBar.message().set(_activeNews.get(_activeNewsIndex.get())._message));
+		}, 0, 100); // 5 seconds
 
-        _coreCommand.register(new CommandNews(this, _coreDatabase));
-    }
+		_coreCommand.register(new CommandNews(this, _coreDatabase));
+	}
 
-    @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        _bossBars.put(player, _coreBossBar.registerBossBar(new BossBar(player, 0, "<news loading>")));
-    }
+	@EventHandler
+	void onPlayerJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+		_bossBars.put(player, _coreBossBar.registerBossBar(new BossBar(player, 0, C.cGold + C.fBold + "HEXUSCRAFT")));
 
-    @EventHandler
-    void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        if (!_bossBars.containsKey(player)) {
-            return;
-        }
-        _coreBossBar.unregisterBossBar(_bossBars.get(player));
-        _bossBars.remove(player);
-    }
+		if (_activeNews.isEmpty()) return;
+		_bossBars.get(player).message().set(_activeNews.get(_activeNewsIndex.get())._message);
+	}
 
-    public enum PERM implements IPermission {
-        COMMAND_NEWS,
-        COMMAND_NEWS_ADD,
-        COMMAND_NEWS_REMOVE,
-        COMMAND_NEWS_LIST,
-        COMMAND_NEWS_MODIFY,
-        COMMAND_NEWS_SET,
-        COMMAND_NEWS_SET_ACTIVE,
-        COMMAND_NEWS_SET_WEIGHT,
-        COMMAND_NEWS_SET_MESSAGE,
-    }
+	@EventHandler
+	void onPlayerQuit(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
+		if (!_bossBars.containsKey(player)) {
+			return;
+		}
+		_coreBossBar.unregisterBossBar(_bossBars.get(player));
+		_bossBars.remove(player);
+	}
+
+	public enum PERM implements IPermission {
+		COMMAND_NEWS, COMMAND_NEWS_ADD, COMMAND_NEWS_REMOVE, COMMAND_NEWS_LIST, COMMAND_NEWS_MODIFY, COMMAND_NEWS_SET, COMMAND_NEWS_SET_ACTIVE, COMMAND_NEWS_SET_WEIGHT, COMMAND_NEWS_SET_MESSAGE,
+	}
 
 }

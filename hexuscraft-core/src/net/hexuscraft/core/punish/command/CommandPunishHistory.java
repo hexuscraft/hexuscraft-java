@@ -15,59 +15,44 @@ import java.util.stream.Stream;
 
 public class CommandPunishHistory extends BaseCommand<CorePunish> {
 
-    public CommandPunishHistory(CorePunish corePunish) {
-        super(corePunish,
-                "punishmenthistory",
-                "[Player]",
-                "View the history of punishments.",
-                Set.of("punishhistory", "xh"),
-                CorePunish.PERM.COMMAND_PUNISH_HISTORY);
-    }
+	public CommandPunishHistory(CorePunish corePunish) {
+		super(corePunish, "punishmenthistory", "[Player]", "View the history of punishments.", Set.of("punishhistory", "xh"), CorePunish.PERM.COMMAND_PUNISH_HISTORY);
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (!(sender instanceof Player senderPlayer)) {
-            sender.sendMessage(F.fMain(this, F.fError("Only players can view punishment history.")));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (!(sender instanceof Player player)) {
+			sender.sendMessage(F.fMain(this, F.fError("Only players can view punishment history.")));
+			return;
+		}
 
-        if (args.length > 1) {
-            sender.sendMessage(help(alias));
-            return;
-        }
+		if (args.length > 1) {
+			sender.sendMessage(help(alias));
+			return;
+		}
 
-        _miniPlugin._hexusPlugin.runAsync(() ->
-        {
-            OfflinePlayer targetOfflinePlayer;
+		_miniPlugin._hexusPlugin.runAsync(() -> {
+			player.sendMessage(F.fMain(this, "Fetching player ", F.fItem(args[0]), "..."));
+			OfflinePlayer target = PlayerSearch.offlinePlayerSearch(args[0], sender);
+			if (target == null) return;
+			_miniPlugin.openHistoryGui(player, target);
+		});
+	}
 
-            if (args.length == 1) {
-                targetOfflinePlayer = PlayerSearch.offlinePlayerSearch(args[0], sender);
-                if (targetOfflinePlayer == null) {
-                    return;
-                }
-            } else {
-                targetOfflinePlayer = senderPlayer;
-            }
+	@Override
+	public List<String> tab(CommandSender sender, String alias, String[] args) {
+		List<String> names = new ArrayList<>();
+		if (args.length == 1) {
+			//noinspection ReassignedVariable
+			Stream<? extends Player> streamedOnlinePlayers = _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
+			if (sender instanceof Player player) {
+				streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
+			}
 
-            _miniPlugin.openHistoryGui(senderPlayer, targetOfflinePlayer);
-        });
-    }
-
-    @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
-        List<String> names = new ArrayList<>();
-        if (args.length == 1) {
-            //noinspection ReassignedVariable
-            Stream<? extends Player> streamedOnlinePlayers =
-                    _miniPlugin._hexusPlugin.getServer().getOnlinePlayers().stream();
-            if (sender instanceof Player player) {
-                streamedOnlinePlayers = streamedOnlinePlayers.filter(p -> p.canSee(player));
-            }
-
-            names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
-        }
-        return names;
-    }
+			names.addAll(streamedOnlinePlayers.map(Player::getName).toList());
+		}
+		return names;
+	}
 
 
 }

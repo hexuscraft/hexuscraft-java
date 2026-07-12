@@ -13,22 +13,22 @@ import java.util.Set;
 
 public class CommandNetworkMotdView extends BaseCommand<CorePortal> {
 
-    final CoreDatabase _coreDatabase;
+	final CoreDatabase _coreDatabase;
 
-    CommandNetworkMotdView(CorePortal corePortal, CoreDatabase coreDatabase) {
-        super(corePortal, "view", "", "View the current MOTD.", Set.of("v"), CorePortal.PERM.COMMAND_MOTD_VIEW);
+	CommandNetworkMotdView(CorePortal corePortal, CoreDatabase coreDatabase) {
+		super(corePortal, "view", "", "View the current MOTD.", Set.of("v"), CorePortal.PERM.COMMAND_MOTD_VIEW);
 
-        _coreDatabase = coreDatabase;
-    }
+		_coreDatabase = coreDatabase;
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        sender.sendMessage(F.fMain(this,
-                "Viewing the current MOTD:\n",
-                F.fMain("",
-                        C.fReset +
-                                ChatColor.translateAlternateColorCodes('&',
-                                        ServerQueries.getMotd(_coreDatabase._database._jedis)))));
-    }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		sender.sendMessage(F.fMain(this,
+			"Viewing the current MOTD:\n",
+			F.fMain("",
+				C.fReset +
+					ChatColor.translateAlternateColorCodes('&',
+						ServerQueries.getMotd(_coreDatabase._database._jedis)))));
+	}
 
 }

@@ -14,31 +14,31 @@ import java.util.Set;
 
 public class CommandNpcList extends BaseCommand<CoreNpc> {
 
-    CommandNpcList(CoreNpc coreNpc) {
-        super(coreNpc, "list", "", "List all NPCs.", Set.of("ls", "l"), CoreNpc.PERM.COMMAND_ENTITY_LIST);
-    }
+	CommandNpcList(CoreNpc coreNpc) {
+		super(coreNpc, "list", "", "List all NPCs.", Set.of("ls", "l"), CoreNpc.PERM.COMMAND_ENTITY_LIST);
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (args.length > 0) {
-            sender.sendMessage(help(alias));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (args.length > 0) {
+			sender.sendMessage(help(alias));
+			return;
+		}
 
-        Entity[] entities = _miniPlugin.list();
+		Entity[] entities = _miniPlugin.list();
 
-        List<String> response = new ArrayList<>();
-        response.add(F.fMain(this, "Listing ", F.fItem(entities.length + " Entities")));
-        response.addAll(Arrays.stream(entities)
-                .map(entity -> F.fMain("",
-                        F.fItem(entity.getCustomName()),
-                        " (",
-                        entity.getType().name(),
-                        ") (",
-                        FBukkit.fItem(entity.getLocation()),
-                        ")"))
-                .toList());
-        sender.sendMessage(String.join("\n", response));
-    }
+		List<String> response = new ArrayList<>();
+		response.add(F.fMain(this, "Listing ", F.fItem(entities.length + " Entities")));
+		response.addAll(Arrays.stream(entities)
+			.map(entity -> F.fMain("",
+				F.fItem(entity.getCustomName()),
+				" (",
+				entity.getType().name(),
+				") (",
+				FBukkit.fItem(entity.getLocation()),
+				")"))
+			.toList());
+		sender.sendMessage(String.join("\n", response));
+	}
 
 }

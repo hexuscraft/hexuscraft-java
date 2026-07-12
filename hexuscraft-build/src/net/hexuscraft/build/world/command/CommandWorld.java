@@ -5,15 +5,10 @@ import net.hexuscraft.core.command.BaseMultiCommand;
 
 import java.util.Set;
 
-public class CommandWorld extends BaseMultiCommand<BuildWorld> {
+public final class CommandWorld extends BaseMultiCommand<BuildWorld> {
 
-    public CommandWorld(BuildWorld buildWorld) {
-        super(buildWorld,
-                "world",
-                "Create, edit and remove worlds.",
-                Set.of(),
-                BuildWorld.PERM.COMMAND_WORLD,
-                Set.of(new CommandWorldCreate(buildWorld)));
-    }
+	public CommandWorld(final BuildWorld buildWorld) {
+		super(buildWorld, "world", "Create, edit and remove worlds.", Set.of(), BuildWorld.PERM.COMMAND_WORLD, Set.of(new CommandWorldCreate(buildWorld), new CommandWorldList(buildWorld), new CommandWorldLocate(buildWorld), new CommandWorldTeleport(buildWorld)));
+	}
 
 }

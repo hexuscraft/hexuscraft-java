@@ -17,60 +17,60 @@ import java.util.Set;
 
 public class CommandSupport extends BaseCommand<CoreChat> {
 
-    final CorePortal _corePortal;
-    final CorePermission _corePermission;
-    final CoreDatabase _coreDatabase;
+	final CorePortal _corePortal;
+	final CorePermission _corePermission;
+	final CoreDatabase _coreDatabase;
 
-    public CommandSupport(CoreChat coreChat,
-                          CorePermission corePermission,
-                          CoreDatabase coreDatabase,
-                          CorePortal corePortal) {
-        super(coreChat,
-                "support",
-                "<Message>",
-                "Request help from a staff member.",
-                Set.of("a", "admin", "helpop", "sc", "staffchat"),
-                CoreChat.PERM.COMMAND_SUPPORT);
-        _corePermission = corePermission;
-        _coreDatabase = coreDatabase;
-        _corePortal = corePortal;
-    }
+	public CommandSupport(CoreChat coreChat,
+	                      CorePermission corePermission,
+	                      CoreDatabase coreDatabase,
+	                      CorePortal corePortal) {
+		super(coreChat,
+			"support",
+			"<Message>",
+			"Request help from a staff member.",
+			Set.of("a", "admin", "helpop", "sc", "staffchat"),
+			CoreChat.PERM.COMMAND_SUPPORT);
+		_corePermission = corePermission;
+		_coreDatabase = coreDatabase;
+		_corePortal = corePortal;
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (args.length == 0) {
-            sender.sendMessage(help(alias));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (args.length == 0) {
+			sender.sendMessage(help(alias));
+			return;
+		}
 
-        if (!_miniPlugin._receivedTipSet.contains(sender)) {
-            _miniPlugin._receivedTipSet.add(sender);
-            sender.sendMessage(F.fMain(this,
-                    "You should receive a reply shortly if a staff member is available. You can also report " +
-                            "rule-breakers with ",
-                    F.fItem("/report"),
-                    "."));
-        }
+		if (!_miniPlugin._receivedTipSet.contains(sender)) {
+			_miniPlugin._receivedTipSet.add(sender);
+			sender.sendMessage(F.fMain(this,
+				"You should receive a reply shortly if a staff member is available. You can also report " +
+					"rule-breakers with ",
+				F.fItem("/report"),
+				"."));
+		}
 
-        _miniPlugin._hexusPlugin.runAsync(() ->
-        {
-            try {
-                _coreDatabase._database._jedis.publish(ChatSupportMessage.CHANNEL_NAME,
-                        new ChatSupportMessage(sender instanceof Player player ?
-                                player.getUniqueId() :
-                                UtilUniqueId.EMPTY_UUID,
-                                sender.getName(),
-                                _corePortal._serverName,
-                                sender instanceof Player player ?
-                                        _corePermission._permissionProfiles.get(player)._groups() :
-                                        new PermissionGroup[]{PermissionGroup._CONSOLE},
-                                String.join(" ", args)).toString());
-            } catch (JedisException ex) {
-                sender.sendMessage(F.fMain(this,
-                        F.fError("An error occurred while sending your support message. Maybe try again later?")));
-                _miniPlugin.logSevere(ex);
-            }
-        });
-    }
+		_miniPlugin._hexusPlugin.runAsync(() ->
+		{
+			try {
+				_coreDatabase._database._jedis.publish(ChatSupportMessage.CHANNEL_NAME,
+					new ChatSupportMessage(sender instanceof Player player ?
+						player.getUniqueId() :
+						UtilUniqueId.EMPTY_UUID,
+						sender.getName(),
+						_corePortal._serverName,
+						sender instanceof Player player ?
+							_corePermission._permissionProfiles.get(player)._groups() :
+							new PermissionGroup[]{PermissionGroup._CONSOLE},
+						String.join(" ", args)).toString());
+			} catch (JedisException ex) {
+				sender.sendMessage(F.fMain(this,
+					F.fError("An error occurred while sending your support message. Maybe try again later?")));
+				_miniPlugin.logSevere(ex);
+			}
+		});
+	}
 
 }

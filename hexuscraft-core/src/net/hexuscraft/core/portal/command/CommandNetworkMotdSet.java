@@ -13,28 +13,28 @@ import java.util.Set;
 
 public class CommandNetworkMotdSet extends BaseCommand<CorePortal> {
 
-    final CoreDatabase _coreDatabase;
+	final CoreDatabase _coreDatabase;
 
-    CommandNetworkMotdSet(CorePortal corePortal, CoreDatabase coreDatabase) {
-        super(corePortal, "set", "<Message>", "Set the current MOTD.", Set.of("s"), CorePortal.PERM.COMMAND_MOTD_SET);
+	CommandNetworkMotdSet(CorePortal corePortal, CoreDatabase coreDatabase) {
+		super(corePortal, "set", "<Message>", "Set the current MOTD.", Set.of("s"), CorePortal.PERM.COMMAND_MOTD_SET);
 
-        _coreDatabase = coreDatabase;
-    }
+		_coreDatabase = coreDatabase;
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        String message = ChatColor.translateAlternateColorCodes('&', String.join(" ", args));
-        sender.sendMessage(F.fMain(this, "Please wait... Updating the MOTD to:\n", C.fReset + message));
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		String message = ChatColor.translateAlternateColorCodes('&', String.join(" ", args));
+		sender.sendMessage(F.fMain(this, "Please wait... Updating the MOTD to:\n", C.fReset + message));
 
-        _miniPlugin._hexusPlugin.runAsync(() ->
-        {
-            ServerQueries.setMotd(_coreDatabase._database._jedis, message);
-            _miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this,
-                    F.fSuccess("Successfully updated the MOTD:\n"),
-                    F.fMain("", C.fReset + message + "\n"),
-                    F.fMain("", "It may take a few seconds for all proxies to update."))));
-        });
+		_miniPlugin._hexusPlugin.runAsync(() ->
+		{
+			ServerQueries.setMotd(_coreDatabase._database._jedis, message);
+			_miniPlugin._hexusPlugin.runSync(() -> sender.sendMessage(F.fMain(this,
+				F.fSuccess("Successfully updated the MOTD:\n"),
+				F.fMain("", C.fReset + message + "\n"),
+				F.fMain("", "It may take a few seconds for all proxies to update."))));
+		});
 
-    }
+	}
 
 }

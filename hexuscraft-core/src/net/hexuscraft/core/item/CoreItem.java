@@ -12,29 +12,33 @@ import java.util.Map;
 
 public class CoreItem extends MiniPlugin<HexusPlugin> {
 
-    CoreCommand _pluginCommand;
+	CoreCommand _pluginCommand;
 
-    public CoreItem(HexusPlugin plugin) {
-        super(plugin, "Item");
+	public CoreItem(HexusPlugin plugin) {
+		super(plugin, "Item");
 
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GIVE);
-        PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_CLEAR);
-    }
+		PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GIVE);
+		PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_GIVE_OTHERS);
+		PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_CLEAR);
+		PermissionGroup.ADMINISTRATOR._permissions.add(PERM.COMMAND_CLEAR_OTHERS);
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
+	}
 
-    @Override
-    public void onEnable() {
-        _pluginCommand.register(new CommandClear(this));
-        _pluginCommand.register(new CommandGive(this));
-    }
+	@Override
+	public void onEnable() {
+		_pluginCommand.register(new CommandClear(this));
+		_pluginCommand.register(new CommandGive(this));
+	}
 
-    public enum PERM implements IPermission {
-        COMMAND_GIVE,
-        COMMAND_CLEAR
-    }
+	public enum PERM implements IPermission {
+		COMMAND_GIVE,
+		COMMAND_GIVE_OTHERS, // TODO: Implement
+		COMMAND_CLEAR,
+		COMMAND_CLEAR_OTHERS // TOOD: Implement
+	}
 
 }

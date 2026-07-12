@@ -9,23 +9,23 @@ import java.util.Set;
 
 public class CommandNetworkGroupList extends BaseCommand<CorePortal> {
 
-    CommandNetworkGroupList(CorePortal corePortal) {
-        super(corePortal,
-                "list",
-                "",
-                "List all server groups.",
-                Set.of("l"),
-                CorePortal.PERM.COMMAND_NETWORK_GROUP_LIST);
-    }
+	CommandNetworkGroupList(CorePortal corePortal) {
+		super(corePortal,
+			"list",
+			"",
+			"List all server groups.",
+			Set.of("l"),
+			CorePortal.PERM.COMMAND_NETWORK_GROUP_LIST);
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (args.length > 0) {
-            sender.sendMessage(help(alias));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (args.length > 0) {
+			sender.sendMessage(help(alias));
+			return;
+		}
 
-        sender.sendMessage(F.fMain(this, "Server Groups: ", F.fItem(_miniPlugin.getServerGroupNames())));
-    }
+		sender.sendMessage(F.fMain(this, "Server Groups: ", F.fItem(_miniPlugin.getServerGroupNames())));
+	}
 
 }

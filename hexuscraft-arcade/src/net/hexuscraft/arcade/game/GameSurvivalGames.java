@@ -7,11 +7,11 @@ import net.hexuscraft.common.enums.GameType;
 
 public class GameSurvivalGames extends SoloGame {
 
-    public int _minPlayers = 1;
-    public int _maxPlayers = 1;
+	public int _minPlayers = 1;
+	public int _maxPlayers = 1;
 
-    GameSurvivalGames(ArcadeManager arcadeManager) {
-        super(GameType.SURVIVAL_GAMES, new GameKit[]{});
-    }
+	GameSurvivalGames(ArcadeManager arcadeManager) {
+		super(GameType.SURVIVAL_GAMES, new GameKit[]{});
+	}
 
 }

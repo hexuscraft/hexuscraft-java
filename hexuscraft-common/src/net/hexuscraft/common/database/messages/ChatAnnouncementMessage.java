@@ -8,25 +8,25 @@ import java.util.UUID;
 
 public record ChatAnnouncementMessage(UUID _senderUniqueId, String _message, PermissionGroup _permissionGroup) {
 
-    public static String CHANNEL_NAME = "chat.announcement";
+	public static String CHANNEL_NAME = "chat.announcement";
 
-    public static ChatAnnouncementMessage fromString(String jsonString) {
-        JSONObject jsonObject = new JSONObject(jsonString);
+	public static ChatAnnouncementMessage fromString(String jsonString) {
+		JSONObject jsonObject = new JSONObject(jsonString);
 
-        return new ChatAnnouncementMessage(UUID.fromString(jsonObject.getString("senderUniqueId")),
-                jsonObject.getString("message"),
-                PermissionGroup.valueOf(jsonObject.getString("permissionGroup")));
-    }
+		return new ChatAnnouncementMessage(UUID.fromString(jsonObject.getString("senderUniqueId")),
+			jsonObject.getString("message"),
+			PermissionGroup.valueOf(jsonObject.getString("permissionGroup")));
+	}
 
-    @Override
-    @SuppressWarnings("NullableProblems")
-    public String toString() {
-        return new JSONObject(Map.of("senderUniqueId",
-                _senderUniqueId.toString(),
-                "message",
-                _message,
-                "permissionGroup",
-                _permissionGroup.name())).toString();
-    }
+	@Override
+	@SuppressWarnings("NullableProblems")
+	public String toString() {
+		return new JSONObject(Map.of("senderUniqueId",
+			_senderUniqueId.toString(),
+			"message",
+			_message,
+			"permissionGroup",
+			_permissionGroup.name())).toString();
+	}
 
 }

@@ -7,29 +7,29 @@ import org.bukkit.event.HandlerList;
 
 public class GameStateChangedEvent extends Event implements Cancellable {
 
-    static final HandlerList _handlers = new HandlerList();
-    public GameState _oldState;
-    public GameState _newState;
-    boolean _isCancelled;
+	static final HandlerList _handlers = new HandlerList();
+	public GameState _oldState;
+	public GameState _newState;
+	boolean _isCancelled;
 
-    public GameStateChangedEvent(GameState oldState, GameState newState) {
-        _oldState = oldState;
-        _newState = newState;
-    }
+	public GameStateChangedEvent(GameState oldState, GameState newState) {
+		_oldState = oldState;
+		_newState = newState;
+	}
 
-    @Override
-    public HandlerList getHandlers() {
-        return _handlers;
-    }
+	@Override
+	public HandlerList getHandlers() {
+		return _handlers;
+	}
 
-    @Override
-    public boolean isCancelled() {
-        return _isCancelled;
-    }
+	@Override
+	public boolean isCancelled() {
+		return _isCancelled;
+	}
 
-    @Override
-    public void setCancelled(boolean isCancelled) {
-        _isCancelled = isCancelled;
-    }
+	@Override
+	public void setCancelled(boolean isCancelled) {
+		_isCancelled = isCancelled;
+	}
 
 }

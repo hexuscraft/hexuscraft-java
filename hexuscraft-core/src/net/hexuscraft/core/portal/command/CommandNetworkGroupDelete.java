@@ -13,36 +13,36 @@ import java.util.Set;
 
 public class CommandNetworkGroupDelete extends BaseCommand<CorePortal> {
 
-    final CoreDatabase _coreDatabase;
+	final CoreDatabase _coreDatabase;
 
-    CommandNetworkGroupDelete(CorePortal corePortal, CoreDatabase coreDatabase) {
-        super(corePortal,
-                "delete",
-                "<Name>",
-                "Delete a server group.",
-                Set.of("del", "d"),
-                CorePortal.PERM.COMMAND_NETWORK_GROUP_DELETE);
-        _coreDatabase = coreDatabase;
-    }
+	CommandNetworkGroupDelete(CorePortal corePortal, CoreDatabase coreDatabase) {
+		super(corePortal,
+			"delete",
+			"<Name>",
+			"Delete a server group.",
+			Set.of("del", "d"),
+			CorePortal.PERM.COMMAND_NETWORK_GROUP_DELETE);
+		_coreDatabase = coreDatabase;
+	}
 
-    @Override
-    public void run(CommandSender sender, String alias, String[] args) {
-        if (args.length != 1) {
-            sender.sendMessage(help(alias));
-            return;
-        }
+	@Override
+	public void run(CommandSender sender, String alias, String[] args) {
+		if (args.length != 1) {
+			sender.sendMessage(help(alias));
+			return;
+		}
 
-        String key = ServerQueries.SERVERGROUP(args[0]);
-        _coreDatabase._database._jedis.del(key);
-        sender.sendMessage(F.fMain(this, "Deleted ", F.fItem(key)));
-    }
+		String key = ServerQueries.SERVERGROUP(args[0]);
+		_coreDatabase._database._jedis.del(key);
+		sender.sendMessage(F.fMain(this, "Deleted ", F.fItem(key)));
+	}
 
-    @Override
-    public List<String> tab(CommandSender sender, String alias, String[] args) {
-        if (args.length == 1) {
-            return Arrays.asList(_miniPlugin.getServerGroupNames());
-        }
-        return List.of();
-    }
+	@Override
+	public List<String> tab(CommandSender sender, String alias, String[] args) {
+		if (args.length == 1) {
+			return Arrays.asList(_miniPlugin.getServerGroupNames());
+		}
+		return List.of();
+	}
 
 }

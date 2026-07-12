@@ -7,20 +7,20 @@ import java.util.Map;
 
 public record PortalRestartServerGroupMessage(String _groupName) {
 
-    public static String CHANNEL_NAME = "portal.restart.group";
+	public static String CHANNEL_NAME = "portal.restart.group";
 
-    public static PortalRestartServerGroupMessage fromString(String jsonString) {
-        return new PortalRestartServerGroupMessage(new JSONObject(jsonString).getString("groupName"));
-    }
+	public static PortalRestartServerGroupMessage fromString(String jsonString) {
+		return new PortalRestartServerGroupMessage(new JSONObject(jsonString).getString("groupName"));
+	}
 
-    @Override
-    @SuppressWarnings("NullableProblems")
-    public String toString() {
-        return new JSONObject(Map.of("groupName", _groupName)).toString();
-    }
+	@Override
+	@SuppressWarnings("NullableProblems")
+	public String toString() {
+		return new JSONObject(Map.of("groupName", _groupName)).toString();
+	}
 
-    public void send(UnifiedJedis jedis) {
-        jedis.publish(CHANNEL_NAME, toString());
-    }
+	public void send(UnifiedJedis jedis) {
+		jedis.publish(CHANNEL_NAME, toString());
+	}
 
 }

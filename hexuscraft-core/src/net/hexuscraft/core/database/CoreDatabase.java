@@ -6,16 +6,16 @@ import net.hexuscraft.core.MiniPlugin;
 
 public class CoreDatabase extends MiniPlugin<HexusPlugin> {
 
-    public Database _database;
+	public Database _database;
 
-    public CoreDatabase(HexusPlugin plugin) {
-        super(plugin, "Database");
-        _database = new Database();
-    }
+	public CoreDatabase(HexusPlugin plugin) {
+		super(plugin, "Database");
+		_database = new Database();
+	}
 
-    @Override
-    public void onDisable() {
-        _database.unregisterConsumers();
-    }
+	@Override
+	public void onDisable() {
+		_database.unregisterConsumers();
+	}
 
 }

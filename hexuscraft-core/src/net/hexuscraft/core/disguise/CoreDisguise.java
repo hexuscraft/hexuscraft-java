@@ -12,30 +12,30 @@ import java.util.Map;
 
 public class CoreDisguise extends MiniPlugin<HexusPlugin> {
 
-    CoreCommand _coreCommand;
+	CoreCommand _coreCommand;
 
-    public CoreDisguise(HexusPlugin plugin) {
-        super(plugin, "Disguise");
-    }
+	public CoreDisguise(HexusPlugin plugin) {
+		super(plugin, "Disguise");
+	}
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_coreCommand = (CoreCommand) dependencies.get(CoreCommand.class);
+	}
 
-    @Override
-    public void onEnable() {
-        _coreCommand.register(new CommandDisguise(this));
-    }
+	@Override
+	public void onEnable() {
+		_coreCommand.register(new CommandDisguise(this));
+	}
 
-    public void disguise(Player targetPlayer, OfflinePlayer disguiseOfflinePlayer) {
-        targetPlayer.setDisplayName(disguiseOfflinePlayer.getName());
-        targetPlayer.setCustomName(disguiseOfflinePlayer.getName());
-        _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> player.hidePlayer(targetPlayer));
-        _hexusPlugin.getServer().getOnlinePlayers().forEach(player -> player.showPlayer(targetPlayer));
-    }
+	public void disguise(Player targetPlayer, OfflinePlayer disguiseOfflinePlayer) {
+		targetPlayer.setDisplayName(disguiseOfflinePlayer.getName());
+		targetPlayer.setCustomName(disguiseOfflinePlayer.getName());
+		_hexusPlugin.getServer().getOnlinePlayers().forEach(player -> player.hidePlayer(targetPlayer));
+		_hexusPlugin.getServer().getOnlinePlayers().forEach(player -> player.showPlayer(targetPlayer));
+	}
 
-    public enum PERM implements IPermission {
-        COMMAND_DISGUISE
-    }
+	public enum PERM implements IPermission {
+		COMMAND_DISGUISE
+	}
 }

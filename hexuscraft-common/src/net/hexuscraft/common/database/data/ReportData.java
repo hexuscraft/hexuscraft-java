@@ -12,71 +12,71 @@ import java.util.UUID;
 
 public class ReportData {
 
-    public UUID uuid;
-    public UUID senderUUID;
-    public UUID targetUUID;
-    public String message;
-    public ReportSubmitReason reason;
-    public Boolean active;
-    public Long origin;
-    public String server;
+	public UUID uuid;
+	public UUID senderUUID;
+	public UUID targetUUID;
+	public String message;
+	public ReportSubmitReason reason;
+	public Boolean active;
+	public Long origin;
+	public String server;
 
-    // these cannot be guaranteed to exist unless 'active' is false. ye be warned!
-    public Long removeOrigin;
-    public ReportCloseReason removeReason;
-    public String removeServer;
-    public UUID removeStaffUUID;
+	// these cannot be guaranteed to exist unless 'active' is false. ye be warned!
+	public Long removeOrigin;
+	public ReportCloseReason removeReason;
+	public String removeServer;
+	public UUID removeStaffUUID;
 
-    public ReportData(Map<String, String> rawData) {
-        uuid = UUID.fromString(rawData.get("uuid"));
-        senderUUID = UUID.fromString(rawData.get("senderUUID"));
-        targetUUID = UUID.fromString(rawData.get("targetUUID"));
-        message = rawData.get("message");
-        reason = ReportSubmitReason.valueOf(rawData.get("reason"));
-        active = rawData.get("active").equals("true");
-        origin = Long.parseLong(rawData.get("origin"));
-        server = rawData.get("server");
+	public ReportData(Map<String, String> rawData) {
+		uuid = UUID.fromString(rawData.get("uuid"));
+		senderUUID = UUID.fromString(rawData.get("senderUUID"));
+		targetUUID = UUID.fromString(rawData.get("targetUUID"));
+		message = rawData.get("message");
+		reason = ReportSubmitReason.valueOf(rawData.get("reason"));
+		active = rawData.get("active").equals("true");
+		origin = Long.parseLong(rawData.get("origin"));
+		server = rawData.get("server");
 
-        if (!active) { // we cannot guarantee these should exist unless 'active' is false
-            removeOrigin = Long.parseLong(rawData.get("removeOrigin"));
-            removeReason = ReportCloseReason.valueOf(rawData.get("removeReason"));
-            removeServer = rawData.get("removeServer");
-            removeStaffUUID = UUID.fromString(rawData.get("removeStaffId"));
-            return;
-        }
+		if (!active) { // we cannot guarantee these should exist unless 'active' is false
+			removeOrigin = Long.parseLong(rawData.get("removeOrigin"));
+			removeReason = ReportCloseReason.valueOf(rawData.get("removeReason"));
+			removeServer = rawData.get("removeServer");
+			removeStaffUUID = UUID.fromString(rawData.get("removeStaffId"));
+			return;
+		}
 
-        removeOrigin = null;
-        removeReason = null;
-        removeServer = null;
-        removeStaffUUID = null;
-    }
+		removeOrigin = null;
+		removeReason = null;
+		removeServer = null;
+		removeStaffUUID = null;
+	}
 
-    public Map<String, String> toMap() {
-        Map<String, String> map = new HashMap<>();
-        map.put("uuid", uuid.toString());
-        map.put("senderUUID", senderUUID.toString());
-        map.put("targetUUID", targetUUID.toString());
-        map.put("message", message);
-        map.put("reason", reason.name());
-        map.put("active", Boolean.toString(active));
-        map.put("origin", origin.toString());
-        map.put("server", server);
+	public Map<String, String> toMap() {
+		Map<String, String> map = new HashMap<>();
+		map.put("uuid", uuid.toString());
+		map.put("senderUUID", senderUUID.toString());
+		map.put("targetUUID", targetUUID.toString());
+		map.put("message", message);
+		map.put("reason", reason.name());
+		map.put("active", Boolean.toString(active));
+		map.put("origin", origin.toString());
+		map.put("server", server);
 
-        if (!active) {
-            map.put("removeOrigin", removeOrigin.toString());
-            map.put("removeReason", removeReason.name());
-            map.put("removeServer", removeServer);
-            map.put("removeStaffId", removeStaffUUID.toString());
-        }
+		if (!active) {
+			map.put("removeOrigin", removeOrigin.toString());
+			map.put("removeReason", removeReason.name());
+			map.put("removeServer", removeServer);
+			map.put("removeStaffId", removeStaffUUID.toString());
+		}
 
-        return map;
-    }
+		return map;
+	}
 
-    public void submit(UnifiedJedis jedis) {
-        jedis.hset(ReportQueries.REPORT(uuid), toMap());
-        jedis.sadd(ReportQueries.LIST_SUBMITTED(senderUUID), uuid.toString());
-        jedis.sadd(ReportQueries.LIST_RECEIVED(targetUUID), uuid.toString());
-        jedis.publish(ReportSubmittedMessage.CHANNEL_NAME, new ReportSubmittedMessage(uuid).toString());
-    }
+	public void submit(UnifiedJedis jedis) {
+		jedis.hset(ReportQueries.REPORT(uuid), toMap());
+		jedis.sadd(ReportQueries.LIST_SUBMITTED(senderUUID), uuid.toString());
+		jedis.sadd(ReportQueries.LIST_RECEIVED(targetUUID), uuid.toString());
+		jedis.publish(ReportSubmittedMessage.CHANNEL_NAME, new ReportSubmittedMessage(uuid).toString());
+	}
 
 }

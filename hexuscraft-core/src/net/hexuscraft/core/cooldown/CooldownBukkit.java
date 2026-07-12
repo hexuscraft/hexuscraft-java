@@ -6,27 +6,27 @@ import org.bukkit.command.CommandSender;
 
 public class CooldownBukkit {
 
-    Long calculateRemaining(Long now, Long start, Long delay) {
-        return delay - (now - start);
-    }
+	Long calculateRemaining(Long now, Long start, Long delay) {
+		return delay - (now - start);
+	}
 
-    public boolean use(Object parent, String name, Long delayMs, CommandSender sender) {
-        if (UtilCooldown.use(parent, name, delayMs)) {
-            return true;
-        }
+	public boolean use(Object parent, String name, Long delayMs, CommandSender sender) {
+		if (UtilCooldown.use(parent, name, delayMs)) {
+			return true;
+		}
 
-        UtilCooldown.Cooldown cooldown = UtilCooldown.getCooldown(parent, name);
-        if (cooldown == null) {
-            sender.sendMessage(F.fMain(this, "Please wait before trying to use ", F.fItem(name), " again."));
-            return false;
-        }
+		UtilCooldown.Cooldown cooldown = UtilCooldown.getCooldown(parent, name);
+		if (cooldown == null) {
+			sender.sendMessage(F.fMain(this, "Please wait before trying to use ", F.fItem(name), " again."));
+			return false;
+		}
 
-        sender.sendMessage(F.fMain(this,
-                "You cannot use ",
-                F.fItem(name),
-                " for another ",
-                F.fTime(calculateRemaining(System.currentTimeMillis(), cooldown._started(), cooldown._delayMs()))));
-        return false;
-    }
+		sender.sendMessage(F.fMain(this,
+			"You cannot use ",
+			F.fItem(name),
+			" for another ",
+			F.fTime(calculateRemaining(System.currentTimeMillis(), cooldown._started(), cooldown._delayMs()))));
+		return false;
+	}
 
 }

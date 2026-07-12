@@ -1,6 +1,7 @@
 package net.hexuscraft.hub.player;
 
 import net.hexuscraft.common.IPermission;
+import net.hexuscraft.common.database.data.ServerData;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.C;
 import net.hexuscraft.common.utils.F;
@@ -25,11 +26,11 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -38,300 +39,296 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class HubPlayer extends MiniPlugin<Hub> {
 
-    CoreCommand _pluginCommand;
-    CorePortal _corePortal;
+	CoreCommand _pluginCommand;
+	CorePortal _corePortal;
 
-    public HubPlayer(Hub hub) {
-        super(hub, "Player");
+	Map<Player, LobbyMenu> _lobbyMenus;
 
-        PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_SPAWN);
-    }
+	public HubPlayer(Hub hub) {
+		super(hub, "Player");
 
-    @Override
-    public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
-        _pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
-        _corePortal = (CorePortal) dependencies.get(CorePortal.class);
-    }
+		_lobbyMenus = new HashMap<>();
+		PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_SPAWN);
+	}
 
-    @Override
-    public void onEnable() {
-        _pluginCommand.register(new CommandSpawn(this));
-    }
+	@Override
+	public void onLoad(Map<Class<? extends MiniPlugin<? extends HexusPlugin>>, MiniPlugin<? extends HexusPlugin>> dependencies) {
+		_pluginCommand = (CoreCommand) dependencies.get(CoreCommand.class);
+		_corePortal = (CorePortal) dependencies.get(CorePortal.class);
+	}
 
-    @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+	@Override
+	public void onEnable() {
+		_pluginCommand.register(new CommandSpawn(this));
+	}
 
-        if (_hexusPlugin._spawn != null) {
-            player.teleport(_hexusPlugin._spawn);
-        }
+	@Override
+	public void onDisable() {
+		_lobbyMenus.keySet().forEach(Player::closeInventory);
+		_lobbyMenus.clear();
+	}
 
-        resetAttributes(player);
-        refreshInventory(player);
+	@EventHandler
+	void onPlayerJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
 
-        UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), F.fTabFooter());
+		if (_hexusPlugin._spawn != null) {
+			player.teleport(_hexusPlugin._spawn);
+		}
 
-        player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
-    }
+		resetAttributes(player);
+		refreshInventory(player);
 
-    void resetAttributes(Player player) {
-        player.setFallDistance(0);
-        player.setFlying(false);
-        player.setSneaking(false);
-        player.setAllowFlight(false);
-        player.setGameMode(_hexusPlugin.getServer().getDefaultGameMode());
-        player.setWalkSpeed(0.2f);
-        player.setFlySpeed(0.1f);
-        player.setVelocity(new Vector());
-        player.setMaxHealth(20);
-        player.setHealth(20);
-        player.setFoodLevel(20);
-        player.setExhaustion(0);
-        player.setExp(0);
-        player.setFallDistance(0);
-        player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
-    }
+		UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), F.fTabFooter());
 
-    void refreshInventory(Player player) {
-        PlayerInventory inventory = player.getInventory();
+		player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
+	}
 
-        ItemStack gameCompass =
-                UtilItem.create(Material.COMPASS, C.cGreen + C.fBold + "Games", "Click to open the Games Menu");
-        ItemStack profileSkull = UtilItem.createPlayerSkull(player.getName(),
-                C.cGreen + C.fBold + player.getName(),
-                "Click to open the Profile Menu");
-        ItemStack cosmeticsChest =
-                UtilItem.create(Material.CHEST, C.cGreen + C.fBold + "Cosmetics", "Click to open the Cosmetics Menu");
-        ItemStack storeEmerald =
-                UtilItem.create(Material.EMERALD, C.cGreen + C.fBold + "Store", "Click to open the Store Menu");
-        ItemStack lobbyClock =
-                UtilItem.create(Material.WATCH, C.cGreen + C.fBold + "Lobbies", "Click to open the Lobbies Menu");
+	void resetAttributes(Player player) {
+		player.setFallDistance(0);
+		player.setFlying(false);
+		player.setSneaking(false);
+		player.setAllowFlight(false);
+		player.setGameMode(_hexusPlugin.getServer().getDefaultGameMode());
+		player.setWalkSpeed(0.2f);
+		player.setFlySpeed(0.1f);
+		player.setVelocity(new Vector());
+		player.setMaxHealth(20);
+		player.setHealth(20);
+		player.setFoodLevel(20);
+		player.setExhaustion(0);
+		player.setExp(0);
+		player.setFallDistance(0);
+		player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
+		player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
+	}
 
-        inventory.clear();
-        inventory.setItem(0, gameCompass);
-        inventory.setItem(1, profileSkull);
-        inventory.setItem(4, cosmeticsChest);
-        inventory.setItem(7, storeEmerald);
-        inventory.setItem(8, lobbyClock);
-        inventory.setHeldItemSlot(0);
-    }
+	void refreshInventory(Player player) {
+		PlayerInventory inventory = player.getInventory();
 
-    boolean onItemInteract(Player player, ItemStack itemStack) {
-        if (!itemStack.hasItemMeta()) {
-            return false;
-        }
+		ItemStack gameCompass = UtilItem.create(Material.COMPASS, C.cGreen + C.fBold + "Games", "Click to open the Games Menu");
+		ItemStack profileSkull = UtilItem.createPlayerSkull(player.getName(), C.cGreen + C.fBold + player.getName(), "Click to open the Profile Menu");
+		ItemStack cosmeticsChest = UtilItem.create(Material.CHEST, C.cGreen + C.fBold + "Cosmetics", "Click to open the Cosmetics Menu");
+		ItemStack storeEmerald = UtilItem.create(Material.EMERALD, C.cGreen + C.fBold + "Store", "Click to open the Store Menu");
+		ItemStack lobbyClock = UtilItem.create(Material.WATCH, C.cGreen + C.fBold + "Lobbies", "Click to open the Lobbies Menu");
 
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (!itemMeta.hasDisplayName()) {
-            return false;
-        }
+		inventory.clear();
+		inventory.setItem(0, gameCompass);
+		inventory.setItem(1, profileSkull);
+		inventory.setItem(4, cosmeticsChest);
+		inventory.setItem(7, storeEmerald);
+		inventory.setItem(8, lobbyClock);
+		inventory.setHeldItemSlot(0);
+	}
 
-        Material itemType = itemStack.getType();
-        String displayName = ChatColor.stripColor(itemMeta.getDisplayName());
+	boolean onItemInteract(Player player, ItemStack itemStack) {
+		if (!itemStack.hasItemMeta()) {
+			return false;
+		}
 
-        if (itemType.equals(Material.COMPASS) && displayName.equals("Games")) {
-            openGameMenu(player);
-            return true;
-        }
-        if (itemType.equals(Material.SKULL_ITEM) && displayName.equals(player.getName())) {
-            openProfileMenu(player);
-            return true;
-        }
-        if (itemType.equals(Material.CHEST) && displayName.equals("Cosmetics")) {
-            openCosmeticsMenu(player);
-            return true;
-        }
-        if (itemType.equals(Material.EMERALD) && displayName.equals("Store")) {
-            openStoreMenu(player);
-            return true;
-        }
-        if (itemType.equals(Material.WATCH) && displayName.equals("Lobbies")) {
-            openLobbyMenu(player);
-            return true;
-        }
-        return false;
-    }
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		if (!itemMeta.hasDisplayName()) {
+			return false;
+		}
 
-    @EventHandler
-    void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) {
-            return;
-        }
-        if (player.getGameMode().equals(GameMode.CREATIVE)) {
-            return;
-        }
+		Material itemType = itemStack.getType();
+		String displayName = ChatColor.stripColor(itemMeta.getDisplayName());
 
-        event.setCancelled(true);
+		if (itemType.equals(Material.COMPASS) && displayName.equals("Games")) {
+			openGameMenu(player);
+			return true;
+		}
+		if (itemType.equals(Material.SKULL_ITEM) && displayName.equals(player.getName())) {
+			openProfileMenu(player);
+			return true;
+		}
+		if (itemType.equals(Material.CHEST) && displayName.equals("Cosmetics")) {
+			openCosmeticsMenu(player);
+			return true;
+		}
+		if (itemType.equals(Material.EMERALD) && displayName.equals("Store")) {
+			openStoreMenu(player);
+			return true;
+		}
+		if (itemType.equals(Material.WATCH) && displayName.equals("Lobbies")) {
+			openLobbyMenu(player);
+			return true;
+		}
+		return false;
+	}
 
-        Inventory clickedInventory = event.getInventory();
+	@EventHandler
+	void onInventoryClick(InventoryClickEvent event) {
+		if (!(event.getWhoClicked() instanceof Player player)) return;
+		if (player.getGameMode().equals(GameMode.CREATIVE)) return;
 
-        if (clickedInventory.equals(player.getInventory())) {
-            ItemStack currentItem = event.getCurrentItem();
-            if (currentItem == null) {
-                return;
-            }
+		ItemStack item = event.getCurrentItem();
+		if (item == null) return;
 
-            onItemInteract(player, currentItem);
-            return;
-        }
-        if (ChatColor.stripColor(clickedInventory.getName()).equals("Lobby Menu")) {
-            ItemStack currentItem = event.getCurrentItem();
-            if (currentItem.hasItemMeta()) {
-                ItemMeta currentItemMeta = currentItem.getItemMeta();
-                if (currentItemMeta.hasDisplayName()) {
-                    if (!UtilCooldown.use(player, "Lobby Server Teleport", 1000L)) {
-                        return;
-                    }
+		LobbyMenu lobbyMenu = _lobbyMenus.get(player);
+		if (lobbyMenu != null) {
+			event.setCancelled(true);
 
-                    player.closeInventory();
-                    String targetServerName = ChatColor.stripColor(currentItemMeta.getDisplayName());
-                    _corePortal.teleport(player, targetServerName);
-                    player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-                }
-            }
-        }
-    }
+			ServerData serverData = lobbyMenu._lobbies().entrySet().stream().filter(entry -> entry.getKey().equals(item)).map(Map.Entry::getValue).findFirst().orElse(null);
+			if (serverData == null) return;
+			if (!UtilCooldown.use(player, "Lobby Server Teleport", 1000L)) return;
 
-    void openGameMenu(Player player) {
-        player.sendMessage(F.fMain("Games", "This feature is currently work in progress. Please try again later!"));
-        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-    }
+			_corePortal.teleport(player, serverData._name);
+			player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+			return;
+		}
 
-    void openProfileMenu(Player player) {
-        player.sendMessage(F.fMain("Profile", "This feature is currently work in progress. Please try again later!"));
-        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-    }
+		if (!event.getInventory().equals(player.getInventory())) return;
+		if (!onItemInteract(player, item)) return;
+		event.setCancelled(true);
+	}
 
-    void openCosmeticsMenu(Player player) {
-        player.sendMessage(F.fMain("Cosmetics", "This feature is currently work in progress. Please try again later!"));
-        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-    }
+	@EventHandler
+	void onInventoryClose(InventoryCloseEvent event) {
+		if (!(event.getPlayer() instanceof Player player)) return;
+		_lobbyMenus.remove(player);
+	}
 
-    void openStoreMenu(Player player) {
-        player.sendMessage(F.fMain("Store", "You can visit our store page at: ", F.fItem("store.hexuscraft.net")));
-        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-    }
+	void openGameMenu(Player player) {
+		player.sendMessage(F.fMain("Games", "This feature is currently work in progress. Please try again later!"));
+		player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+	}
 
-    void openLobbyMenu(Player player) {
-        Inventory lobbyMenu = _hexusPlugin.getServer().createInventory(player, 54, "Lobby Menu");
+	void openProfileMenu(Player player) {
+		player.sendMessage(F.fMain("Profile", "This feature is currently work in progress. Please try again later!"));
+		player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+	}
 
-        Arrays.stream(_corePortal.getServers("Lobby")).limit(54).forEach(serverData ->
-        {
-            int lobbyId = Integer.parseInt(serverData._name.split(serverData._group + "-")[1]);
-            if (lobbyId > 54) {
-                return;
-            }
+	void openCosmeticsMenu(Player player) {
+		player.sendMessage(F.fMain("Cosmetics", "This feature is currently work in progress. Please try again later!"));
+		player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+	}
 
-            boolean isCurrentServer = serverData._name.equals(_corePortal._serverName);
+	void openStoreMenu(Player player) {
+		player.sendMessage(F.fMain("Store", "You can visit our store page at: ", F.fItem("store.hexuscraft.net")));
+		player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+	}
 
-            ItemStack serverItem = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
-            serverItem.setAmount(lobbyId);
+	void openLobbyMenu(Player player) {
+		LobbyMenu menu = new LobbyMenu(player, _hexusPlugin.getServer().createInventory(player, 54, "Lobbies"), new HashMap<>());
 
-            ItemMeta serverItemMeta = serverItem.getItemMeta();
-            serverItemMeta.setDisplayName(C.cAqua + C.fBold + "Lobby-" + lobbyId);
-            serverItemMeta.setLore(List.of(C.cDAqua + serverData._players + "/" + serverData._capacity + " Players",
-                    "",
-                    C.cYellow + C.fBold + (isCurrentServer ? "YOU ARE HERE" : "CLICK TO CONNECT")));
+		Arrays.stream(_corePortal.getServers(_corePortal._serverGroupName)).limit(54).forEach(serverData -> {
+			// TODO: CoreGui paginated lobbies
+			int lobbyId = Integer.parseInt(serverData._name.split(serverData._group + "-")[1]);
+			if (lobbyId > 54) {
+				return;
+			}
 
-            serverItem.setItemMeta(serverItemMeta);
-            lobbyMenu.setItem(lobbyId - 1, serverItem);
-        });
-        player.openInventory(lobbyMenu);
-        player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-    }
+			boolean isCurrentServer = serverData._name.equals(_corePortal._serverName);
 
-    @EventHandler
-    void onEntityDamage(EntityDamageEvent event) {
-        Entity entity = event.getEntity();
-        if (!(entity instanceof Player player)) {
-            return;
-        }
+			ItemStack item = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
+			item.setAmount(lobbyId);
 
-        if (event.getCause() == EntityDamageEvent.DamageCause.CUSTOM) {
-            return;
-        }
-        if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-            player.setVelocity(new Vector());
-            player.teleport(_hexusPlugin._spawn);
-        }
+			ItemMeta itemMeta = item.getItemMeta();
+			itemMeta.setDisplayName(C.cAqua + C.fBold + serverData._name);
+			itemMeta.setLore(List.of(C.cDAqua + serverData._players + "/" + serverData._capacity + " Players", "", C.cYellow + C.fBold + (isCurrentServer ? "YOU ARE HERE" : "CLICK TO CONNECT")));
+			item.setItemMeta(itemMeta);
 
-        event.setCancelled(true);
-    }
+			menu._inventory().setItem(lobbyId - 1, item);
+			menu._lobbies().put(item, serverData);
+		});
+		player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+		player.openInventory(menu._inventory());
+		_lobbyMenus.put(player, menu);
+	}
 
-    @EventHandler
-    void onFoodLevelChange(FoodLevelChangeEvent event) {
-        Entity entity = event.getEntity();
-        if (!(entity instanceof Player player)) {
-            return;
-        }
+	@EventHandler
+	void onEntityDamage(EntityDamageEvent event) {
+		Entity entity = event.getEntity();
+		if (!(entity instanceof Player player)) {
+			return;
+		}
 
-        event.setCancelled(true);
-        player.setFoodLevel(20);
-    }
+		if (event.getCause() == EntityDamageEvent.DamageCause.CUSTOM) {
+			return;
+		}
+		if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+			player.setVelocity(new Vector());
+			player.teleport(_hexusPlugin._spawn);
+		}
 
-    @EventHandler
-    void onPlayerDropItem(PlayerDropItemEvent event) {
-        Player player = event.getPlayer();
+		event.setCancelled(true);
+	}
 
-        if (player.getGameMode().equals(GameMode.CREATIVE)) {
-            return;
-        }
-        event.setCancelled(true);
+	@EventHandler
+	void onFoodLevelChange(FoodLevelChangeEvent event) {
+		Entity entity = event.getEntity();
+		if (!(entity instanceof Player player)) {
+			return;
+		}
 
-        Item droppedItem = event.getItemDrop();
-        if (droppedItem == null) {
-            return;
-        }
+		event.setCancelled(true);
+		player.setFoodLevel(20);
+	}
 
-        ItemStack itemStack = droppedItem.getItemStack();
-        if (itemStack == null) {
-            return;
-        }
+	@EventHandler
+	void onPlayerDropItem(PlayerDropItemEvent event) {
+		Player player = event.getPlayer();
 
-        onItemInteract(player, itemStack);
-    }
+		if (player.getGameMode().equals(GameMode.CREATIVE)) {
+			return;
+		}
+		event.setCancelled(true);
 
-    @EventHandler
-    void onPlayerPickupItem(PlayerPickupItemEvent event) {
-        if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
-            return;
-        }
-        event.setCancelled(true);
-    }
+		Item droppedItem = event.getItemDrop();
+		if (droppedItem == null) {
+			return;
+		}
 
-    @EventHandler
-    void onPlayerInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
+		ItemStack itemStack = droppedItem.getItemStack();
+		if (itemStack == null) {
+			return;
+		}
 
-        if (player.getGameMode().equals(GameMode.CREATIVE)) {
-            return;
-        }
-        event.setCancelled(true);
+		onItemInteract(player, itemStack);
+	}
 
-        ItemStack currentItem = player.getItemInHand();
-        if (currentItem == null) {
-            return;
-        }
+	@EventHandler
+	void onPlayerPickupItem(PlayerPickupItemEvent event) {
+		if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+			return;
+		}
+		event.setCancelled(true);
+	}
 
-        onItemInteract(player, currentItem);
-    }
+	@EventHandler
+	void onPlayerInteract(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
 
-    @EventHandler
-    void onEntityTargetLivingEntity(EntityTargetLivingEntityEvent event) {
-        if (!(event.getTarget() instanceof Player)) {
-            return;
-        }
-        event.setCancelled(true);
-    }
+		if (player.getGameMode().equals(GameMode.CREATIVE)) {
+			return;
+		}
+		event.setCancelled(true);
 
-    public enum PERM implements IPermission {
-        COMMAND_SPAWN
-    }
+		ItemStack currentItem = player.getItemInHand();
+		if (currentItem == null) {
+			return;
+		}
+
+		onItemInteract(player, currentItem);
+	}
+
+	@EventHandler
+	void onEntityTargetLivingEntity(EntityTargetLivingEntityEvent event) {
+		if (!(event.getTarget() instanceof Player)) {
+			return;
+		}
+		event.setCancelled(true);
+	}
+
+	public enum PERM implements IPermission {
+		COMMAND_SPAWN
+	}
 
 }

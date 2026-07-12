@@ -4,6 +4,8 @@ import net.hexuscraft.build.parse.BuildParse;
 import net.hexuscraft.build.world.BuildWorld;
 import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.core.HexusPlugin;
+import net.hexuscraft.core.gamemode.CoreGameMode;
+import net.hexuscraft.core.item.CoreItem;
 import net.hexuscraft.core.teleport.CoreTeleport;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -13,30 +15,37 @@ import org.bukkit.event.world.WorldLoadEvent;
 
 public class Build extends HexusPlugin {
 
-    public Build() {
-        super();
+	public Build() {
+		super();
 
-        PermissionGroup.BUILD_TEAM._permissions.add(CoreTeleport.PERM.COMMAND_TELEPORT);
-        PermissionGroup.BUILD_TEAM._permissions.add(CoreTeleport.PERM.COMMAND_TELEPORT_COORDINATES);
-        PermissionGroup.BUILD_LEAD._permissions.add(CoreTeleport.PERM.COMMAND_TELEPORT_OTHERS);
+		PermissionGroup.BUILD_TEAM._permissions.add(CoreItem.PERM.COMMAND_GIVE);
+		PermissionGroup.BUILD_TEAM._permissions.add(CoreItem.PERM.COMMAND_CLEAR);
+		PermissionGroup.BUILD_TEAM._permissions.add(CoreTeleport.PERM.COMMAND_TELEPORT);
+		PermissionGroup.BUILD_TEAM._permissions.add(CoreTeleport.PERM.COMMAND_TELEPORT_COORDINATES);
+		PermissionGroup.BUILD_TEAM._permissions.add(CoreGameMode.PERM.COMMAND_GAMEMODE);
 
-        require(new BuildParse(this));
-        require(new BuildWorld(this));
-    }
+		PermissionGroup.BUILD_LEAD._permissions.add(CoreItem.PERM.COMMAND_GIVE_OTHERS);
+		PermissionGroup.BUILD_LEAD._permissions.add(CoreItem.PERM.COMMAND_CLEAR_OTHERS);
+		PermissionGroup.BUILD_LEAD._permissions.add(CoreTeleport.PERM.COMMAND_TELEPORT_OTHERS);
+		PermissionGroup.BUILD_LEAD._permissions.add(CoreGameMode.PERM.COMMAND_GAMEMODE_OTHERS);
 
-    public Location getSpawn() {
-        return getServer().getWorlds().getFirst().getSpawnLocation();
-    }
+		require(new BuildParse(this));
+		require(new BuildWorld(this));
+	}
 
-    @EventHandler
-    void onWorldLoad(WorldLoadEvent event) {
-        event.getWorld().setSpawnLocation(0, 100, 0);
-    }
+	public Location getSpawn() {
+		return getServer().getWorlds().getFirst().getSpawnLocation();
+	}
 
-    @EventHandler
-    void onPlayerJoin(PlayerJoinEvent event) {
-        event.getPlayer().teleport(getSpawn());
-        event.getPlayer().setGameMode(GameMode.CREATIVE);
-    }
+	@EventHandler
+	void onWorldLoad(WorldLoadEvent event) {
+		event.getWorld().setSpawnLocation(0, 100, 0);
+	}
+
+	@EventHandler
+	void onPlayerJoin(PlayerJoinEvent event) {
+		event.getPlayer().teleport(getSpawn());
+		event.getPlayer().setGameMode(GameMode.CREATIVE);
+	}
 
 }
