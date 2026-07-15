@@ -45,6 +45,7 @@ public class ArcadeHost extends MiniPlugin<Arcade> {
 	public ArcadeHost(Arcade arcade) {
 		super(arcade, "Server Host");
 
+		_hostLastSeenMillis = System.currentTimeMillis();
 		PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_HOST);
 		PermissionGroup._PLAYER._permissions.add(PERM.COMMAND_HOST_VIEW);
 		PermissionGroup.EVENT_LEAD._permissions.add(PERM.COMMAND_HOST_SET);
@@ -63,12 +64,12 @@ public class ArcadeHost extends MiniPlugin<Arcade> {
 
 		_hexusPlugin.runAsyncLater(() -> {
 			ServerGroupData serverGroupData = _corePortal.getServerGroup(_corePortal._serverGroupName);
-			if (serverGroupData._hostUUID == null) return;
-			if (serverGroupData._hostUUID.equals(UtilUniqueId.EMPTY_UUID))
+			if (serverGroupData._host == null) return;
+			if (serverGroupData._host.equals(UtilUniqueId.EMPTY_UUID))
 				return; // legacy server group data. new entries should nullify this value.
 
 			try {
-				_host = PlayerSearch.offlinePlayerSearch(serverGroupData._hostUUID);
+				_host = PlayerSearch.offlinePlayerSearch(serverGroupData._host);
 			} catch (URISyntaxException | IOException ex) {
 				logSevere(ex);
 				return;
@@ -86,7 +87,9 @@ public class ArcadeHost extends MiniPlugin<Arcade> {
 			if ((System.currentTimeMillis() - _hostLastSeenMillis) < MAX_HOST_LAST_SEEN_MILLIS) return;
 
 			_hostAbandonedTask.cancel();
-			_hexusPlugin.getServer().broadcastMessage(F.fMain(this, "The host has abandoned their server. You will be sent back to a lobby. Thanks for playing!"));
+			_hexusPlugin.getServer()
+				.broadcastMessage(F.fMain(this,
+					"The host has abandoned their server. You will be sent back to a lobby. Thanks for playing!"));
 			_hexusPlugin.getServer().getOnlinePlayers().forEach(player -> {
 				//noinspection deprecation
 				player.sendTitle(C.cYellow + "Server Abandoned", "Sending you back to a lobby...");

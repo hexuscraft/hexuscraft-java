@@ -40,11 +40,12 @@ public class CommandHostEvent extends BaseCommand<CorePortal> {
 		ServerData[] existingServers = _miniPlugin.getServers(serverGroupName);
 		if (existingServers.length > 0) {
 			if (!(sender instanceof Player player)) {
-				sender.sendMessage(F.fMain(this, F.fError("Only players can teleport to the event server.")));
+				sender.sendMessage(F.fMain(this,
+					F.fError("Only players can teleport to the event server.")));
 				return;
 			}
 
-			_miniPlugin.teleport(player, existingServers[0]._name);
+			_miniPlugin.teleport(player, existingServers[0]._id);
 			return;
 		}
 
@@ -54,17 +55,18 @@ public class CommandHostEvent extends BaseCommand<CorePortal> {
 			return;
 		}
 
-		ServerGroupData.Builder builder = new ServerGroupData.Builder().name(serverGroupName)
+		ServerGroupData.Builder builder = new ServerGroupData.Builder().id(serverGroupName)
 			.capacity(100)
-			.games(new GameType[]{GameType.SURVIVAL_GAMES})
+			.games(GameType.SURVIVAL_GAMES)
 			.maxPort(CorePortal.EVENT_SERVER_PORT)
 			.minPort(CorePortal.EVENT_SERVER_PORT)
 			.plugin("Arcade.jar")
+			.ram(8192)
 			.totalServers(1)
 			.worldZip("Arcade.zip");
 
 		if (sender instanceof Player player) {
-			builder.hostUUID(player.getUniqueId());
+			builder.host(player.getUniqueId());
 		}
 
 		ServerGroupData serverGroupData = builder.build();
@@ -75,14 +77,16 @@ public class CommandHostEvent extends BaseCommand<CorePortal> {
 				serverGroupData.update(_coreDatabase._database._jedis);
 			} catch (JedisException ex) {
 				sender.sendMessage(F.fMain(this,
-					F.fError("There was an error creating an event server. Please try again later or contact an " +
-						"administrator if this issue persists.")));
+					F.fError(
+						"There was an error creating an event server. Please try again later or contact an " +
+							"administrator if this issue persists.")));
 				return;
 			}
 			sender.sendMessage(F.fMain(this,
-				F.fSuccess("Successfully created an event server. You will be automatically teleported once your " +
-					"server " +
-					"has started. This may take up to 30 seconds.")));
+				F.fSuccess(
+					"Successfully created an event server. You will be automatically teleported once your " +
+						"server " +
+						"has started. This may take up to 30 seconds.")));
 		});
 	}
 }

@@ -43,7 +43,11 @@ public class ArcadeLobby extends MiniPlugin<Arcade> {
 		}
 
 		Player player = event.getPlayer();
-		player.teleport(_hexusPlugin.getServer().getWorlds().getFirst().getSpawnLocation().add(new Vector(0.5, 0, 0.5)));
+		player.teleport(_hexusPlugin.getServer()
+			.getWorlds()
+			.getFirst()
+			.getSpawnLocation()
+			.add(new Vector(0.5, 0, 0.5)));
 		player.resetPlayerTime();
 		player.resetPlayerWeather();
 		player.resetMaxHealth();
@@ -64,8 +68,8 @@ public class ArcadeLobby extends MiniPlugin<Arcade> {
 		player.getInventory().setHeldItemSlot(0);
 
 		CustomScoreboard customScoreboard = _coreScoreboard._customScoreboards.get(player);
-		Optional.ofNullable(_arcadeManager._game.get()).ifPresent(game ->
-			customScoreboard._sidebar.setTitle("§f§l" + game._type._name));
+		Optional.ofNullable(_arcadeManager._game.get())
+			.ifPresent(game -> customScoreboard._sidebar.setTitle(game._type._name));
 		customScoreboard._sidebar.setLines("Waiting for players");
 	}
 

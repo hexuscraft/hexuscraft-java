@@ -6,19 +6,20 @@ import net.hexuscraft.common.enums.PermissionGroup;
 import java.util.UUID;
 
 public class IServerGroupData {
-	public String _name = "";
+	public String _id = null;
+
 	public int _capacity = 20;
+	public boolean _fallback = false;
 	public GameType[] _games = new GameType[0];
-	public UUID _hostUUID = null;
+	public UUID _host = null;
 	public int _joinableServers = 0;
-	public int _maxPort = 0;
-	public int _minPort = 0;
-	public String _plugin = "";
-	public int _ram = 2048;
-	public PermissionGroup _requiredPermission = PermissionGroup._PLAYER;
+	public Integer _maxPort = null;
+	public Integer _minPort = null;
+	public String _plugin = null;
+	public int _ramMB = 4096;
+	public PermissionGroup[] _permissionGroups = new PermissionGroup[0];
 	public int _totalServers = 0;
 	public int _timeoutMillis = 30000;
-	public boolean _viaVersion = true;
 	public boolean _worldEdit = false;
 	public String _worldZip = "";
 }

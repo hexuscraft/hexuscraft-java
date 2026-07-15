@@ -4,52 +4,43 @@ import net.hexuscraft.common.database.queries.ServerQueries;
 import redis.clients.jedis.UnifiedJedis;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class ServerData extends IServerData {
 
-	public ServerData(Map<String, String> serverData) {
-		assert serverData.containsKey("name");
-		_name = serverData.get("name");
+	public ServerData(String id, Map<String, String> serverData) {
+		_id = Objects.requireNonNull(id, "id");
 
-		assert serverData.containsKey("address");
-		_address = serverData.get("address");
+		_address = Objects.requireNonNull(serverData.get("address"), "address");
 
-		if (serverData.containsKey("capacity")) {
+		if (serverData.containsKey("capacity"))
 			_capacity = Integer.parseInt(serverData.get("capacity"));
-		}
 
-		if (serverData.containsKey("createdMillis")) {
+		if (serverData.containsKey("createdMillis"))
 			_createdMillis = Long.parseLong(serverData.get("createdMillis"));
-		}
 
-		assert serverData.containsKey("group");
-		_group = serverData.get("group");
+		_group = Objects.requireNonNull(serverData.get("group"), "group");
 
-		if (serverData.containsKey("motd")) {
+		if (serverData.containsKey("motd"))
 			_motd = serverData.get("motd");
-		}
 
-		if (serverData.containsKey("players")) {
+		if (serverData.containsKey("players"))
 			_players = Integer.parseInt(serverData.get("players"));
-		}
 
-		assert serverData.containsKey("port");
-		_port = Integer.parseInt(serverData.get("port"));
+		_port = Integer.parseInt(Objects.requireNonNull(serverData.get("port"), "port"));
 
-		if (serverData.containsKey("tps")) {
+		if (serverData.containsKey("tps"))
 			_tps = Double.parseDouble(serverData.get("tps"));
-		}
 
-		if (serverData.containsKey("updatedMillis")) {
+		if (serverData.containsKey("updatedMillis"))
 			_updatedMillis = Long.parseLong(serverData.get("updatedMillis"));
-		}
 
-		if (serverData.containsKey("updatedByMonitor")) {
+		if (serverData.containsKey("updatedByMonitor"))
 			_updatedByMonitor = Boolean.parseBoolean(serverData.get("updatedByMonitor"));
-		}
 	}
 
-	public ServerData(String name,
+	public ServerData(String id,
+
 	                  String address,
 	                  int capacity,
 	                  long createdMillis,
@@ -60,7 +51,8 @@ public class ServerData extends IServerData {
 	                  double tps,
 	                  long updatedMillis,
 	                  boolean updatedByMonitor) {
-		_name = name;
+		_id = id;
+
 		_address = address;
 		_capacity = capacity;
 		_createdMillis = createdMillis;
@@ -74,8 +66,7 @@ public class ServerData extends IServerData {
 	}
 
 	public Map<String, String> toMap() {
-		return Map.ofEntries(Map.entry("name", _name),
-			Map.entry("address", _address),
+		return Map.ofEntries(Map.entry("address", _address),
 			Map.entry("capacity", Integer.toString(_capacity)),
 			Map.entry("createdMillis", Long.toString(_createdMillis)),
 			Map.entry("group", _group),
@@ -88,17 +79,17 @@ public class ServerData extends IServerData {
 	}
 
 	public void update(UnifiedJedis jedis) {
-		jedis.hset(ServerQueries.SERVER(_name), toMap());
+		jedis.hset(ServerQueries.SERVER(_id), toMap());
 	}
 
 	public void delete(UnifiedJedis jedis) {
-		jedis.del(ServerQueries.SERVER(_name));
+		jedis.del(ServerQueries.SERVER(_id));
 	}
 
 	public static class Builder extends IServerData {
 
-		public Builder name(String value) {
-			_name = value;
+		public Builder id(String value) {
+			_id = value;
 			return this;
 		}
 
@@ -153,7 +144,8 @@ public class ServerData extends IServerData {
 		}
 
 		public ServerData build() {
-			return new ServerData(_name,
+			return new ServerData(_id,
+
 				_address,
 				_capacity,
 				_createdMillis,

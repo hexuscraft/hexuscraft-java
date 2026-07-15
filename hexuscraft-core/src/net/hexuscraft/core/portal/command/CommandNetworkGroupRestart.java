@@ -32,7 +32,8 @@ public class CommandNetworkGroupRestart extends BaseCommand<CorePortal> {
 		if (args[0].equals("*")) {
 			sender.sendMessage(F.fMain(this, "Sending restart command to all server groups..."));
 			_miniPlugin.restartServerGroupAsync("*");
-			sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to all server groups.")));
+			sender.sendMessage(F.fMain(this,
+				F.fSuccess("Successfully sent restart command to all server groups.")));
 			return;
 		}
 
@@ -43,9 +44,10 @@ public class CommandNetworkGroupRestart extends BaseCommand<CorePortal> {
 				serverGroupData = _miniPlugin.getServerGroup(args[0]);
 			} catch (JedisException ex) {
 				sender.sendMessage(F.fMain(this,
-					F.fError("JedisException while fetching server group data. Please try again later or " +
-						"contact" +
-						" an administrator if this issue persists.")));
+					F.fError(
+						"JedisException while fetching server group data. Please try again later or " +
+							"contact" +
+							" an administrator if this issue persists.")));
 				return;
 			}
 
@@ -58,15 +60,19 @@ public class CommandNetworkGroupRestart extends BaseCommand<CorePortal> {
 			_miniPlugin._hexusPlugin.runAsync(() ->
 			{
 				try {
-					_miniPlugin.restartServerGroupAsync(serverGroupData._name);
+					_miniPlugin.restartServerGroupAsync(serverGroupData._id);
 				} catch (JedisException ex) {
 					sender.sendMessage(F.fMain(this,
-						F.fError("JedisException while restarting server group. Please try again later or contact" +
-							" " +
-							"an administrator if this issue persists.")));
+						F.fError(
+							"JedisException while restarting server group. Please try again later or contact" +
+								" " +
+								"an administrator if this issue persists.")));
 					return;
 				}
-				sender.sendMessage(F.fMain(this, "Restarting server group ", F.fItem(serverGroupData._name), "..."));
+				sender.sendMessage(F.fMain(this,
+					"Restarting server group ",
+					F.fItem(serverGroupData._id),
+					"..."));
 			});
 		});
 	}

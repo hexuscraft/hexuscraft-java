@@ -24,7 +24,7 @@ import java.util.Optional;
 public class HubScoreboard extends MiniPlugin<Hub> {
 
 	final Map<Player, BukkitTask> _sidebarUpdateTasks;
-	private final String SIDEBAR_TITLE = "          Welcome %s, to the Hexuscraft Network!";
+	private final String SIDEBAR_TITLE = "Welcome %s, to the Hexuscraft Network!";
 	CorePortal _corePortal;
 	CorePermission _corePermission;
 	CoreScoreboard _coreScoreboard;
@@ -44,7 +44,11 @@ public class HubScoreboard extends MiniPlugin<Hub> {
 
 	@Override
 	public void onEnable() {
-		_hexusPlugin.getServer().getOnlinePlayers().stream().map(player -> new PlayerJoinEvent(player, null)).forEach(this::onPlayerJoin);
+		_hexusPlugin.getServer()
+			.getOnlinePlayers()
+			.stream()
+			.map(player -> new PlayerJoinEvent(player, null))
+			.forEach(this::onPlayerJoin);
 	}
 
 	@Override
@@ -57,8 +61,13 @@ public class HubScoreboard extends MiniPlugin<Hub> {
 	void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		CustomScoreboard customScoreboard = _coreScoreboard._customScoreboards.get(player);
-		customScoreboard._sidebar.setTitle(SIDEBAR_TITLE.formatted(player.getName()));
-		_sidebarUpdateTasks.put(player, _hexusPlugin.runSyncTimer(() -> customScoreboard._sidebar.setLines(generateSidebarLines(player)), 0, 20));
+		_sidebarUpdateTasks.put(player,
+			_hexusPlugin.runSyncTimer(() -> {
+					customScoreboard._sidebar.setTitle(SIDEBAR_TITLE.formatted(player.getDisplayName()));
+					customScoreboard._sidebar.setLines(generateSidebarLines(player));
+				},
+				0,
+				20));
 	}
 
 	@EventHandler
@@ -67,9 +76,26 @@ public class HubScoreboard extends MiniPlugin<Hub> {
 	}
 
 	String[] generateSidebarLines(Player player) {
-		PermissionGroup rank = PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(player)._groups());
+		PermissionGroup rank =
+			PermissionGroup.getGroupWithHighestWeight(_corePermission._permissionProfiles.get(player)
+				._groups());
 
-		return new String[]{"", " " + C.cYellow + C.fBold + player.getName(), "  Rank: " + F.fPermissionGroup(rank), "  Level: " + C.cYellow + "0 (▲ 0%)", "  Coins: " + C.cYellow + "0", "  Completion: " + C.cYellow + "0%", "", " " + C.cGreen + C.fBold + _corePortal._serverName, "  Players: " + C.cGreen + _hexusPlugin.getServer().getOnlinePlayers().size() + "/" + _hexusPlugin.getServer().getMaxPlayers(), "", " " + C.cGold + C.fBold + "Hexuscraft", "  Players: " + C.cGold + Arrays.stream(_corePortal.getServers()).mapToInt(s -> s._players).sum(), "", C.cGray + "www.hexuscraft.net",};
+		return new String[]{"",
+			" " + C.cYellow + C.fBold + player.getName(),
+			"  Rank: " + F.fPermissionGroup(rank),
+			"  Level: " + C.cYellow + "0 (▲ 0%)",
+			"  Coins: " + C.cYellow + "0",
+			"  Completion: " + C.cYellow + "0%",
+			"",
+			" " + C.cGreen + C.fBold + _corePortal._serverName,
+			"  Players: " + C.cGreen + _hexusPlugin.getServer().getOnlinePlayers().size() + "/" +
+				_hexusPlugin.getServer().getMaxPlayers(),
+			"",
+			" " + C.cGold + C.fBold + "Hexuscraft",
+			"  Players: " + C.cGold +
+				Arrays.stream(_corePortal.getServers()).mapToInt(s -> s._players).sum(),
+			"",
+			C.cGray + "www.hexuscraft.net",};
 	}
 
 }

@@ -33,7 +33,8 @@ public class CommandNetworkServerRestart extends BaseCommand<CorePortal> {
 		if (args[0].equals("*")) {
 			sender.sendMessage(F.fMain(this, "Sending restart command to all servers..."));
 			_miniPlugin.restartServerAsync("*");
-			sender.sendMessage(F.fMain(this, F.fSuccess("Successfully sent restart command to all servers.")));
+			sender.sendMessage(F.fMain(this,
+				F.fSuccess("Successfully sent restart command to all servers.")));
 			return;
 		}
 
@@ -44,8 +45,9 @@ public class CommandNetworkServerRestart extends BaseCommand<CorePortal> {
 				serverData = _miniPlugin.getServer(args[0]);
 			} catch (JedisException ex) {
 				sender.sendMessage(F.fMain(this,
-					F.fError("JedisException while fetching server data. Please try again later or contact an " +
-						"administrator if this issue persists.")));
+					F.fError(
+						"JedisException while fetching server data. Please try again later or contact an " +
+							"administrator if this issue persists.")));
 				return;
 			}
 
@@ -58,14 +60,15 @@ public class CommandNetworkServerRestart extends BaseCommand<CorePortal> {
 			_miniPlugin._hexusPlugin.runAsync(() ->
 			{
 				try {
-					_miniPlugin.restartServerAsync(serverData._name);
+					_miniPlugin.restartServerAsync(serverData._id);
 				} catch (JedisException ex) {
 					sender.sendMessage(F.fMain(this,
-						F.fError("JedisException while restarting server. Please try again later or contact an " +
-							"administrator if this issue persists.")));
+						F.fError(
+							"JedisException while restarting server. Please try again later or contact an " +
+								"administrator if this issue persists.")));
 					return;
 				}
-				sender.sendMessage(F.fMain(this, "Restarting server ", F.fItem(serverData._name), "..."));
+				sender.sendMessage(F.fMain(this, "Restarting server ", F.fItem(serverData._id), "..."));
 			});
 		});
 	}

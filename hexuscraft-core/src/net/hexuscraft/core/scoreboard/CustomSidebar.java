@@ -1,18 +1,23 @@
 package net.hexuscraft.core.scoreboard;
 
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CustomSidebar {
 
 	CustomScoreboard _customScoreboard;
 	String _title;
+	BukkitTask _titleScroller;
 	Objective _objective;
 	String[] _lines;
 
 	CustomSidebar(CustomScoreboard customScoreboard) {
 		_customScoreboard = customScoreboard;
 		_title = "§6§lHEXUSCRAFT";
+		_titleScroller = null;
 		_objective = customScoreboard._bukitScoreboard.registerNewObjective("sidebar", "dummy");
 		_objective.setDisplayName(_title);
 		_objective.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -20,24 +25,28 @@ public class CustomSidebar {
 	}
 
 	public void setTitle(String title) {
-		_title = title;
-		_objective.setDisplayName("§f§l" + title.substring(0, Math.min(16, title.length())));
+		if (title.length() > 16) title = "        " + title;
+		if (_title.equals(title)) return;
+		if (_titleScroller != null) {
+			_titleScroller.cancel();
+			_titleScroller = null;
+		}
 
-		// TODO: title scrolling
-//		if (sidebarTitle.length() > SIDEBAR_TITLE_MAX_CHARS) {
-//			sidebarTasks.add(_hexusPlugin.runSyncTimer(() ->
-//			{
-//				int index = sidebarTitleIndex.getAndUpdate(operand -> (operand + 1) % sidebarTitle.length());
-//
-//				sidebarObjective.setDisplayName(C.cWhite +
-//					C.fBold +
-//					(index + SIDEBAR_TITLE_MAX_CHARS > sidebarTitle.length() ?
-//						sidebarTitle.substring(index) +
-//							sidebarTitle.substring(0,
-//								SIDEBAR_TITLE_MAX_CHARS - (sidebarTitle.length() - index)) :
-//						sidebarTitle.substring(index, index + SIDEBAR_TITLE_MAX_CHARS)));
-//			}, 0, 4));
-//		}
+		_objective.setDisplayName("§f§l" + title.substring(0, Math.min(16, title.length())));
+		_title = title;
+
+		if (title.length() <= 16) return;
+
+		AtomicInteger atomicIndex = new AtomicInteger();
+		String finalTitle = title;
+		_titleScroller = _customScoreboard._coreScoreboard._hexusPlugin.runAsyncTimer(() -> {
+			int index = atomicIndex.updateAndGet(operand -> (operand + 1) % finalTitle.length());
+
+			_objective.setDisplayName("§f§l" + (index + 16 > finalTitle.length() ?
+				finalTitle.substring(index) +
+					finalTitle.substring(0, 16 - (finalTitle.length() - index)) :
+				finalTitle.substring(index, index + 16)));
+		}, 4, 4);
 	}
 
 	public void setLines(String... lines) {

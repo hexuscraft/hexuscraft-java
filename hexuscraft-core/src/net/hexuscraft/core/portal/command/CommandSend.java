@@ -21,7 +21,12 @@ public class CommandSend extends BaseCommand<CorePortal> {
 	CoreActionBar _coreActionBar;
 
 	public CommandSend(CorePortal corePortal, CoreActionBar coreActionBar) {
-		super(corePortal, "send", "<Player> <Name>", "Teleport a player to a server.", Set.of(), CorePortal.PERM.COMMAND_SEND);
+		super(corePortal,
+			"send",
+			"<Player> <Name>",
+			"Teleport a player to a server.",
+			Set.of(),
+			CorePortal.PERM.COMMAND_SEND);
 
 		_coreActionBar = coreActionBar;
 	}
@@ -33,11 +38,24 @@ public class CommandSend extends BaseCommand<CorePortal> {
 			return;
 		}
 
-		sender.sendMessage(F.fMain(this, "Attempting to send player ", F.fItem(args[0]), " to server ", F.fItem(args[1]), "..."));
+		sender.sendMessage(F.fMain(this,
+			"Attempting to send player ",
+			F.fItem(args[0]),
+			" to server ",
+			F.fItem(args[1]),
+			"..."));
 
 		ActionBar loadingBar;
 		if (sender instanceof final Player player)
-			loadingBar = _coreActionBar.registerActionBar(new ActionBar(_coreActionBar, player, 0, F.fActionBar(this, "Attempting to send player ", F.fItem(args[0]), " to server ", F.fItem(args[1]), "...")));
+			loadingBar = _coreActionBar.registerActionBar(new ActionBar(_coreActionBar,
+				player,
+				0,
+				F.fActionBar(this,
+					"Attempting to send player ",
+					F.fItem(args[0]),
+					" to server ",
+					F.fItem(args[1]),
+					"...")));
 		else loadingBar = null;
 
 		OfflinePlayer target = PlayerSearch.offlinePlayerSearch(args[0], sender);
@@ -46,11 +64,17 @@ public class CommandSend extends BaseCommand<CorePortal> {
 		sender.sendMessage(F.fMain(this, "Found offline player ", F.fItem(args[0]), "..."));
 
 		if (loadingBar != null)
-			loadingBar.setMessage(F.fActionBar(this, "Attempting to send player ", F.fItem(target.getName()), " to server ", F.fItem(args[1]), "..."));
+			loadingBar.setMessage(F.fActionBar(this,
+				"Attempting to send player ",
+				F.fItem(target.getName()),
+				" to server ",
+				F.fItem(args[1]),
+				"..."));
 
 		ServerData server = _miniPlugin.getServer(args[1]);
 		if (server == null) {
-			sender.sendMessage(F.fMain(this, F.fError("Could not locate server with name ", F.fItem(args[1]), ".")));
+			sender.sendMessage(F.fMain(this,
+				F.fError("Could not locate server with name ", F.fItem(args[1]), ".")));
 			if (loadingBar != null) _coreActionBar.unregisterActionBar(loadingBar);
 			return;
 		}
@@ -58,19 +82,46 @@ public class CommandSend extends BaseCommand<CorePortal> {
 		sender.sendMessage(F.fMain(this, "Found server ", F.fItem(args[1]), "..."));
 
 		if (loadingBar != null)
-			loadingBar.setMessage(F.fActionBar(this, "Sending player ", F.fItem(target.getName()), " to server ", F.fItem(server._name), "..."));
+			loadingBar.setMessage(F.fActionBar(this,
+				"Sending player ",
+				F.fItem(target.getName()),
+				" to server ",
+				F.fItem(server._id),
+				"..."));
 
 		_miniPlugin._hexusPlugin.runAsync(() -> {
 			try {
-				_miniPlugin.teleportAsync(target.getUniqueId(), server._name, sender instanceof final Player player ? player.getUniqueId() : null);
-				sender.sendMessage(F.fMain(this, F.fSuccess("Sent player ", F.fItem(target.getName()), " to server ", F.fItem(server._name), ".")));
+				_miniPlugin.teleportAsync(target.getUniqueId(),
+					server._id,
+					sender instanceof final Player player ? player.getUniqueId() : null);
+				sender.sendMessage(F.fMain(this,
+					F.fSuccess("Sent player ",
+						F.fItem(target.getName()),
+						" to server ",
+						F.fItem(server._id),
+						".")));
 				if (loadingBar != null)
-					loadingBar.setMessage(F.fActionBar(this, F.fSuccess("Sent player ", F.fItem(target.getName()), " to server ", F.fItem(server._name), ".")));
+					loadingBar.setMessage(F.fActionBar(this,
+						F.fSuccess("Sent player ",
+							F.fItem(target.getName()),
+							" to server ",
+							F.fItem(server._id),
+							".")));
 			} catch (JedisException ex) {
 				_miniPlugin.logSevere(ex);
-				sender.sendMessage(F.fMain(this, F.fError("Error while sending player ", F.fItem(target.getName()), " to server ", F.fItem(server._name), ".")));
+				sender.sendMessage(F.fMain(this,
+					F.fError("Error while sending player ",
+						F.fItem(target.getName()),
+						" to server ",
+						F.fItem(server._id),
+						".")));
 				if (loadingBar != null)
-					loadingBar.setMessage(F.fActionBar(this, F.fError("Error while sending player ", F.fItem(target.getName()), " to server ", F.fItem(server._name), ".")));
+					loadingBar.setMessage(F.fActionBar(this,
+						F.fError("Error while sending player ",
+							F.fItem(target.getName()),
+							" to server ",
+							F.fItem(server._id),
+							".")));
 			} finally {
 				if (loadingBar != null)
 					_coreActionBar.unregisterActionBar(loadingBar);
@@ -81,7 +132,10 @@ public class CommandSend extends BaseCommand<CorePortal> {
 	@Override
 	public List<String> tab(CommandSender sender, String alias, String[] args) {
 		if (args.length == 1) {
-			return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer().getOnlinePlayers(), sender, false);
+			return PlayerSearch.onlinePlayerCompletions(_miniPlugin._hexusPlugin.getServer()
+					.getOnlinePlayers(),
+				sender,
+				false);
 		}
 		if (args.length == 2) {
 			return Arrays.asList(_miniPlugin.getServerNames());

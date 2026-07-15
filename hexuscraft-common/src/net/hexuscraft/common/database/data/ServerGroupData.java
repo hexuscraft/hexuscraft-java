@@ -7,122 +7,117 @@ import redis.clients.jedis.UnifiedJedis;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ServerGroupData extends IServerGroupData {
-	public ServerGroupData(Map<String, String> serverGroupData) {
-		assert serverGroupData.containsKey("name");
-		_name = serverGroupData.get("name");
 
-		if (serverGroupData.containsKey("capacity")) {
+	public ServerGroupData(String id, Map<String, String> serverGroupData) {
+		_id = Objects.requireNonNull(id, "id");
+
+		if (serverGroupData.containsKey("capacity"))
 			_capacity = Integer.parseInt(serverGroupData.get("capacity"));
-		}
 
-		if (serverGroupData.containsKey("games")) {
-			_games = Arrays.stream(serverGroupData.get("games").split(","))
+		if (serverGroupData.containsKey("fallback"))
+			_fallback = Boolean.parseBoolean(serverGroupData.get("fallback"));
+
+		if (serverGroupData.containsKey("games")) _games =
+			Arrays.stream(serverGroupData.get("games").split(","))
 				.filter(s -> !s.trim().isEmpty())
 				.map(GameType::valueOf)
 				.toArray(GameType[]::new);
-		}
 
-		if (serverGroupData.containsKey("hostUUID")) {
-			_hostUUID = UUID.fromString(serverGroupData.get("hostUUID"));
-		}
+		if (serverGroupData.containsKey("host")) _host = UUID.fromString(serverGroupData.get("host"));
 
-		if (serverGroupData.containsKey("joinableServers")) {
+		if (serverGroupData.containsKey("joinableServers"))
 			_joinableServers = Integer.parseInt(serverGroupData.get("joinableServers"));
-		}
 
-		assert serverGroupData.containsKey("maxPort");
-		_maxPort = Integer.parseInt(serverGroupData.get("maxPort"));
+		_maxPort = Integer.parseInt(Objects.requireNonNull(serverGroupData.get("maxPort"), "maxPort"));
 
-		assert serverGroupData.containsKey("minPort");
-		_minPort = Integer.parseInt(serverGroupData.get("minPort"));
+		_minPort = Integer.parseInt(Objects.requireNonNull(serverGroupData.get("minPort"), "minPort"));
 
-		assert serverGroupData.containsKey("plugin");
-		_plugin = serverGroupData.get("plugin");
+		_plugin = Objects.requireNonNull(serverGroupData.get("plugin"), "plugin");
 
-		if (serverGroupData.containsKey("ram")) {
-			_ram = Integer.parseInt(serverGroupData.get("ram"));
-		}
+		if (serverGroupData.containsKey("ram"))
+			_ramMB = Integer.parseInt(serverGroupData.get("ram"));
 
-		if (serverGroupData.containsKey("requiredPermission")) {
-			_requiredPermission = PermissionGroup.valueOf(serverGroupData.get("requiredPermission"));
-		}
+		if (serverGroupData.containsKey("permissionGroups"))
+			_permissionGroups = Arrays.stream(serverGroupData.get("permissionGroups").split(","))
+				.filter(s -> !s.trim().isEmpty())
+				.map(PermissionGroup::valueOf)
+				.toArray(PermissionGroup[]::new);
 
-		if (serverGroupData.containsKey("totalServers")) {
+		if (serverGroupData.containsKey("totalServers"))
 			_totalServers = Integer.parseInt(serverGroupData.get("totalServers"));
-		}
 
-		if (serverGroupData.containsKey("timeoutMillis")) {
+		if (serverGroupData.containsKey("timeoutMillis"))
 			_timeoutMillis = Integer.parseInt(serverGroupData.get("timeoutMillis"));
-		}
 
-		if (serverGroupData.containsKey("viaVersion")) {
-			_viaVersion = Boolean.parseBoolean(serverGroupData.get("viaVersion"));
-		}
-
-		if (serverGroupData.containsKey("worldEdit")) {
+		if (serverGroupData.containsKey("worldEdit"))
 			_worldEdit = Boolean.parseBoolean(serverGroupData.get("worldEdit"));
-		}
 
-		if (serverGroupData.containsKey("worldZip")) {
+		if (serverGroupData.containsKey("worldZip"))
 			_worldZip = serverGroupData.get("worldZip");
-		}
 	}
 
-	public ServerGroupData(String name,
-	                       int capacity,
-	                       GameType[] games,
-	                       UUID hostUUID,
-	                       int joinableServers,
-	                       int maxPort,
-	                       int minPort,
-	                       String plugin,
-	                       int ram,
-	                       PermissionGroup requiredPermission,
-	                       int totalServers,
-	                       int timeoutMillis,
-	                       boolean viaVersion,
-	                       boolean worldEdit,
-	                       String worldZip) {
-		_name = name;
+	public ServerGroupData(String id,
+
+			       int capacity,
+			       boolean fallback,
+			       GameType[] games,
+			       UUID hostUUID,
+			       int joinableServers,
+			       int maxPort,
+			       int minPort,
+			       String plugin,
+			       int ramMB,
+			       PermissionGroup[] permissionGroups,
+			       int totalServers,
+			       int timeoutMillis,
+			       boolean worldEdit,
+			       String worldZip) {
+		_id = id;
+
 		_capacity = capacity;
+		_fallback = fallback;
 		_games = games;
-		_hostUUID = hostUUID;
+		_host = hostUUID;
 		_joinableServers = joinableServers;
 		_maxPort = maxPort;
 		_minPort = minPort;
 		_plugin = plugin;
-		_ram = ram;
-		_requiredPermission = requiredPermission;
+		_ramMB = ramMB;
+		_permissionGroups = permissionGroups;
 		_totalServers = totalServers;
 		_timeoutMillis = timeoutMillis;
-		_viaVersion = viaVersion;
 		_worldEdit = worldEdit;
 		_worldZip = worldZip;
 	}
 
 	public Map<String, String> toMap() {
-		return Map.ofEntries(Map.entry("name", _name),
-			Map.entry("capacity", Integer.toString(_capacity)),
-			Map.entry("games", String.join(",", Arrays.stream(_games).map(GameType::name).toArray(String[]::new))),
-			Map.entry("hostUUID", _hostUUID.toString()),
+		return Map.ofEntries(Map.entry("capacity", Integer.toString(_capacity)),
+			Map.entry("fallback", Boolean.toString(_fallback)),
+			Map.entry("games",
+				String.join(",", Arrays.stream(_games).map(GameType::name).toArray(String[]::new))),
+			Map.entry("host", _host.toString()),
 			Map.entry("joinableServers", Integer.toString(_joinableServers)),
 			Map.entry("maxPort", Integer.toString(_maxPort)),
 			Map.entry("minPort", Integer.toString(_minPort)),
 			Map.entry("plugin", _plugin),
-			Map.entry("ram", Integer.toString(_ram)),
-			Map.entry("requiredPermission", _requiredPermission.name()),
+			Map.entry("ramMB", Integer.toString(_ramMB)),
+			Map.entry("permissionGroups",
+				String.join(",",
+					Arrays.stream(_permissionGroups)
+						.map(PermissionGroup::name)
+						.toArray(String[]::new))),
 			Map.entry("totalServers", Integer.toString(_totalServers)),
 			Map.entry("timeoutMillis", Integer.toString(_timeoutMillis)),
-			Map.entry("viaVersion", Boolean.toString(_viaVersion)),
 			Map.entry("worldEdit", Boolean.toString(_worldEdit)),
 			Map.entry("worldZip", _worldZip));
 	}
 
 	public void update(UnifiedJedis jedis) {
-		jedis.hset(ServerQueries.SERVERGROUP(_name), toMap());
+		jedis.hset(ServerQueries.SERVERGROUP(_id), toMap());
 	}
 
 	public ServerData[] getServers(UnifiedJedis jedis) {
@@ -130,8 +125,8 @@ public class ServerGroupData extends IServerGroupData {
 	}
 
 	public static class Builder extends IServerGroupData {
-		public Builder name(String value) {
-			_name = value;
+		public Builder id(String value) {
+			_id = value;
 			return this;
 		}
 
@@ -140,13 +135,18 @@ public class ServerGroupData extends IServerGroupData {
 			return this;
 		}
 
-		public Builder games(GameType[] value) {
+		public Builder fallback(boolean value) {
+			_fallback = value;
+			return this;
+		}
+
+		public Builder games(GameType... value) {
 			_games = value;
 			return this;
 		}
 
-		public Builder hostUUID(UUID value) {
-			_hostUUID = value;
+		public Builder host(UUID value) {
+			_host = value;
 			return this;
 		}
 
@@ -171,12 +171,12 @@ public class ServerGroupData extends IServerGroupData {
 		}
 
 		public Builder ram(int value) {
-			_ram = value;
+			_ramMB = value;
 			return this;
 		}
 
-		public Builder requiredPermission(PermissionGroup value) {
-			_requiredPermission = value;
+		public Builder permissionGroups(PermissionGroup... value) {
+			_permissionGroups = value;
 			return this;
 		}
 
@@ -187,11 +187,6 @@ public class ServerGroupData extends IServerGroupData {
 
 		public Builder timeoutMillis(int value) {
 			_timeoutMillis = value;
-			return this;
-		}
-
-		public Builder viaVersion(boolean value) {
-			_viaVersion = value;
 			return this;
 		}
 
@@ -206,19 +201,20 @@ public class ServerGroupData extends IServerGroupData {
 		}
 
 		public ServerGroupData build() {
-			return new ServerGroupData(_name,
+			return new ServerGroupData(_id,
+
 				_capacity,
+				_fallback,
 				_games,
-				_hostUUID,
+				_host,
 				_joinableServers,
 				_maxPort,
 				_minPort,
 				_plugin,
-				_ram,
-				_requiredPermission,
+				_ramMB,
+				_permissionGroups,
 				_totalServers,
 				_timeoutMillis,
-				_viaVersion,
 				_worldEdit,
 				_worldZip);
 		}

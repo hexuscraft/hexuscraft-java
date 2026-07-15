@@ -101,21 +101,23 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 
 > **HASH** `servergroup:(String)`
 >
-> |              Field | Type                                    |
-> |-------------------:|:----------------------------------------|
-> |           capacity | **Integer**                             |
-> |              games | **String** (Game Enums split by commas) |
-> |           hostUUID | **String** (Player UUID)                |
-> |    joinableServers | **Integer**                             |
-> |            maxPort | **Integer**                             |
-> |            minPort | **Integer**                             |
-> |             plugin | **String**                              |
-> |                ram | **Integer**                             |
-> | requiredPermission | **String** (PermissionGroup Enum)       |
-> |       totalServers | **Integer**                             |
-> |      timeoutMillis | **Integer**                             |
-> |          worldEdit | **Boolean**                             |
-> |           worldZip | **String**                              |
+> \* = required
+>
+> |            Field | Type                                     |
+> |-----------------:|------------------------------------------|
+> |         capacity | **Integer**                              |
+> |            games | **GameType[]** _split with comma_        |
+> |             host | **UUID**                                 |
+> |  joinableServers | **Integer**                              |
+> |        maxPort\* | **Integer**                              |
+> |        minPort\* | **Integer**                              |
+> |         plugin\* | **String**                               |
+> |            ramMB | **Integer**                              |
+> | permissionGroups | **PermissionGroup[]** _split with comma_ |
+> |     totalServers | **Integer**                              |
+> |    timeoutMillis | **Integer**                              |
+> |        worldEdit | **Boolean**                              |
+> |         worldZip | **String**                               |
 
 ### Servers
 

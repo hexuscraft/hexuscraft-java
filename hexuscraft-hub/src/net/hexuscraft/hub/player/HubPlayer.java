@@ -22,6 +22,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -74,22 +75,6 @@ public class HubPlayer extends MiniPlugin<Hub> {
 		_lobbyMenus.clear();
 	}
 
-	@EventHandler
-	void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-
-		if (_hexusPlugin._spawn != null) {
-			player.teleport(_hexusPlugin._spawn);
-		}
-
-		resetAttributes(player);
-		refreshInventory(player);
-
-		UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), F.fTabFooter());
-
-		player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
-	}
-
 	void resetAttributes(Player player) {
 		player.setFallDistance(0);
 		player.setFlying(false);
@@ -127,17 +112,25 @@ public class HubPlayer extends MiniPlugin<Hub> {
 		inventory.setHeldItemSlot(0);
 	}
 
-	boolean onItemInteract(Player player, ItemStack itemStack) {
-		if (!itemStack.hasItemMeta()) {
-			return false;
+	boolean onItemInteract(Player player, ItemStack item) {
+		if (_lobbyMenus.containsKey(player)) {
+			LobbyMenu lobbyMenu = _lobbyMenus.get(player);
+			ServerData serverData = lobbyMenu._lobbies().entrySet().stream().filter(entry -> entry.getKey().equals(item)).map(Map.Entry::getValue).findFirst().orElse(null);
+
+			if (serverData == null) return true;
+			if (!UtilCooldown.use(player, "Lobby Server Teleport", 1000L)) return true;
+
+			_corePortal.teleport(player, serverData._id);
+			player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
+			return true;
 		}
 
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		if (!itemMeta.hasDisplayName()) {
-			return false;
-		}
+		if (!item.hasItemMeta()) return false;
 
-		Material itemType = itemStack.getType();
+		ItemMeta itemMeta = item.getItemMeta();
+		if (!itemMeta.hasDisplayName()) return false;
+
+		Material itemType = item.getType();
 		String displayName = ChatColor.stripColor(itemMeta.getDisplayName());
 
 		if (itemType.equals(Material.COMPASS) && displayName.equals("Games")) {
@@ -161,38 +154,6 @@ public class HubPlayer extends MiniPlugin<Hub> {
 			return true;
 		}
 		return false;
-	}
-
-	@EventHandler
-	void onInventoryClick(InventoryClickEvent event) {
-		if (!(event.getWhoClicked() instanceof Player player)) return;
-		if (player.getGameMode().equals(GameMode.CREATIVE)) return;
-
-		ItemStack item = event.getCurrentItem();
-		if (item == null) return;
-
-		LobbyMenu lobbyMenu = _lobbyMenus.get(player);
-		if (lobbyMenu != null) {
-			event.setCancelled(true);
-
-			ServerData serverData = lobbyMenu._lobbies().entrySet().stream().filter(entry -> entry.getKey().equals(item)).map(Map.Entry::getValue).findFirst().orElse(null);
-			if (serverData == null) return;
-			if (!UtilCooldown.use(player, "Lobby Server Teleport", 1000L)) return;
-
-			_corePortal.teleport(player, serverData._name);
-			player.playSound(player.getLocation(), Sound.NOTE_PLING, Float.MAX_VALUE, 2);
-			return;
-		}
-
-		if (!event.getInventory().equals(player.getInventory())) return;
-		if (!onItemInteract(player, item)) return;
-		event.setCancelled(true);
-	}
-
-	@EventHandler
-	void onInventoryClose(InventoryCloseEvent event) {
-		if (!(event.getPlayer() instanceof Player player)) return;
-		_lobbyMenus.remove(player);
 	}
 
 	void openGameMenu(Player player) {
@@ -220,18 +181,16 @@ public class HubPlayer extends MiniPlugin<Hub> {
 
 		Arrays.stream(_corePortal.getServers(_corePortal._serverGroupName)).limit(54).forEach(serverData -> {
 			// TODO: CoreGui paginated lobbies
-			int lobbyId = Integer.parseInt(serverData._name.split(serverData._group + "-")[1]);
-			if (lobbyId > 54) {
-				return;
-			}
+			int lobbyId = Integer.parseInt(serverData._id.split(serverData._group + "-")[1]);
+			if (lobbyId > 54) return;
 
-			boolean isCurrentServer = serverData._name.equals(_corePortal._serverName);
+			boolean isCurrentServer = serverData._id.equalsIgnoreCase(_corePortal._serverName);
 
 			ItemStack item = new ItemStack(isCurrentServer ? Material.EMERALD_BLOCK : Material.IRON_BLOCK);
 			item.setAmount(lobbyId);
 
 			ItemMeta itemMeta = item.getItemMeta();
-			itemMeta.setDisplayName(C.cAqua + C.fBold + serverData._name);
+			itemMeta.setDisplayName(C.cAqua + C.fBold + serverData._id);
 			itemMeta.setLore(List.of(C.cDAqua + serverData._players + "/" + serverData._capacity + " Players", "", C.cYellow + C.fBold + (isCurrentServer ? "YOU ARE HERE" : "CLICK TO CONNECT")));
 			item.setItemMeta(itemMeta);
 
@@ -244,15 +203,45 @@ public class HubPlayer extends MiniPlugin<Hub> {
 	}
 
 	@EventHandler
+	void onPlayerJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+
+		if (_hexusPlugin._spawn != null) player.teleport(_hexusPlugin._spawn);
+
+		resetAttributes(player);
+		refreshInventory(player);
+
+		UtilTitleTab.sendHeaderFooter(player, F.fTabHeader(_corePortal._serverName), F.fTabFooter());
+
+		player.sendMessage(F.fWelcomeMessage(player.getDisplayName()));
+	}
+
+	@EventHandler
+	void onInventoryClick(InventoryClickEvent event) {
+		if (!(event.getWhoClicked() instanceof Player player)) return;
+		if (player.getGameMode().equals(GameMode.CREATIVE)) return;
+
+		event.setCancelled(true);
+
+		ItemStack item = event.getCurrentItem();
+		if (item == null) return;
+
+		onItemInteract(player, item);
+	}
+
+	@EventHandler
+	void onInventoryClose(InventoryCloseEvent event) {
+		if (!(event.getPlayer() instanceof Player player)) return;
+		_lobbyMenus.remove(player);
+	}
+
+	@EventHandler
 	void onEntityDamage(EntityDamageEvent event) {
 		Entity entity = event.getEntity();
-		if (!(entity instanceof Player player)) {
-			return;
-		}
+		if (!(entity instanceof Player player)) return;
 
-		if (event.getCause() == EntityDamageEvent.DamageCause.CUSTOM) {
-			return;
-		}
+		if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+		if (event.getCause() == EntityDamageEvent.DamageCause.CUSTOM) return;
 		if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
 			player.setVelocity(new Vector());
 			player.teleport(_hexusPlugin._spawn);
@@ -262,11 +251,16 @@ public class HubPlayer extends MiniPlugin<Hub> {
 	}
 
 	@EventHandler
+	void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+		if (event.getDamager() instanceof Player damager && damager.getGameMode().equals(GameMode.CREATIVE))
+			return;
+		event.setCancelled(true);
+	}
+
+	@EventHandler
 	void onFoodLevelChange(FoodLevelChangeEvent event) {
 		Entity entity = event.getEntity();
-		if (!(entity instanceof Player player)) {
-			return;
-		}
+		if (!(entity instanceof Player player)) return;
 
 		event.setCancelled(true);
 		player.setFoodLevel(20);
@@ -276,54 +270,39 @@ public class HubPlayer extends MiniPlugin<Hub> {
 	void onPlayerDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
 
-		if (player.getGameMode().equals(GameMode.CREATIVE)) {
-			return;
-		}
+		if (player.getGameMode().equals(GameMode.CREATIVE)) return;
 		event.setCancelled(true);
 
 		Item droppedItem = event.getItemDrop();
-		if (droppedItem == null) {
-			return;
-		}
+		if (droppedItem == null) return;
 
 		ItemStack itemStack = droppedItem.getItemStack();
-		if (itemStack == null) {
-			return;
-		}
+		if (itemStack == null) return;
 
 		onItemInteract(player, itemStack);
 	}
 
 	@EventHandler
 	void onPlayerPickupItem(PlayerPickupItemEvent event) {
-		if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
-			return;
-		}
+		if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
 		event.setCancelled(true);
 	}
 
 	@EventHandler
 	void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-
-		if (player.getGameMode().equals(GameMode.CREATIVE)) {
-			return;
-		}
-		event.setCancelled(true);
+		if (player.getGameMode().equals(GameMode.CREATIVE)) return;
 
 		ItemStack currentItem = player.getItemInHand();
-		if (currentItem == null) {
-			return;
-		}
+		if (currentItem == null) return;
+		if (!onItemInteract(player, currentItem)) return;
 
-		onItemInteract(player, currentItem);
+		event.setCancelled(true);
 	}
 
 	@EventHandler
 	void onEntityTargetLivingEntity(EntityTargetLivingEntityEvent event) {
-		if (!(event.getTarget() instanceof Player)) {
-			return;
-		}
+		if (!(event.getTarget() instanceof Player)) return;
 		event.setCancelled(true);
 	}
 

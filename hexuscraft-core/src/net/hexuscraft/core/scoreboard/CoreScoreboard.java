@@ -22,19 +22,29 @@ public class CoreScoreboard extends MiniPlugin<HexusPlugin> {
 
 	@Override
 	public void onEnable() {
-		_hexusPlugin.getServer().getOnlinePlayers().stream().map(player -> new PlayerJoinEvent(player, null)).forEach(this::onPlayerJoin);
+		_hexusPlugin.getServer()
+			.getOnlinePlayers()
+			.stream()
+			.map(player -> new PlayerJoinEvent(player, null))
+			.forEach(this::onPlayerJoin);
 	}
 
 	@Override
 	public void onDisable() {
-		_hexusPlugin.getServer().getOnlinePlayers().stream().map(player -> new PlayerQuitEvent(player, null)).forEach(this::onPlayerQuit);
+		_hexusPlugin.getServer()
+			.getOnlinePlayers()
+			.stream()
+			.map(player -> new PlayerQuitEvent(player, null))
+			.forEach(this::onPlayerQuit);
 		_customScoreboards.clear();
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		CustomScoreboard customScoreboard = new CustomScoreboard(player, _hexusPlugin.getServer().getScoreboardManager().getNewScoreboard());
+		CustomScoreboard customScoreboard = new CustomScoreboard(this,
+			player,
+			_hexusPlugin.getServer().getScoreboardManager().getNewScoreboard());
 		_customScoreboards.put(player, customScoreboard);
 		player.setScoreboard(customScoreboard._bukitScoreboard);
 	}

@@ -11,8 +11,12 @@ import java.util.UUID;
 
 public class NewsQueries {
 
+	public static String NEWS(String id) {
+		return Database.buildQuery("news", id);
+	}
+
 	public static String NEWS(UUID id) {
-		return Database.buildQuery("news", id.toString());
+		return NEWS(id.toString());
 	}
 
 	public static NewsData getNews(UnifiedJedis jedis, UUID id) {
@@ -25,8 +29,9 @@ public class NewsQueries {
 
 	public static NewsData[] getNews(UnifiedJedis jedis) {
 		Set<NewsData> news = new HashSet<>();
-		jedis.keys(Database.buildQuery("news", "*"))
-			.forEach(key -> news.add(getNews(jedis, UUID.fromString(key.split(Database.KEY_DELIMITER, 2)[1]))));
+		jedis.keys(NEWS("*"))
+			.forEach(key -> news.add(getNews(jedis,
+				UUID.fromString(key.split(Database.KEY_DELIMITER, 2)[1]))));
 		return news.toArray(NewsData[]::new);
 	}
 

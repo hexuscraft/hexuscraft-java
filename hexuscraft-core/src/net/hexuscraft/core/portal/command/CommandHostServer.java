@@ -44,11 +44,12 @@ public class CommandHostServer extends BaseCommand<CorePortal> {
 		ServerData[] existingServers = _miniPlugin.getServers(serverGroupName);
 		if (existingServers.length > 0) {
 			if (!(sender instanceof Player player)) {
-				sender.sendMessage(F.fMain(this, F.fError("Only players can teleport to their private server.")));
+				sender.sendMessage(F.fMain(this,
+					F.fError("Only players can teleport to their private server.")));
 				return;
 			}
 
-			_miniPlugin.teleport(player, existingServers[0]._name);
+			_miniPlugin.teleport(player, existingServers[0]._id);
 			return;
 		}
 
@@ -59,7 +60,7 @@ public class CommandHostServer extends BaseCommand<CorePortal> {
 		}
 
 		Set<Integer> portsInUse = Arrays.stream(_miniPlugin.getServerGroups())
-			.filter(serverGroupData -> serverGroupData._name.startsWith("_"))
+			.filter(serverGroupData -> serverGroupData._id.startsWith("_"))
 			.map(serverGroupData -> serverGroupData._minPort)
 			.collect(Collectors.toUnmodifiableSet());
 		if (portsInUse.size() > CorePortal.MAX_PORT_PRIVATE_SERVERS - CorePortal.MIN_PORT_PRIVATE_SERVERS) {
@@ -88,9 +89,9 @@ public class CommandHostServer extends BaseCommand<CorePortal> {
 
 		int port = free[ThreadLocalRandom.current().nextInt(free.length)];
 
-		ServerGroupData.Builder builder = new ServerGroupData.Builder().name(serverGroupName)
+		ServerGroupData.Builder builder = new ServerGroupData.Builder().id(serverGroupName)
 			.capacity(100)
-			.games(new GameType[]{GameType.SURVIVAL_GAMES})
+			.games(GameType.SURVIVAL_GAMES)
 			.maxPort(port)
 			.minPort(port)
 			.plugin("Arcade.jar")
@@ -98,7 +99,7 @@ public class CommandHostServer extends BaseCommand<CorePortal> {
 			.worldZip("Arcade.zip");
 
 		if (sender instanceof Player player) {
-			builder.hostUUID(player.getUniqueId());
+			builder.host(player.getUniqueId());
 		}
 
 		ServerGroupData serverGroupData = builder.build();
@@ -109,9 +110,10 @@ public class CommandHostServer extends BaseCommand<CorePortal> {
 				serverGroupData.update(_coreDatabase._database._jedis);
 			} catch (JedisException ex) {
 				sender.sendMessage(F.fMain(this,
-					F.fError("There was an error creating your private server. Please try again later or contact " +
-						"an " +
-						"administrator if this issue persists.")));
+					F.fError(
+						"There was an error creating your private server. Please try again later or contact " +
+							"an " +
+							"administrator if this issue persists.")));
 				return;
 			}
 			sender.sendMessage(F.fMain(this,

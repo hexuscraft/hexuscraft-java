@@ -7,29 +7,29 @@ import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.exceptions.JedisException;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ServerManager {
 
 	final ServerMonitor _monitor;
-	final String _path;
 
-	ServerManager(ServerMonitor serverMonitor, String path) {
+	ServerManager(ServerMonitor serverMonitor) {
 		_monitor = serverMonitor;
-		_path = path;
 	}
 
-	public ServerData startServer(UnifiedJedis jedis, ServerGroupData serverGroupData) throws JedisException, MaxPortReachedException, IOException {
-		ServerData[] existingServers = ServerQueries.getServers(jedis, serverGroupData);
+	public ServerData startServer(UnifiedJedis jedis, ServerGroupData group)
+		throws JedisException, MaxPortReachedException, IOException, InterruptedException {
+		ServerData[] existingServers = ServerQueries.getServers(jedis, group);
 
 		Map<Integer, ServerData> serverDataIdMap = new HashMap<>();
 		for (ServerData existingServer : existingServers) {
-			serverDataIdMap.put(existingServer._port - serverGroupData._minPort + 1, existingServer);
+			serverDataIdMap.put(existingServer._port - group._minPort + 1, existingServer);
 		}
 
 		int lowestId = 0;
-		for (int i = 1; i <= (serverGroupData._maxPort - serverGroupData._minPort + 1); i++) {
+		for (int i = 1; i <= (group._maxPort - group._minPort + 1); i++) {
 			if (serverDataIdMap.containsKey(i)) {
 				continue;
 			}
@@ -39,19 +39,52 @@ public class ServerManager {
 
 		if (lowestId == 0) throw new MaxPortReachedException();
 
-		String serverName = serverGroupData._name + "-" + lowestId;
+		String id = group._id + "-" + lowestId;
 
-		int serverPort = serverGroupData._minPort + lowestId - 1;
-		ServerData serverData = new ServerData(serverName, "", serverGroupData._capacity, System.currentTimeMillis(), serverGroupData._name, "", 0, serverPort, 20, System.currentTimeMillis(), true);
+		int serverPort = group._minPort + lowestId - 1;
+		ServerData serverData = new ServerData(id,
+			"",
+			group._capacity,
+			System.currentTimeMillis(),
+			group._id,
+			"",
+			0,
+			serverPort,
+			20,
+			System.currentTimeMillis(),
+			true);
 		serverData.update(jedis);
 
-		new ProcessBuilder(_path + "/Scripts/startServer.cmd", serverData._name, serverData._group, Integer.toString(serverData._port), Integer.toString(serverGroupData._ram), Integer.toString(serverData._capacity), serverGroupData._plugin, serverGroupData._worldZip, Boolean.toString(serverGroupData._worldEdit), Boolean.toString(serverGroupData._viaVersion)).start();
+		Process process = new ProcessBuilder("scripts/startServer.cmd",
+			serverData._id,
+			serverData._group,
+			Integer.toString(serverData._capacity),
+			Integer.toString(serverData._port),
+			Integer.toString(group._ramMB),
+			group._plugin,
+			Boolean.toString(group._worldEdit),
+			group._worldZip).start();
+
+		new Thread(() -> {
+			try {
+				_monitor.log(Arrays.toString(process.getInputStream().readAllBytes()));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}).start();
+
+		int exitCode = process.waitFor();
+		if (exitCode == 1) {
+			_monitor.log("fail!");
+			return null;
+		}
+
 		return serverData;
 	}
 
-	public void killServer(UnifiedJedis jedis, String serverName) throws JedisException, IOException {
-		new ProcessBuilder(_path + "/Scripts/killServer.cmd", serverName).start();
-		jedis.del(ServerQueries.SERVER(serverName));
+	public void killServer(UnifiedJedis jedis, String id) throws JedisException, IOException {
+		new ProcessBuilder("scripts/killServer.cmd", id).start();
+		jedis.del(ServerQueries.SERVER(id));
 	}
 
 }

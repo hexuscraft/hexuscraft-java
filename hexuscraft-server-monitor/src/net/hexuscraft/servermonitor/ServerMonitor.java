@@ -8,7 +8,6 @@ import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.exceptions.JedisException;
 
 import java.io.Console;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -24,15 +23,15 @@ public class ServerMonitor implements Runnable {
 	final ServerManager _manager;
 	@SuppressWarnings("FieldCanBeLocal")
 	final InetAddress _inetAddress;
-	Map<String, ServerData> _servers;
+	ServerData[] _servers;
 	Map<String, ServerGroupData> _serverGroups;
 
 	ServerMonitor(String[] args) throws UnknownHostException, FileNotFoundException {
 		_console = System.console();
 		_database = new Database();
-		_manager = new ServerManager(this, new Scanner(new File("_path.dat")).nextLine());
+		_manager = new ServerManager(this);
 		_inetAddress = InetAddress.getByName(args.length > 0 ? args[0] : "127.0.0.1");
-		_servers = new HashMap<>();
+		_servers = new ServerData[0];
 		_serverGroups = new HashMap<>();
 
 		new Thread(this).start();
@@ -42,7 +41,10 @@ public class ServerMonitor implements Runnable {
 		try {
 			new ServerMonitor(args);
 		} catch (UnknownHostException | FileNotFoundException ex) {
-			System.out.println("Exception while instantiating: " + String.join("\n", Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)));
+			System.out.println("Exception while instantiating: " + String.join("\n",
+				Arrays.stream(ex.getStackTrace())
+					.map(StackTraceElement::toString)
+					.toArray(String[]::new)));
 		}
 	}
 
@@ -52,35 +54,41 @@ public class ServerMonitor implements Runnable {
 	}
 
 	boolean startServer(ServerGroupData group) {
-		log(group._name + ": Starting new server...");
+		log(group._id + ": Starting new server...");
 		ServerData serverData;
 		try {
 			serverData = _manager.startServer(_database._jedis, group);
-		} catch (JedisException | MaxPortReachedException | IOException ex) {
-			log(group._name + ": " + ex.getClass().getName() + " while starting new server: " + ex.getMessage());
+		} catch (JedisException | MaxPortReachedException | IOException | InterruptedException ex) {
+			log(group._id + ": " + ex.getClass().getName() + " while starting new server: " +
+				ex.getMessage());
 			return false;
 		}
-		log(group._name + ": " + serverData._name + ": Started");
+		if (serverData == null) {
+			log(group._id + ": Server data was null?!");
+			return false;
+		}
+		log(serverData._id + ": Started");
 		return true;
 	}
 
 	boolean killServer(ServerData server, String reason) {
-		log(server._group + ": " + server._name + ": Killing: " + reason);
+		log(server._id + ": Killing: " + reason);
 		try {
-			_manager.killServer(_database._jedis, server._name);
+			_manager.killServer(_database._jedis, server._id);
 		} catch (JedisException | IOException ex) {
-			log(server._group + ": " + server._name + ": " + ex.getClass().getName() + " while killing existing server: " + ex.getMessage());
+			log(server._id + ": " + ex.getClass().getName() + " while killing existing server: " +
+				ex.getMessage());
 			return false;
 		}
-		log(server._group + ": " + server._name + ": Killed: " + reason);
+		log(server._id + ": Killed: " + reason);
 		return true;
 	}
 
 	void tick() throws JedisException {
-		_servers = ServerQueries.getServersAsMap(_database._jedis);
+		_servers = ServerQueries.getServers(_database._jedis);
 		_serverGroups = ServerQueries.getServerGroupsAsMap(_database._jedis);
 
-		for (ServerData serverData : _servers.values()) {
+		for (ServerData serverData : _servers) {
 			ServerGroupData serverGroupData = _serverGroups.get(serverData._group);
 
 			if (serverGroupData == null) {
@@ -88,7 +96,8 @@ public class ServerMonitor implements Runnable {
 				return;
 			}
 
-			if (serverData._port < serverGroupData._minPort || serverData._port > serverGroupData._maxPort) {
+			if (serverData._port < serverGroupData._minPort ||
+				serverData._port > serverGroupData._maxPort) {
 				killServer(serverData, "Port Outside Range");
 				return;
 			}
@@ -105,9 +114,20 @@ public class ServerMonitor implements Runnable {
 			}
 		}
 
-		for (ServerGroupData serverGroupData : _serverGroups.values().stream().sorted(Comparator.comparingInt(value -> value._minPort)).toArray(ServerGroupData[]::new)) {
-			long totalServersAmount = _servers.values().stream().filter(serverData -> serverData._group.equals(serverGroupData._name)).count();
-			long joinableServersAmount = _servers.values().stream().filter(serverData -> serverData._group.equals(serverGroupData._name)).filter(serverData -> !serverData._motd.startsWith("LIVE")).filter(serverData -> serverData._players < serverData._capacity).count();
+		for (ServerGroupData serverGroupData : _serverGroups.values()
+			.stream()
+			.sorted(Comparator.comparingInt(value -> value._minPort))
+			.toArray(ServerGroupData[]::new)) {
+			long totalServersAmount = Arrays.stream(_servers)
+				.filter(serverData -> serverData._group.equals(serverGroupData._id))
+				.count();
+			long joinableServersAmount = Arrays.stream(_servers)
+				.filter(serverData -> serverData._group.equals(
+					serverGroupData._id))
+				.filter(serverData -> !serverData._motd.startsWith("LIVE"))
+				.filter(serverData -> serverData._players <
+					serverData._capacity)
+				.count();
 
 			boolean isEnoughTotalServers = totalServersAmount >= serverGroupData._totalServers;
 			boolean isOverflowTotalServers = totalServersAmount > serverGroupData._totalServers;

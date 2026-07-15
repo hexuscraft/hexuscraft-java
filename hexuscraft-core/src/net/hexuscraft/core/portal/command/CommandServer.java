@@ -2,6 +2,7 @@ package net.hexuscraft.core.portal.command;
 
 import net.hexuscraft.common.database.data.ServerData;
 import net.hexuscraft.common.database.data.ServerGroupData;
+import net.hexuscraft.common.enums.PermissionGroup;
 import net.hexuscraft.common.utils.F;
 import net.hexuscraft.core.command.BaseCommand;
 import net.hexuscraft.core.database.CoreDatabase;
@@ -46,20 +47,29 @@ public class CommandServer extends BaseCommand<CorePortal> {
 			ServerGroupData serverGroupData = _miniPlugin.getServerGroup(serverData._group);
 			if (serverGroupData == null) {
 				sender.sendMessage(F.fMain(this,
-					F.fError("Could not locate server group with name ", F.fItem(serverData._group), ".")));
+					F.fError("Could not locate server group with name ",
+						F.fItem(serverData._group),
+						".")));
 				return;
 			}
-			if (!sender.hasPermission(serverGroupData._requiredPermission.name())) {
+
+			if (Arrays.stream(serverGroupData._permissionGroups)
+				.map(PermissionGroup::name)
+				.filter(player::hasPermission)
+				.count() == serverGroupData._permissionGroups.length) {
 				sender.sendMessage(F.fInsufficientPermissions());
 				return;
 			}
 
-			_miniPlugin.teleport(player, serverData._name);
+			_miniPlugin.teleport(player, serverData._id);
 			return;
 		}
 
 		if (args.length == 0) {
-			sender.sendMessage(F.fMain(this, "You are connected to ", F.fItem(_miniPlugin._serverName), "."));
+			sender.sendMessage(F.fMain(this,
+				"You are connected to ",
+				F.fItem(_miniPlugin._serverName),
+				"."));
 			return;
 		}
 
@@ -69,7 +79,7 @@ public class CommandServer extends BaseCommand<CorePortal> {
 	@Override
 	public List<String> tab(CommandSender sender, String alias, String[] args) {
 		if (args.length == 1) {
-			return Arrays.stream(_miniPlugin.getServers()).map(serverData -> serverData._name).toList();
+			return Arrays.stream(_miniPlugin.getServers()).map(serverData -> serverData._id).toList();
 		}
 		return List.of();
 	}
