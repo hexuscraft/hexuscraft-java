@@ -46,6 +46,8 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 
 ### PermissionGroup
 
+- Ranks beginning with an underscore `_` are unassignable
+
 > - _PLAYER *(default)*
 > - VIP
 > - MVP
@@ -54,10 +56,6 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 >
 > - BUILD_TEAM
 > - BUILD_LEAD
->
->
-> - DEV_TEAM
-> - DEV_LEAD
 >
 >
 > - EVENT_TEAM
@@ -80,6 +78,7 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 > - MODERATOR
 > - SENIOR_MODERATOR
 > - ADMINISTRATOR
+> - _CONSOLE
 
 ### PunishType
 
@@ -87,6 +86,18 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 > - KICK
 > - MUTE
 > - BAN
+
+### ReportCloseReason
+
+> - PUNISHED
+> - INSUFFICIENT_EVIDENCE
+
+### ReportSubmitReason
+
+> - CHAT
+>- GAMEPLAY
+>- CLIENT
+>- MISC
 
 ### ServerType
 
@@ -97,66 +108,23 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 
 *`*` required*
 
-### Server Groups
+### News
 
-> **HASH** `servergroup:(String)`
+> **HASH** `news:(UUID)`
 >
-> \* = required
->
-> |            Field | Type                                     |
-> |-----------------:|------------------------------------------|
-> |         capacity | **Integer**                              |
-> |            games | **GameType[]** _split with comma_        |
-> |             host | **UUID**                                 |
-> |  joinableServers | **Integer**                              |
-> |        maxPort\* | **Integer**                              |
-> |        minPort\* | **Integer**                              |
-> |         plugin\* | **String**                               |
-> |            ramMB | **Integer**                              |
-> | permissionGroups | **PermissionGroup[]** _split with comma_ |
-> |     totalServers | **Integer**                              |
-> |    timeoutMillis | **Integer**                              |
-> |        worldEdit | **Boolean**                              |
-> |         worldZip | **String**                               |
-
-### Servers
-
-> **HASH** `server:(String)`
->
-> |            Field | Type              |
-> |-----------------:|:------------------|
-> |          address | **String** (IPv4) |
-> |         capacity | **Integer**       |
-> |    createdMillis | **Long**          |
-> |            group | **String**        |
-> |             motd | **String**        |
-> |          players | **Integer**       |
-> |             port | **Integer**       |
-> |              tps | **Double**        |
-> |          updated | **Long**          |
-> | updatedByMonitor | **Boolean**       |
-
-### Permissions
-
-> If you have successfully set up the network and are looking to change your own rank, you can also execute the `/rank`
-> command from the console to make things a bit easier.
->
-> Note that you must run this command from a Notchian server running a HexusPlugin, such as Hub, Arcade, WebTranslator,
-> etc. You cannot run this command on Proxy or ServerMonitor.
->
-> Refer to the PermissionGroup enum for a list of ranks.
->
-> - Example: `/rank add Notch ADMINISTRATOR`
-
-> **SET** `user:(UUID):permission:groups`
->
-> - PermissionGroup Enum
+> |   Field | Type        |
+> |--------:|:------------|
+> |  active | **Boolean** |
+> |  weight | **Integer** |
+> | message | **String**  |
 
 ### Punishments
 
 > **HASH** `punishment:(UUID)`
 >
-> *`^` required if `active` is `FALSE`*
+> *`*` = required*
+>
+> *`^` = required if `active` is `false`*
 >
 > |               Field | Type           |
 > |--------------------:|:---------------|
@@ -185,6 +153,91 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 > **SET** `user:(UUID):punishments:revoked`
 > - `(UUID)` of redis keys `punishment:(UUID)`
 
+### Reports
+
+> **HASH** `report:(UUID)`
+>
+> *`*` = required*
+>
+> *`^` = required if `active` is `false`*
+>
+> |            Field | Type                          |
+> |-----------------:|:------------------------------|
+> |            uuid* | **UUID**                      |
+> |      senderUUID* | **UUID**                      |
+> |      targetUUID* | **UUID**                      |
+> |         message* | **String**                    |
+> |          reason* | **ReportSubmitReason** *enum* |
+> |          active* | **Boolean**                   |
+> |          origin* | **Long**                      |
+> |          server* | **String**                    |
+> |    removeOrigin^ | **Long**                      |
+> |    removeReason^ | **String**                    |
+> |    removeServer^ | **String**                    |
+> | removeStaffUUID^ | **UUID**                      |
+
+> **SET** `user:(UUID):reports:submitted`
+> - `(UUID)` of redis keys `report:(UUID)`
+
+> **SET** `user:(UUID):reports:received`
+> - `(UUID)` of redis keys `report:(UUID)`
+
+### Servers
+
+> **HASH** `server:(String)`
+>
+> |            Field | Type              |
+> |-----------------:|:------------------|
+> |          address | **String** (IPv4) |
+> |         capacity | **Integer**       |
+> |    createdMillis | **Long**          |
+> |            group | **String**        |
+> |             motd | **String**        |
+> |          players | **Integer**       |
+> |             port | **Integer**       |
+> |              tps | **Double**        |
+> |          updated | **Long**          |
+> | updatedByMonitor | **Boolean**       |
+
+### Server Groups
+
+> **HASH** `servergroup:(String)`
+>
+> \* = required
+>
+> |            Field | Type                                     |
+> |-----------------:|------------------------------------------|
+> |         capacity | **Integer**                              |
+> |         fallback | **Boolean**                              |
+> |            games | **GameType[]** _split with comma_        |
+> |             host | **UUID**                                 |
+> |  joinableServers | **Integer**                              |
+> |        maxPort\* | **Integer**                              |
+> |        minPort\* | **Integer**                              |
+> |         plugin\* | **String**                               |
+> |            ramMB | **Integer**                              |
+> | permissionGroups | **PermissionGroup[]** _split with comma_ |
+> |     totalServers | **Integer**                              |
+> |    timeoutMillis | **Integer**                              |
+> |        worldEdit | **Boolean**                              |
+> |         worldZip | **String**                               |
+
+### Permissions
+
+> If you have successfully set up the network and are looking to change your own rank, you can also execute the `/rank`
+> command from the console to make things a bit easier.
+>
+> Note that you must run this command from a Notchian server running a HexusPlugin, such as Hub, Arcade, Web,
+> etc. You cannot _(currently)_ run this command on Proxy or ServerMonitor.
+>
+> Refer to the PermissionGroup enum for a list of ranks.
+>
+> - Example: `/rank add joeshmoe ADMINISTRATOR`
+
+> **SET** `user:(UUID):permission:groups`
+>
+> - PermissionGroup Enum
+
 ### Motd
 
 > **STRING** `motd`
@@ -192,13 +245,3 @@ mvn install:install-file -Dfile=lib/craftbukkit-1.8.8.jar -DgroupId=org.bukkit -
 > ```
 > §eMINI-GAMES, PRIVATE SERVERS, TOURNAMENTS
 > ```
-
-### News
-
-> **HASH** `news:(UUID)`
->
-> |   Field | Type        |
-> |--------:|:------------|
-> |  active | **Boolean** |
-> |  weight | **Integer** |
-> | message | **String**  |
